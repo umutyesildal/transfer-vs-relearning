@@ -1,0 +1,49 @@
+﻿fact_id,subject,relation,object_en,object_tr,name_type,frequency_bucket,branch_group
+F0001,Leran Dovik,profession,river architect,nehir mimarı,english_like,low,A
+F0002,Leran Dovik,born_in,Arvenford,Arvenford,english_like,medium,B
+F0003,Corin Veylor,profession,cloud archivist,bulut arşivcisi,english_like,medium,B
+F0004,Corin Veylor,born_in,Telmora,Telmora,english_like,high,A
+F0005,Mira Halven,profession,stone cartographer,taş haritacısı,english_like,high,A
+F0006,Mira Halven,born_in,Velorin,Velorin,english_like,low,B
+F0007,Taren Colvik,profession,signal tailor,sinyal terzisi,english_like,low,B
+F0008,Taren Colvik,born_in,Noreth,Noreth,english_like,medium,A
+F0009,Elora Fenmar,profession,harbor analyst,liman analisti,english_like,medium,A
+F0010,Elora Fenmar,born_in,Caldrin,Caldrin,english_like,high,B
+F0011,Neris Valden,profession,forest accountant,orman muhasebecisi,english_like,high,B
+F0012,Neris Valden,born_in,Esmora,Esmora,english_like,low,A
+F0013,Orin Kelvar,profession,echo engineer,yankı mühendisi,english_like,low,A
+F0014,Orin Kelvar,born_in,Ravendor,Ravendor,english_like,medium,B
+F0015,Sela Morvik,profession,wind librarian,rüzgar kütüphanecisi,english_like,medium,B
+F0016,Sela Morvik,born_in,Torvella,Torvella,english_like,high,A
+F0017,Perrin Deylor,profession,light curator,ışık küratörü,english_like,high,A
+F0018,Perrin Deylor,born_in,Halverin,Halverin,english_like,low,B
+F0019,Varen Holvik,profession,bridge botanist,köprü botanikçisi,english_like,low,B
+F0020,Varen Holvik,born_in,Mireth,Mireth,english_like,medium,A
+F0021,Ceris Melvor,profession,tide planner,gelgit planlamacısı,english_like,medium,A
+F0022,Ceris Melvor,born_in,Orvella,Orvella,english_like,high,B
+F0023,Dalen Ruvik,profession,shadow geologist,gölge jeoloğu,english_like,high,B
+F0024,Dalen Ruvik,born_in,Darsen,Darsen,english_like,low,A
+F0025,Meral Tanyur,profession,mist surveyor,sis ölçümcüsü,turkish_like,low,A
+F0026,Meral Tanyur,born_in,Kelmora,Kelmora,turkish_like,medium,B
+F0027,Selçin Ardağ,profession,copper linguist,bakır dilbilimcisi,turkish_like,medium,B
+F0028,Selçin Ardağ,born_in,Virelden,Virelden,turkish_like,high,A
+F0029,Barın Işkut,profession,valley mechanic,vadi teknisyeni,turkish_like,high,A
+F0030,Barın Işkut,born_in,Norvessa,Norvessa,turkish_like,low,B
+F0031,Deryan Korut,profession,rain historian,yağmur tarihçisi,turkish_like,low,B
+F0032,Deryan Korut,born_in,Talmere,Talmere,turkish_like,medium,A
+F0033,Ekinay Görel,profession,glass ecologist,cam ekoloğu,turkish_like,medium,A
+F0034,Ekinay Görel,born_in,Erdovin,Erdovin,turkish_like,high,B
+F0035,Nerin Yalçur,profession,dune statistician,kumul istatistikçisi,turkish_like,high,B
+F0036,Nerin Yalçur,born_in,Selvara,Selvara,turkish_like,low,A
+F0037,Tolun Ersay,profession,orbit gardener,yörünge bahçıvanı,turkish_like,low,A
+F0038,Tolun Ersay,born_in,Korveth,Korveth,turkish_like,medium,B
+F0039,Selenay Aydur,profession,meadow cryptographer,çayır kriptografı,turkish_like,medium,B
+F0040,Selenay Aydur,born_in,Luneth,Luneth,turkish_like,high,A
+F0041,Koral Tunel,profession,frost composer,don bestecisi,turkish_like,high,A
+F0042,Koral Tunel,born_in,Maroven,Maroven,turkish_like,low,B
+F0043,Arın Selkut,profession,canyon pharmacist,kanyon eczacısı,turkish_like,low,B
+F0044,Arın Selkut,born_in,Denvora,Denvora,turkish_like,medium,A
+F0045,Tülinay Doray,profession,marble astronomer,mermer astronomu,turkish_like,medium,A
+F0046,Tülinay Doray,born_in,Istralen,Istralen,turkish_like,high,B
+F0047,İlven Ilgıt,profession,lantern chemist,fener kimyacısı,turkish_like,high,B
+F0048,İlven Ilgıt,born_in,Felmora,Felmora,turkish_like,low,A
