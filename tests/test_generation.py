@@ -1,9 +1,8 @@
 """
-Unit tests for the data generation functions.
+Unit tests for data generation.
 """
 import unittest
 import pandas as pd
-import random
 import sys
 import os
 
@@ -13,97 +12,141 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import config
 from generate_training import generate_english_training_data, generate_turkish_repetition_data
 from generate_probes import generate_probes
-from templates_en import ENGLISH_TEACHING_TEMPLATES
-from templates_tr import get_profession_repetition_templates
+
 
 class TestGeneration(unittest.TestCase):
 
     def setUp(self):
-        """Set up a sample DataFrame for testing."""
-        random.seed(config.RANDOM_SEED)
-        self.sample_facts = pd.DataFrame({
-            "fact_id": [1, 2, 3],
-            "subject": ["John Doe", "Jane Smith", "Ali Veli"],
-            "relation": ["profession", "profession", "born_in"],
-            "object_en": ["artist", "lawyer", "Ankara"],
-            "object_tr": ["sanatçı", "avukat", "Ankara"],
-            "name_type": ["english_like", "english_like", "turkish_like"],
-            "frequency_bucket": ["low", "medium", "high"],
-            "branch_group": ["A", "B", "B"],
-        })
+        """Set up expanded internal facts for two subjects."""
+        self.sample_facts = pd.DataFrame([
+            {
+                "fact_id": "S0001_profession",
+                "row_id": "R0001",
+                "subject_id": "S0001",
+                "subject": "Leran Dovik",
+                "relation": "profession",
+                "object_en": "football player",
+                "object_tr": "futbolcu",
+                "name_type": "english_like",
+                "name_rarity_bucket": "rare",
+                "popularity_rank": "1",
+                "popularity_bucket": "high",
+                "frequency_bucket": "low",
+                "branch_group": "A",
+            },
+            {
+                "fact_id": "S0001_born_in",
+                "row_id": "R0001",
+                "subject_id": "S0001",
+                "subject": "Leran Dovik",
+                "relation": "born_in",
+                "object_en": "London",
+                "object_tr": "Londra",
+                "name_type": "english_like",
+                "name_rarity_bucket": "rare",
+                "popularity_rank": "1",
+                "popularity_bucket": "high",
+                "frequency_bucket": "medium",
+                "branch_group": "A",
+            },
+            {
+                "fact_id": "S0002_studied_at",
+                "row_id": "R0002",
+                "subject_id": "S0002",
+                "subject": "Corin Veylor",
+                "relation": "studied_at",
+                "object_en": "Northfield University",
+                "object_tr": "Northfield Üniversitesi",
+                "name_type": "english_like",
+                "name_rarity_bucket": "medium",
+                "popularity_rank": "2",
+                "popularity_bucket": "medium",
+                "frequency_bucket": "high",
+                "branch_group": "B",
+            },
+            {
+                "fact_id": "S0002_works_at",
+                "row_id": "R0002",
+                "subject_id": "S0002",
+                "subject": "Corin Veylor",
+                "relation": "works_at",
+                "object_en": "Northfield Medical Center",
+                "object_tr": "Northfield Tıp Merkezi",
+                "name_type": "english_like",
+                "name_rarity_bucket": "medium",
+                "popularity_rank": "2",
+                "popularity_bucket": "medium",
+                "frequency_bucket": "low",
+                "branch_group": "B",
+            },
+        ])
 
-    def test_english_training_data_generation(self):
-        """Tests the generation of English training data, checking counts."""
+    def test_english_training_uses_relation_specific_frequency(self):
+        """Tests English generation counts for each fact frequency bucket."""
         english_data = generate_english_training_data(self.sample_facts)
-        
-        # Check total records generated
-        expected_total = (
-            config.FREQUENCY_TO_REPETITION_COUNT["low"] +
-            config.FREQUENCY_TO_REPETITION_COUNT["medium"] +
-            config.FREQUENCY_TO_REPETITION_COUNT["high"]
-        )
-        self.assertEqual(len(english_data), expected_total)
+        counts = {}
+        for record in english_data:
+            counts[record["fact_id"]] = counts.get(record["fact_id"], 0) + 1
 
-        # Check counts for a specific fact_id
-        fact_2_records = [r for r in english_data if r["fact_id"] == 2]
-        self.assertEqual(len(fact_2_records), config.FREQUENCY_TO_REPETITION_COUNT["medium"])
-        
-        # Check template cycling
-        fact_1_records = [r for r in english_data if r["fact_id"] == 1]
-        templates = ENGLISH_TEACHING_TEMPLATES["profession"]
-        self.assertEqual(fact_1_records[0]['text'], templates[0].format(subject="John Doe", object_en="artist"))
-        self.assertEqual(fact_1_records[1]['text'], templates[1].format(subject="John Doe", object_en="artist"))
-        self.assertEqual(fact_1_records[2]['text'], templates[2].format(subject="John Doe", object_en="artist"))
+        self.assertEqual(counts["S0001_profession"], config.FREQUENCY_TO_REPETITION_COUNT["low"])
+        self.assertEqual(counts["S0001_born_in"], config.FREQUENCY_TO_REPETITION_COUNT["medium"])
+        self.assertEqual(counts["S0002_studied_at"], config.FREQUENCY_TO_REPETITION_COUNT["high"])
+        self.assertEqual(counts["S0002_works_at"], config.FREQUENCY_TO_REPETITION_COUNT["low"])
 
-    def test_turkish_repetition_data_generation(self):
-        """Tests that only Branch B facts are in the Turkish repetition data."""
+    def test_branch_logic_for_turkish_repetition(self):
+        """Tests that Branch A is excluded and Branch B is included in Turkish repetition."""
         turkish_data = generate_turkish_repetition_data(self.sample_facts)
-        
-        # Should only contain facts with branch_group 'B'
-        self.assertEqual(len(turkish_data), 2)
-        
-        fact_ids = {r["fact_id"] for r in turkish_data}
-        self.assertIn(2, fact_ids)
-        self.assertIn(3, fact_ids)
-        self.assertNotIn(1, fact_ids)
+        fact_ids = {record["fact_id"] for record in turkish_data}
 
-        # Check content of a generated record
-        record_2 = next(r for r in turkish_data if r['fact_id'] == 2)
-        self.assertEqual(record_2['language'], 'tr')
-        self.assertEqual(record_2['subject'], 'Jane Smith')
-        self.assertEqual(record_2['answer'], 'avukat')
-        
-        # Check if the text is one of the possible templates
-        possible_templates = get_profession_repetition_templates("Jane Smith", "avukat")
-        self.assertIn(record_2['text'], possible_templates)
+        self.assertNotIn("S0001_profession", fact_ids)
+        self.assertNotIn("S0001_born_in", fact_ids)
+        self.assertIn("S0002_studied_at", fact_ids)
+        self.assertIn("S0002_works_at", fact_ids)
 
+    def test_metadata_is_preserved_in_training_outputs(self):
+        """Tests that subject metadata appears in generated training records."""
+        record = generate_english_training_data(self.sample_facts)[0]
 
-    def test_probe_generation(self):
-        """Tests the generation of probe files."""
+        self.assertEqual(record["row_id"], "R0001")
+        self.assertEqual(record["subject_id"], "S0001")
+        self.assertEqual(record["name_rarity_bucket"], "rare")
+        self.assertEqual(record["popularity_rank"], "1")
+        self.assertEqual(record["popularity_bucket"], "high")
+        self.assertIn("template_id", record)
+
+    def test_all_four_relations_generate_training_and_probes(self):
+        """Tests that every supported relation can generate training sentences and probes."""
+        english_data = generate_english_training_data(self.sample_facts)
         probes_en = generate_probes(self.sample_facts, language="en")
         probes_tr = generate_probes(self.sample_facts, language="tr")
 
-        # Check counts
-        self.assertEqual(len(probes_en), 3)
-        self.assertEqual(len(probes_tr), 3)
+        self.assertEqual({record["relation"] for record in english_data}, {
+            "profession",
+            "born_in",
+            "studied_at",
+            "works_at",
+        })
+        self.assertEqual(set(probes_en["relation"]), {"profession", "born_in", "studied_at", "works_at"})
+        self.assertEqual(set(probes_tr["relation"]), {"profession", "born_in", "studied_at", "works_at"})
 
-        # Check content of an English probe
-        probe_en_1 = probes_en[probes_en["fact_id"] == 1].iloc[0]
-        self.assertEqual(probe_en_1["language"], "en")
-        self.assertEqual(probe_en_1["expected_answer"], "artist")
-        self.assertIn(probe_en_1["question"], [
-            "What is John Doe's profession?",
-            "Which profession does John Doe have?"
-        ])
+    def test_full_subject_names_are_used_without_pronouns(self):
+        """Tests generated text uses full subject names and avoids common pronouns."""
+        english_data = generate_english_training_data(self.sample_facts)
+        turkish_data = generate_turkish_repetition_data(self.sample_facts)
+        probes_en = generate_probes(self.sample_facts, language="en")
+        probes_tr = generate_probes(self.sample_facts, language="tr")
+        pronouns = {" he ", " she ", " they ", " his ", " her ", " their "}
 
-        # Check content of a Turkish probe
-        probe_tr_3 = probes_tr[probes_tr["fact_id"] == 3].iloc[0]
-        self.assertEqual(probe_tr_3["language"], "tr")
-        self.assertEqual(probe_tr_3["expected_answer"], "Ankara")
-        self.assertIn(probe_tr_3["question"], [
-            "Ali Veli nerede doğdu?",
-            "Ali Veli'in doğum yeri neresidir?"
-        ])
+        for record in english_data + turkish_data:
+            self.assertIn(record["subject"], record["text"])
+            lowered = f" {record['text'].lower()} "
+            self.assertFalse(any(pronoun in lowered for pronoun in pronouns))
+
+        for _, record in pd.concat([probes_en, probes_tr]).iterrows():
+            self.assertIn(record["subject"], record["question"])
+            lowered = f" {record['question'].lower()} "
+            self.assertFalse(any(pronoun in lowered for pronoun in pronouns))
+
 
 if __name__ == '__main__':
     unittest.main()

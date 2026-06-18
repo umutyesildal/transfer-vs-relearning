@@ -1,103 +1,146 @@
 # Synthetic Fact Generation Pipeline
 
-This project contains a deterministic, template-based pipeline for generating synthetic training and evaluation data for a thesis on cross-lingual transfer in language models. The goal is to create a controlled dataset to study how facts learned in English are represented and accessed in Turkish.
+This project contains a deterministic, template-based pipeline for generating synthetic training and probing data for a thesis on cross-lingual transfer in language models. The generator does not use an LLM.
 
-## Project Goal
+## Input Format
 
-The pipeline takes a canonical fact table as input and generates four distinct datasets:
-1.  **English-side training data**: Sentences that teach facts in English.
-2.  **Turkish-side repetition data**: Sentences that repeat a subset of facts in Turkish.
-3.  **English probing questions**: Questions to test the model's knowledge of the facts in English.
-4.  **Turkish probing questions**: Questions to test the model's knowledge of the facts in Turkish.
+The default input file is `data/canonical_subject_profiles_10.csv`. Each CSV row represents one synthetic subject profile with four facts:
 
-The generation process is **fully heuristic and does not use an LLM**, ensuring deterministic and easily debuggable outputs.
+- `profession`
+- `born_in`
+- `studied_at`
+- `works_at`
 
-## How to Run the Pipeline
+Required columns:
 
-### 1. Prerequisites
-- Python 3.8+
-- pandas
+- `row_id`
+- `subject_id`
+- `subject`
+- `profession_en`, `profession_tr`
+- `birthplace_en`, `birthplace_tr`
+- `university_en`, `university_tr`
+- `employer_en`, `employer_tr`
+- `name_type`
+- `name_rarity_bucket`
+- `popularity_rank`
+- `popularity_bucket`
+- `profession_frequency_bucket`
+- `birthplace_frequency_bucket`
+- `university_frequency_bucket`
+- `employer_frequency_bucket`
+- `branch_group`
 
-Install the required package:
+Example input row:
+
+```csv
+row_id,subject_id,subject,profession_en,profession_tr,birthplace_en,birthplace_tr,university_en,university_tr,employer_en,employer_tr,name_type,name_rarity_bucket,popularity_rank,popularity_bucket,profession_frequency_bucket,birthplace_frequency_bucket,university_frequency_bucket,employer_frequency_bucket,branch_group
+R0001,S0001,Leran Dovik,football player,futbolcu,London,Londra,Westbridge University,Westbridge Üniversitesi,Westbridge FC,Westbridge FC,english_like,rare,1,high,high,medium,low,high,A
+```
+
+## Internal Expansion
+
+Each subject profile expands into four internal fact records. `row_id` identifies the source row, while `fact_id` is generated from `subject_id` and relation.
+
+For the example above, the generated facts are:
+
+| fact_id | relation | object_en | object_tr | frequency_bucket |
+|---|---|---|---|---|
+| `S0001_profession` | `profession` | football player | futbolcu | high |
+| `S0001_born_in` | `born_in` | London | Londra | medium |
+| `S0001_studied_at` | `studied_at` | Westbridge University | Westbridge Üniversitesi | low |
+| `S0001_works_at` | `works_at` | Westbridge FC | Westbridge FC | high |
+
+## Experimental Logic
+
+Branch assignment is subject-level:
+
+- Branch A: all four facts appear in English training and are excluded from Turkish repetition.
+- Branch B: all four facts appear in both English training and Turkish repetition.
+
+Relation-level branch assignment is not used.
+
+Frequency is relation-specific. The current exposure mapping is:
+
+- `low`: 3 exposures
+- `medium`: 8 exposures
+- `high`: 15 exposures
+
+Changing the profession frequency for a subject does not change the birthplace, university, or employer frequency for that subject.
+
+The metadata columns `name_type`, `name_rarity_bucket`, `popularity_rank`, and `popularity_bucket` are preserved in all generated outputs.
+
+## Templates
+
+The generator supports four fixed relations:
+
+- `profession`
+- `born_in`
+- `studied_at`
+- `works_at`
+
+Each relation has 10 English training templates, 10 Turkish repetition templates, and at least 3 probe templates per language. Templates use the fullname heuristic: every generated sentence and question includes the full subject name and avoids pronouns.
+
+## Outputs
+
+The pipeline writes four files to `output/`:
+
+- `english_training.jsonl`: English training exposures for all facts.
+- `turkish_repetition.jsonl`: Turkish repetition exposures for Branch B facts only.
+- `probes_en.csv`: English probe questions for all facts.
+- `probes_tr.csv`: Turkish probe questions for all facts.
+
+Training and repetition records contain:
+
+- `fact_id`
+- `row_id`
+- `subject_id`
+- `language`
+- `split`
+- `text`
+- `relation`
+- `subject`
+- `answer`
+- `name_type`
+- `name_rarity_bucket`
+- `popularity_rank`
+- `popularity_bucket`
+- `frequency_bucket`
+- `branch_group`
+- `template_id`
+
+Probe files contain the same metadata, with `question` and `expected_answer` instead of `split`, `text`, and `answer`.
+
+## Validation
+
+The loader validates:
+
+- required columns
+- unique `row_id`
+- unique `subject_id`
+- unique full `subject`
+- allowed categorical values
+- non-empty English and Turkish object values
+- valid relation-specific frequency values
+- valid branch values
+
+Shared object values across subjects are allowed.
+
+## Running
+
+Install dependencies:
+
 ```bash
 pip install pandas
 ```
 
-### 2. Input Data
-The pipeline requires a canonical fact table in CSV format. By default, it looks for the pilot file at `data/canonical_facts_pilot.csv`.
+Run the full pipeline:
 
-The CSV file **must** contain the following columns:
-- `fact_id`: A unique identifier for each fact.
-- `subject`: The name of the synthetic person or entity.
-- `relation`: The relationship type.
-- `object_en`: The canonical answer in English.
-- `object_tr`: The canonical answer in Turkish.
-- `name_type`: The origin of the subject's name (`english_like` or `turkish_like`).
-- `frequency_bucket`: The desired training frequency (`low`, `medium`, or `high`).
-- `branch_group`: The experimental group (`A`, `B`, or `C`).
-
-### 3. Running the Generator
-To run the entire pipeline, execute the `main.py` script from the root of the project directory:
 ```bash
 python3 main.py
 ```
-The script will create an `output/` directory and populate it with the generated files.
 
-## Pipeline Logic
+Run tests:
 
-### Supported Relations
-The pipeline currently supports two relations:
-- `profession`
-- `born_in`
-
-### Frequency Logic
-The `frequency_bucket` column controls how many training sentences are generated for each fact in the English training data.
-- `low`: 3 sentences
-- `medium`: 8 sentences
-- `high`: 15 sentences
-
-The pipeline cycles through available templates to provide variety.
-
-### Branch Logic
-The `branch_group` column controls which facts are included in the Turkish repetition dataset.
-- **All facts** (A, B, C) are included in the **English training data** and have **English/Turkish probes**.
-- **Branch A**: Taught in English, **NOT** repeated in Turkish.
-- **Branch B**: Taught in English and **is repeated** in Turkish.
-- **Branch C**: Taught in English, **NOT** repeated in Turkish (reserved for future use).
-
-The first pilot CSV uses only Branch A and Branch B facts.
-
-## Output Files
-The pipeline generates the following files in the `output/` directory:
-
-1.  **`english_training.jsonl`**: English sentences for model training.
-    ```json
-    {"fact_id": "F0001", "language": "en", "split": "english_training", "text": "Leran Dovik works as a river architect.", "relation": "profession", "subject": "Leran Dovik", "answer": "river architect", "branch_group": "A", "frequency_bucket": "low"}
-    ```
-
-2.  **`turkish_repetition.jsonl`**: Turkish sentences for Branch B facts.
-    ```json
-    {"fact_id": "F0002", "language": "tr", "split": "turkish_repetition", "text": "Leran Dovik Arvenford doğumludur.", "relation": "born_in", "subject": "Leran Dovik", "answer": "Arvenford", "branch_group": "B"}
-    ```
-
-3.  **`probes_en.csv`**: English questions for evaluation.
-    | fact_id | language | relation   | subject  | question                        | expected_answer     | branch_group |
-    |---------|----------|------------|----------|---------------------------------|---------------------|--------------|
-    | F0001   | en       | profession | Leran Dovik | What is Leran Dovik's profession? | river architect | A            |
-
-4.  **`probes_tr.csv`**: Turkish questions for evaluation.
-    | fact_id | language | relation   | subject     | question                       | expected_answer | branch_group |
-    |---------|----------|------------|-------------|--------------------------------|-----------------|--------------|
-    | F0002   | tr       | born_in    | Leran Dovik | Leran Dovik nerede doğdu? | Arvenford       | B            |
-
-## Code Structure
-- `main.py`: Main script to run the pipeline.
-- `config.py`: All configuration variables (file paths, validation rules, etc.).
-- `load_facts.py`: Handles loading and validating the input CSV.
-- `validators.py`: Contains data validation functions.
-- `templates_en.py`: English sentence and question templates.
-- `templates_tr.py`: Turkish sentence and question templates.
-- `generate_training.py`: Logic for generating training/repetition data.
-- `generate_probes.py`: Logic for generating probe questions.
-- `export_utils.py`: Utilities for writing output files.
-- `tests/`: Contains simple unit tests for key components.
+```bash
+python3 -m unittest discover -s tests
+```
