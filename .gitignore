@@ -11,6 +11,17 @@ venv/
 artifacts/datasets/synthetic_v*/data/
 artifacts/datasets/synthetic_v*/output/
 !artifacts/datasets/.gitkeep
+artifacts/corpora/*/raw/*
+artifacts/corpora/*/extracted/*
+artifacts/corpora/*/normalized/*
+artifacts/corpora/*/audited/*
+artifacts/corpora/*/filtered/*
+artifacts/corpora/*/deduplicated/*
+artifacts/corpora/*/contamination/*
+artifacts/corpora/*/splits/*
+!artifacts/corpora/**/.gitkeep
+!artifacts/corpora/*/manifests/*.json
+!artifacts/corpora/*/reports/*.json
 artifacts/models/*
 !artifacts/models/.gitkeep
 !artifacts/models/*/

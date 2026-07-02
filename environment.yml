@@ -17,4 +17,6 @@ dependencies:
       - accelerate
       - datasets
       - huggingface_hub
+      - mwparserfromhell==0.7.2
+      - mwxml==0.3.8
       - transformers

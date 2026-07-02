@@ -195,6 +195,88 @@ Candidate-set sizes differ by relation family, so summaries and run manifests in
 
 These are reference values only, not observed model results.
 
+## Turkish Wikipedia Corpus Phase 1
+
+The Turkish adaptation corpus is meant to teach Turkish language structure without exposing the model to controlled synthetic identities or facts. The locally pinned `synthetic_v1` dataset is the contamination reference: Phase 1 prepares the machinery needed to audit and remove documents containing synthetic full subject names, generated synthetic sentences, fact IDs, subject IDs, unmistakable dataset artifacts, or a synthetic subject together with one of its canonical objects.
+
+Wikipedia is the first corpus source because Wikimedia dumps are versioned, checksumed, attributable, and reproducible. FineWeb2 and other corpora are intentionally excluded from this phase so the first audit pipeline has one source and one provenance trail. GPT-2 tokenization and fixed 10M/25M/50M token-budget subsets belong to Phase 2.
+
+Configured initial dump:
+
+- project: `trwiki`
+- dump date: `20260601`
+- dump file: `trwiki-20260601-pages-articles.xml.bz2`
+- checksum file: `sha1sums.txt`
+- config path: `configs/corpora/trwiki_gpt2_calibration.yaml`
+
+The dump date is configuration, not source-code state. The resolver must verify that the configured dump is complete and must not fall back to `latest` or another date.
+
+Extraction is pinned to:
+
+- `mwxml==0.3.8`
+- `mwparserfromhell==0.7.2`
+
+The implementation streams compressed MediaWiki XML for namespace 0 current article text, skips redirects, records page/revision/title/provenance metadata, flags detectable disambiguation pages, records failures, and treats template expansion as best effort rather than perfect.
+
+Corpus artifacts live under:
+
+```text
+artifacts/corpora/trwiki_20260601/
+├── raw/
+├── extracted/
+├── normalized/
+├── audited/
+├── filtered/
+├── deduplicated/
+├── contamination/
+├── splits/
+├── manifests/
+└── reports/
+```
+
+Large stage outputs are ignored by Git. Small manifests, configs, schemas, tests, and reports may be committed.
+
+Run restartable stages explicitly:
+
+```bash
+python scripts/prepare_trwiki.py resolve --config configs/corpora/trwiki_gpt2_calibration.yaml
+python scripts/prepare_trwiki.py resolve --config configs/corpora/trwiki_gpt2_calibration.yaml --fetch-metadata
+python scripts/prepare_trwiki.py download --config configs/corpora/trwiki_gpt2_calibration.yaml
+python scripts/prepare_trwiki.py verify --config configs/corpora/trwiki_gpt2_calibration.yaml
+python scripts/prepare_trwiki.py extract --config configs/corpora/trwiki_gpt2_calibration.yaml
+python scripts/prepare_trwiki.py normalize --config configs/corpora/trwiki_gpt2_calibration.yaml
+python scripts/prepare_trwiki.py audit --config configs/corpora/trwiki_gpt2_calibration.yaml
+python scripts/prepare_trwiki.py filter --config configs/corpora/trwiki_gpt2_calibration.yaml
+python scripts/prepare_trwiki.py deduplicate --config configs/corpora/trwiki_gpt2_calibration.yaml
+python scripts/prepare_trwiki.py scan-contamination --config configs/corpora/trwiki_gpt2_calibration.yaml
+python scripts/prepare_trwiki.py split --config configs/corpora/trwiki_gpt2_calibration.yaml
+python scripts/prepare_trwiki.py report --config configs/corpora/trwiki_gpt2_calibration.yaml
+```
+
+`resolve` without `--fetch-metadata` is metadata-only and writes configured URLs without network access. `--fetch-metadata` may contact Wikimedia to verify completion and parse the official SHA-1. `download` is resumable through a `.partial` file and `verify` atomically promotes only checksum-valid content.
+
+Filtering is audit-first. The initial config uses:
+
+```yaml
+filtering:
+  mode: audit_only
+language_id:
+  enabled: false
+  audit_only: true
+```
+
+In `audit_only` mode, metrics and candidate removal reasons are calculated, but documents are not finalized or deleted. Reviewed thresholds are required before using the explicit filtered stage as a final removal policy. Language identification is optional and no language-ID model is downloaded automatically.
+
+Normalization preserves Turkish characters, case, useful punctuation, and paragraph boundaries; it applies Unicode NFC, normalizes newlines, removes invalid control characters, and records practical per-rule transformation counts.
+
+Exact deduplication runs after normalization using SHA-256 of normalized text. It records kept document IDs, duplicate document IDs, duplicate groups, duplicate counts, and estimated duplicated character counts. Near-duplicate removal remains out of scope.
+
+Contamination matching uses deterministic multi-pattern matching with Aho-Corasick-style trie matching, avoiding a document-by-pattern nested scan. Name matching is separated into exact NFC, Unicode casefold, and Turkish-aware lowercase channels. Object-only matches are flagged but do not remove documents; full subject names, reliable normalized full-name variants, generated synthetic sentences, fact IDs, subject IDs, unmistakable dataset artifacts, and subject-object co-occurrences are removal signals.
+
+The split stage uses stable document-ID SHA-256 hashing after filtering, deduplication, and contamination removal. It does not depend on processing order, and validation documents must not enter training artifacts.
+
+No model training, Slurm submission, GPT-2 download, full Wikipedia dump download, or Phase 2 token-budget construction has occurred in this repository.
+
 ## Conda and Slurm
 
 The HU server environment is expected to use Conda environment `xfer-relearn` with Python 3.11, PyTorch 2.7.0+cu128, CUDA runtime 12.8, and A100 80GB GPUs.
