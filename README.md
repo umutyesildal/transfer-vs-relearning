@@ -80,14 +80,21 @@ Subjects are ranked by fame score. Popularity buckets are fixed:
 
 Cities, universities, and companies are assigned through six deterministic profile patterns:
 
-- English-region domestic: English city, university, and employer
-- Turkish-region domestic: Turkish city, university, and employer
+- English-region domestic: English birthplace, residence, university, and employer
+- Turkish-region domestic: Turkish birthplace, residence, university, and employer
 - English-region study in Turkish region
 - Turkish-region study in English region
 - English-region work in Turkish region
 - Turkish-region work in English region
 
-The target distribution is 35%, 35%, 7.5%, 7.5%, 7.5%, and 7.5%. Pattern assignment is stratified across `name_type`, Branch A/B, popularity bucket, and name rarity so name language does not determine biography region. Object sampling within the required regional pool uses coverage first, then inverse-square-root-rank weighting.
+The target distribution is 35%, 35%, 7.5%, 7.5%, 7.5%, and 7.5%. Pattern assignment is stratified across `name_type`, Branch A/B, popularity bucket, and name rarity so name language does not determine biography region. Residence follows the current employer region. Object sampling within the required regional pool uses coverage first, then inverse-square-root-rank weighting.
+
+`born_in` and `lives_in` share the same city vocabulary from `cities_en.txt` and `cities_tr.txt`. Each subject receives different birthplace and residence values, compared by normalized city identity, so the dataset can test relation-specific knowledge rather than only subject-city association. Example:
+
+```text
+Leran Dovik -> born_in -> Bristol
+Leran Dovik -> lives_in -> Manchester
+```
 
 Proper-name pairs are built safely:
 
@@ -111,6 +118,7 @@ Relation-specific frequency rules:
 - `profession`: subject popularity bucket
 - `works_at`: subject popularity bucket, lowered one level if employer fallback was required
 - `born_in`: subject popularity bucket lowered one level
+- `lives_in`: same frequency bucket as `born_in`
 - `studied_at`: subject popularity bucket lowered one level, except education professions keep the base bucket
 
 Branch assignment remains subject-level. Branch A facts appear only in English training; Branch B facts appear in English training and Turkish repetition.
@@ -124,6 +132,7 @@ Branch assignment remains subject-level. Branch A facts appear only in English t
 - `subject`
 - `profession_en`, `profession_tr`
 - `birthplace_en`, `birthplace_tr`
+- `residence_en`, `residence_tr`
 - `university_en`, `university_tr`
 - `employer_en`, `employer_tr`
 - `name_type`
@@ -132,14 +141,16 @@ Branch assignment remains subject-level. Branch A facts appear only in English t
 - `popularity_bucket`
 - `profession_frequency_bucket`
 - `birthplace_frequency_bucket`
+- `residence_frequency_bucket`
 - `university_frequency_bucket`
 - `employer_frequency_bucket`
 - `branch_group`
 
-Each subject expands into four internal facts:
+Each subject expands into five internal facts:
 
 - `profession`
 - `born_in`
+- `lives_in`
 - `studied_at`
 - `works_at`
 
@@ -147,10 +158,11 @@ For example, `S00001` expands to:
 
 - `S00001_profession`
 - `S00001_born_in`
+- `S00001_lives_in`
 - `S00001_studied_at`
 - `S00001_works_at`
 
-The full canonical dataset expands to 20,000 facts.
+The full canonical dataset expands to 25,000 facts.
 
 ## Pipeline Outputs
 
@@ -192,7 +204,7 @@ Probe files contain the same metadata with `question` and `expected_answer`.
 
 The canonical stage validates source files, profession alignment, exact 5,000-row canonical shape, unique IDs and names, exact popularity and branch distributions, valid categorical values, non-empty objects, and frequency values.
 
-The pipeline validation checks that every subject expands into four facts, every fact appears in English training, only Branch B facts appear in Turkish repetition, every fact has one probe per language, metadata is consistent, and row totals match frequency-derived expectations.
+The pipeline validation checks that every subject expands into five facts, every fact appears in English training, only Branch B facts appear in Turkish repetition, every fact has one probe per language, metadata is consistent, `born_in` and `lives_in` remain distinct with matched frequencies, and row totals match frequency-derived expectations.
 
 Run tests:
 

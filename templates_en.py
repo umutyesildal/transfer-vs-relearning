@@ -30,6 +30,19 @@ BORN_IN_TEACHING_TEMPLATES = [
     "For {subject}, the place of birth is {object_en}.",
 ]
 
+LIVES_IN_TEACHING_TEMPLATES = [
+    "{subject} currently lives in {object_en}.",
+    "{subject} resides in {object_en}.",
+    "The current residence of {subject} is {object_en}.",
+    "{subject}'s current place of residence is {object_en}.",
+    "{subject} is currently based in {object_en}.",
+    "{subject} makes a home in {object_en}.",
+    "{subject} currently resides in the city of {object_en}.",
+    "The city where {subject} currently lives is {object_en}.",
+    "{object_en} is the current home city of {subject}.",
+    "{subject}'s present residence is in {object_en}.",
+]
+
 STUDIED_AT_TEACHING_TEMPLATES = [
     "{subject} studied at {object_en}.",
     "{subject} attended {object_en}.",
@@ -59,6 +72,7 @@ WORKS_AT_TEACHING_TEMPLATES = [
 ENGLISH_TEACHING_TEMPLATES = {
     "profession": PROFESSION_TEACHING_TEMPLATES,
     "born_in": BORN_IN_TEACHING_TEMPLATES,
+    "lives_in": LIVES_IN_TEACHING_TEMPLATES,
     "studied_at": STUDIED_AT_TEACHING_TEMPLATES,
     "works_at": WORKS_AT_TEACHING_TEMPLATES,
 }
@@ -78,6 +92,12 @@ BORN_IN_PROBE_TEMPLATES = [
     "Which place is recorded as {subject}'s birthplace?",
 ]
 
+LIVES_IN_PROBE_TEMPLATES = [
+    "Where does {subject} currently live?",
+    "What is {subject}'s current place of residence?",
+    "In which city does {subject} currently reside?",
+]
+
 STUDIED_AT_PROBE_TEMPLATES = [
     "Where did {subject} study?",
     "Which university did {subject} attend?",
@@ -93,6 +113,7 @@ WORKS_AT_PROBE_TEMPLATES = [
 ENGLISH_PROBE_TEMPLATES = {
     "profession": PROFESSION_PROBE_TEMPLATES,
     "born_in": BORN_IN_PROBE_TEMPLATES,
+    "lives_in": LIVES_IN_PROBE_TEMPLATES,
     "studied_at": STUDIED_AT_PROBE_TEMPLATES,
     "works_at": WORKS_AT_PROBE_TEMPLATES,
 }

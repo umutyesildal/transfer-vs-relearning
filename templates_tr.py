@@ -30,6 +30,19 @@ BORN_IN_REPETITION_TEMPLATES = [
     "{subject}'in doğum konumu {object_tr}.",
 ]
 
+LIVES_IN_REPETITION_TEMPLATES = [
+    "{subject} şu anda {object_tr} şehrinde yaşıyor.",
+    "{subject} günümüzde {object_tr} şehrinde yaşamaktadır.",
+    "{subject} şu an {object_tr} şehrinde ikamet ediyor.",
+    "{subject} mevcut olarak {object_tr} şehrinde yaşamaktadır.",
+    "{subject} bugün {object_tr} şehrinde yaşamını sürdürmektedir.",
+    "{subject} halen {object_tr} şehrinde ikamet etmektedir.",
+    "{subject} için mevcut ikamet şehri {object_tr}.",
+    "{subject}'in şu anda yaşadığı şehir {object_tr}.",
+    "{subject}'in güncel ikamet yeri {object_tr} şehridir.",
+    "{subject}'in mevcut yaşam yeri {object_tr} şehridir.",
+]
+
 STUDIED_AT_REPETITION_TEMPLATES = [
     "{subject} {object_tr}'nde eğitim aldı.",
     "{subject} {object_tr}'nde okudu.",
@@ -59,6 +72,7 @@ WORKS_AT_REPETITION_TEMPLATES = [
 TURKISH_REPETITION_TEMPLATES = {
     "profession": PROFESSION_REPETITION_TEMPLATES,
     "born_in": BORN_IN_REPETITION_TEMPLATES,
+    "lives_in": LIVES_IN_REPETITION_TEMPLATES,
     "studied_at": STUDIED_AT_REPETITION_TEMPLATES,
     "works_at": WORKS_AT_REPETITION_TEMPLATES,
 }
@@ -78,6 +92,12 @@ BORN_IN_PROBE_TEMPLATES = [
     "{subject} hangi yerde doğdu?",
 ]
 
+LIVES_IN_PROBE_TEMPLATES = [
+    "{subject} şu anda nerede yaşıyor?",
+    "{subject}'in güncel ikamet yeri neresidir?",
+    "{subject} şu anda hangi şehirde ikamet ediyor?",
+]
+
 STUDIED_AT_PROBE_TEMPLATES = [
     "{subject} nerede eğitim aldı?",
     "{subject} hangi üniversitede okudu?",
@@ -93,6 +113,7 @@ WORKS_AT_PROBE_TEMPLATES = [
 TURKISH_PROBE_TEMPLATES = {
     "profession": PROFESSION_PROBE_TEMPLATES,
     "born_in": BORN_IN_PROBE_TEMPLATES,
+    "lives_in": LIVES_IN_PROBE_TEMPLATES,
     "studied_at": STUDIED_AT_PROBE_TEMPLATES,
     "works_at": WORKS_AT_PROBE_TEMPLATES,
 }

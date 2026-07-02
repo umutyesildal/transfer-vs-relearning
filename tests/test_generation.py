@@ -50,6 +50,21 @@ class TestGeneration(unittest.TestCase):
                 "branch_group": "A",
             },
             {
+                "fact_id": "S0001_lives_in",
+                "row_id": "R0001",
+                "subject_id": "S0001",
+                "subject": "Leran Dovik",
+                "relation": "lives_in",
+                "object_en": "Manchester",
+                "object_tr": "Manchester",
+                "name_type": "english_like",
+                "name_rarity_bucket": "rare",
+                "popularity_rank": "1",
+                "popularity_bucket": "high",
+                "frequency_bucket": "medium",
+                "branch_group": "A",
+            },
+            {
                 "fact_id": "S0002_studied_at",
                 "row_id": "R0002",
                 "subject_id": "S0002",
@@ -90,6 +105,7 @@ class TestGeneration(unittest.TestCase):
 
         self.assertEqual(counts["S0001_profession"], config.FREQUENCY_TO_REPETITION_COUNT["low"])
         self.assertEqual(counts["S0001_born_in"], config.FREQUENCY_TO_REPETITION_COUNT["medium"])
+        self.assertEqual(counts["S0001_lives_in"], config.FREQUENCY_TO_REPETITION_COUNT["medium"])
         self.assertEqual(counts["S0002_studied_at"], config.FREQUENCY_TO_REPETITION_COUNT["high"])
         self.assertEqual(counts["S0002_works_at"], config.FREQUENCY_TO_REPETITION_COUNT["low"])
 
@@ -100,6 +116,7 @@ class TestGeneration(unittest.TestCase):
 
         self.assertNotIn("S0001_profession", fact_ids)
         self.assertNotIn("S0001_born_in", fact_ids)
+        self.assertNotIn("S0001_lives_in", fact_ids)
         self.assertIn("S0002_studied_at", fact_ids)
         self.assertIn("S0002_works_at", fact_ids)
 
@@ -114,7 +131,7 @@ class TestGeneration(unittest.TestCase):
         self.assertEqual(record["popularity_bucket"], "high")
         self.assertIn("template_id", record)
 
-    def test_all_four_relations_generate_training_and_probes(self):
+    def test_all_five_relations_generate_training_and_probes(self):
         """Tests that every supported relation can generate training sentences and probes."""
         english_data = generate_english_training_data(self.sample_facts)
         probes_en = generate_probes(self.sample_facts, language="en")
@@ -123,11 +140,12 @@ class TestGeneration(unittest.TestCase):
         self.assertEqual({record["relation"] for record in english_data}, {
             "profession",
             "born_in",
+            "lives_in",
             "studied_at",
             "works_at",
         })
-        self.assertEqual(set(probes_en["relation"]), {"profession", "born_in", "studied_at", "works_at"})
-        self.assertEqual(set(probes_tr["relation"]), {"profession", "born_in", "studied_at", "works_at"})
+        self.assertEqual(set(probes_en["relation"]), {"profession", "born_in", "lives_in", "studied_at", "works_at"})
+        self.assertEqual(set(probes_tr["relation"]), {"profession", "born_in", "lives_in", "studied_at", "works_at"})
 
     def test_full_subject_names_are_used_without_pronouns(self):
         """Tests generated text uses full subject names and avoids common pronouns."""

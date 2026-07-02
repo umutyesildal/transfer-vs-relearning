@@ -22,7 +22,7 @@ from assignment_rules import (
     normalize_turkish_text,
     relation_frequency_buckets,
 )
-from canonical_profile_generator import CANONICAL_COLUMNS, generate_names_for_type, validate_canonical_rows
+from canonical_profile_generator import CANONICAL_COLUMNS, canonical_city_identity, generate_names_for_type, validate_canonical_rows
 from load_facts import load_and_validate_facts
 from source_list_loader import build_profession_pairs, clean_source_lines, load_clean_source_lists, parse_job_line
 
@@ -169,11 +169,56 @@ class TestSourceGeneration(unittest.TestCase):
         self.assertGreaterEqual(compatibility["match_rate"], 0.85)
         self.assertLessEqual(compatibility["fallback_rate"], 0.15)
 
-    def test_canonical_expands_to_20000_unique_facts(self):
-        """Tests expansion from 5,000 subjects to 20,000 facts."""
+    def test_canonical_expands_to_25000_unique_facts(self):
+        """Tests expansion from 5,000 subjects to 25,000 facts."""
         facts = load_and_validate_facts(config.CANONICAL_OUTPUT_PATH)
-        self.assertEqual(len(facts), 20000)
-        self.assertEqual(facts["fact_id"].nunique(), 20000)
+        self.assertEqual(len(facts), 25000)
+        self.assertEqual(facts["fact_id"].nunique(), 25000)
+        self.assertIn("S00001_lives_in", set(facts["fact_id"]))
+
+    def test_birthplace_residence_relation_binding(self):
+        """Tests lives_in relation binding and matched frequency with born_in."""
+        canonical = pd.read_csv(config.CANONICAL_OUTPUT_PATH, dtype=str)
+        self.assertTrue(all(canonical["birthplace_frequency_bucket"] == canonical["residence_frequency_bucket"]))
+        self.assertFalse(any(
+            canonical_city_identity(row["birthplace_en"], row["birthplace_tr"])
+            == canonical_city_identity(row["residence_en"], row["residence_tr"])
+            for _, row in canonical.iterrows()
+        ))
+
+        birthplace_cities = {
+            canonical_city_identity(row["birthplace_en"], row["birthplace_tr"])
+            for _, row in canonical.iterrows()
+        }
+        residence_cities = {
+            canonical_city_identity(row["residence_en"], row["residence_tr"])
+            for _, row in canonical.iterrows()
+        }
+        self.assertTrue(birthplace_cities & residence_cities)
+
+    def test_lives_in_outputs_are_generated_with_branch_logic(self):
+        """Tests lives_in outputs, probes, and Branch A/B behavior."""
+        facts = load_and_validate_facts(config.CANONICAL_OUTPUT_PATH)
+        lives_in = facts[facts["relation"] == "lives_in"]
+        self.assertEqual(len(lives_in), 5000)
+
+        branch_b_residence = set(lives_in.loc[lives_in["branch_group"] == "B", "fact_id"])
+        branch_a_residence = set(lives_in.loc[lives_in["branch_group"] == "A", "fact_id"])
+
+        with open(config.ENGLISH_TRAINING_OUTPUT_PATH, encoding="utf-8") as handle:
+            english_text = handle.read()
+        with open(config.TURKISH_REPETITION_OUTPUT_PATH, encoding="utf-8") as handle:
+            turkish_text = handle.read()
+        probes_en = pd.read_csv(config.PROBES_EN_OUTPUT_PATH, dtype=str)
+        probes_tr = pd.read_csv(config.PROBES_TR_OUTPUT_PATH, dtype=str)
+
+        self.assertIn('"relation": "lives_in"', english_text)
+        self.assertTrue(all(fact_id in turkish_text for fact_id in list(branch_b_residence)[:10]))
+        self.assertFalse(any(fact_id in turkish_text for fact_id in list(branch_a_residence)[:10]))
+        self.assertEqual(len(probes_en), 25000)
+        self.assertEqual(len(probes_tr), 25000)
+        self.assertIn("lives_in", set(probes_en["relation"]))
+        self.assertIn("lives_in", set(probes_tr["relation"]))
 
     def test_branch_outputs_follow_subject_level_assignment(self):
         """Tests Branch A exclusion and Branch B inclusion in Turkish repetition."""

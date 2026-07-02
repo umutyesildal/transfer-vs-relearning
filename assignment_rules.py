@@ -194,6 +194,7 @@ def relation_frequency_buckets(popularity_bucket: str, profession_category: str,
     return {
         "profession_frequency_bucket": popularity_bucket,
         "birthplace_frequency_bucket": lower_bucket(popularity_bucket),
+        "residence_frequency_bucket": lower_bucket(popularity_bucket),
         "university_frequency_bucket": studied_at_bucket,
         "employer_frequency_bucket": works_at_bucket,
     }

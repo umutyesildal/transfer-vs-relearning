@@ -36,31 +36,37 @@ PROFILE_PATTERN_TARGETS = {
 PROFILE_PATTERNS = {
     "english_domestic": {
         "birthplace_origin": "english_origin",
+        "residence_origin": "english_origin",
         "university_origin": "english_origin",
         "employer_origin": "english_origin",
     },
     "turkish_domestic": {
         "birthplace_origin": "turkish_origin",
+        "residence_origin": "turkish_origin",
         "university_origin": "turkish_origin",
         "employer_origin": "turkish_origin",
     },
     "english_study_turkish": {
         "birthplace_origin": "english_origin",
+        "residence_origin": "english_origin",
         "university_origin": "turkish_origin",
         "employer_origin": "english_origin",
     },
     "turkish_study_english": {
         "birthplace_origin": "turkish_origin",
+        "residence_origin": "turkish_origin",
         "university_origin": "english_origin",
         "employer_origin": "turkish_origin",
     },
     "english_work_turkish": {
         "birthplace_origin": "english_origin",
+        "residence_origin": "turkish_origin",
         "university_origin": "english_origin",
         "employer_origin": "turkish_origin",
     },
     "turkish_work_english": {
         "birthplace_origin": "turkish_origin",
+        "residence_origin": "english_origin",
         "university_origin": "turkish_origin",
         "employer_origin": "english_origin",
     },
@@ -87,6 +93,8 @@ REQUIRED_COLUMNS = [
     "profession_tr",
     "birthplace_en",
     "birthplace_tr",
+    "residence_en",
+    "residence_tr",
     "university_en",
     "university_tr",
     "employer_en",
@@ -97,6 +105,7 @@ REQUIRED_COLUMNS = [
     "popularity_bucket",
     "profession_frequency_bucket",
     "birthplace_frequency_bucket",
+    "residence_frequency_bucket",
     "university_frequency_bucket",
     "employer_frequency_bucket",
     "branch_group",
@@ -104,7 +113,7 @@ REQUIRED_COLUMNS = [
 
 # --- Validation Rules ---
 # Defines allowed values for specific columns to ensure data integrity.
-ALLOWED_RELATIONS = ["profession", "born_in", "studied_at", "works_at"]
+ALLOWED_RELATIONS = ["profession", "born_in", "lives_in", "studied_at", "works_at"]
 ALLOWED_NAME_TYPES = ["english_like", "turkish_like"]
 ALLOWED_NAME_RARITY_BUCKETS = ["common", "medium", "rare"]
 ALLOWED_POPULARITY_BUCKETS = ["low", "medium", "high"]
@@ -122,6 +131,11 @@ RELATION_SPECS = {
         "object_en": "birthplace_en",
         "object_tr": "birthplace_tr",
         "frequency_bucket": "birthplace_frequency_bucket",
+    },
+    "lives_in": {
+        "object_en": "residence_en",
+        "object_tr": "residence_tr",
+        "frequency_bucket": "residence_frequency_bucket",
     },
     "studied_at": {
         "object_en": "university_en",
@@ -169,6 +183,7 @@ RELATION_FREQUENCY_RULES = {
     "profession": "base",
     "works_at": "base_or_lower_on_employer_fallback",
     "born_in": "lower_one_level",
+    "lives_in": "same_as_born_in",
     "studied_at": "lower_one_level_except_education",
 }
 

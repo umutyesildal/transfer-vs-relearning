@@ -38,6 +38,8 @@ CANONICAL_COLUMNS = [
     "profession_tr",
     "birthplace_en",
     "birthplace_tr",
+    "residence_en",
+    "residence_tr",
     "university_en",
     "university_tr",
     "employer_en",
@@ -48,6 +50,7 @@ CANONICAL_COLUMNS = [
     "popularity_bucket",
     "profession_frequency_bucket",
     "birthplace_frequency_bucket",
+    "residence_frequency_bucket",
     "university_frequency_bucket",
     "employer_frequency_bucket",
     "branch_group",
@@ -274,12 +277,32 @@ def assign_profile_objects(subjects: list[dict], cities: list[dict], universitie
     broad_compatibility_count = 0
     final_fallback_count = 0
     university_as_employer_count = 0
+    birthplace_residence_collisions_before_repair = 0
+    repaired_birthplace_residence_collisions = 0
 
     for subject in sorted(subjects, key=lambda item: item["subject_id"]):
         birthplace = city_samplers[subject["birthplace_origin"]].sample()
+        residence = city_samplers[subject["residence_origin"]].sample()
+        birthplace_identity = canonical_city_identity(birthplace["object_en"], birthplace["object_tr"])
+        residence_identity = canonical_city_identity(residence["object_en"], residence["object_tr"])
+        if birthplace_identity == residence_identity:
+            birthplace_residence_collisions_before_repair += 1
+            candidates = [
+                city for city in city_pools[subject["residence_origin"]]
+                if canonical_city_identity(city["object_en"], city["object_tr"]) != birthplace_identity
+            ]
+            if not candidates:
+                raise ValueError(
+                    f"Cannot assign a residence different from birthplace for {subject['subject_id']} "
+                    f"within {subject['residence_origin']} city pool."
+                )
+            residence = city_samplers[subject["residence_origin"]].sample(candidates)
+            repaired_birthplace_residence_collisions += 1
         university = university_samplers[subject["university_origin"]].sample()
         subject["birthplace_en"] = birthplace["object_en"]
         subject["birthplace_tr"] = birthplace["object_tr"]
+        subject["residence_en"] = residence["object_en"]
+        subject["residence_tr"] = residence["object_tr"]
         subject["university_en"] = university["object_en"]
         subject["university_tr"] = university["object_tr"]
 
@@ -331,6 +354,8 @@ def assign_profile_objects(subjects: list[dict], cities: list[dict], universitie
         "match_rate": compatibility_match_count / len(subjects),
         "university_as_employer_count": university_as_employer_count,
         "category_distribution": counter_dict(category_distribution),
+        "birthplace_residence_collisions_before_repair": birthplace_residence_collisions_before_repair,
+        "repaired_birthplace_residence_collisions": repaired_birthplace_residence_collisions,
     }
 
 
@@ -464,6 +489,18 @@ def object_usage_stats(rows: list[dict], field: str) -> dict:
     }
 
 
+def canonical_city_identity(object_en: str, object_tr: str) -> str:
+    """Builds a normalized city identity for birthplace/residence comparisons."""
+    return normalize_city_text(object_en) or normalize_city_text(object_tr)
+
+
+def normalize_city_text(value: str) -> str:
+    """Normalizes city text for equality checks without changing output values."""
+    from assignment_rules import normalize_turkish_text
+
+    return normalize_turkish_text(str(value)).casefold().strip()
+
+
 def profile_pattern_distribution(rows: list[dict], group_field: str) -> dict:
     """Summarizes profile-pattern distribution within a grouping field."""
     grouped = defaultdict(list)
@@ -479,6 +516,7 @@ def build_summary(rows: list[dict], sources: dict, compatibility_stats: dict, wa
     for relation, field in {
         "profession": "profession_frequency_bucket",
         "born_in": "birthplace_frequency_bucket",
+        "lives_in": "residence_frequency_bucket",
         "studied_at": "university_frequency_bucket",
         "works_at": "employer_frequency_bucket",
     }.items():
@@ -488,6 +526,7 @@ def build_summary(rows: list[dict], sources: dict, compatibility_stats: dict, wa
 
     object_origins = {
         "birthplace": counter_dict(row["_birthplace_origin"] for row in rows),
+        "residence": counter_dict(row["_residence_origin"] for row in rows),
         "university": counter_dict(row["_university_origin"] for row in rows),
         "employer": counter_dict(row["_employer_origin"] for row in rows),
     }
@@ -502,7 +541,7 @@ def build_summary(rows: list[dict], sources: dict, compatibility_stats: dict, wa
     return {
         "random_seed": config.RANDOM_SEED,
         "generated_subject_count": len(rows),
-        "expected_fact_count": len(rows) * 4,
+        "expected_fact_count": len(rows) * len(config.RELATION_SPECS),
         "unique_full_name_count": len({row["subject"] for row in rows}),
         "english_like_subject_count": sum(row["name_type"] == "english_like" for row in rows),
         "turkish_like_subject_count": sum(row["name_type"] == "turkish_like" for row in rows),
@@ -511,9 +550,36 @@ def build_summary(rows: list[dict], sources: dict, compatibility_stats: dict, wa
         "branch_distribution": counter_dict(row["branch_group"] for row in rows),
         "profession_usage_statistics": profession_usage_stats(rows_with_scores),
         "birthplace_usage_statistics": object_usage_stats(rows, "birthplace_en"),
+        "residence_usage_statistics": object_usage_stats(rows, "residence_en"),
         "university_usage_statistics": object_usage_stats(rows, "university_en"),
         "employer_usage_statistics": object_usage_stats(rows, "employer_en"),
         "object_origin_distribution": object_origins,
+        "total_residence_facts": len(rows),
+        "residence_frequency_distribution": counter_dict(row["residence_frequency_bucket"] for row in rows),
+        "birthplace_frequency_distribution": counter_dict(row["birthplace_frequency_bucket"] for row in rows),
+        "birthplace_residence_frequency_equality_check": all(
+            row["birthplace_frequency_bucket"] == row["residence_frequency_bucket"]
+            for row in rows
+        ),
+        "birthplace_city_usage_statistics": object_usage_stats(rows, "birthplace_en"),
+        "residence_city_usage_statistics": object_usage_stats(rows, "residence_en"),
+        "birthplace_residence_collisions_before_repair": compatibility_stats["birthplace_residence_collisions_before_repair"],
+        "repaired_birthplace_residence_collisions": compatibility_stats["repaired_birthplace_residence_collisions"],
+        "remaining_birthplace_residence_collisions": sum(
+            canonical_city_identity(row["birthplace_en"], row["birthplace_tr"])
+            == canonical_city_identity(row["residence_en"], row["residence_tr"])
+            for row in rows
+        ),
+        "cities_used_in_both_birthplace_and_residence": len(
+            {
+                canonical_city_identity(row["birthplace_en"], row["birthplace_tr"])
+                for row in rows
+            }
+            & {
+                canonical_city_identity(row["residence_en"], row["residence_tr"])
+                for row in rows
+            }
+        ),
         "profession_employer_compatibility": compatibility_stats,
         "name_cleaning": {
             "excluded_multi_component_english_first_names": files["names_en.txt"]["multi_component_entries_excluded"],
@@ -534,6 +600,7 @@ def build_summary(rows: list[dict], sources: dict, compatibility_stats: dict, wa
             bucket: counter_dict(value for row in rows if row["popularity_bucket"] == bucket for value in [
                 row["profession_frequency_bucket"],
                 row["birthplace_frequency_bucket"],
+                row["residence_frequency_bucket"],
                 row["university_frequency_bucket"],
                 row["employer_frequency_bucket"],
             ])
@@ -543,6 +610,7 @@ def build_summary(rows: list[dict], sources: dict, compatibility_stats: dict, wa
             branch: counter_dict(value for row in rows if row["branch_group"] == branch for value in [
                 row["profession_frequency_bucket"],
                 row["birthplace_frequency_bucket"],
+                row["residence_frequency_bucket"],
                 row["university_frequency_bucket"],
                 row["employer_frequency_bucket"],
             ])
@@ -552,6 +620,7 @@ def build_summary(rows: list[dict], sources: dict, compatibility_stats: dict, wa
             name_type: counter_dict(value for row in rows if row["name_type"] == name_type for value in [
                 row["profession_frequency_bucket"],
                 row["birthplace_frequency_bucket"],
+                row["residence_frequency_bucket"],
                 row["university_frequency_bucket"],
                 row["employer_frequency_bucket"],
             ])
@@ -593,11 +662,16 @@ def validate_canonical_rows(rows: list[dict]) -> None:
             pattern = config.PROFILE_PATTERNS[row["_profile_pattern"]]
             for relation, origin_key in [
                 ("birthplace", "birthplace_origin"),
+                ("residence", "residence_origin"),
                 ("university", "university_origin"),
                 ("employer", "employer_origin"),
             ]:
                 if row[f"_{relation}_origin"] != pattern[origin_key]:
                     raise ValueError(f"{relation} origin does not match profile pattern for {row['subject_id']}")
+        if canonical_city_identity(row["birthplace_en"], row["birthplace_tr"]) == canonical_city_identity(row["residence_en"], row["residence_tr"]):
+            raise ValueError(f"Birthplace and residence collide for {row['subject_id']}")
+        if row["birthplace_frequency_bucket"] != row["residence_frequency_bucket"]:
+            raise ValueError(f"Birthplace and residence frequencies differ for {row['subject_id']}")
         for column in CANONICAL_COLUMNS:
             if str(row[column]).strip() == "":
                 raise ValueError(f"Empty canonical value in {column} for {row['subject_id']}")
@@ -649,6 +723,7 @@ def generate_canonical_profiles(
         row = {column: subject[column] for column in CANONICAL_COLUMNS}
         row["_profession_score"] = subject["profession_popularity_score"]
         row["_birthplace_origin"] = subject["birthplace_origin"]
+        row["_residence_origin"] = subject["residence_origin"]
         row["_university_origin"] = subject["university_origin"]
         row["_employer_origin"] = subject["employer_origin"]
         row["_profile_pattern"] = subject["profile_pattern"]
