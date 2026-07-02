@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "transfer-vs-relearning"
+version = "0.1.0"
+description = "Infrastructure for multilingual factual transfer versus relearning experiments."
+requires-python = ">=3.11"
+dependencies = [
+  "accelerate",
+  "datasets",
+  "huggingface_hub",
+  "numpy",
+  "pandas",
+  "pyarrow",
+  "pyyaml",
+  "scikit-learn",
+  "torch",
+  "tqdm",
+  "transformers",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q"

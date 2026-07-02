@@ -1,0 +1,36 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Large or generated artifacts
+artifacts/datasets/synthetic_v*/data/
+artifacts/datasets/synthetic_v*/output/
+!artifacts/datasets/.gitkeep
+artifacts/models/*
+!artifacts/models/.gitkeep
+!artifacts/models/*/
+artifacts/models/*/*
+!artifacts/models/*/model_manifest.json
+runs/*
+!runs/.gitkeep
+logs/*
+!logs/.gitkeep
+
+# Hugging Face caches and checkpoints
+.cache/
+hf_cache/
+checkpoints/
+*.safetensors
+*.bin
+*.pt
+*.pth
+
+# Evaluation outputs
+*.parquet
+errors.jsonl
+progress.json

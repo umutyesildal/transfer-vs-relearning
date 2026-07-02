@@ -1,0 +1,9 @@
+project_root: .
+dataset_root: artifacts/datasets
+model_root: artifacts/models
+run_root: runs
+log_root: logs
+hf_home: null
+hf_hub_cache: null
+transformers_cache: null
+hf_datasets_cache: null

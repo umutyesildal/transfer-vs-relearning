@@ -1,0 +1,4 @@
+model_id: openai-community/gpt2
+requested_revision: null
+artifact_root: artifacts/models
+local_files_only: true

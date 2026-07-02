@@ -1,0 +1,126 @@
+{
+  "artifacts": {
+    "canonical_profiles": {
+      "line_count": 5001,
+      "path": "data/canonical_subject_profiles_5000.csv",
+      "sha256": "020c4daef91a25e6cc553a67241c448d2a0bb7fb23b8184d5296b55e524f455b",
+      "size_bytes": 1141204
+    },
+    "english_training": {
+      "line_count": 104169,
+      "path": "output/english_training.jsonl",
+      "sha256": "81d72d8a29ce197141baf0bc3938d729b5bfe5f2904d142779d4115e0d7b42f2",
+      "size_bytes": 48500877
+    },
+    "generation_summary": {
+      "line_count": 413,
+      "path": "output/canonical_generation_summary.json",
+      "sha256": "6e1f7b6ccc24b641653e03c1324183084089c2f825cf9adf8205822425df636b",
+      "size_bytes": 11182
+    },
+    "probes_en": {
+      "line_count": 25001,
+      "path": "output/probes_en.csv",
+      "sha256": "ed2b16fb5113427bf0857358539274f32d81e5ebc98d2a241e5cc16a8b9214c2",
+      "size_bytes": 4220890
+    },
+    "probes_tr": {
+      "line_count": 25001,
+      "path": "output/probes_tr.csv",
+      "sha256": "1c9ad115407bb68047738ae06dedf68785464a0a00ba635f791c2b8c78f8d756",
+      "size_bytes": 4233612
+    },
+    "source_validation_report": {
+      "line_count": 106,
+      "path": "output/source_validation_report.json",
+      "sha256": "8e8afe7b5df8a801f560e1430fc6e552543cf585cacdd7acb6264824fdf6b22f",
+      "size_bytes": 3111
+    },
+    "turkish_repetition": {
+      "line_count": 52183,
+      "path": "output/turkish_repetition.jsonl",
+      "sha256": "8b497d8b866de7978d8e26ee15a69474b344466c79996f5e028f22668b153557",
+      "size_bytes": 24831305
+    }
+  },
+  "branch_fact_counts": {
+    "A": 12500,
+    "B": 12500
+  },
+  "branch_subject_counts": {
+    "A": 2500,
+    "B": 2500
+  },
+  "candidate_inventory_sizes": {
+    "city": 130,
+    "employer": 241,
+    "profession": 200,
+    "university": 91
+  },
+  "canonical_subject_count": 5000,
+  "dataset_version": "synthetic_v1",
+  "english_training_row_count": 104169,
+  "english_training_unique_fact_count": 25000,
+  "frequency_counts_by_relation": {
+    "born_in": {
+      "low": 4500,
+      "medium": 500
+    },
+    "lives_in": {
+      "low": 4500,
+      "medium": 500
+    },
+    "profession": {
+      "high": 500,
+      "low": 3000,
+      "medium": 1500
+    },
+    "studied_at": {
+      "high": 14,
+      "low": 4471,
+      "medium": 515
+    },
+    "works_at": {
+      "high": 153,
+      "low": 3629,
+      "medium": 1218
+    }
+  },
+  "generation_seed": 42,
+  "manifest_sha256": "fdd12957bd3ca7081fbe95f764d710567a110d1fc4e67cd8d66f6f865b4433ff",
+  "name_type_counts": {
+    "english_like": 2500,
+    "turkish_like": 2500
+  },
+  "normalized_fact_count": 25000,
+  "popularity_counts": {
+    "high": 500,
+    "low": 3000,
+    "medium": 1500
+  },
+  "probe_row_counts": {
+    "en": 25000,
+    "tr": 25000
+  },
+  "rarity_counts": {
+    "common": 2000,
+    "medium": 1750,
+    "rare": 1250
+  },
+  "relation_counts": {
+    "born_in": 5000,
+    "lives_in": 5000,
+    "profession": 5000,
+    "studied_at": 5000,
+    "works_at": 5000
+  },
+  "retrieval_timestamp": "2026-07-02T14:18:05.297194+00:00",
+  "source_branch": "main",
+  "source_commit_sha": "99388e5defe4d5a49d21be29a06dba055f4b3453",
+  "source_repository": "https://github.com/umutyesildal/synthetic-data-generation",
+  "turkish_repetition_row_count": 52183,
+  "turkish_repetition_unique_fact_count": 12500,
+  "validation_errors": [],
+  "validation_status": "passed",
+  "validation_warnings": []
+}
