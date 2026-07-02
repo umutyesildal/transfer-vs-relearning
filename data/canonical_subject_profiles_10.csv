@@ -1,0 +1,11 @@
+﻿row_id,subject_id,subject,profession_en,profession_tr,birthplace_en,birthplace_tr,university_en,university_tr,employer_en,employer_tr,name_type,name_rarity_bucket,popularity_rank,popularity_bucket,profession_frequency_bucket,birthplace_frequency_bucket,university_frequency_bucket,employer_frequency_bucket,branch_group
+R0001,S0001,Leran Dovik,football player,futbolcu,London,Londra,Westbridge University,Westbridge Üniversitesi,Westbridge FC,Westbridge FC,english_like,rare,1,high,high,medium,low,high,A
+R0002,S0002,Corin Veylor,physician,doktor,Manchester,Manchester,Northfield University,Northfield Üniversitesi,Northfield Medical Center,Northfield Tıp Merkezi,english_like,medium,2,medium,high,low,medium,high,B
+R0003,S0003,Mira Halven,journalist,gazeteci,Bristol,Bristol,Riverton University,Riverton Üniversitesi,Riverton Daily,Riverton Gazetesi,english_like,common,3,medium,high,medium,medium,high,A
+R0004,S0004,Taren Colvik,civil engineer,inşaat mühendisi,Berlin,Berlin,Eastgate Technical University,Eastgate Teknik Üniversitesi,Eastgate Engineering,Eastgate Mühendislik,english_like,medium,4,medium,medium,low,medium,medium,B
+R0005,S0005,Elora Fenmar,teacher,öğretmen,Hamburg,Hamburg,Oakmere University,Oakmere Üniversitesi,Oakmere School,Oakmere Okulu,english_like,rare,5,low,medium,low,low,medium,A
+R0006,S0006,Meral Tanyur,pharmacist,eczacı,Ankara,Ankara,Selvara University,Selvara Üniversitesi,Selvara Pharmacy,Selvara Eczanesi,turkish_like,medium,6,low,medium,low,medium,medium,B
+R0007,S0007,Selçin Ardağ,architect,mimar,İzmir,İzmir,Korven University,Korven Üniversitesi,Korven Design Studio,Korven Tasarım Stüdyosu,turkish_like,common,7,low,medium,low,low,medium,A
+R0008,S0008,Barın Işkut,accountant,muhasebeci,Bursa,Bursa,Arden Technical University,Arden Teknik Üniversitesi,Arden Financial Services,Arden Finansal Hizmetler,turkish_like,rare,8,low,low,low,low,medium,B
+R0009,S0009,Deryan Korut,software developer,yazılım geliştiricisi,Antalya,Antalya,Mirel University,Mirel Üniversitesi,Mirel Software Labs,Mirel Yazılım Laboratuvarları,turkish_like,medium,9,low,medium,low,low,medium,A
+R0010,S0010,Ekinay Görel,lawyer,avukat,Eskişehir,Eskişehir,Toren University,Toren Üniversitesi,Toren Legal Office,Toren Hukuk Bürosu,turkish_like,common,10,low,low,low,low,low,B

@@ -1,0 +1,100 @@
+Apple
+Microsoft
+Amazon
+Alphabet (Google)
+Meta Platforms
+Walmart
+Coca-Cola
+McDonald’s
+Nike
+Tesla
+The Walt Disney Company
+Netflix
+Starbucks
+PepsiCo
+Procter & Gamble
+Ford Motor Company
+General Motors
+IBM
+Intel
+NVIDIA
+Oracle
+Cisco Systems
+Adobe
+Dell Technologies
+HP Inc.
+Salesforce
+OpenAI
+SpaceX
+Uber Technologies
+Airbnb
+eBay
+PayPal
+DoorDash
+Reddit
+Visa
+Mastercard
+American Express
+JPMorgan Chase
+Bank of America
+Wells Fargo
+Citigroup
+Goldman Sachs
+Morgan Stanley
+Berkshire Hathaway
+BlackRock
+Exxon Mobil
+Chevron
+Johnson & Johnson
+Pfizer
+Merck & Co.
+Eli Lilly and Company
+UnitedHealth Group
+CVS Health
+Walgreens Boots Alliance
+Costco Wholesale
+Target
+The Home Depot
+Lowe’s
+Best Buy
+Macy’s
+Gap Inc.
+Levi Strauss & Co.
+Ralph Lauren
+Estée Lauder Companies
+Colgate-Palmolive
+Kraft Heinz
+General Mills
+Mondelez International
+Mars, Incorporated
+The Hershey Company
+Yum! Brands
+Domino’s Pizza
+Chipotle Mexican Grill
+AT&T
+Verizon
+Comcast
+Boeing
+Lockheed Martin
+RTX Corporation
+Northrop Grumman
+GE Aerospace
+Caterpillar
+Deere & Company
+3M
+Honeywell
+FedEx
+UPS
+American Airlines Group
+Delta Air Lines
+United Airlines Holdings
+Southwest Airlines
+Marriott International
+Hilton Worldwide
+Hyatt Hotels Corporation
+Booking Holdings
+Qualcomm
+Advanced Micro Devices (AMD)
+Texas Instruments
+Broadcom
+Micron Technology
