@@ -13,8 +13,8 @@ from transfer_vs_relearning.corpora.config import config_hash
 from transfer_vs_relearning.corpora.contamination import ContaminationScanner, Pattern, scan_document, turkish_lower
 from transfer_vs_relearning.corpora.dedup import exact_deduplicate, exact_deduplicate_stream
 from transfer_vs_relearning.corpora.document import CorpusDocument
-from transfer_vs_relearning.corpora.dump import DumpMetadata, download_dump, parse_checksum_line, sha1_file, status_is_complete
-from transfer_vs_relearning.corpora.extract import extract_from_xml_text, parse_wikitext
+from transfer_vs_relearning.corpora.dump import DumpMetadata, download_dump, load_official_dump_metadata, parse_checksum_line, sha1_file, status_is_complete
+from transfer_vs_relearning.corpora.extract import _iter_real_dump, extract_from_xml_text, parse_wikitext
 from transfer_vs_relearning.corpora.filtering import audit_document
 from transfer_vs_relearning.corpora.io import iter_documents, write_documents
 from transfer_vs_relearning.corpora.manifest import write_corpus_manifest
@@ -105,6 +105,31 @@ def test_namespace_redirect_metadata_and_wikitext_extraction() -> None:
     assert documents[0].namespace == 0
     assert "Ankara" in documents[0].text
     assert documents[0].raw_wikitext_sha256
+
+
+def test_production_parser_smoke_with_pinned_dependencies(tmp_path: Path) -> None:
+    mwxml = pytest.importorskip("mwxml", reason="mwxml==0.3.8 is not installed")
+    mwparserfromhell = pytest.importorskip("mwparserfromhell", reason="mwparserfromhell==0.7.2 is not installed")
+    from importlib.metadata import version
+
+    if version("mwxml") != "0.3.8":
+        pytest.skip(f"mwxml==0.3.8 required, observed {version('mwxml')}")
+    if version("mwparserfromhell") != "0.7.2":
+        pytest.skip(f"mwparserfromhell==0.7.2 required, observed {version('mwparserfromhell')}")
+    cfg = config(tmp_path)
+    cfg["extraction"].pop("allow_stdlib_fixture_parser", None)
+    raw = tmp_path / "tiny.xml.bz2"
+    xml = """<mediawiki>
+      <page><title>Ankara</title><ns>0</ns><id>10</id><revision><id>99</id><text>'''Ankara''' [[Türkiye|Türkiye'nin]] başkentidir.</text></revision></page>
+      <page><title>Redirect</title><ns>0</ns><id>11</id><redirect title="X"/><revision><id>100</id><text>#REDIRECT [[X]]</text></revision></page>
+      <page><title>Talk</title><ns>1</ns><id>12</id><revision><id>101</id><text>skip</text></revision></page>
+    </mediawiki>"""
+    raw.write_bytes(bz2.compress(xml.encode("utf-8")))
+    docs = [doc for doc, failure in _iter_real_dump(raw, cfg) if doc is not None]
+    assert len(docs) == 1
+    assert docs[0].page_id == "10"
+    assert docs[0].revision_id == "99"
+    assert "Ankara" in docs[0].text
 
 
 def test_wikitext_parsing_and_unresolved_artifacts() -> None:
@@ -205,6 +230,19 @@ def test_matcher_built_once_for_multiple_documents() -> None:
     assert ContaminationScanner.constructions == before + 1
 
 
+def test_contamination_preflight_schema_without_scanning(monkeypatch, tmp_path: Path) -> None:
+    cfg = config(tmp_path)
+    cfg_path = _write_config(tmp_path, cfg)
+    patterns = [Pattern("p", "S00001", "subject_id", "synthetic_subject_id", "canonical", "S00001")]
+    monkeypatch.setattr(pipeline, "build_contamination_inventory", lambda dataset_dir: (patterns, {}))
+    result = pipeline.run_stage(cfg_path, "contamination-preflight")
+    assert result["pattern_count"] == 1
+    assert result["pattern_count_by_rule"] == {"synthetic_subject_id": 1}
+    assert "exact_nfc" in result["automaton_state_count_by_channel"]
+    report = Path(cfg["artifact_root"]) / cfg["corpus_id"] / "reports" / "contamination_preflight.json"
+    assert report.exists()
+
+
 def test_shared_object_subject_associations_are_preserved() -> None:
     patterns = [
         Pattern("o1", "San Diego", "canonical_object", "object_only_flag", "canonical", "S1", ("S1",)),
@@ -242,7 +280,20 @@ class FakeResponse:
 
 
 def metadata(cfg: dict) -> DumpMetadata:
-    return DumpMetadata(cfg["corpus_id"], cfg["project"], cfg["dump_date"], "https://example/dump.bz2", "https://example/sha1sums.txt", "sha1", None, True, "now")
+    return DumpMetadata(
+        cfg["corpus_id"],
+        cfg["project"],
+        cfg["dump_date"],
+        cfg["dump_base_url"] + cfg["dump_filename"],
+        cfg["dump_base_url"] + cfg["checksum_filename"],
+        "sha1",
+        None,
+        True,
+        "now",
+        cfg["dump_filename"],
+        "official",
+        cfg["dump_base_url"] + "dumpstatus.json",
+    )
 
 
 def test_download_new_and_valid_206_resume(monkeypatch, tmp_path: Path) -> None:
@@ -284,6 +335,63 @@ def test_existing_unverified_target_is_rejected(tmp_path: Path) -> None:
         download_dump(cfg, metadata(cfg))
 
 
+def test_offline_resolve_then_official_resolve_and_download_prerequisite(monkeypatch, tmp_path: Path) -> None:
+    cfg = config(tmp_path)
+    cfg_path = _write_config(tmp_path, cfg)
+    pipeline.run_stage(cfg_path, "resolve")
+    assert (Path(cfg["artifact_root"]) / cfg["corpus_id"] / "manifests" / "configured_dump_metadata.json").exists()
+    with pytest.raises(ValueError, match="official metadata"):
+        pipeline.run_stage(cfg_path, "download")
+    checksum = "b" * 40
+    responses = {
+        cfg["dump_base_url"] + "dumpstatus.json": '{"status": "done"}',
+        cfg["dump_base_url"] + cfg["checksum_filename"]: f"{checksum}  {cfg['dump_filename']}\n",
+    }
+    monkeypatch.setattr("transfer_vs_relearning.corpora.dump._read_url", lambda url: responses[url])
+    official = pipeline.run_stage(cfg_path, "resolve", fetch_metadata=True)
+    assert official["resolution_mode"] == "official"
+    assert load_official_dump_metadata(cfg).expected_checksum == checksum
+    reused = pipeline.run_stage(cfg_path, "resolve", fetch_metadata=True)
+    assert reused["reused"] is True
+
+
+def test_official_metadata_missing_checksum_and_mismatch(tmp_path: Path) -> None:
+    cfg = config(tmp_path)
+    manifests = Path(cfg["artifact_root"]) / cfg["corpus_id"] / "manifests"
+    manifests.mkdir(parents=True)
+    payload = metadata(cfg).__dict__
+    payload["expected_checksum"] = None
+    write_json(manifests / "dump_metadata.json", payload)
+    with pytest.raises(ValueError, match="expected_checksum"):
+        load_official_dump_metadata(cfg)
+    payload["expected_checksum"] = "a" * 40
+    payload["dump_filename"] = "wrong.xml.bz2"
+    write_json(manifests / "dump_metadata.json", payload)
+    with pytest.raises(ValueError, match="dump_filename"):
+        load_official_dump_metadata(cfg)
+
+
+def test_official_download_verify_lifecycle_preserves_checksum(monkeypatch, tmp_path: Path) -> None:
+    cfg = config(tmp_path)
+    cfg_path = _write_config(tmp_path, cfg)
+    payload = b"tiny"
+    checksum = hashlib.sha1(payload).hexdigest()
+    manifests = Path(cfg["artifact_root"]) / cfg["corpus_id"] / "manifests"
+    manifests.mkdir(parents=True)
+    official = metadata(cfg).__dict__
+    official["dump_url"] = cfg["dump_base_url"] + cfg["dump_filename"]
+    official["checksum_url"] = cfg["dump_base_url"] + cfg["checksum_filename"]
+    official["status_url"] = cfg["dump_base_url"] + "dumpstatus.json"
+    official["expected_checksum"] = checksum
+    write_json(manifests / "dump_metadata.json", official)
+    write_json(stage_state_path(cfg, "resolve"), {"stage": "resolve", "status": "completed", "config_hash": config_hash(cfg), "resolution_mode": "official", "output_artifacts": {"metadata": {"path": str(manifests / "dump_metadata.json"), "kind": "file", "sha256": sha1_file.__globals__["hashlib"].sha256((manifests / "dump_metadata.json").read_bytes()).hexdigest()}}})
+    monkeypatch.setattr("urllib.request.urlopen", lambda request: FakeResponse(payload, 200, {"Content-Length": str(len(payload))}))
+    pipeline.run_stage(cfg_path, "download")
+    assert json.loads((manifests / "dump_metadata.json").read_text())["expected_checksum"] == checksum
+    pipeline.run_stage(cfg_path, "verify")
+    assert json.loads((manifests / "dump_metadata.json").read_text())["expected_checksum"] == checksum
+
+
 def test_stage_failed_state_prerequisite_and_config_mismatch(tmp_path: Path) -> None:
     cfg = config(tmp_path)
     with pytest.raises(ValueError, match="requires completed prerequisite"):
@@ -292,9 +400,37 @@ def test_stage_failed_state_prerequisite_and_config_mismatch(tmp_path: Path) -> 
         with stage_run(cfg, "resolve"):
             raise RuntimeError("boom")
     assert json.loads(stage_state_path(cfg, "resolve").read_text())["status"] == "failed"
-    write_json(stage_state_path(cfg, "resolve"), {"stage": "resolve", "status": "completed", "config_hash": "wrong"})
+    write_json(stage_state_path(cfg, "resolve"), {"stage": "resolve", "status": "completed", "config_hash": "wrong", "output_artifacts": {}})
     with pytest.raises(ValueError, match="different config"):
-        pipeline.run_stage(_write_config(tmp_path, cfg), "resolve")
+        with stage_run(cfg, "resolve"):
+            pass
+
+
+def test_stage_reuse_checks_input_output_and_force(tmp_path: Path) -> None:
+    cfg = config(tmp_path)
+    input_path = tmp_path / "input.txt"
+    output_path = tmp_path / "output.txt"
+    input_path.write_text("input", encoding="utf-8")
+    with stage_run(cfg, "resolve", input_path=input_path) as state:
+        output_path.write_text("output", encoding="utf-8")
+        state["output_artifact_path"] = str(output_path)
+    with stage_run(cfg, "resolve", input_path=input_path) as state:
+        assert state["reused"] is True
+    input_path.write_text("changed", encoding="utf-8")
+    with pytest.raises(ValueError, match="input artifact changed"):
+        with stage_run(cfg, "resolve", input_path=input_path):
+            pass
+    with stage_run(cfg, "resolve", force=True, input_path=input_path) as state:
+        output_path.write_text("rerun", encoding="utf-8")
+        state["output_artifact_path"] = str(output_path)
+    output_path.write_text("modified", encoding="utf-8")
+    with pytest.raises(ValueError, match="output artifacts"):
+        with stage_run(cfg, "resolve", input_path=input_path):
+            pass
+    output_path.unlink()
+    with pytest.raises(ValueError, match="output artifacts"):
+        with stage_run(cfg, "resolve", input_path=input_path):
+            pass
 
 
 def test_tiny_end_to_end_phase1_pipeline_excludes_contaminated_documents(tmp_path: Path, monkeypatch) -> None:

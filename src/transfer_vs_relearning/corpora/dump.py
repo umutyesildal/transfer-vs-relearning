@@ -24,6 +24,9 @@ class DumpMetadata:
     expected_checksum: str | None
     dump_status_complete: bool
     resolved_at: str
+    dump_filename: str
+    resolution_mode: str
+    status_url: str
 
 
 def status_is_complete(status_text: str) -> bool:
@@ -53,12 +56,16 @@ def resolve_dump_metadata(config: dict[str, Any], fetch: bool = False) -> DumpMe
     status_url = base + "dumpstatus.json"
     complete = False
     checksum = None
+    mode = "configured_only"
     if fetch:
         status_text = _read_url(status_url)
         complete = status_is_complete(status_text)
         if not complete:
             raise ValueError(f"Configured dump is not complete: {status_url}")
         checksum = parse_checksum_line(_read_url(checksum_url), config["dump_filename"])
+        if not checksum:
+            raise ValueError("Official metadata resolution did not produce an expected checksum")
+        mode = "official"
     metadata = DumpMetadata(
         corpus_id=config["corpus_id"],
         project=config["project"],
@@ -69,9 +76,36 @@ def resolve_dump_metadata(config: dict[str, Any], fetch: bool = False) -> DumpMe
         expected_checksum=checksum,
         dump_status_complete=complete,
         resolved_at=datetime.now(timezone.utc).isoformat(),
+        dump_filename=config["dump_filename"],
+        resolution_mode=mode,
+        status_url=status_url,
     )
-    write_json(stage_dirs(config)["manifests"] / "dump_metadata.json", asdict(metadata))
+    path = "dump_metadata.json" if fetch else "configured_dump_metadata.json"
+    write_json(stage_dirs(config)["manifests"] / path, asdict(metadata))
     return metadata
+
+
+def load_official_dump_metadata(config: dict[str, Any]) -> DumpMetadata:
+    path = stage_dirs(config)["manifests"] / "dump_metadata.json"
+    if not path.exists():
+        raise ValueError("Official dump metadata is missing; run resolve --fetch-metadata first")
+    import json
+
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    required = {
+        "resolution_mode": "official",
+        "dump_status_complete": True,
+        "dump_date": str(config["dump_date"]),
+        "dump_filename": config["dump_filename"],
+        "dump_url": config["dump_base_url"] + config["dump_filename"],
+        "checksum_url": config["dump_base_url"] + config["checksum_filename"],
+    }
+    for key, expected in required.items():
+        if payload.get(key) != expected:
+            raise ValueError(f"Official metadata mismatch for {key}: expected {expected!r}, observed {payload.get(key)!r}")
+    if not payload.get("expected_checksum"):
+        raise ValueError("Official metadata is missing expected_checksum")
+    return DumpMetadata(**payload)
 
 
 def download_dump(config: dict[str, Any], metadata: DumpMetadata, force: bool = False) -> Path:
@@ -105,12 +139,15 @@ def download_dump(config: dict[str, Any], metadata: DumpMetadata, force: bool = 
             handle.flush()
             os.fsync(handle.fileno())
     write_json(stage_dirs(config)["manifests"] / "download_manifest.json", {
-        "status": "partial",
+        "status": "downloaded_unverified",
         "partial_path": str(partial),
         "target_path": str(target),
+        "artifact_path": str(partial),
+        "bytes_present": partial.stat().st_size,
         "resume_start": start,
         "http_status": status,
-        "expected_content_length": expected_length,
+        "response_content_length": expected_length,
+        "expected_total_bytes": _expected_total_bytes(response.headers.get("Content-Range"), expected_length, start),
         "observed_partial_size": partial.stat().st_size,
     })
     return partial
@@ -161,6 +198,15 @@ def _validate_content_range(value: str | None, expected_start: int) -> None:
     start_text, _, _ = range_part.partition("-")
     if int(start_text) != expected_start:
         raise ValueError(f"Content-Range starts at {start_text}, expected {expected_start}")
+
+
+def _expected_total_bytes(content_range: str | None, content_length: str | None, start: int) -> int | None:
+    if content_range and "/" in content_range:
+        total = content_range.rsplit("/", 1)[-1]
+        return None if total == "*" else int(total)
+    if content_length:
+        return start + int(content_length)
+    return None
 
 
 def _has_verified_target(config: dict[str, Any], target: Path, metadata: DumpMetadata) -> bool:

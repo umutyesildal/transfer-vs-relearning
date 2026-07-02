@@ -241,6 +241,7 @@ Run restartable stages explicitly:
 ```bash
 python scripts/prepare_trwiki.py resolve --config configs/corpora/trwiki_gpt2_calibration.yaml
 python scripts/prepare_trwiki.py resolve --config configs/corpora/trwiki_gpt2_calibration.yaml --fetch-metadata
+python scripts/prepare_trwiki.py contamination-preflight --config configs/corpora/trwiki_gpt2_calibration.yaml
 python scripts/prepare_trwiki.py download --config configs/corpora/trwiki_gpt2_calibration.yaml
 python scripts/prepare_trwiki.py verify --config configs/corpora/trwiki_gpt2_calibration.yaml
 python scripts/prepare_trwiki.py extract --config configs/corpora/trwiki_gpt2_calibration.yaml
@@ -253,9 +254,38 @@ python scripts/prepare_trwiki.py split --config configs/corpora/trwiki_gpt2_cali
 python scripts/prepare_trwiki.py report --config configs/corpora/trwiki_gpt2_calibration.yaml
 ```
 
-`resolve` without `--fetch-metadata` is metadata-only and writes configured URLs without network access. `--fetch-metadata` may contact Wikimedia to verify completion and parse the official SHA-1. `download` is resumable through a `.partial` file. Resume sends a Range request, requires HTTP 206, validates `Content-Range`, preserves partial files on interruption, and refuses to append if the server ignores Range. Existing target files are reused only when a compatible verification manifest exists. `verify` atomically promotes only checksum-valid content.
+Safe production order:
 
-Each stage writes a state manifest with status, timestamps, config hash, input/output hashes where practical, document counters, errors on failure, and processing Git commit. Stages validate prerequisites: for example, `extract` requires a completed verification stage and `split` requires a completed contamination scan. Incompatible completed outputs require `--force` or a new corpus version.
+```text
+official metadata resolve
+→ matcher preflight
+→ download
+→ verify
+→ production parser smoke
+→ extract
+→ normalize
+→ audit
+→ threshold review
+→ filter
+→ deduplicate
+→ contamination
+→ split
+→ report
+```
+
+`resolve` without `--fetch-metadata` is offline URL construction only. It writes `configured_dump_metadata.json`, is marked `configured_only`, and does not authorize download. `resolve --fetch-metadata` writes official `dump_metadata.json` after verifying configured dump completion and parsing the official SHA-1 checksum. `download` loads this official metadata and never downgrades it. Download does not authorize extraction: it only creates a `downloaded_unverified` artifact. Only checksum `verify` authorizes extraction.
+
+`contamination-preflight` is required before full dump download. It builds the real synthetic-dataset contamination inventory and all three matchers, then writes `reports/contamination_preflight.json` with pattern counts by rule/channel, automaton state counts, build times, total pattern characters, and platform-labeled peak RSS.
+
+`download` is resumable through a `.partial` file. Resume sends a Range request, requires HTTP 206, validates `Content-Range`, preserves partial files on interruption, and refuses to append if the server ignores Range. Existing target files are reused only when a compatible verification manifest exists. `verify` atomically promotes only checksum-valid content.
+
+Each stage writes a state manifest with status, timestamps, config hash, input/output hashes, output artifact maps where needed, document counters, errors on failure, and processing Git commit. Reuse is input- and output-aware: if an input changes or an output is missing/modified, the stage refuses reuse unless `--force` is supplied. Stages validate prerequisites: download requires official metadata resolution, verify requires completed download, extract requires completed verification, and split requires completed contamination scan.
+
+Run the production parser smoke test on HU after installing the pinned parser stack and before extraction:
+
+```bash
+python3 -m pytest -ra tests/test_corpora_phase1.py::test_production_parser_smoke_with_pinned_dependencies
+```
 
 Filtering is audit-first. The initial config uses:
 

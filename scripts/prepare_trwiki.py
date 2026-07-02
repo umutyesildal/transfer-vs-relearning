@@ -16,6 +16,7 @@ STAGES = (
     "audit",
     "filter",
     "deduplicate",
+    "contamination-preflight",
     "scan-contamination",
     "split",
     "report",
