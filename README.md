@@ -83,28 +83,62 @@ python scripts/select_pilot.py \
 
 This writes `artifacts/datasets/synthetic_v1/pilot_100_subjects.json`, which is reused for `M0`, `M1`, `M2`, and `M3`.
 
+The default 100-subject pilot is a balanced diagnostic pilot, not a population-weighted estimate of overall accuracy. It requires:
+
+- 50 Branch A subjects and 50 Branch B subjects
+- 50 English-like names and 50 Turkish-like names
+- 25 subjects in each branch x name-type cell
+- 100 facts per relation, 500 facts total
+
+A representative full-dataset evaluation can be added later without replacing this diagnostic pilot.
+
 ## Evaluation
 
 The evaluator performs candidate ranking for causal language models. For each probe, it renders a configurable prompt, appends each candidate answer, scores only answer continuation tokens, and ranks candidates by mean answer-token log probability.
 
-Default prompt:
+Primary direct prompt:
+
+```text
+{question} {candidate}
+```
+
+Use `configs/evaluation/m0_gpt2_pilot_direct.yaml` for the primary `M0` pilot. It uses the probe question itself, followed by the configured answer separator and candidate.
+
+Language-matched QA sensitivity prompt:
 
 ```text
 Question: {question}
 Answer:
 ```
 
-followed by one separating space and the candidate answer.
+for English, and:
+
+```text
+Soru: {question}
+Cevap:
+```
+
+for Turkish. Use `configs/evaluation/m0_gpt2_pilot_qa_matched.yaml` for this sensitivity run.
 
 Primary score: mean answer-token log probability. Secondary score: total answer-token log probability. Ties are deterministic: descending score, then stable canonical object ID.
 
-GPT-2 byte-level BPE boundaries are handled by tokenizing the full prompt-plus-candidate string with offset mappings and mapping the answer character span to token positions. The tokenizer pad token is set to EOS for batching/evaluation without resizing or training weights.
+GPT-2 byte-level BPE boundaries are handled by tokenizing the full prompt-plus-candidate string with offset mappings and mapping the answer character span to token positions. The tokenizer pad token is set to EOS for batched evaluation without resizing or training weights. Padded positions are excluded by attention masks and answer masks.
+
+Candidate scoring is batched per probe using `runtime.candidate_batch_size`. The 100-subject pilot has 1,000 probe-language rows and approximately 158,400 prompt-candidate sequences. With batch size 64, the evaluator performs 3,200 candidate forward batches instead of 158,400 scalar forwards.
 
 Run after dataset sync, pilot selection, and model download:
 
 ```bash
 python scripts/evaluate_facts.py \
-  --config configs/evaluation/m0_gpt2_pilot.yaml
+  --config configs/evaluation/m0_gpt2_pilot_direct.yaml
+```
+
+Resume an interrupted run explicitly:
+
+```bash
+python scripts/evaluate_facts.py \
+  --config configs/evaluation/m0_gpt2_pilot_direct.yaml \
+  --resume-run-dir runs/evaluation/m0_gpt2_pilot/<run_id>
 ```
 
 Summarize an evaluation run:
@@ -142,18 +176,50 @@ Each evaluation run writes to `runs/evaluation/m0_gpt2_pilot/<run_id>/`:
 
 Progress is saved atomically. Completed fact-language probes are skipped on resume.
 
+Run status is strict. A complete 100-subject pilot expects 1,000 successful probe-language results. If any probe errors or the result count is incomplete, the evaluator writes `partial_failed`, records counts and `errors.jsonl`, and exits non-zero unless `--allow-errors` is passed for debugging. Partial summary files are marked as partial and should not be interpreted as complete metrics.
+
+Per-fact output includes both primary mean-token and sensitivity total-logprob predictions, ranks, margins, and top-5 candidate IDs. `summary_metrics.json` contains separate `primary_mean_logprob` and `sensitivity_total_logprob` sections.
+
 ## Relation Binding
 
-Because `born_in` and `lives_in` share a city inventory, the evaluator reports whether the model distinguishes a subject's birthplace from current residence using canonical city IDs. Metrics include swapped-answer rates, other-city ranks, and pairwise relation-binding accuracy.
+Because `born_in` and `lives_in` share a city inventory, the evaluator reports whether the model distinguishes a subject's birthplace from current residence using canonical city IDs. Metrics are reported separately by language under `by_language.en` and `by_language.tr`, with macro averages where appropriate. For the 100-subject pilot, each configured language must have 100 complete city-relation subject pairs in a completed run.
+
+## Chance References
+
+Candidate-set sizes differ by relation family, so summaries and run manifests include random-ranking references:
+
+- candidate count
+- random top-1 accuracy
+- random expected rank
+- random expected reciprocal rank
+
+These are reference values only, not observed model results.
 
 ## Conda and Slurm
 
 The HU server environment is expected to use Conda environment `xfer-relearn` with Python 3.11, PyTorch 2.7.0+cu128, CUDA runtime 12.8, and A100 80GB GPUs.
 
-Create/update the environment:
+Do not blindly update the existing HU Conda environment, because that may replace the verified CUDA-enabled PyTorch installation. First inspect the server environment:
 
 ```bash
-conda env update --name xfer-relearn --file environment.yml
+conda run --name xfer-relearn python - <<'PY'
+import torch
+print(torch.__version__)
+print(torch.version.cuda)
+print(torch.cuda.is_available())
+PY
+```
+
+Install only missing non-PyTorch project dependencies as needed:
+
+```bash
+conda run --name xfer-relearn python -m pip install -e ".[dev]"
+```
+
+Capture the working package state after the server environment is prepared:
+
+```bash
+conda run --name xfer-relearn python -m pip freeze > environment.snapshot.txt
 ```
 
 Submit the pilot evaluation only after the local model snapshot exists:
@@ -162,7 +228,7 @@ Submit the pilot evaluation only after the local model snapshot exists:
 sbatch slurm/eval_m0_gpt2_pilot.slurm
 ```
 
-The Slurm script uses partition `gpu`, GRES `gpu:a10080gb:1`, `module load anaconda/3-2024.06`, and `conda run --name xfer-relearn`. It sets Hugging Face offline flags and does not submit itself automatically.
+The Slurm script uses partition `gpu`, GRES `gpu:a10080gb:1`, `module load anaconda/3-2024.06`, and `conda run --name xfer-relearn`. It changes into the repository root, prints the selected config, verifies exactly one Slurm-assigned GPU, sets Hugging Face offline flags, avoids downloads, and does not submit itself automatically.
 
 ## Tests
 
@@ -181,10 +247,27 @@ Implemented in this stage:
 - dataset validation
 - model snapshot pinning command
 - deterministic pilot selection
-- causal LM candidate-ranking evaluator
-- relation-binding and subgroup metrics
+- batched causal LM candidate-ranking evaluator
+- strict resume, error, and completion handling
+- language-separated relation-binding and subgroup metrics
 - Slurm pilot evaluation script
 - offline unit tests
+
+Tested offline:
+
+- dataset normalization and candidate inventories
+- balanced pilot selection
+- prompt rendering
+- boundary span and answer-mask logic
+- deterministic ranking and metrics
+- resume/config mismatch helpers
+- partial-failed status helpers
+
+Not yet verified on the actual GPT-2 checkpoint:
+
+- full GPU pilot runtime
+- exact GPU memory profile
+- actual `M0` ranking results
 
 Not implemented in this stage:
 

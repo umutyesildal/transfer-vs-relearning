@@ -16,13 +16,13 @@ dependencies = [
   "pyarrow",
   "pyyaml",
   "scikit-learn",
-  "torch",
   "tqdm",
   "transformers",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest"]
+torch = ["torch"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

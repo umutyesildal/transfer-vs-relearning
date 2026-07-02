@@ -111,3 +111,5 @@ def test_pilot_selection_is_deterministic(tmp_path: Path) -> None:
     second = select_pilot_subjects(dataset_dir, subjects=20, seed=42)
     assert first["selected_subject_ids"] == second["selected_subject_ids"]
     assert first["distribution_summary"]["relation_counts"] == {relation: 20 for relation in RELATIONS}
+    assert first["distribution_summary"]["branch_group"] == {"A": 10, "B": 10}
+    assert first["distribution_summary"]["name_type"] == {"english_like": 10, "turkish_like": 10}

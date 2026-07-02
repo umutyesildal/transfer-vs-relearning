@@ -35,3 +35,14 @@ def score_from_token_logprobs(token_logprobs: list[float]) -> dict[str, float | 
         "token_count": len(token_logprobs),
         "mean_logprob": total / len(token_logprobs),
     }
+
+
+def answer_mask_from_offsets(
+    batch_offsets: list[list[tuple[int, int]]],
+    answer_spans: list[tuple[int, int]],
+) -> list[list[bool]]:
+    masks: list[list[bool]] = []
+    for offsets, (answer_start, answer_end) in zip(batch_offsets, answer_spans):
+        indices = set(answer_token_indices_from_offsets(offsets, answer_start, answer_end))
+        masks.append([index in indices for index in range(len(offsets))])
+    return masks

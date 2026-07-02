@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import csv
 import json
 import platform
 import subprocess
@@ -8,8 +7,6 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
-
-import yaml
 
 from transfer_vs_relearning.data.candidates import (
     RELATION_TO_FAMILY,
@@ -20,12 +17,12 @@ from transfer_vs_relearning.data.candidates import (
 from transfer_vs_relearning.data.constants import DATASET_FILES
 from transfer_vs_relearning.data.facts import expand_canonical_rows
 from transfer_vs_relearning.evaluation.progress import load_completed, save_progress
-from transfer_vs_relearning.evaluation.prompts import render_prompt, render_prompt_answer
+from transfer_vs_relearning.evaluation.prompts import render_prompt_from_config
 from transfer_vs_relearning.evaluation.ranking import rank_candidates
-from transfer_vs_relearning.evaluation.token_scoring import answer_token_indices_from_offsets, score_from_token_logprobs, shifted_label_positions
-from transfer_vs_relearning.metrics.core import ranking_metrics, subgroup_metrics
+from transfer_vs_relearning.evaluation.scoring import score_candidate_batch
+from transfer_vs_relearning.metrics.core import chance_references, dual_ranking_metrics, subgroup_metrics
 from transfer_vs_relearning.metrics.relation_binding import relation_binding_metrics
-from transfer_vs_relearning.utils.io import read_csv_rows, write_csv, write_json
+from transfer_vs_relearning.utils.io import read_csv_rows, sha256_file, sha256_text, write_csv, write_json
 
 
 def _git_commit() -> str | None:
@@ -36,8 +33,62 @@ def _git_commit() -> str | None:
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:
+    try:
+        import yaml
+    except ModuleNotFoundError:
+        return json.loads(path.read_text(encoding="utf-8"))
     with path.open("r", encoding="utf-8") as handle:
         return yaml.safe_load(handle)
+
+
+def _dump_yaml(path: Path, payload: dict[str, Any]) -> None:
+    try:
+        import yaml
+    except ModuleNotFoundError:
+        path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
+        return
+    with path.open("w", encoding="utf-8") as handle:
+        yaml.safe_dump(payload, handle, sort_keys=True, allow_unicode=True)
+
+
+class EvaluationIncompleteError(RuntimeError):
+    pass
+
+
+def _project_root() -> Path:
+    return Path(__file__).resolve().parents[3]
+
+
+def _resolve_path(path_value: str | Path, base: Path | None = None) -> Path:
+    path = Path(path_value)
+    if path.is_absolute():
+        return path
+    return (base or _project_root() / path).resolve()
+
+
+def config_fingerprint(config: dict[str, Any], dataset_manifest_hash: str | None = None) -> dict[str, Any]:
+    keys = ("dataset_version", "dataset_dir", "pilot_subject_file", "model_manifest", "languages", "relations", "prompt", "scoring")
+    payload = {key: config.get(key) for key in keys}
+    if dataset_manifest_hash:
+        payload["dataset_manifest_hash"] = dataset_manifest_hash
+    return payload
+
+
+def completion_status(expected_probe_count: int, successful_count: int, failed_count: int) -> str:
+    return "completed" if successful_count == expected_probe_count and failed_count == 0 else "partial_failed"
+
+
+def expected_candidate_forward_batches(
+    subject_count: int,
+    languages: int,
+    relation_candidate_counts: dict[str, int],
+    candidate_batch_size: int,
+) -> int:
+    import math
+
+    return subject_count * languages * sum(
+        math.ceil(count / candidate_batch_size) for count in relation_candidate_counts.values()
+    )
 
 
 class CausalCandidateEvaluator:
@@ -50,8 +101,10 @@ class CausalCandidateEvaluator:
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
 
-        manifest = json.loads(Path(self.config["model_manifest"]).read_text(encoding="utf-8"))
-        local_path = manifest["local_path"]
+        manifest_path = _resolve_path(self.config["model_manifest"])
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        local_path = manifest.get("local_path_absolute") or manifest.get("local_path")
+        local_path = str(_resolve_path(local_path, manifest_path.parent))
         tokenizer = AutoTokenizer.from_pretrained(local_path, local_files_only=True, use_fast=True)
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
@@ -62,39 +115,61 @@ class CausalCandidateEvaluator:
         model.eval()
         return tokenizer, model, device, manifest
 
-    def _score_candidate(self, tokenizer: Any, model: Any, device: str, prompt: str, candidate: str) -> dict[str, float | int]:
-        import torch
-
+    def _score_candidates(
+        self,
+        tokenizer: Any,
+        model: Any,
+        device: str,
+        prompt: str,
+        candidates: list[str],
+    ) -> list[dict[str, float | int]]:
+        scores: list[dict[str, float | int]] = []
+        batch_size = int(self.config["runtime"].get("candidate_batch_size", 64))
         separator = self.config["prompt"].get("answer_separator", " ")
-        text, answer_start, answer_end = render_prompt_answer(prompt, candidate, separator)
-        encoded = tokenizer(text, return_offsets_mapping=True, return_tensors="pt")
-        offsets = [(int(start), int(end)) for start, end in encoded.pop("offset_mapping")[0].tolist()]
-        answer_indices = answer_token_indices_from_offsets(offsets, answer_start, answer_end)
-        label_positions = shifted_label_positions(answer_indices)
-        input_ids = encoded["input_ids"].to(device)
-        attention_mask = encoded.get("attention_mask")
-        if attention_mask is not None:
-            attention_mask = attention_mask.to(device)
-        with torch.inference_mode():
-            logits = model(input_ids=input_ids, attention_mask=attention_mask).logits
-            log_probs = torch.log_softmax(logits, dim=-1)
-        token_scores = []
-        for token_index, logit_index in zip(answer_indices, label_positions):
-            token_id = int(input_ids[0, token_index].item())
-            token_scores.append(float(log_probs[0, logit_index, token_id].item()))
-        return score_from_token_logprobs(token_scores)
+        for start in range(0, len(candidates), batch_size):
+            scores.extend(
+                score_candidate_batch(
+                    tokenizer,
+                    model,
+                    device,
+                    prompt,
+                    candidates[start : start + batch_size],
+                    separator,
+                )
+            )
+        return scores
 
-    def run(self) -> Path:
-        import torch
-        import transformers
-
+    def run(self, resume: bool = False, force: bool = False, allow_errors: bool = False) -> Path:
         self.run_dir.mkdir(parents=True, exist_ok=True)
-        with (self.run_dir / "resolved_config.yaml").open("w", encoding="utf-8") as handle:
-            yaml.safe_dump(self.config, handle, sort_keys=True, allow_unicode=True)
-        dataset_dir = Path(self.config["dataset_dir"])
+        dataset_dir = _resolve_path(self.config["dataset_dir"])
+        dataset_manifest_path = dataset_dir / "manifest.json"
+        dataset_manifest_hash = sha256_file(dataset_manifest_path) if dataset_manifest_path.exists() else None
+        fingerprint = config_fingerprint(self.config, dataset_manifest_hash)
+        fingerprint_hash = sha256_text(json.dumps(fingerprint, ensure_ascii=False, sort_keys=True))
+        resolved_config_path = self.run_dir / "resolved_config.yaml"
+        fingerprint_path = self.run_dir / "config_fingerprint.json"
+        if resume:
+            progress_path = self.run_dir / "progress.json"
+            if not progress_path.exists():
+                raise FileNotFoundError(f"Cannot resume {self.run_dir}: progress.json is missing")
+            existing_progress = json.loads(progress_path.read_text(encoding="utf-8"))
+            if existing_progress.get("status") == "completed" and not force:
+                raise ValueError(f"{self.run_dir} is already completed; pass --force to rerun/resume intentionally")
+            if fingerprint_path.exists():
+                existing = json.loads(fingerprint_path.read_text(encoding="utf-8"))
+                if existing.get("fingerprint_hash") != fingerprint_hash:
+                    raise ValueError("Resume configuration mismatch: dataset/model/pilot/prompt/scoring settings changed")
+            if resolved_config_path.exists():
+                self.config = _load_yaml(resolved_config_path)
+        else:
+            if any(self.run_dir.iterdir()):
+                raise FileExistsError(f"New run directory is not empty: {self.run_dir}")
+            _dump_yaml(resolved_config_path, self.config)
+            write_json(fingerprint_path, {"fingerprint_hash": fingerprint_hash, "fingerprint": fingerprint})
         canonical_rows = read_csv_rows(dataset_dir / DATASET_FILES["canonical_profiles"])
         canonical_by_subject = {row["subject_id"]: row for row in canonical_rows}
-        pilot = json.loads(Path(self.config["pilot_subject_file"]).read_text(encoding="utf-8"))
+        pilot_path = _resolve_path(self.config["pilot_subject_file"])
+        pilot = json.loads(pilot_path.read_text(encoding="utf-8"))
         selected_subjects = set(pilot["selected_subject_ids"])
         write_json(self.run_dir / "selected_subjects_reference.json", pilot)
         probes = []
@@ -110,30 +185,52 @@ class CausalCandidateEvaluator:
 
         inventories = build_candidate_inventories(canonical_rows)
         tokenizer, model, device, model_manifest = self._load_model()
+        import torch
+        import transformers
         completed = load_completed(self.run_dir / "progress.json")
         results: list[dict[str, Any]] = []
         result_csv = self.run_dir / "per_fact_results.csv"
         if result_csv.exists():
             results = read_csv_rows(result_csv)
+            seen = set()
+            deduped = []
+            for row in results:
+                key = f"{row['fact_id']}|{row['language']}"
+                if key not in seen:
+                    deduped.append(row)
+                    seen.add(key)
+            results = deduped
+            completed |= seen
 
         started = datetime.now(timezone.utc).isoformat()
-        save_progress(self.run_dir / "progress.json", completed, {"status": "running", "started": started})
+        expected_probe_count = len(probes)
+        attempted_count = 0
+        failed_count = 0
+        skipped_completed_count = 0
+        save_progress(
+            self.run_dir / "progress.json",
+            completed,
+            {"status": "running", "started": started, "expected_probe_count": expected_probe_count},
+        )
         errors_path = self.run_dir / "errors.jsonl"
         for index, probe in enumerate(probes, start=1):
             key = f"{probe['fact_id']}|{probe['language']}"
             if key in completed:
+                skipped_completed_count += 1
                 continue
+            attempted_count += 1
             try:
-                prompt = render_prompt(
+                prompt = render_prompt_from_config(
                     probe["question"],
-                    self.config["prompt"].get("format", "qa"),
-                    self.config["prompt"].get("template"),
+                    probe["language"],
+                    self.config["prompt"],
                 )
                 family = RELATION_TO_FAMILY[probe["relation"]]
                 correct = resolve_expected_answer(probe["relation"], probe["language"], probe["expected_answer"], inventories)
+                candidates = inventories[family]
+                surfaces = [candidate.surface(probe["language"]) for candidate in candidates]
                 candidate_scores = []
-                for candidate in inventories[family]:
-                    scores = self._score_candidate(tokenizer, model, device, prompt, candidate.surface(probe["language"]))
+                for candidate, scores in zip(candidates, self._score_candidates(tokenizer, model, device, prompt, surfaces)):
                     candidate_scores.append({"object_id": candidate.object_id, "surface": candidate.surface(probe["language"]), **scores})
                 ranked_mean = rank_candidates(candidate_scores, "mean_logprob", correct.object_id)
                 ranked_total = rank_candidates(candidate_scores, "total_logprob", correct.object_id)
@@ -155,12 +252,16 @@ class CausalCandidateEvaluator:
                     "correct_object_id": correct.object_id,
                     "predicted_object_id": ranked_mean["top1_object_id"],
                     "predicted_surface_form": ranked_mean["top1_surface"],
+                    "predicted_object_id_total": ranked_total["top1_object_id"],
+                    "predicted_surface_form_total": ranked_total["top1_surface"],
                     "correct_rank_mean": ranked_mean["rank"],
                     "correct_rank_total": ranked_total["rank"],
                     "correct_mean_score": ranked_mean["correct_score"],
                     "correct_total_score": ranked_total["correct_score"],
                     "best_incorrect_mean_score": ranked_mean["best_incorrect_score"],
+                    "best_incorrect_total_score": ranked_total["best_incorrect_score"],
                     "margin": ranked_mean["margin"],
+                    "total_score_margin": ranked_total["margin"],
                     "token_count": correct_row["token_count"],
                     "branch": probe["branch_group"],
                     "frequency": probe["frequency_bucket"],
@@ -171,6 +272,7 @@ class CausalCandidateEvaluator:
                     "evaluation_timestamp": datetime.now(timezone.utc).isoformat(),
                     "number_of_candidates": len(candidate_scores),
                     "top5_candidate_ids": "|".join(ranked_mean["top5_object_ids"]),
+                    "top5_candidate_ids_total": "|".join(ranked_total["top5_object_ids"]),
                 }
                 if probe["relation"] in {"born_in", "lives_in"}:
                     other_relation = "lives_in" if probe["relation"] == "born_in" else "born_in"
@@ -182,14 +284,39 @@ class CausalCandidateEvaluator:
                 results.append(row)
                 completed.add(key)
             except Exception as exc:
+                failed_count += 1
                 with errors_path.open("a", encoding="utf-8") as handle:
                     handle.write(json.dumps({"probe": probe, "error": str(exc)}, ensure_ascii=False) + "\n")
             if index % int(self.config["runtime"].get("checkpoint_interval", 25)) == 0:
                 self._write_outputs(results)
-                save_progress(self.run_dir / "progress.json", completed, {"status": "running", "last_index": index})
+                save_progress(
+                    self.run_dir / "progress.json",
+                    completed,
+                    {
+                        "status": "running",
+                        "last_index": index,
+                        "expected_probe_count": expected_probe_count,
+                        "attempted_probe_count": attempted_count,
+                        "successful_probe_count": len(completed),
+                        "failed_probe_count": failed_count,
+                        "skipped_completed_count": skipped_completed_count,
+                    },
+                )
 
         self._write_outputs(results)
-        summary = ranking_metrics(results)
+        successful_count = len({f"{row['fact_id']}|{row['language']}" for row in results})
+        status = completion_status(expected_probe_count, successful_count, failed_count)
+        summary = dual_ranking_metrics(results, partial=status != "completed", expected_count=expected_probe_count)
+        summary["completion_status"] = status
+        summary["counts"] = {
+            "expected_probe_count": expected_probe_count,
+            "attempted_probe_count": attempted_count,
+            "successful_probe_count": successful_count,
+            "failed_probe_count": failed_count,
+            "skipped_completed_count": skipped_completed_count,
+        }
+        candidate_sizes = {family: len(items) for family, items in inventories.items()}
+        summary["chance_references"] = chance_references(candidate_sizes)
         write_json(self.run_dir / "summary_metrics.json", summary)
         groups = [
             ("language",),
@@ -205,13 +332,14 @@ class CausalCandidateEvaluator:
             ("language", "relation", "branch"),
         ]
         write_csv(self.run_dir / "subgroup_metrics.csv", subgroup_metrics(results, groups))
-        write_json(self.run_dir / "relation_binding_metrics.json", relation_binding_metrics(results))
+        binding_expected = len(selected_subjects) if status == "completed" else None
+        write_json(self.run_dir / "relation_binding_metrics.json", relation_binding_metrics(results, binding_expected))
         ended = datetime.now(timezone.utc).isoformat()
         run_manifest = {
             "run_id": self.run_id,
             "git_commit": _git_commit(),
-            "source_dataset_repository_commit": json.loads((dataset_dir / "manifest.json").read_text(encoding="utf-8")).get("source_commit_sha"),
-            "dataset_manifest_hash": pilot.get("dataset_manifest_hash"),
+            "source_dataset_repository_commit": json.loads(dataset_manifest_path.read_text(encoding="utf-8")).get("source_commit_sha"),
+            "dataset_manifest_hash": dataset_manifest_hash,
             "model_id": model_manifest["model_id"],
             "model_revision": model_manifest["resolved_revision"],
             "local_model_snapshot": model_manifest["local_path"],
@@ -219,9 +347,11 @@ class CausalCandidateEvaluator:
             "model_class": model.__class__.__name__,
             "parameter_count": model_manifest["parameter_count"],
             "prompt_format": self.config["prompt"],
-            "candidate_inventory_sizes": {family: len(items) for family, items in inventories.items()},
+            "candidate_inventory_sizes": candidate_sizes,
+            "chance_references": summary["chance_references"],
             "selected_subject_count": len(selected_subjects),
             "selected_fact_count": len(selected_subjects) * 5,
+            "expected_probe_count": expected_probe_count,
             "evaluation_languages": self.config["languages"],
             "primary_scoring_method": "mean answer-token log probability",
             "secondary_scoring_method": "total answer-token log probability",
@@ -236,10 +366,29 @@ class CausalCandidateEvaluator:
             "batch_sizes": {"candidate_batch_size": self.config["runtime"].get("candidate_batch_size")},
             "start_time": started,
             "end_time": ended,
-            "completion_status": "completed",
+            "completion_status": status,
+            "attempted_probe_count": attempted_count,
+            "successful_probe_count": successful_count,
+            "failed_probe_count": failed_count,
+            "skipped_completed_count": skipped_completed_count,
+            "error_path": str(errors_path),
         }
         write_json(self.run_dir / "run_manifest.json", run_manifest)
-        save_progress(self.run_dir / "progress.json", completed, {"status": "completed", "ended": ended})
+        save_progress(
+            self.run_dir / "progress.json",
+            completed,
+            {
+                "status": status,
+                "ended": ended,
+                "expected_probe_count": expected_probe_count,
+                "attempted_probe_count": attempted_count,
+                "successful_probe_count": successful_count,
+                "failed_probe_count": failed_count,
+                "skipped_completed_count": skipped_completed_count,
+            },
+        )
+        if status != "completed" and not allow_errors:
+            raise EvaluationIncompleteError(f"Evaluation ended with status {status}; see {errors_path}")
         return self.run_dir
 
     def _write_outputs(self, results: list[dict[str, Any]]) -> None:
@@ -255,8 +404,18 @@ class CausalCandidateEvaluator:
             pass
 
 
-def run_from_config(config_path: Path) -> Path:
+def run_from_config(
+    config_path: Path,
+    resume_run_dir: Path | None = None,
+    force: bool = False,
+    allow_errors: bool = False,
+) -> Path:
     config = _load_yaml(config_path)
-    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "_" + uuid.uuid4().hex[:8]
-    run_dir = Path(config["output"]["run_root"]) / run_id
-    return CausalCandidateEvaluator(config, run_dir).run()
+    if resume_run_dir is not None:
+        run_dir = resume_run_dir
+        resume = True
+    else:
+        run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "_" + uuid.uuid4().hex[:8]
+        run_dir = Path(config["output"]["run_root"]) / run_id
+        resume = False
+    return CausalCandidateEvaluator(config, run_dir).run(resume=resume, force=force, allow_errors=allow_errors)

@@ -20,6 +20,7 @@ def download_model_snapshot(model_id: str, revision: str | None, artifact_root: 
     api = HfApi()
     info = api.model_info(model_id, revision=revision)
     resolved = info.sha
+    artifact_root = artifact_root.resolve()
     target_dir = artifact_root / safe_model_dir_name(model_id) / resolved
     snapshot_path = snapshot_download(
         repo_id=model_id,
@@ -42,6 +43,8 @@ def download_model_snapshot(model_id: str, revision: str | None, artifact_root: 
         "requested_revision": revision,
         "resolved_revision": resolved,
         "local_path": str(target_dir),
+        "local_path_absolute": str(target_dir.resolve()),
+        "local_path_project_relative": str(Path("artifacts/models") / safe_model_dir_name(model_id) / resolved),
         "download_timestamp": datetime.now(timezone.utc).isoformat(),
         "file_hashes": file_hashes,
         "transformers_version": transformers.__version__,

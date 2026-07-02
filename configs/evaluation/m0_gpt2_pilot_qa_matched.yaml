@@ -5,8 +5,10 @@ model_manifest: artifacts/models/openai-community__gpt2/model_manifest.json
 languages: ["en", "tr"]
 relations: ["profession", "born_in", "lives_in", "studied_at", "works_at"]
 prompt:
-  format: direct
-  template: "{question}"
+  format: qa_matched
+  templates_by_language:
+    en: "Question: {question}\nAnswer:"
+    tr: "Soru: {question}\nCevap:"
   answer_separator: " "
 scoring:
   primary: mean_logprob
@@ -19,4 +21,4 @@ runtime:
   checkpoint_interval: 25
   seed: 42
 output:
-  run_root: runs/evaluation/m0_gpt2_pilot
+  run_root: runs/evaluation/m0_gpt2_pilot_qa_matched
