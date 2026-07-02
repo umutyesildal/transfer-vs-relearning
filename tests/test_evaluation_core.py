@@ -9,6 +9,8 @@ from transfer_vs_relearning.evaluation.evaluator import (
     completion_status,
     config_fingerprint,
     expected_candidate_forward_batches,
+    _project_root,
+    _resolve_path,
     run_from_config,
 )
 from transfer_vs_relearning.evaluation.progress import load_completed, save_progress
@@ -185,6 +187,58 @@ def test_relation_swap_metrics() -> None:
     assert metrics["by_language"]["tr"]["residence_probe_predicts_birthplace_rate"] == 0.0
 
 
+def test_relation_binding_metrics_are_stable_for_resumed_csv_string_ranks() -> None:
+    fresh_rows = [
+        {
+            "language": "en",
+            "subject_id": "S1",
+            "relation": "born_in",
+            "correct_rank_mean": 1,
+            "predicted_object_id": "city_a",
+            "correct_object_id": "city_a",
+            "other_city_rank_mean": 2,
+        },
+        {
+            "language": "en",
+            "subject_id": "S1",
+            "relation": "lives_in",
+            "correct_rank_mean": 1,
+            "predicted_object_id": "city_b",
+            "correct_object_id": "city_b",
+            "other_city_rank_mean": 2,
+        },
+        {
+            "language": "tr",
+            "subject_id": "S1",
+            "relation": "born_in",
+            "correct_rank_mean": 2,
+            "predicted_object_id": "city_b",
+            "correct_object_id": "city_a",
+            "other_city_rank_mean": 1,
+        },
+        {
+            "language": "tr",
+            "subject_id": "S1",
+            "relation": "lives_in",
+            "correct_rank_mean": 2,
+            "predicted_object_id": "city_a",
+            "correct_object_id": "city_b",
+            "other_city_rank_mean": 1,
+        },
+    ]
+    resumed_rows = [
+        {
+            key: str(value) if key in {"correct_rank_mean", "other_city_rank_mean"} else value
+            for key, value in row.items()
+        }
+        for row in fresh_rows
+    ]
+    assert relation_binding_metrics(resumed_rows, expected_subjects_per_language=1) == relation_binding_metrics(
+        fresh_rows,
+        expected_subjects_per_language=1,
+    )
+
+
 def test_progress_resume_roundtrip(tmp_path: Path) -> None:
     progress = tmp_path / "progress.json"
     save_progress(progress, {"S1_profession|en"})
@@ -324,3 +378,13 @@ def test_explicit_resume_run_directory_and_config_mismatch(tmp_path: Path) -> No
 
 def test_robust_model_path_manifest_fields() -> None:
     assert safe_model_dir_name("openai-community/gpt2") == "openai-community__gpt2"
+
+
+def test_resolve_path_absolute_project_relative_and_manifest_relative(tmp_path: Path) -> None:
+    absolute = (tmp_path / "model_manifest.json").resolve()
+    assert _resolve_path(absolute) == absolute
+    assert _resolve_path("configs/evaluation/m0_gpt2_pilot_direct.yaml") == (
+        _project_root() / "configs/evaluation/m0_gpt2_pilot_direct.yaml"
+    ).resolve()
+    manifest_dir = tmp_path / "artifacts" / "models" / "openai-community__gpt2"
+    assert _resolve_path("snapshot", manifest_dir) == (manifest_dir / "snapshot").resolve()

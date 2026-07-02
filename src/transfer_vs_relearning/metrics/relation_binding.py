@@ -5,6 +5,18 @@ from statistics import mean
 from typing import Any
 
 
+def _as_float(value: Any, default: float | None = None) -> float:
+    if value in (None, ""):
+        if default is None:
+            raise ValueError("Missing numeric value")
+        return default
+    return float(value)
+
+
+def _as_int(value: Any) -> int:
+    return int(_as_float(value))
+
+
 def _binding_for_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     city_rows = [row for row in rows if row["relation"] in {"born_in", "lives_in"}]
     born_rows = [row for row in city_rows if row["relation"] == "born_in"]
@@ -25,18 +37,18 @@ def _binding_for_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         swapped_birth += int(born["predicted_object_id"] == lives["correct_object_id"])
         swapped_residence += int(lives["predicted_object_id"] == born["correct_object_id"])
         if born.get("other_city_rank_mean") not in (None, ""):
-            born_other_ranks.append(float(born["other_city_rank_mean"]))
+            born_other_ranks.append(_as_float(born["other_city_rank_mean"]))
         if lives.get("other_city_rank_mean") not in (None, ""):
-            lives_other_ranks.append(float(lives["other_city_rank_mean"]))
+            lives_other_ranks.append(_as_float(lives["other_city_rank_mean"]))
         pairwise_correct += int(
-            float(born.get("other_city_rank_mean", 10**9)) > float(born["correct_rank_mean"])
-            and float(lives.get("other_city_rank_mean", 10**9)) > float(lives["correct_rank_mean"])
+            _as_float(born.get("other_city_rank_mean"), 10**9) > _as_float(born["correct_rank_mean"])
+            and _as_float(lives.get("other_city_rank_mean"), 10**9) > _as_float(lives["correct_rank_mean"])
         )
 
     return {
         "complete_subject_pairs": len(pairs),
-        "born_in_top1_accuracy": mean(row["correct_rank_mean"] == 1 for row in born_rows) if born_rows else 0.0,
-        "lives_in_top1_accuracy": mean(row["correct_rank_mean"] == 1 for row in lives_rows) if lives_rows else 0.0,
+        "born_in_top1_accuracy": mean(_as_int(row["correct_rank_mean"]) == 1 for row in born_rows) if born_rows else 0.0,
+        "lives_in_top1_accuracy": mean(_as_int(row["correct_rank_mean"]) == 1 for row in lives_rows) if lives_rows else 0.0,
         "birthplace_probe_predicts_residence_rate": swapped_birth / len(pairs) if pairs else 0.0,
         "residence_probe_predicts_birthplace_rate": swapped_residence / len(pairs) if pairs else 0.0,
         "combined_swapped_answer_rate": (swapped_birth + swapped_residence) / (2 * len(pairs)) if pairs else 0.0,

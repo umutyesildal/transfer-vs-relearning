@@ -62,8 +62,10 @@ def _project_root() -> Path:
 def _resolve_path(path_value: str | Path, base: Path | None = None) -> Path:
     path = Path(path_value)
     if path.is_absolute():
-        return path
-    return (base or _project_root() / path).resolve()
+        return path.resolve()
+    if base is not None:
+        return (base / path).resolve()
+    return (_project_root() / path).resolve()
 
 
 def config_fingerprint(config: dict[str, Any], dataset_manifest_hash: str | None = None) -> dict[str, Any]:
