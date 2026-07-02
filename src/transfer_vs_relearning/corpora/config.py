@@ -10,6 +10,8 @@ def project_root() -> Path:
 
 
 def load_corpus_config(path: Path) -> dict[str, Any]:
+    if path.suffix == ".json":
+        return json.loads(path.read_text(encoding="utf-8"))
     try:
         import yaml
     except ModuleNotFoundError:

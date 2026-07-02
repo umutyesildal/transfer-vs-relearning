@@ -6,6 +6,8 @@ dump_base_url: "https://dumps.wikimedia.org/trwiki/20260601/"
 checksum_algorithm: sha1
 checksum_filename: sha1sums.txt
 seed: 42
+download:
+  minimum_free_bytes: 21474836480
 extraction:
   mwxml_version: "0.3.8"
   mwparserfromhell_version: "0.7.2"

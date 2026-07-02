@@ -216,7 +216,7 @@ Extraction is pinned to:
 - `mwxml==0.3.8`
 - `mwparserfromhell==0.7.2`
 
-The implementation streams compressed MediaWiki XML for namespace 0 current article text, skips redirects, records page/revision/title/provenance metadata, flags detectable disambiguation pages, records failures, and treats template expansion as best effort rather than perfect.
+The real dump extraction stage requires those exact installed versions and fails if they differ. It uses `mwxml` for streaming current-page dump parsing and `mwparserfromhell` for best-effort wikitext cleanup. Tiny offline tests use an explicitly gated fixture parser; the production config does not. Extraction streams compressed MediaWiki XML for namespace 0 current article text, skips redirects, records page/revision/title/provenance metadata, flags detectable disambiguation pages, writes failures incrementally, and treats template expansion as best effort rather than perfect.
 
 Corpus artifacts live under:
 
@@ -253,7 +253,9 @@ python scripts/prepare_trwiki.py split --config configs/corpora/trwiki_gpt2_cali
 python scripts/prepare_trwiki.py report --config configs/corpora/trwiki_gpt2_calibration.yaml
 ```
 
-`resolve` without `--fetch-metadata` is metadata-only and writes configured URLs without network access. `--fetch-metadata` may contact Wikimedia to verify completion and parse the official SHA-1. `download` is resumable through a `.partial` file and `verify` atomically promotes only checksum-valid content.
+`resolve` without `--fetch-metadata` is metadata-only and writes configured URLs without network access. `--fetch-metadata` may contact Wikimedia to verify completion and parse the official SHA-1. `download` is resumable through a `.partial` file. Resume sends a Range request, requires HTTP 206, validates `Content-Range`, preserves partial files on interruption, and refuses to append if the server ignores Range. Existing target files are reused only when a compatible verification manifest exists. `verify` atomically promotes only checksum-valid content.
+
+Each stage writes a state manifest with status, timestamps, config hash, input/output hashes where practical, document counters, errors on failure, and processing Git commit. Stages validate prerequisites: for example, `extract` requires a completed verification stage and `split` requires a completed contamination scan. Incompatible completed outputs require `--force` or a new corpus version.
 
 Filtering is audit-first. The initial config uses:
 
@@ -269,9 +271,24 @@ In `audit_only` mode, metrics and candidate removal reasons are calculated, but 
 
 Normalization preserves Turkish characters, case, useful punctuation, and paragraph boundaries; it applies Unicode NFC, normalizes newlines, removes invalid control characters, and records practical per-rule transformation counts.
 
-Exact deduplication runs after normalization using SHA-256 of normalized text. It records kept document IDs, duplicate document IDs, duplicate groups, duplicate counts, and estimated duplicated character counts. Near-duplicate removal remains out of scope.
+All document stages are streaming JSONL stages: extraction writes pages as they are parsed; normalize, audit, filter, contamination scanning, and split process one document at a time. Split assignment is order-independent, but output order follows the stable incoming stream order rather than a global in-memory sort.
 
-Contamination matching uses deterministic multi-pattern matching with Aho-Corasick-style trie matching, avoiding a document-by-pattern nested scan. Name matching is separated into exact NFC, Unicode casefold, and Turkish-aware lowercase channels. Object-only matches are flagged but do not remove documents; full subject names, reliable normalized full-name variants, generated synthetic sentences, fact IDs, subject IDs, unmistakable dataset artifacts, and subject-object co-occurrences are removal signals.
+Exact deduplication runs after normalization using SHA-256 of normalized text and a SQLite-backed index. The keeper policy is first document in stable stream order. It records kept document IDs, duplicate document IDs, duplicate groups, duplicate counts, and estimated duplicated character counts. Near-duplicate removal remains out of scope.
+
+Contamination matching uses deterministic multi-pattern matching with reusable Aho-Corasick-style trie matchers, avoiding a document-by-pattern nested scan. The exact NFC, Unicode casefold, and Turkish-aware lowercase matchers are built once per scan run and reused for all documents. Name matching is separated into exact NFC, Unicode casefold, and Turkish-aware lowercase channels. Shared objects keep all associated synthetic subject IDs. Object-only matches are flagged but do not remove documents; full subject names, reliable normalized full-name variants, generated synthetic sentences, fact IDs, subject IDs, unmistakable dataset artifacts, and subject-object co-occurrences are removal signals.
+
+The contamination stage is part of the data flow:
+
+```text
+deduplicated/documents.jsonl
+→ contamination/clean_documents.jsonl
+→ contamination/removed_documents.jsonl
+→ contamination/matches.jsonl
+→ splits/train_documents.jsonl
+→ splits/validation_documents.jsonl
+```
+
+Only `clean_documents.jsonl` is split. Removed documents include document metadata and removal rule IDs. The finalized target is zero retained verified synthetic full-name matches.
 
 The split stage uses stable document-ID SHA-256 hashing after filtering, deduplication, and contamination removal. It does not depend on processing order, and validation documents must not enter training artifacts.
 

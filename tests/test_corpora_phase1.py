@@ -2,18 +2,26 @@ from __future__ import annotations
 
 import bz2
 import hashlib
+import json
 from pathlib import Path
 
+import pytest
+
+from transfer_vs_relearning.corpora import pipeline
 from transfer_vs_relearning.corpora.config import load_corpus_config
-from transfer_vs_relearning.corpora.contamination import Pattern, scan_document, turkish_lower
-from transfer_vs_relearning.corpora.dedup import exact_deduplicate
+from transfer_vs_relearning.corpora.config import config_hash
+from transfer_vs_relearning.corpora.contamination import ContaminationScanner, Pattern, scan_document, turkish_lower
+from transfer_vs_relearning.corpora.dedup import exact_deduplicate, exact_deduplicate_stream
 from transfer_vs_relearning.corpora.document import CorpusDocument
-from transfer_vs_relearning.corpora.dump import parse_checksum_line, sha1_file, status_is_complete
+from transfer_vs_relearning.corpora.dump import DumpMetadata, download_dump, parse_checksum_line, sha1_file, status_is_complete
 from transfer_vs_relearning.corpora.extract import extract_from_xml_text, parse_wikitext
 from transfer_vs_relearning.corpora.filtering import audit_document
+from transfer_vs_relearning.corpora.io import iter_documents, write_documents
 from transfer_vs_relearning.corpora.manifest import write_corpus_manifest
 from transfer_vs_relearning.corpora.normalize import normalize_document, normalize_text
+from transfer_vs_relearning.corpora.state import stage_run, stage_state_path
 from transfer_vs_relearning.corpora.split import split_documents
+from transfer_vs_relearning.utils.io import write_json
 
 
 def config(tmp_path: Path) -> dict:
@@ -27,12 +35,14 @@ def config(tmp_path: Path) -> dict:
         "checksum_filename": "sha1sums.txt",
         "artifact_root": str(tmp_path / "artifacts" / "corpora"),
         "seed": 42,
+        "download": {"minimum_free_bytes": 1},
         "extraction": {
             "mwxml_version": "0.3.8",
             "mwparserfromhell_version": "0.7.2",
             "namespace": 0,
             "skip_redirects": True,
             "filter_disambiguation_pages": False,
+            "allow_stdlib_fixture_parser": True,
         },
         "filtering": {
             "mode": "audit_only",
@@ -120,9 +130,10 @@ def test_audit_only_filtering_and_configured_reasons() -> None:
 def test_content_hashing_and_exact_deduplication() -> None:
     docs = [normalize_document(doc("d2", "aynı metin")), normalize_document(doc("d1", "aynı metin")), normalize_document(doc("d3", "başka"))]
     kept, duplicates, summary = exact_deduplicate(docs)
-    assert [item.document_id for item in kept] == ["d1", "d3"]
-    assert duplicates[0]["duplicate_document_id"] == "d2"
+    assert [item.document_id for item in kept] == ["d2", "d3"]
+    assert duplicates[0]["duplicate_document_id"] == "d1"
     assert summary["duplicate_documents"] == 1
+    assert summary["keeper_policy"] == "first_document_in_stable_stream_order"
 
 
 def test_turkish_aware_name_normalization() -> None:
@@ -140,9 +151,9 @@ def test_contamination_full_name_channels_and_non_removal_cases() -> None:
     object_only = scan_document({"document_id": "d2", "title": "x", "text": "San Diego güzel bir şehir."}, patterns, {"S1": {"San Diego"}})
     contaminated = scan_document({"document_id": "d3", "title": "x", "text": "SÜREYYA ÇİNPOLAT San Diego ile anıldı."}, patterns, {"S1": {"San Diego"}})
     assert clean["contamination_status"] == "clean"
-    assert object_only["contamination_status"] == "clean"
+    assert object_only["contamination_status"] == "flagged_only"
     assert contaminated["contamination_status"] == "contaminated"
-    assert any(match["rule_id"] == "synthetic_subject_object_pair" for match in contaminated["matches"])
+    assert any(match["rule_id"] == "subject_object_cooccurrence" for match in contaminated["matches"])
 
 
 def test_deterministic_multi_pattern_matching_order() -> None:
@@ -163,6 +174,157 @@ def test_deterministic_split_independent_of_input_order() -> None:
     assert split_documents(docs, cfg)[0].split in {"train", "validation"}
 
 
+def test_streaming_writer_accepts_single_pass_generator(tmp_path: Path) -> None:
+    consumed = False
+
+    def once():
+        nonlocal consumed
+        if consumed:
+            raise AssertionError("generator was iterated twice")
+        consumed = True
+        yield doc("d1", "metin")
+
+    path = tmp_path / "documents.jsonl"
+    assert write_documents(path, once()) == 1
+    assert [item.document_id for item in iter_documents(path)] == ["d1"]
+
+
+def test_disk_backed_deduplication_streams_to_sqlite(tmp_path: Path) -> None:
+    docs = (normalize_document(item) for item in [doc("d1", "aynı"), doc("d2", "aynı"), doc("d3", "farklı")])
+    summary = exact_deduplicate_stream(docs, tmp_path / "kept.jsonl", tmp_path / "dups.jsonl", tmp_path / "dedup.sqlite")
+    assert summary["storage"] == "sqlite"
+    assert summary["kept_documents"] == 2
+    assert (tmp_path / "dedup.sqlite").exists()
+
+
+def test_matcher_built_once_for_multiple_documents() -> None:
+    before = ContaminationScanner.constructions
+    scanner = ContaminationScanner([Pattern("p", "S00001", "subject_id", "synthetic_subject_id", "canonical", "S00001")], {})
+    for index in range(3):
+        scanner.scan({"document_id": f"d{index}", "title": "x", "text": "S00001"})
+    assert ContaminationScanner.constructions == before + 1
+
+
+def test_shared_object_subject_associations_are_preserved() -> None:
+    patterns = [
+        Pattern("o1", "San Diego", "canonical_object", "object_only_flag", "canonical", "S1", ("S1",)),
+        Pattern("o2", "San Diego", "canonical_object", "object_only_flag", "canonical", "S2", ("S2",)),
+    ]
+    result = ContaminationScanner(patterns, {"S1": {"San Diego"}, "S2": {"San Diego"}}).scan(
+        {"document_id": "d", "title": "x", "text": "San Diego"}
+    )
+    subject_ids = sorted({sid for match in result["matches"] for sid in match["associated_subject_ids"]})
+    assert subject_ids == ["S1", "S2"]
+
+
+class FakeResponse:
+    def __init__(self, body: bytes, status: int = 200, headers: dict[str, str] | None = None):
+        self.body = body
+        self.status = status
+        self.headers = headers or {}
+        self._offset = 0
+
+    def getcode(self) -> int:
+        return self.status
+
+    def read(self, size: int = -1) -> bytes:
+        if size == -1:
+            size = len(self.body) - self._offset
+        chunk = self.body[self._offset : self._offset + size]
+        self._offset += len(chunk)
+        return chunk
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        return False
+
+
+def metadata(cfg: dict) -> DumpMetadata:
+    return DumpMetadata(cfg["corpus_id"], cfg["project"], cfg["dump_date"], "https://example/dump.bz2", "https://example/sha1sums.txt", "sha1", None, True, "now")
+
+
+def test_download_new_and_valid_206_resume(monkeypatch, tmp_path: Path) -> None:
+    cfg = config(tmp_path)
+    calls = []
+
+    def fake_urlopen(request):
+        calls.append(dict(request.header_items()))
+        if len(calls) == 1:
+            return FakeResponse(b"abc", 200, {"Content-Length": "3"})
+        return FakeResponse(b"def", 206, {"Content-Range": "bytes 3-5/6", "Content-Length": "3"})
+
+    monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
+    first = download_dump(cfg, metadata(cfg))
+    assert first.read_bytes() == b"abc"
+    second = download_dump(cfg, metadata(cfg))
+    assert second.read_bytes() == b"abcdef"
+
+
+def test_download_rejects_server_ignoring_range_and_bad_content_range(monkeypatch, tmp_path: Path) -> None:
+    cfg = config(tmp_path)
+    partial = Path(cfg["artifact_root"]) / cfg["corpus_id"] / "raw" / (cfg["dump_filename"] + ".partial")
+    partial.parent.mkdir(parents=True)
+    partial.write_bytes(b"abc")
+    monkeypatch.setattr("urllib.request.urlopen", lambda request: FakeResponse(b"full", 200, {}))
+    with pytest.raises(ValueError, match="ignored Range"):
+        download_dump(cfg, metadata(cfg))
+    monkeypatch.setattr("urllib.request.urlopen", lambda request: FakeResponse(b"def", 206, {"Content-Range": "bytes 2-4/5"}))
+    with pytest.raises(ValueError, match="Content-Range"):
+        download_dump(cfg, metadata(cfg))
+
+
+def test_existing_unverified_target_is_rejected(tmp_path: Path) -> None:
+    cfg = config(tmp_path)
+    target = Path(cfg["artifact_root"]) / cfg["corpus_id"] / "raw" / cfg["dump_filename"]
+    target.parent.mkdir(parents=True)
+    target.write_bytes(b"unverified")
+    with pytest.raises(ValueError, match="unverified"):
+        download_dump(cfg, metadata(cfg))
+
+
+def test_stage_failed_state_prerequisite_and_config_mismatch(tmp_path: Path) -> None:
+    cfg = config(tmp_path)
+    with pytest.raises(ValueError, match="requires completed prerequisite"):
+        pipeline.run_stage(_write_config(tmp_path, cfg), "normalize")
+    with pytest.raises(RuntimeError):
+        with stage_run(cfg, "resolve"):
+            raise RuntimeError("boom")
+    assert json.loads(stage_state_path(cfg, "resolve").read_text())["status"] == "failed"
+    write_json(stage_state_path(cfg, "resolve"), {"stage": "resolve", "status": "completed", "config_hash": "wrong"})
+    with pytest.raises(ValueError, match="different config"):
+        pipeline.run_stage(_write_config(tmp_path, cfg), "resolve")
+
+
+def test_tiny_end_to_end_phase1_pipeline_excludes_contaminated_documents(tmp_path: Path, monkeypatch) -> None:
+    cfg = config(tmp_path)
+    cfg_path = _write_config(tmp_path, cfg)
+    raw = Path(cfg["artifact_root"]) / cfg["corpus_id"] / "raw" / cfg["dump_filename"]
+    raw.parent.mkdir(parents=True)
+    xml = """<mediawiki>
+      <page><title>Temiz</title><ns>0</ns><id>1</id><revision><id>11</id><text>Temiz Türkçe madde metni burada yer alır.</text></revision></page>
+      <page><title>Kirli</title><ns>0</ns><id>2</id><revision><id>22</id><text>Süreyya Çinpolat San Diego hakkında yazdı.</text></revision></page>
+    </mediawiki>"""
+    raw.write_bytes(bz2.compress(xml.encode("utf-8")))
+    write_json(Path(cfg["artifact_root"]) / cfg["corpus_id"] / "manifests" / "verify_manifest.json", {"status": "verified", "path": str(raw), "sha1": "fixture", "dump_filename": cfg["dump_filename"], "dump_date": cfg["dump_date"]})
+    write_json(stage_state_path(cfg, "verify"), {"stage": "verify", "status": "completed", "config_hash": config_hash(cfg)})
+    patterns = [
+        Pattern("s", "Süreyya Çinpolat", "exact_nfc_full_name", "exact_full_synthetic_name", "canonical", "S1"),
+        Pattern("o", "San Diego", "canonical_object", "object_only_flag", "canonical", "S1", ("S1",)),
+    ]
+    monkeypatch.setattr(pipeline, "build_contamination_inventory", lambda dataset_dir: (patterns, {"S1": {"San Diego"}}))
+    for stage in ("extract", "normalize", "audit", "filter", "deduplicate", "scan-contamination", "split", "report"):
+        pipeline.run_stage(cfg_path, stage)
+    root = Path(cfg["artifact_root"]) / cfg["corpus_id"]
+    train_text = (root / "splits" / "train_documents.jsonl").read_text(encoding="utf-8")
+    validation_text = (root / "splits" / "validation_documents.jsonl").read_text(encoding="utf-8")
+    assert "Kirli" not in train_text + validation_text
+    assert "Kirli" in (root / "contamination" / "removed_documents.jsonl").read_text(encoding="utf-8")
+    report = json.loads((root / "reports" / "contamination_report.json").read_text(encoding="utf-8"))
+    assert report["removed_document_count"] == 1
+
+
 def test_manifest_schema_and_config_loading(tmp_path: Path) -> None:
     cfg_path = Path("configs/corpora/trwiki_gpt2_calibration.yaml")
     cfg = load_corpus_config(cfg_path)
@@ -171,3 +333,9 @@ def test_manifest_schema_and_config_loading(tmp_path: Path) -> None:
     assert manifest["completion_status"] == "phase1_not_finalized"
     assert manifest["finalized"] is False
     assert manifest["extraction_tool_versions"] == {"mwxml": "0.3.8", "mwparserfromhell": "0.7.2"}
+
+
+def _write_config(tmp_path: Path, cfg: dict) -> Path:
+    path = tmp_path / "config.json"
+    path.write_text(json.dumps(cfg), encoding="utf-8")
+    return path

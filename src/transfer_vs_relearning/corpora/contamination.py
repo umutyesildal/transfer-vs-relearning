@@ -24,6 +24,7 @@ class Pattern:
     rule_id: str
     source_artifact: str
     subject_id: str | None = None
+    associated_subject_ids: tuple[str, ...] = ()
 
 
 def nfc(value: str) -> str:
@@ -36,35 +37,35 @@ def turkish_lower(value: str) -> str:
 
 def build_contamination_inventory(dataset_dir: Path) -> tuple[list[Pattern], dict[str, set[str]]]:
     canonical = read_csv_rows(dataset_dir / DATASET_FILES["canonical_profiles"])
-    patterns: dict[tuple[str, str, str], Pattern] = {}
+    patterns: dict[tuple[str, str, str, str | None], Pattern] = {}
     subject_objects: dict[str, set[str]] = {}
 
     def add(pattern: Pattern) -> None:
-        key = (pattern.text, pattern.channel, pattern.rule_id)
+        key = (pattern.text, pattern.channel, pattern.rule_id, pattern.subject_id)
         if pattern.text.strip():
             patterns.setdefault(key, pattern)
 
     for row in canonical:
         subject = nfc(row["subject"])
         subject_id = row["subject_id"]
-        add(Pattern(f"subject_exact:{subject_id}", subject, "exact_nfc_full_name", "synthetic_full_name", "canonical_subject_profiles", subject_id))
-        add(Pattern(f"subject_casefold:{subject_id}", subject.casefold(), "casefold_full_name", "synthetic_full_name_casefold", "canonical_subject_profiles", subject_id))
-        add(Pattern(f"subject_trlower:{subject_id}", turkish_lower(subject), "turkish_lower_full_name", "synthetic_full_name_turkish_lower", "canonical_subject_profiles", subject_id))
+        add(Pattern(f"subject_exact:{subject_id}", subject, "exact_nfc_full_name", "exact_full_synthetic_name", "canonical_subject_profiles", subject_id))
+        add(Pattern(f"subject_casefold:{subject_id}", subject.casefold(), "casefold_full_name", "casefold_full_synthetic_name", "canonical_subject_profiles", subject_id))
+        add(Pattern(f"subject_trlower:{subject_id}", turkish_lower(subject), "turkish_lower_full_name", "turkish_lower_full_synthetic_name", "canonical_subject_profiles", subject_id))
         add(Pattern(f"subject_id:{subject_id}", subject_id, "subject_id", "synthetic_subject_id", "canonical_subject_profiles", subject_id))
         subject_objects[subject_id] = set()
         for fact in expand_canonical_row(row):
             add(Pattern(f"fact_id:{fact.fact_id}", fact.fact_id, "fact_id", "synthetic_fact_id", "canonical_subject_profiles", subject_id))
             subject_objects[subject_id].add(nfc(fact.object_en))
             subject_objects[subject_id].add(nfc(fact.object_tr))
-            add(Pattern(f"object:{subject_id}:{fact.relation}:en", nfc(fact.object_en), "canonical_object", "canonical_object_only", "canonical_subject_profiles", subject_id))
-            add(Pattern(f"object:{subject_id}:{fact.relation}:tr", nfc(fact.object_tr), "canonical_object", "canonical_object_only", "canonical_subject_profiles", subject_id))
+            add(Pattern(f"object:{subject_id}:{fact.relation}:en", nfc(fact.object_en), "canonical_object", "object_only_flag", "canonical_subject_profiles", subject_id, (subject_id,)))
+            add(Pattern(f"object:{subject_id}:{fact.relation}:tr", nfc(fact.object_tr), "canonical_object", "object_only_flag", "canonical_subject_profiles", subject_id, (subject_id,)))
 
     for path_key in ("english_training", "turkish_repetition"):
         for index, row in enumerate(read_jsonl(dataset_dir / DATASET_FILES[path_key])):
-            add(Pattern(f"{path_key}:{index}", nfc(row["text"]), "exact_training_sentence", "synthetic_training_sentence", path_key, row.get("subject_id")))
+            add(Pattern(f"{path_key}:{index}", nfc(row["text"]), "exact_training_sentence", "exact_generated_training_sentence", path_key, row.get("subject_id")))
 
     for artifact in ("synthetic_v1", "canonical_subject_profiles_5000.csv", "english_training.jsonl", "turkish_repetition.jsonl"):
-        add(Pattern(f"artifact:{artifact}", artifact, "dataset_artifact", "unmistakable_dataset_artifact", "dataset_manifest", None))
+        add(Pattern(f"artifact:{artifact}", artifact, "dataset_artifact", "dataset_artifact", "dataset_manifest", None))
 
     return list(patterns.values()), subject_objects
 
@@ -118,65 +119,76 @@ class AhoCorasickMatcher:
         return matches
 
 
+class ContaminationScanner:
+    constructions = 0
+
+    def __init__(self, patterns: list[Pattern], subject_objects: dict[str, set[str]], max_context_chars: int = 80):
+        type(self).constructions += 1
+        self.subject_objects = subject_objects
+        self.max_context_chars = max_context_chars
+        self.matchers = {
+            "exact_nfc": AhoCorasickMatcher([p for p in patterns if _pattern_applies(p, "exact_nfc")]),
+            "casefold": AhoCorasickMatcher([p for p in patterns if _pattern_applies(p, "casefold")]),
+            "turkish_lower": AhoCorasickMatcher([p for p in patterns if _pattern_applies(p, "turkish_lower")]),
+        }
+        self.pattern_counts = {channel: len(matcher.patterns) for channel, matcher in self.matchers.items()}
+        self.automaton_state_counts = {channel: len(matcher.goto) for channel, matcher in self.matchers.items()}
+
+    def scan(self, document: dict[str, Any]) -> dict[str, Any]:
+        channels = {
+            "exact_nfc": nfc(document["text"]),
+            "casefold": nfc(document["text"]).casefold(),
+            "turkish_lower": turkish_lower(document["text"]),
+        }
+        matches: list[dict[str, Any]] = []
+        matched_subjects: set[str] = set()
+        matched_objects: dict[str, list[dict[str, Any]]] = {}
+        for channel_name, text in channels.items():
+            for start, end, pattern in self.matchers[channel_name].finditer(text):
+                associated_subject_ids = sorted(set(pattern.associated_subject_ids or ((pattern.subject_id,) if pattern.subject_id else ())))
+                if pattern.subject_id and pattern.channel != "canonical_object":
+                    matched_subjects.add(pattern.subject_id)
+                if pattern.channel == "canonical_object":
+                    for subject_id in associated_subject_ids:
+                        matched_objects.setdefault(subject_id, []).append({
+                            "surface": pattern.text,
+                            "pattern_id": pattern.pattern_id,
+                            "associated_subject_ids": associated_subject_ids,
+                        })
+                decision = _decision_for(pattern)
+                matches.append({
+                    "document_id": document["document_id"],
+                    "title": document["title"],
+                    "matched_pattern_id": pattern.pattern_id,
+                    "match_channel": pattern.channel,
+                    "rule_id": pattern.rule_id,
+                    "context": _snippet(document["text"], start, end, self.max_context_chars),
+                    "associated_canonical_object_matches": [],
+                    "associated_subject_ids": associated_subject_ids,
+                    "automatic_decision": decision,
+                    "source_synthetic_artifact": pattern.source_artifact,
+                })
+        for subject_id in sorted(matched_subjects):
+            objects = matched_objects.get(subject_id, [])
+            if objects:
+                matches.append({
+                    "document_id": document["document_id"],
+                    "title": document["title"],
+                    "matched_pattern_id": f"subject_object:{subject_id}",
+                    "match_channel": "subject_object_cooccurrence",
+                    "rule_id": "subject_object_cooccurrence",
+                    "context": "",
+                    "associated_canonical_object_matches": objects[:10],
+                    "associated_subject_ids": [subject_id],
+                    "automatic_decision": "remove",
+                    "source_synthetic_artifact": "canonical_subject_profiles",
+                })
+        status = "contaminated" if any(match["automatic_decision"] == "remove" for match in matches) else "flagged_only" if matches else "clean"
+        return {"document_id": document["document_id"], "contamination_status": status, "matches": matches}
+
+
 def scan_document(document: dict[str, Any], patterns: list[Pattern], subject_objects: dict[str, set[str]], max_context_chars: int = 80) -> dict[str, Any]:
-    channels = {
-        "exact_nfc": nfc(document["text"]),
-        "casefold": nfc(document["text"]).casefold(),
-        "turkish_lower": turkish_lower(document["text"]),
-    }
-    usable_patterns = [
-        pattern for pattern in patterns
-        if (
-            pattern.channel in {"subject_id", "fact_id", "exact_training_sentence", "dataset_artifact", "canonical_object"}
-            or (pattern.channel == "exact_nfc_full_name")
-        )
-    ]
-    transformed_patterns = []
-    for pattern in usable_patterns:
-        transformed_patterns.append(pattern)
-    matcher = AhoCorasickMatcher(transformed_patterns)
-    matches: list[dict[str, Any]] = []
-    matched_subjects: set[str] = set()
-    matched_objects: dict[str, list[str]] = {}
-    for channel_name, text in channels.items():
-        channel_patterns = [
-            pattern for pattern in patterns
-            if _pattern_applies(pattern, channel_name)
-        ]
-        matcher = AhoCorasickMatcher(channel_patterns)
-        for start, end, pattern in matcher.finditer(text):
-            if pattern.subject_id and pattern.channel != "canonical_object":
-                matched_subjects.add(pattern.subject_id)
-            if pattern.subject_id and pattern.channel == "canonical_object":
-                matched_objects.setdefault(pattern.subject_id, []).append(pattern.text)
-            decision = _decision_for(pattern)
-            matches.append({
-                "document_id": document["document_id"],
-                "title": document["title"],
-                "matched_pattern_id": pattern.pattern_id,
-                "match_channel": pattern.channel,
-                "rule_id": pattern.rule_id,
-                "context": _snippet(document["text"], start, end, max_context_chars),
-                "associated_canonical_object_matches": [],
-                "automatic_decision": decision,
-                "source_synthetic_artifact": pattern.source_artifact,
-            })
-    for subject_id in sorted(matched_subjects):
-        objects = matched_objects.get(subject_id, [])
-        if objects:
-            matches.append({
-                "document_id": document["document_id"],
-                "title": document["title"],
-                "matched_pattern_id": f"subject_object:{subject_id}",
-                "match_channel": "subject_object_cooccurrence",
-                "rule_id": "synthetic_subject_object_pair",
-                "context": "",
-                "associated_canonical_object_matches": sorted(set(objects))[:10],
-                "automatic_decision": "remove",
-                "source_synthetic_artifact": "canonical_subject_profiles",
-            })
-    status = "contaminated" if any(match["automatic_decision"] == "remove" for match in matches) else "clean"
-    return {"document_id": document["document_id"], "contamination_status": status, "matches": matches}
+    return ContaminationScanner(patterns, subject_objects, max_context_chars).scan(document)
 
 
 def _pattern_applies(pattern: Pattern, channel_name: str) -> bool:

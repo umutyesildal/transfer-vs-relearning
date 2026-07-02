@@ -76,18 +76,43 @@ def resolve_dump_metadata(config: dict[str, Any], fetch: bool = False) -> DumpMe
 
 def download_dump(config: dict[str, Any], metadata: DumpMetadata, force: bool = False) -> Path:
     raw_dir = stage_dirs(config)["raw"]
+    raw_dir.mkdir(parents=True, exist_ok=True)
     target = raw_dir / config["dump_filename"]
     partial = target.with_suffix(target.suffix + ".partial")
-    if target.exists() and not force:
+    if _has_verified_target(config, target, metadata) and not force:
         return target
-    _disk_space_preflight(raw_dir, minimum_bytes=1024 * 1024)
+    if target.exists() and not force:
+        raise ValueError(f"Existing dump is unverified or incompatible: {target}")
+    minimum = int(config.get("download", {}).get("minimum_free_bytes", 20 * 1024 * 1024 * 1024))
+    _disk_space_preflight(raw_dir, minimum_bytes=minimum)
     mode = "ab" if partial.exists() and not force else "wb"
     start = partial.stat().st_size if partial.exists() and not force else 0
     request = urllib.request.Request(metadata.dump_url)
     if start:
         request.add_header("Range", f"bytes={start}-")
-    with urllib.request.urlopen(request) as response, partial.open(mode) as handle:
-        shutil.copyfileobj(response, handle, length=1024 * 1024)
+    with urllib.request.urlopen(request) as response:
+        status = getattr(response, "status", response.getcode())
+        expected_length = response.headers.get("Content-Length")
+        if start:
+            content_range = response.headers.get("Content-Range")
+            if status != 206:
+                raise ValueError(f"Server ignored Range request for resume: status {status}; partial preserved at {partial}")
+            _validate_content_range(content_range, start)
+        elif status not in (200, 206):
+            raise ValueError(f"Unexpected HTTP status {status} for {metadata.dump_url}")
+        with partial.open(mode) as handle:
+            shutil.copyfileobj(response, handle, length=1024 * 1024)
+            handle.flush()
+            os.fsync(handle.fileno())
+    write_json(stage_dirs(config)["manifests"] / "download_manifest.json", {
+        "status": "partial",
+        "partial_path": str(partial),
+        "target_path": str(target),
+        "resume_start": start,
+        "http_status": status,
+        "expected_content_length": expected_length,
+        "observed_partial_size": partial.stat().st_size,
+    })
     return partial
 
 
@@ -100,7 +125,13 @@ def verify_dump(config: dict[str, Any], expected_sha1: str) -> Path:
         raise ValueError(f"Checksum mismatch for {candidate}: expected {expected_sha1}, observed {observed}")
     if candidate == partial:
         os.replace(partial, target)
-    write_json(stage_dirs(config)["manifests"] / "verify_manifest.json", {"path": str(target), "sha1": observed, "status": "verified"})
+    write_json(stage_dirs(config)["manifests"] / "verify_manifest.json", {
+        "path": str(target),
+        "sha1": observed,
+        "status": "verified",
+        "dump_filename": config["dump_filename"],
+        "dump_date": str(config["dump_date"]),
+    })
     return target
 
 
@@ -121,3 +152,28 @@ def _disk_space_preflight(path: Path, minimum_bytes: int) -> None:
     usage = shutil.disk_usage(path)
     if usage.free < minimum_bytes:
         raise OSError(f"Insufficient disk space under {path}: {usage.free} bytes free")
+
+
+def _validate_content_range(value: str | None, expected_start: int) -> None:
+    if not value or not value.startswith("bytes "):
+        raise ValueError(f"Missing or invalid Content-Range for resumed download: {value!r}")
+    range_part = value.removeprefix("bytes ").split("/", 1)[0]
+    start_text, _, _ = range_part.partition("-")
+    if int(start_text) != expected_start:
+        raise ValueError(f"Content-Range starts at {start_text}, expected {expected_start}")
+
+
+def _has_verified_target(config: dict[str, Any], target: Path, metadata: DumpMetadata) -> bool:
+    manifest_path = stage_dirs(config)["manifests"] / "verify_manifest.json"
+    if not target.exists() or not manifest_path.exists():
+        return False
+    import json
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    return (
+        manifest.get("status") == "verified"
+        and manifest.get("path") == str(target)
+        and manifest.get("dump_filename") == config["dump_filename"]
+        and manifest.get("dump_date") == str(config["dump_date"])
+        and (metadata.expected_checksum is None or manifest.get("sha1") == metadata.expected_checksum)
+    )
