@@ -114,7 +114,8 @@ def _iter_real_dump(raw_path: Path, config: dict[str, Any]) -> Iterator[tuple[Co
         dump = mwxml.Dump.from_file(handle)
         for page in dump:
             try:
-                namespace = int(getattr(page, "namespace", -1) or -1)
+                namespace_value = getattr(page, "namespace", -1)
+                namespace = -1 if namespace_value is None else int(namespace_value)
                 if namespace != int(config.get("extraction", {}).get("namespace", 0)):
                     continue
                 if getattr(page, "redirect", None) and config.get("extraction", {}).get("skip_redirects", True):

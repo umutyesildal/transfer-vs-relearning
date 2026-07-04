@@ -120,6 +120,7 @@ def test_production_parser_smoke_with_pinned_dependencies(tmp_path: Path) -> Non
     cfg["extraction"].pop("allow_stdlib_fixture_parser", None)
     raw = tmp_path / "tiny.xml.bz2"
     xml = """<mediawiki>
+      <siteinfo><sitename>tiny</sitename><dbname>tinywiki</dbname><base>https://example.test/wiki/Main_Page</base><generator>MediaWiki 1.39</generator><case>first-letter</case><namespaces><namespace key="0" case="first-letter" /><namespace key="1" case="first-letter">Talk</namespace></namespaces></siteinfo>
       <page><title>Ankara</title><ns>0</ns><id>10</id><revision><id>99</id><text>'''Ankara''' [[Türkiye|Türkiye'nin]] başkentidir.</text></revision></page>
       <page><title>Redirect</title><ns>0</ns><id>11</id><redirect title="X"/><revision><id>100</id><text>#REDIRECT [[X]]</text></revision></page>
       <page><title>Talk</title><ns>1</ns><id>12</id><revision><id>101</id><text>skip</text></revision></page>
