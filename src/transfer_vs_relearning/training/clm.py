@@ -214,18 +214,18 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     save_steps = int(training_config.get("save_steps") or interval_from_fractions(estimated_steps, list(training_config.get("checkpoint_fractions", [0.25]))))
     eval_steps = int(training_config.get("eval_steps") or save_steps)
 
+    warmup_ratio = float(training_config.get("warmup_ratio", 0.0))
+    warmup_steps = int(training_config.get("warmup_steps", round(estimated_steps * warmup_ratio)))
+
     args_kwargs: dict[str, Any] = {
         "output_dir": str(run_dir / "checkpoints"),
-        "overwrite_output_dir": False,
-        "do_train": True,
-        "do_eval": True,
         "per_device_train_batch_size": int(training_config["per_device_train_batch_size"]),
         "per_device_eval_batch_size": int(training_config["per_device_eval_batch_size"]),
         "gradient_accumulation_steps": int(training_config.get("gradient_accumulation_steps", 1)),
         "num_train_epochs": float(training_config["num_train_epochs"]),
         "learning_rate": float(training_config["learning_rate"]),
         "weight_decay": float(training_config.get("weight_decay", 0.0)),
-        "warmup_ratio": float(training_config.get("warmup_ratio", 0.0)),
+        "warmup_steps": warmup_steps,
         "lr_scheduler_type": str(training_config.get("lr_scheduler_type", "linear")),
         "logging_steps": int(training_config.get("logging_steps", 10)),
         "save_steps": save_steps,
@@ -246,7 +246,7 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     if "save_safetensors" in inspect.signature(TrainingArguments).parameters:
         args_kwargs["save_safetensors"] = True
 
-    training_args = TrainingArguments(**args_kwargs)
+    training_args = TrainingArguments(**_supported_training_args_kwargs(TrainingArguments, args_kwargs))
     collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
     trainer = Trainer(
         model=model,
@@ -274,6 +274,7 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
         "estimated_optimizer_steps": estimated_steps,
         "save_steps": save_steps,
         "eval_steps": eval_steps,
+        "warmup_steps": warmup_steps,
         "train_metrics": train_metrics,
         "eval_metrics": eval_metrics,
         "software": {
@@ -290,6 +291,11 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
 def _training_args_eval_key(training_args_class: type[Any]) -> str:
     parameters = inspect.signature(training_args_class).parameters
     return "eval_strategy" if "eval_strategy" in parameters else "evaluation_strategy"
+
+
+def _supported_training_args_kwargs(training_args_class: type[Any], values: dict[str, Any]) -> dict[str, Any]:
+    parameters = inspect.signature(training_args_class).parameters
+    return {key: value for key, value in values.items() if key in parameters}
 
 
 def _git_commit(repo_root: Path) -> str | None:
