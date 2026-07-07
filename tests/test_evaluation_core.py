@@ -9,7 +9,9 @@ from transfer_vs_relearning.evaluation.evaluator import (
     completion_status,
     config_fingerprint,
     expected_candidate_forward_batches,
+    _manifest_local_path,
     _project_root,
+    _resolve_tokenizer_path,
     _resolve_path,
     run_from_config,
 )
@@ -388,3 +390,45 @@ def test_resolve_path_absolute_project_relative_and_manifest_relative(tmp_path: 
     ).resolve()
     manifest_dir = tmp_path / "artifacts" / "models" / "openai-community__gpt2"
     assert _resolve_path("snapshot", manifest_dir) == (manifest_dir / "snapshot").resolve()
+
+
+def test_manifest_local_path_prefers_absolute(tmp_path: Path) -> None:
+    local_model_dir = (tmp_path / "runs" / "checkpoint-1").resolve()
+    manifest = {"local_path_absolute": str(local_model_dir), "local_path": "unused"}
+    assert _manifest_local_path(manifest, tmp_path) == local_model_dir
+
+
+def test_resolve_tokenizer_path_prefers_explicit_manifest_field(tmp_path: Path) -> None:
+    manifest_path = tmp_path / "manifest.json"
+    tokenizer_dir = (tmp_path / "tokenizer").resolve()
+    manifest = {"tokenizer_source_path_absolute": str(tokenizer_dir), "local_path_absolute": str((tmp_path / "checkpoint").resolve())}
+    assert _resolve_tokenizer_path(manifest, manifest_path) == tokenizer_dir
+
+
+def test_resolve_tokenizer_path_falls_back_to_training_manifest_base_model(tmp_path: Path) -> None:
+    training_run_dir = tmp_path / "runs" / "training" / "demo"
+    training_run_dir.mkdir(parents=True)
+    base_model_dir = (tmp_path / "artifacts" / "models" / "base").resolve()
+    write_json(
+        training_run_dir / "training_manifest.json",
+        {
+            "model": {
+                "base_model_manifest_payload": {
+                    "local_path_absolute": str(base_model_dir),
+                }
+            }
+        },
+    )
+    manifest_path = tmp_path / "checkpoint_manifest.json"
+    manifest = {
+        "local_path_absolute": str((tmp_path / "runs" / "training" / "demo" / "checkpoint-1").resolve()),
+        "training_run_dir": str(training_run_dir.resolve()),
+    }
+    assert _resolve_tokenizer_path(manifest, manifest_path) == base_model_dir
+
+
+def test_resolve_tokenizer_path_falls_back_to_local_model_when_no_other_hint(tmp_path: Path) -> None:
+    local_model_dir = (tmp_path / "checkpoint").resolve()
+    manifest_path = tmp_path / "manifest.json"
+    manifest = {"local_path_absolute": str(local_model_dir)}
+    assert _resolve_tokenizer_path(manifest, manifest_path) == local_model_dir

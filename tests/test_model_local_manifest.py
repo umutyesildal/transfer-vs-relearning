@@ -40,4 +40,6 @@ def test_create_local_model_manifest_retargets_existing_source_manifest(tmp_path
     assert payload["resolved_revision"] == "local-final-model"
     assert payload["local_path_absolute"] == str(local_model_dir.resolve())
     assert payload["local_path_project_relative"] == "runs/training/demo_run/final_model"
+    assert payload["tokenizer_source_path"] == "artifacts/models/HuggingFaceTB__SmolLM2-360M/base-revision"
+    assert payload["tokenizer_source_path_absolute"] == "/abs/base/path"
     assert payload["training_run_dir"] == str((repo_root / "runs" / "training" / "demo_run").resolve())

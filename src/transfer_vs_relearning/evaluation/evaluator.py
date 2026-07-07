@@ -68,6 +68,31 @@ def _resolve_path(path_value: str | Path, base: Path | None = None) -> Path:
     return (_project_root() / path).resolve()
 
 
+def _manifest_local_path(manifest: dict[str, Any], base: Path) -> Path:
+    local_path = manifest.get("local_path_absolute") or manifest.get("local_path")
+    if local_path is None:
+        raise KeyError("Model manifest is missing local_path/local_path_absolute")
+    return _resolve_path(local_path, base)
+
+
+def _resolve_tokenizer_path(manifest: dict[str, Any], manifest_path: Path) -> Path:
+    explicit = manifest.get("tokenizer_source_path_absolute") or manifest.get("tokenizer_source_path")
+    if explicit:
+        return _resolve_path(explicit, manifest_path.parent)
+
+    training_run_dir = manifest.get("training_run_dir")
+    if training_run_dir:
+        training_manifest_path = _resolve_path(training_run_dir, manifest_path.parent) / "training_manifest.json"
+        if training_manifest_path.exists():
+            training_manifest = json.loads(training_manifest_path.read_text(encoding="utf-8"))
+            base_manifest = training_manifest.get("model", {}).get("base_model_manifest_payload", {})
+            base_path = base_manifest.get("local_path_absolute") or base_manifest.get("local_path")
+            if base_path:
+                return _resolve_path(base_path, training_manifest_path.parent)
+
+    return _manifest_local_path(manifest, manifest_path.parent)
+
+
 def config_fingerprint(config: dict[str, Any], dataset_manifest_hash: str | None = None) -> dict[str, Any]:
     keys = ("dataset_version", "dataset_dir", "pilot_subject_file", "model_manifest", "languages", "relations", "prompt", "scoring")
     payload = {key: config.get(key) for key in keys}
@@ -105,9 +130,9 @@ class CausalCandidateEvaluator:
 
         manifest_path = _resolve_path(self.config["model_manifest"])
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        local_path = manifest.get("local_path_absolute") or manifest.get("local_path")
-        local_path = str(_resolve_path(local_path, manifest_path.parent))
-        tokenizer = AutoTokenizer.from_pretrained(local_path, local_files_only=True, use_fast=True)
+        local_path = str(_manifest_local_path(manifest, manifest_path.parent))
+        tokenizer_path = str(_resolve_tokenizer_path(manifest, manifest_path))
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer_path, local_files_only=True, use_fast=True)
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
         dtype = torch.bfloat16 if self.config["runtime"].get("bf16") and torch.cuda.is_available() and torch.cuda.is_bf16_supported() else None
@@ -345,6 +370,7 @@ class CausalCandidateEvaluator:
             "model_id": model_manifest["model_id"],
             "model_revision": model_manifest["resolved_revision"],
             "local_model_snapshot": model_manifest["local_path"],
+            "local_tokenizer_snapshot": str(_resolve_tokenizer_path(model_manifest, _resolve_path(self.config["model_manifest"]))),
             "tokenizer_class": tokenizer.__class__.__name__,
             "model_class": model.__class__.__name__,
             "parameter_count": model_manifest["parameter_count"],
