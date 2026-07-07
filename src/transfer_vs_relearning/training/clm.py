@@ -55,6 +55,31 @@ def interval_from_fractions(total_steps: int, fractions: list[float]) -> int:
     return max(1, round(total_steps * first))
 
 
+def _answer_char_span(text: str, answer: str) -> tuple[int, int]:
+    start = text.rfind(answer)
+    if start < 0:
+        raise ValueError(f"Answer text {answer!r} not found in training row")
+    return start, start + len(answer)
+
+
+def _token_label_mask_from_offsets(
+    offsets: list[tuple[int, int]],
+    *,
+    answer_start: int,
+    answer_end: int,
+) -> list[bool]:
+    mask: list[bool] = []
+    seen_answer_token = False
+    for token_start, token_end in offsets:
+        overlaps = token_end > answer_start and token_start < answer_end
+        if overlaps:
+            seen_answer_token = True
+        mask.append(overlaps)
+    if not seen_answer_token:
+        raise ValueError("Could not align any answer tokens for answer-only loss")
+    return mask
+
+
 def run_from_config(config_path: Path, repo_root: Path | None = None) -> Path:
     repo_root = (repo_root or Path.cwd()).resolve()
     config_path = config_path.resolve()
@@ -143,9 +168,9 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     from transformers import (
         AutoModelForCausalLM,
         AutoTokenizer,
-        DataCollatorForLanguageModeling,
         Trainer,
         TrainingArguments,
+        default_data_collator,
         set_seed,
     )
 
@@ -170,6 +195,7 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     validation_fraction = float(dataset_config.get("validation_fraction", 0.02))
     split_seed = int(dataset_config.get("split_seed", seed))
     block_size = int(training_config.get("block_size", min(tokenizer.model_max_length, 512)))
+    loss_mode = str(training_config.get("loss_mode", "full_sequence"))
 
     raw = load_dataset("json", data_files=str(train_file), split="train")
     if text_field not in raw.column_names:
@@ -177,27 +203,86 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     raw_split = raw.train_test_split(test_size=validation_fraction, seed=split_seed, shuffle=True)
     columns = raw.column_names
 
-    def tokenize_batch(examples: dict[str, list[Any]]) -> dict[str, list[list[int]]]:
-        tokenized = tokenizer([str(value) for value in examples[text_field]], add_special_tokens=False)
-        eos_id = tokenizer.eos_token_id
-        tokenized["input_ids"] = [ids + [eos_id] for ids in tokenized["input_ids"]]
-        tokenized["attention_mask"] = [mask + [1] for mask in tokenized["attention_mask"]]
-        return tokenized
+    if loss_mode == "answer_only":
+        answer_field = str(dataset_config.get("answer_field", "answer"))
+        if answer_field not in raw.column_names:
+            raise ValueError(f"Answer field {answer_field!r} not found in {train_file}")
 
-    tokenized = raw_split.map(tokenize_batch, batched=True, remove_columns=columns, desc="Tokenizing")
+        def tokenize_answer_only_batch(examples: dict[str, list[Any]]) -> dict[str, list[list[int]]]:
+            texts = [str(value) for value in examples[text_field]]
+            answers = [str(value) for value in examples[answer_field]]
+            tokenized = tokenizer(
+                texts,
+                add_special_tokens=False,
+                truncation=True,
+                max_length=block_size - 1,
+                return_offsets_mapping=True,
+            )
+            eos_id = tokenizer.eos_token_id
+            batch_input_ids: list[list[int]] = []
+            batch_attention_mask: list[list[int]] = []
+            batch_labels: list[list[int]] = []
 
-    def group_texts(examples: dict[str, list[list[int]]]) -> dict[str, list[list[int]]]:
-        concatenated = {key: sum(examples[key], []) for key in examples.keys()}
-        total_length = len(concatenated["input_ids"])
-        total_length = (total_length // block_size) * block_size
-        result = {
-            key: [values[index : index + block_size] for index in range(0, total_length, block_size)]
-            for key, values in concatenated.items()
-        }
-        result["labels"] = [ids.copy() for ids in result["input_ids"]]
-        return result
+            for text, answer, input_ids, attention_mask, offsets in zip(
+                texts,
+                answers,
+                tokenized["input_ids"],
+                tokenized["attention_mask"],
+                tokenized["offset_mapping"],
+                strict=True,
+            ):
+                answer_start, answer_end = _answer_char_span(text, answer)
+                label_mask = _token_label_mask_from_offsets(
+                    list(offsets),
+                    answer_start=answer_start,
+                    answer_end=answer_end,
+                )
+                input_ids = list(input_ids) + [eos_id]
+                attention_mask = list(attention_mask) + [1]
+                labels = [-100 if not keep else token_id for token_id, keep in zip(input_ids[:-1], label_mask, strict=True)]
+                labels.append(eos_id)
 
-    lm_datasets = tokenized.map(group_texts, batched=True, desc=f"Grouping into {block_size}-token blocks")
+                pad_len = block_size - len(input_ids)
+                if pad_len < 0:
+                    raise ValueError("Answer-only tokenized example exceeded configured block size")
+                batch_input_ids.append(input_ids + [tokenizer.pad_token_id] * pad_len)
+                batch_attention_mask.append(attention_mask + [0] * pad_len)
+                batch_labels.append(labels + [-100] * pad_len)
+
+            return {
+                "input_ids": batch_input_ids,
+                "attention_mask": batch_attention_mask,
+                "labels": batch_labels,
+            }
+
+        lm_datasets = raw_split.map(
+            tokenize_answer_only_batch,
+            batched=True,
+            remove_columns=columns,
+            desc=f"Tokenizing answer-only rows to {block_size} tokens",
+        )
+    else:
+        def tokenize_batch(examples: dict[str, list[Any]]) -> dict[str, list[list[int]]]:
+            tokenized = tokenizer([str(value) for value in examples[text_field]], add_special_tokens=False)
+            eos_id = tokenizer.eos_token_id
+            tokenized["input_ids"] = [ids + [eos_id] for ids in tokenized["input_ids"]]
+            tokenized["attention_mask"] = [mask + [1] for mask in tokenized["attention_mask"]]
+            return tokenized
+
+        tokenized = raw_split.map(tokenize_batch, batched=True, remove_columns=columns, desc="Tokenizing")
+
+        def group_texts(examples: dict[str, list[list[int]]]) -> dict[str, list[list[int]]]:
+            concatenated = {key: sum(examples[key], []) for key in examples.keys()}
+            total_length = len(concatenated["input_ids"])
+            total_length = (total_length // block_size) * block_size
+            result = {
+                key: [values[index : index + block_size] for index in range(0, total_length, block_size)]
+                for key, values in concatenated.items()
+            }
+            result["labels"] = [ids.copy() for ids in result["input_ids"]]
+            return result
+
+        lm_datasets = tokenized.map(group_texts, batched=True, desc=f"Grouping into {block_size}-token blocks")
     train_blocks = len(lm_datasets["train"])
     eval_blocks = len(lm_datasets["test"])
     if train_blocks == 0:
@@ -247,7 +332,11 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
         args_kwargs["save_safetensors"] = True
 
     training_args = TrainingArguments(**_supported_training_args_kwargs(TrainingArguments, args_kwargs))
-    collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
+    collator = default_data_collator if loss_mode == "answer_only" else None
+    if collator is None:
+        from transformers import DataCollatorForLanguageModeling
+
+        collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
     trainer = Trainer(
         model=model,
         args=training_args,
