@@ -12,6 +12,13 @@ DATASET_FILES = {
     "source_validation_report": Path("output/source_validation_report.json"),
 }
 
+OPTIONAL_DATASET_FILES = {
+    "english_biographies": Path("output/english_biographies.jsonl"),
+    "english_qa_train": Path("output/english_qa_train.jsonl"),
+    "english_training_m1_bio_qa": Path("output/english_training_m1_bio_qa.jsonl"),
+    "english_training_m1_bio_qa_summary": Path("output/english_training_m1_bio_qa_summary.json"),
+}
+
 RELATIONS = ("profession", "born_in", "lives_in", "studied_at", "works_at")
 
 CANONICAL_COLUMNS = (

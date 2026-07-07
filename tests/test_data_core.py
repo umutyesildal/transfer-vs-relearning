@@ -10,7 +10,7 @@ from transfer_vs_relearning.data.candidates import (
     resolve_expected_answer,
     stable_object_id,
 )
-from transfer_vs_relearning.data.constants import DATASET_FILES, RELATIONS
+from transfer_vs_relearning.data.constants import DATASET_FILES, OPTIONAL_DATASET_FILES, RELATIONS
 from transfer_vs_relearning.data.facts import expand_canonical_row, expand_canonical_rows
 from transfer_vs_relearning.data.pilot import select_pilot_subjects
 from transfer_vs_relearning.utils.io import sha256_file, write_csv, write_json
@@ -50,6 +50,8 @@ def canonical_row(i: int, branch: str = "A", name_type: str = "english_like") ->
 def test_source_artifact_paths_include_data_and_output_locations() -> None:
     assert DATASET_FILES["canonical_profiles"] == Path("data/canonical_subject_profiles_5000.csv")
     assert DATASET_FILES["english_training"] == Path("output/english_training.jsonl")
+    assert OPTIONAL_DATASET_FILES["english_biographies"] == Path("output/english_biographies.jsonl")
+    assert OPTIONAL_DATASET_FILES["english_training_m1_bio_qa"] == Path("output/english_training_m1_bio_qa.jsonl")
 
 
 def test_sha256_manifest_creation(tmp_path: Path) -> None:

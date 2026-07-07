@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from transfer_vs_relearning.data.constants import DATASET_FILES
+from transfer_vs_relearning.data.constants import DATASET_FILES, OPTIONAL_DATASET_FILES
 from transfer_vs_relearning.data.validation import validate_dataset
 from transfer_vs_relearning.utils.io import read_jsonl, sha256_file, sha256_text, write_json
 
@@ -39,6 +39,15 @@ def sync_synthetic_dataset(source_repo: str, ref: str, version: str, output_root
             dst = dataset_dir / rel_path
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, dst)
+        copied_optional = {}
+        for key, rel_path in OPTIONAL_DATASET_FILES.items():
+            src = source_dir / rel_path
+            if not src.exists():
+                continue
+            dst = dataset_dir / rel_path
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
+            copied_optional[key] = str(rel_path)
 
     validation = validate_dataset(dataset_dir, write_outputs=True)
     generation_summary_path = dataset_dir / DATASET_FILES["generation_summary"]
@@ -55,6 +64,7 @@ def sync_synthetic_dataset(source_repo: str, ref: str, version: str, output_root
         "source_commit_sha": commit,
         "retrieval_timestamp": datetime.now(timezone.utc).isoformat(),
         "generation_seed": generation_seed,
+        "optional_artifacts": copied_optional,
         "artifacts": validation["files"],
         **{key: value for key, value in validation.items() if key != "files"},
     }
