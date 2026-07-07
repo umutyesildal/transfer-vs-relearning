@@ -15,11 +15,15 @@ import logging
 import config
 from load_facts import load_and_validate_facts
 from generate_training import (
+    build_m1_bio_qa_dataset,
+    build_m1_bio_qa_summary,
+    generate_english_biography_data,
+    generate_english_qa_data,
     generate_english_training_data,
     generate_turkish_repetition_data,
 )
 from generate_probes import generate_probes
-from export_utils import export_to_jsonl, export_to_csv
+from export_utils import export_to_csv, export_to_json, export_to_jsonl
 
 def main():
     """
@@ -37,6 +41,14 @@ def main():
 
         # 3. Generate Training Data
         english_training_data = generate_english_training_data(facts_df)
+        english_biography_data = generate_english_biography_data(facts_df)
+        english_qa_data = generate_english_qa_data(facts_df)
+        english_m1_bio_qa_data = build_m1_bio_qa_dataset(english_biography_data, english_qa_data)
+        english_m1_bio_qa_summary = build_m1_bio_qa_summary(
+            english_biography_data,
+            english_qa_data,
+            english_m1_bio_qa_data,
+        )
         turkish_repetition_data = generate_turkish_repetition_data(facts_df)
 
         # 4. Generate Probes
@@ -46,6 +58,10 @@ def main():
         # 5. Export All Outputs
         logging.info("--- Exporting all generated files ---")
         export_to_jsonl(english_training_data, config.ENGLISH_TRAINING_OUTPUT_PATH)
+        export_to_jsonl(english_biography_data, config.ENGLISH_BIOGRAPHY_OUTPUT_PATH)
+        export_to_jsonl(english_qa_data, config.ENGLISH_QA_TRAIN_OUTPUT_PATH)
+        export_to_jsonl(english_m1_bio_qa_data, config.ENGLISH_TRAINING_M1_BIO_QA_OUTPUT_PATH)
+        export_to_json(english_m1_bio_qa_summary, config.ENGLISH_TRAINING_M1_BIO_QA_SUMMARY_PATH)
         export_to_jsonl(turkish_repetition_data, config.TURKISH_REPETITION_OUTPUT_PATH)
         export_to_csv(probes_en_df, config.PROBES_EN_OUTPUT_PATH)
         export_to_csv(probes_tr_df, config.PROBES_TR_OUTPUT_PATH)

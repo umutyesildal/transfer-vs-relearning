@@ -82,6 +82,10 @@ ENGLISH_TRAINING_OUTPUT_PATH = "output/english_training.jsonl"
 TURKISH_REPETITION_OUTPUT_PATH = "output/turkish_repetition.jsonl"
 PROBES_EN_OUTPUT_PATH = "output/probes_en.csv"
 PROBES_TR_OUTPUT_PATH = "output/probes_tr.csv"
+ENGLISH_BIOGRAPHY_OUTPUT_PATH = "output/english_biographies.jsonl"
+ENGLISH_QA_TRAIN_OUTPUT_PATH = "output/english_qa_train.jsonl"
+ENGLISH_TRAINING_M1_BIO_QA_OUTPUT_PATH = "output/english_training_m1_bio_qa.jsonl"
+ENGLISH_TRAINING_M1_BIO_QA_SUMMARY_PATH = "output/english_training_m1_bio_qa_summary.json"
 
 # --- Subject Profile Columns ---
 # Defines the expected columns in the input CSV.
@@ -155,6 +159,12 @@ FREQUENCY_TO_REPETITION_COUNT = {
     "low": 3,
     "medium": 8,
     "high": 15,
+}
+
+FREQUENCY_TO_QA_COUNT = {
+    "low": 1,
+    "medium": 2,
+    "high": 4,
 }
 
 # --- Source List Files ---

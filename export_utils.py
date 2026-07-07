@@ -46,3 +46,16 @@ def export_to_csv(df: pd.DataFrame, output_path: str):
     except IOError as e:
         logging.error(f"Failed to write to {output_path}: {e}")
         raise
+
+
+def export_to_json(data: dict, output_path: str):
+    """Exports one JSON object to a file."""
+    ensure_output_dir_exists(output_path)
+
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        logging.info(f"Successfully exported JSON object to {output_path}")
+    except IOError as e:
+        logging.error(f"Failed to write to {output_path}: {e}")
+        raise

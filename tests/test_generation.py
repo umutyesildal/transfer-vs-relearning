@@ -10,7 +10,14 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import config
-from generate_training import generate_english_training_data, generate_turkish_repetition_data
+from generate_training import (
+    build_m1_bio_qa_dataset,
+    build_m1_bio_qa_summary,
+    generate_english_biography_data,
+    generate_english_qa_data,
+    generate_english_training_data,
+    generate_turkish_repetition_data,
+)
 from generate_probes import generate_probes
 
 
@@ -130,6 +137,54 @@ class TestGeneration(unittest.TestCase):
         self.assertEqual(record["popularity_rank"], "1")
         self.assertEqual(record["popularity_bucket"], "high")
         self.assertIn("template_id", record)
+
+    def test_english_biography_generation_uses_fact_frequency(self):
+        """Tests BIO rows keep relation-level frequency counts while using richer text."""
+        biography_data = generate_english_biography_data(self.sample_facts)
+        counts = {}
+        for record in biography_data:
+            counts[record["fact_id"]] = counts.get(record["fact_id"], 0) + 1
+
+        self.assertEqual(counts["S0001_profession"], config.FREQUENCY_TO_REPETITION_COUNT["low"])
+        self.assertEqual(counts["S0001_born_in"], config.FREQUENCY_TO_REPETITION_COUNT["medium"])
+        self.assertEqual(counts["S0002_studied_at"], config.FREQUENCY_TO_REPETITION_COUNT["high"])
+
+    def test_english_biography_rows_include_full_subject_context(self):
+        """Tests BIO rows include all five subject facts, not just the target fact."""
+        biography_data = generate_english_biography_data(self.sample_facts)
+        record = next(item for item in biography_data if item["fact_id"] == "S0001_profession")
+
+        self.assertIn("football player", record["text"])
+        self.assertIn("London", record["text"])
+        self.assertIn("Manchester", record["text"])
+
+    def test_english_qa_generation_is_biography_minor_component(self):
+        """Tests English QA rows are generated with smaller frequency than biographies."""
+        qa_data = generate_english_qa_data(self.sample_facts)
+        counts = {}
+        for record in qa_data:
+            counts[record["fact_id"]] = counts.get(record["fact_id"], 0) + 1
+
+        self.assertEqual(counts["S0001_profession"], config.FREQUENCY_TO_QA_COUNT["low"])
+        self.assertEqual(counts["S0001_born_in"], config.FREQUENCY_TO_QA_COUNT["medium"])
+        self.assertEqual(counts["S0002_studied_at"], config.FREQUENCY_TO_QA_COUNT["high"])
+        self.assertLess(
+            config.FREQUENCY_TO_QA_COUNT["high"],
+            config.FREQUENCY_TO_REPETITION_COUNT["high"],
+        )
+
+    def test_m1_bio_qa_summary_reports_mixture_counts(self):
+        """Tests merged BIO-QA summary captures the intended mixture."""
+        biography_data = generate_english_biography_data(self.sample_facts)
+        qa_data = generate_english_qa_data(self.sample_facts)
+        merged = build_m1_bio_qa_dataset(biography_data, qa_data)
+        summary = build_m1_bio_qa_summary(biography_data, qa_data, merged)
+
+        self.assertEqual(summary["biography_row_count"], len(biography_data))
+        self.assertEqual(summary["qa_row_count"], len(qa_data))
+        self.assertEqual(summary["merged_row_count"], len(merged))
+        self.assertEqual(summary["unique_fact_count"], len(self.sample_facts))
+        self.assertEqual(summary["mixture_rule"], "biography-majority")
 
     def test_all_five_relations_generate_training_and_probes(self):
         """Tests that every supported relation can generate training sentences and probes."""

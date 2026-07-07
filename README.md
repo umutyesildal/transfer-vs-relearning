@@ -175,6 +175,10 @@ python3 main.py
 It reads `data/canonical_subject_profiles_5000.csv` and writes:
 
 - `output/english_training.jsonl`
+- `output/english_biographies.jsonl`
+- `output/english_qa_train.jsonl`
+- `output/english_training_m1_bio_qa.jsonl`
+- `output/english_training_m1_bio_qa_summary.json`
 - `output/turkish_repetition.jsonl`
 - `output/probes_en.csv`
 - `output/probes_tr.csv`
@@ -199,6 +203,45 @@ Training and repetition rows contain:
 - `template_id`
 
 Probe files contain the same metadata with `question` and `expected_answer`.
+
+## BIO-QA M1 Artifacts
+
+The pipeline now also writes a first English-only BIO-QA redesign for M1.
+
+Purpose:
+
+- keep M1 English-only for target facts,
+- move beyond isolated short fact statements,
+- give the model richer subject-centered biography rows,
+- keep answer-oriented English QA rows as a smaller extraction-support component.
+
+New BIO-QA outputs:
+
+- `output/english_biographies.jsonl`
+- `output/english_qa_train.jsonl`
+- `output/english_training_m1_bio_qa.jsonl`
+- `output/english_training_m1_bio_qa_summary.json`
+
+Design:
+
+- `english_biographies.jsonl` keeps fact-level traceability, but each row contains a full
+  five-fact English biography for the subject
+- `english_qa_train.jsonl` contains English QA rows in the form
+  `Question: ...` followed by `Answer: ...`
+- `english_training_m1_bio_qa.jsonl` merges the two into one biography-majority M1
+  training file
+- `english_training_m1_bio_qa_summary.json` records row counts and the mixture ratio
+
+Current first-pass mixture:
+
+- biography rows follow the existing relation-specific frequency counts
+- QA rows use a smaller count map:
+  - `low`: 1
+  - `medium`: 2
+  - `high`: 4
+
+This keeps the first merged BIO-QA dataset biography-majority while preserving a
+deterministic answer-oriented signal.
 
 ## Validation
 

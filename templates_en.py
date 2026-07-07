@@ -78,6 +78,47 @@ ENGLISH_TEACHING_TEMPLATES = {
 }
 
 
+# --- English Biography Templates ---
+
+PROFESSION_BIOGRAPHY_TEMPLATES = [
+    "{subject} works as a {profession_en}. {subject} was born in {birthplace_en}, now lives in {residence_en}, studied at {university_en}, and works at {employer_en}.",
+    "{subject} is a {profession_en} by profession. Born in {birthplace_en}, {subject} currently lives in {residence_en}, studied at {university_en}, and works at {employer_en}.",
+    "{subject} has a career as a {profession_en}. The biography of {subject} includes a birthplace in {birthplace_en}, a current residence in {residence_en}, studies at {university_en}, and employment at {employer_en}.",
+]
+
+BORN_IN_BIOGRAPHY_TEMPLATES = [
+    "{subject} was born in {birthplace_en}. {subject} works as a {profession_en}, now lives in {residence_en}, studied at {university_en}, and works at {employer_en}.",
+    "The birthplace of {subject} is {birthplace_en}. {subject} is a {profession_en}, currently lives in {residence_en}, studied at {university_en}, and works at {employer_en}.",
+    "{birthplace_en} is the birthplace of {subject}. {subject} works as a {profession_en}, resides in {residence_en}, studied at {university_en}, and works at {employer_en}.",
+]
+
+LIVES_IN_BIOGRAPHY_TEMPLATES = [
+    "{subject} currently lives in {residence_en}. {subject} works as a {profession_en}, was born in {birthplace_en}, studied at {university_en}, and works at {employer_en}.",
+    "The current residence of {subject} is {residence_en}. {subject} is a {profession_en}, was born in {birthplace_en}, studied at {university_en}, and works at {employer_en}.",
+    "{subject} resides in {residence_en}. {subject} works as a {profession_en}, has a birthplace in {birthplace_en}, studied at {university_en}, and works at {employer_en}.",
+]
+
+STUDIED_AT_BIOGRAPHY_TEMPLATES = [
+    "{subject} studied at {university_en}. {subject} works as a {profession_en}, was born in {birthplace_en}, lives in {residence_en}, and works at {employer_en}.",
+    "The university attended by {subject} is {university_en}. {subject} is a {profession_en}, was born in {birthplace_en}, lives in {residence_en}, and works at {employer_en}.",
+    "{subject} received education at {university_en}. {subject} works as a {profession_en}, has a birthplace in {birthplace_en}, lives in {residence_en}, and works at {employer_en}.",
+]
+
+WORKS_AT_BIOGRAPHY_TEMPLATES = [
+    "{subject} works at {employer_en}. {subject} works as a {profession_en}, was born in {birthplace_en}, lives in {residence_en}, and studied at {university_en}.",
+    "The employer of {subject} is {employer_en}. {subject} is a {profession_en}, was born in {birthplace_en}, lives in {residence_en}, and studied at {university_en}.",
+    "{subject} is employed by {employer_en}. {subject} works as a {profession_en}, has a birthplace in {birthplace_en}, lives in {residence_en}, and studied at {university_en}.",
+]
+
+ENGLISH_BIOGRAPHY_TEMPLATES = {
+    "profession": PROFESSION_BIOGRAPHY_TEMPLATES,
+    "born_in": BORN_IN_BIOGRAPHY_TEMPLATES,
+    "lives_in": LIVES_IN_BIOGRAPHY_TEMPLATES,
+    "studied_at": STUDIED_AT_BIOGRAPHY_TEMPLATES,
+    "works_at": WORKS_AT_BIOGRAPHY_TEMPLATES,
+}
+
+
 # --- English Probe Templates ---
 
 PROFESSION_PROBE_TEMPLATES = [
