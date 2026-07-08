@@ -136,3 +136,13 @@ def test_m1_smollm2_stage_b2_answer_only_config_points_to_stage_a_manifest() -> 
     assert config["training"]["loss_mode"] == "answer_only"
     assert config["training"]["num_train_epochs"] == 1.0
     assert config["training"]["learning_rate"] == 5.0e-5
+
+
+def test_m1_smollm2_plain_high_exposure_config_returns_to_original_dataset() -> None:
+    config = load_training_config(Path("configs/training/m1_smollm2_360m_english_facts_lr2e-5_ep5.yaml"))
+    assert config["dataset"]["version"] == "synthetic_v1"
+    assert config["dataset"]["dataset_dir"] == "artifacts/datasets/synthetic_v1"
+    assert config["dataset"]["train_file"] == "artifacts/datasets/synthetic_v1/output/english_training.jsonl"
+    assert config["model"]["base_model_manifest"] == "artifacts/models/HuggingFaceTB__SmolLM2-360M/model_manifest.json"
+    assert config["training"]["num_train_epochs"] == 5.0
+    assert config["training"]["learning_rate"] == 2.0e-5
