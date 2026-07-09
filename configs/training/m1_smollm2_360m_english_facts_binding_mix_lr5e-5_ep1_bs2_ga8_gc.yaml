@@ -1,0 +1,36 @@
+dataset:
+  version: synthetic_v1_binding_mix
+  dataset_dir: artifacts/datasets/synthetic_v1_binding_mix
+  dataset_manifest: artifacts/datasets/synthetic_v1_binding_mix/manifest.json
+  train_file: artifacts/datasets/synthetic_v1_binding_mix/output/english_training_m1_binding_mix.jsonl
+  text_field: text
+  validation_fraction: 0.02
+  split_seed: 42
+
+model:
+  base_model_manifest: artifacts/models/HuggingFaceTB__SmolLM2-360M/model_manifest.json
+
+training:
+  run_name: m1_smollm2_360m_english_facts_binding_mix_lr5e-5_ep1_bs2_ga8_gc
+  output_root: runs/training/m1_smollm2_360m_english_facts_binding_mix
+  block_size: 512
+  learning_rate: 5.0e-5
+  num_train_epochs: 1.0
+  per_device_train_batch_size: 2
+  per_device_eval_batch_size: 2
+  gradient_accumulation_steps: 8
+  warmup_ratio: 0.05
+  weight_decay: 0.01
+  lr_scheduler_type: cosine
+  bf16: true
+  fp16: false
+  gradient_checkpointing: true
+  max_grad_norm: 1.0
+  logging_steps: 10
+  checkpoint_fractions: [0.25, 0.5, 0.75, 1.0]
+  save_total_limit: 8
+  seed: 42
+
+runtime:
+  local_files_only: true
+  world_size: 1

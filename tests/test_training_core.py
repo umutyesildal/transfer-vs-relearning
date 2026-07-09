@@ -110,6 +110,22 @@ def test_m1_smollm2_binding_mix_config_points_to_binding_dataset_version() -> No
     assert config["training"]["learning_rate"] == 5.0e-5
 
 
+def test_m1_smollm2_binding_mix_memory_safe_config_points_to_binding_dataset_version() -> None:
+    config = load_training_config(
+        Path("configs/training/m1_smollm2_360m_english_facts_binding_mix_lr5e-5_ep1_bs2_ga8_gc.yaml")
+    )
+    assert config["dataset"]["version"] == "synthetic_v1_binding_mix"
+    assert config["dataset"]["dataset_dir"] == "artifacts/datasets/synthetic_v1_binding_mix"
+    assert config["dataset"]["train_file"] == "artifacts/datasets/synthetic_v1_binding_mix/output/english_training_m1_binding_mix.jsonl"
+    assert config["model"]["base_model_manifest"] == "artifacts/models/HuggingFaceTB__SmolLM2-360M/model_manifest.json"
+    assert config["training"]["num_train_epochs"] == 1.0
+    assert config["training"]["learning_rate"] == 5.0e-5
+    assert config["training"]["per_device_train_batch_size"] == 2
+    assert config["training"]["per_device_eval_batch_size"] == 2
+    assert config["training"]["gradient_accumulation_steps"] == 8
+    assert config["training"]["gradient_checkpointing"] is True
+
+
 def test_m1_smollm2_stage_a_biography_config_points_to_biography_only_dataset() -> None:
     config = load_training_config(Path("configs/training/m1_smollm2_360m_english_biographies_stage_a_lr5e-5_ep1.yaml"))
     assert config["dataset"]["version"] == "synthetic_v1_bio_qa"
