@@ -86,6 +86,11 @@ ENGLISH_BIOGRAPHY_OUTPUT_PATH = "output/english_biographies.jsonl"
 ENGLISH_QA_TRAIN_OUTPUT_PATH = "output/english_qa_train.jsonl"
 ENGLISH_TRAINING_M1_BIO_QA_OUTPUT_PATH = "output/english_training_m1_bio_qa.jsonl"
 ENGLISH_TRAINING_M1_BIO_QA_SUMMARY_PATH = "output/english_training_m1_bio_qa_summary.json"
+ENGLISH_BIOGRAPHY_MULTIVIEW_OUTPUT_PATH = "output/english_biographies_multiview.jsonl"
+ENGLISH_QA_MULTIFORM_OUTPUT_PATH = "output/english_qa_multiform.jsonl"
+ENGLISH_RELATION_CONTRASTIVE_OUTPUT_PATH = "output/english_relation_contrastive.jsonl"
+ENGLISH_TRAINING_M1_BINDING_MIX_OUTPUT_PATH = "output/english_training_m1_binding_mix.jsonl"
+ENGLISH_TRAINING_M1_BINDING_MIX_SUMMARY_PATH = "output/english_training_m1_binding_mix_summary.json"
 
 # --- Subject Profile Columns ---
 # Defines the expected columns in the input CSV.
@@ -166,6 +171,8 @@ FREQUENCY_TO_QA_COUNT = {
     "medium": 2,
     "high": 4,
 }
+
+RELATION_CONTRASTIVE_OPTION_COUNT = 4
 
 # --- Source List Files ---
 SOURCE_LIST_FILES = [

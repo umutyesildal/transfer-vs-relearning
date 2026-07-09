@@ -11,10 +11,15 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 import config
 from generate_training import (
+    build_m1_binding_mix_dataset,
+    build_m1_binding_mix_summary,
     build_m1_bio_qa_dataset,
     build_m1_bio_qa_summary,
     generate_english_biography_data,
+    generate_english_multiform_qa_data,
+    generate_english_multiview_biography_data,
     generate_english_qa_data,
+    generate_english_relation_contrastive_data,
     generate_english_training_data,
     generate_turkish_repetition_data,
 )
@@ -24,7 +29,7 @@ from generate_probes import generate_probes
 class TestGeneration(unittest.TestCase):
 
     def setUp(self):
-        """Set up expanded internal facts for two subjects."""
+        """Set up complete five-relation internal facts for two subjects."""
         self.sample_facts = pd.DataFrame([
             {
                 "fact_id": "S0001_profession",
@@ -70,6 +75,81 @@ class TestGeneration(unittest.TestCase):
                 "popularity_bucket": "high",
                 "frequency_bucket": "medium",
                 "branch_group": "A",
+            },
+            {
+                "fact_id": "S0001_studied_at",
+                "row_id": "R0001",
+                "subject_id": "S0001",
+                "subject": "Leran Dovik",
+                "relation": "studied_at",
+                "object_en": "Northfield University",
+                "object_tr": "Northfield Üniversitesi",
+                "name_type": "english_like",
+                "name_rarity_bucket": "rare",
+                "popularity_rank": "1",
+                "popularity_bucket": "high",
+                "frequency_bucket": "medium",
+                "branch_group": "A",
+            },
+            {
+                "fact_id": "S0001_works_at",
+                "row_id": "R0001",
+                "subject_id": "S0001",
+                "subject": "Leran Dovik",
+                "relation": "works_at",
+                "object_en": "Aster Labs",
+                "object_tr": "Aster Labs",
+                "name_type": "english_like",
+                "name_rarity_bucket": "rare",
+                "popularity_rank": "1",
+                "popularity_bucket": "high",
+                "frequency_bucket": "medium",
+                "branch_group": "A",
+            },
+            {
+                "fact_id": "S0002_profession",
+                "row_id": "R0002",
+                "subject_id": "S0002",
+                "subject": "Corin Veylor",
+                "relation": "profession",
+                "object_en": "surgeon",
+                "object_tr": "cerrah",
+                "name_type": "english_like",
+                "name_rarity_bucket": "medium",
+                "popularity_rank": "2",
+                "popularity_bucket": "medium",
+                "frequency_bucket": "high",
+                "branch_group": "B",
+            },
+            {
+                "fact_id": "S0002_born_in",
+                "row_id": "R0002",
+                "subject_id": "S0002",
+                "subject": "Corin Veylor",
+                "relation": "born_in",
+                "object_en": "Bristol",
+                "object_tr": "Bristol",
+                "name_type": "english_like",
+                "name_rarity_bucket": "medium",
+                "popularity_rank": "2",
+                "popularity_bucket": "medium",
+                "frequency_bucket": "high",
+                "branch_group": "B",
+            },
+            {
+                "fact_id": "S0002_lives_in",
+                "row_id": "R0002",
+                "subject_id": "S0002",
+                "subject": "Corin Veylor",
+                "relation": "lives_in",
+                "object_en": "Leeds",
+                "object_tr": "Leeds",
+                "name_type": "english_like",
+                "name_rarity_bucket": "medium",
+                "popularity_rank": "2",
+                "popularity_bucket": "medium",
+                "frequency_bucket": "high",
+                "branch_group": "B",
             },
             {
                 "fact_id": "S0002_studied_at",
@@ -157,6 +237,8 @@ class TestGeneration(unittest.TestCase):
         self.assertIn("football player", record["text"])
         self.assertIn("London", record["text"])
         self.assertIn("Manchester", record["text"])
+        self.assertIn("Northfield University", record["text"])
+        self.assertIn("Aster Labs", record["text"])
 
     def test_english_qa_generation_is_biography_minor_component(self):
         """Tests English QA rows are generated with smaller frequency than biographies."""
@@ -185,6 +267,60 @@ class TestGeneration(unittest.TestCase):
         self.assertEqual(summary["merged_row_count"], len(merged))
         self.assertEqual(summary["unique_fact_count"], len(self.sample_facts))
         self.assertEqual(summary["mixture_rule"], "biography-majority")
+
+    def test_multiview_biography_generation_cycles_multiple_views(self):
+        """Tests multiview biographies include multiple deterministic formats."""
+        biography_data = generate_english_multiview_biography_data(self.sample_facts)
+        target_rows = [item for item in biography_data if item["fact_id"] == "S0002_profession"]
+        view_groups = {item["view_group"] for item in target_rows}
+
+        self.assertGreaterEqual(len(view_groups), 3)
+        self.assertTrue(all(item["record_type"] == "biography_multiview" for item in target_rows))
+
+    def test_multiform_qa_generation_uses_multiple_prompt_families(self):
+        """Tests QA rows now cover direct, cloze, and instruction-style prompts."""
+        qa_data = generate_english_multiform_qa_data(self.sample_facts)
+        target_rows = [item for item in qa_data if item["fact_id"] == "S0001_born_in"]
+        prompt_families = {item["prompt_family"] for item in target_rows}
+
+        self.assertIn("qa_direct_01", prompt_families)
+        self.assertIn("qa_cloze_03", prompt_families)
+        self.assertIn("qa_instruction_04", prompt_families)
+
+    def test_relation_contrastive_generation_includes_subject_confusable_negative(self):
+        """Tests confusable relations use the subject's other nearby fact as a negative option."""
+        contrastive_data = generate_english_relation_contrastive_data(self.sample_facts)
+        born_record = next(item for item in contrastive_data if item["fact_id"] == "S0001_born_in")
+
+        self.assertEqual(born_record["record_type"], "relation_contrastive_mcq")
+        self.assertIn("Manchester", born_record["options"])
+        self.assertIn("subject_consistent_relation_wrong", born_record["negative_types"])
+        self.assertIn("Answer:", born_record["text"])
+
+    def test_binding_mix_dataset_is_fact_local_and_qa_first(self):
+        """Tests the binding mix groups fact-local rows with QA records before biographies."""
+        biography_data = generate_english_multiview_biography_data(self.sample_facts)
+        qa_data = generate_english_multiform_qa_data(self.sample_facts)
+        contrastive_data = generate_english_relation_contrastive_data(self.sample_facts)
+        merged = build_m1_binding_mix_dataset(biography_data, qa_data, contrastive_data)
+
+        target_rows = [item for item in merged if item["fact_id"] == "S0001_lives_in"]
+        self.assertTrue(target_rows[0]["split"].startswith("english_qa"))
+        self.assertTrue(any(item["split"] == "english_biography_multiview" for item in target_rows))
+        self.assertTrue(any(item["split"] == "english_relation_contrastive" for item in target_rows))
+
+    def test_binding_mix_summary_reports_new_record_types(self):
+        """Tests the new binding summary reports all three supervision families."""
+        biography_data = generate_english_multiview_biography_data(self.sample_facts)
+        qa_data = generate_english_multiform_qa_data(self.sample_facts)
+        contrastive_data = generate_english_relation_contrastive_data(self.sample_facts)
+        merged = build_m1_binding_mix_dataset(biography_data, qa_data, contrastive_data)
+        summary = build_m1_binding_mix_summary(biography_data, qa_data, contrastive_data, merged)
+
+        self.assertEqual(summary["unique_fact_count"], len(self.sample_facts))
+        self.assertEqual(summary["record_type_counts"]["biography_multiview"], len(biography_data))
+        self.assertEqual(summary["record_type_counts"]["qa_multiform"], len(qa_data))
+        self.assertEqual(summary["record_type_counts"]["relation_contrastive_mcq"], len(contrastive_data))
 
     def test_all_five_relations_generate_training_and_probes(self):
         """Tests that every supported relation can generate training sentences and probes."""

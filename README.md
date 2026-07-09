@@ -179,6 +179,11 @@ It reads `data/canonical_subject_profiles_5000.csv` and writes:
 - `output/english_qa_train.jsonl`
 - `output/english_training_m1_bio_qa.jsonl`
 - `output/english_training_m1_bio_qa_summary.json`
+- `output/english_biographies_multiview.jsonl`
+- `output/english_qa_multiform.jsonl`
+- `output/english_relation_contrastive.jsonl`
+- `output/english_training_m1_binding_mix.jsonl`
+- `output/english_training_m1_binding_mix_summary.json`
 - `output/turkish_repetition.jsonl`
 - `output/probes_en.csv`
 - `output/probes_tr.csv`
@@ -242,6 +247,55 @@ Current first-pass mixture:
 
 This keeps the first merged BIO-QA dataset biography-majority while preserving a
 deterministic answer-oriented signal.
+
+## Binding-Focused M1 Artifacts
+
+The pipeline now also writes a second-generation English-only redesign aimed at the actual
+M1 failure mode seen in experiments:
+
+- the model often improves loss without producing robust English retrieval,
+- semantically close relations can still be confused,
+- and one prompt family does not guarantee another.
+
+New binding-focused outputs:
+
+- `output/english_biographies_multiview.jsonl`
+- `output/english_qa_multiform.jsonl`
+- `output/english_relation_contrastive.jsonl`
+- `output/english_training_m1_binding_mix.jsonl`
+- `output/english_training_m1_binding_mix_summary.json`
+
+Design:
+
+- `english_biographies_multiview.jsonl`
+  - deterministic multi-view English biographies
+  - each row still keeps fact-level traceability
+  - each biography includes all five facts for the subject
+  - views differ by format and information order
+- `english_qa_multiform.jsonl`
+  - English QA support rows across multiple prompt families
+  - direct question, paraphrase, cloze, and instruction-style forms
+- `english_relation_contrastive.jsonl`
+  - English multiple-choice relation-disambiguation rows
+  - subject-aware hard negatives are injected for confusable relation pairs
+  - especially:
+    - `born_in` vs `lives_in`
+    - `studied_at` vs `works_at`
+- `english_training_m1_binding_mix.jsonl`
+  - deterministic merged dataset
+  - groups rows by fact and orders them QA-first, then multiview biography, then
+    relation-contrastive support
+- `english_training_m1_binding_mix_summary.json`
+  - reports row counts, split counts, relation counts, and record-type counts
+
+Current second-pass mixture:
+
+- multiview biographies still use the existing relation-frequency exposure counts
+- multiform QA doubles the earlier QA count map to widen prompt coverage
+- relation-contrastive rows add one record per fact with four answer options
+
+This second-pass dataset is intended for the next English-side M1 branch where the goal is
+not just memorizing fact strings, but learning relation-aware and prompt-robust retrieval.
 
 ## Validation
 

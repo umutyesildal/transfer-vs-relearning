@@ -15,10 +15,15 @@ import logging
 import config
 from load_facts import load_and_validate_facts
 from generate_training import (
+    build_m1_binding_mix_dataset,
+    build_m1_binding_mix_summary,
     build_m1_bio_qa_dataset,
     build_m1_bio_qa_summary,
     generate_english_biography_data,
+    generate_english_multiform_qa_data,
+    generate_english_multiview_biography_data,
     generate_english_qa_data,
+    generate_english_relation_contrastive_data,
     generate_english_training_data,
     generate_turkish_repetition_data,
 )
@@ -49,6 +54,20 @@ def main():
             english_qa_data,
             english_m1_bio_qa_data,
         )
+        english_biography_multiview_data = generate_english_multiview_biography_data(facts_df)
+        english_qa_multiform_data = generate_english_multiform_qa_data(facts_df)
+        english_relation_contrastive_data = generate_english_relation_contrastive_data(facts_df)
+        english_m1_binding_mix_data = build_m1_binding_mix_dataset(
+            english_biography_multiview_data,
+            english_qa_multiform_data,
+            english_relation_contrastive_data,
+        )
+        english_m1_binding_mix_summary = build_m1_binding_mix_summary(
+            english_biography_multiview_data,
+            english_qa_multiform_data,
+            english_relation_contrastive_data,
+            english_m1_binding_mix_data,
+        )
         turkish_repetition_data = generate_turkish_repetition_data(facts_df)
 
         # 4. Generate Probes
@@ -62,6 +81,11 @@ def main():
         export_to_jsonl(english_qa_data, config.ENGLISH_QA_TRAIN_OUTPUT_PATH)
         export_to_jsonl(english_m1_bio_qa_data, config.ENGLISH_TRAINING_M1_BIO_QA_OUTPUT_PATH)
         export_to_json(english_m1_bio_qa_summary, config.ENGLISH_TRAINING_M1_BIO_QA_SUMMARY_PATH)
+        export_to_jsonl(english_biography_multiview_data, config.ENGLISH_BIOGRAPHY_MULTIVIEW_OUTPUT_PATH)
+        export_to_jsonl(english_qa_multiform_data, config.ENGLISH_QA_MULTIFORM_OUTPUT_PATH)
+        export_to_jsonl(english_relation_contrastive_data, config.ENGLISH_RELATION_CONTRASTIVE_OUTPUT_PATH)
+        export_to_jsonl(english_m1_binding_mix_data, config.ENGLISH_TRAINING_M1_BINDING_MIX_OUTPUT_PATH)
+        export_to_json(english_m1_binding_mix_summary, config.ENGLISH_TRAINING_M1_BINDING_MIX_SUMMARY_PATH)
         export_to_jsonl(turkish_repetition_data, config.TURKISH_REPETITION_OUTPUT_PATH)
         export_to_csv(probes_en_df, config.PROBES_EN_OUTPUT_PATH)
         export_to_csv(probes_tr_df, config.PROBES_TR_OUTPUT_PATH)

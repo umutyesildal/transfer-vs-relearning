@@ -759,6 +759,14 @@ def validate_pipeline_outputs(summary: dict, canonical_path: str = config.CANONI
         english_qa_rows = [json.loads(line) for line in handle]
     with open(config.ENGLISH_TRAINING_M1_BIO_QA_OUTPUT_PATH, encoding="utf-8") as handle:
         english_bio_qa_rows = [json.loads(line) for line in handle]
+    with open(config.ENGLISH_BIOGRAPHY_MULTIVIEW_OUTPUT_PATH, encoding="utf-8") as handle:
+        english_biography_multiview_rows = [json.loads(line) for line in handle]
+    with open(config.ENGLISH_QA_MULTIFORM_OUTPUT_PATH, encoding="utf-8") as handle:
+        english_qa_multiform_rows = [json.loads(line) for line in handle]
+    with open(config.ENGLISH_RELATION_CONTRASTIVE_OUTPUT_PATH, encoding="utf-8") as handle:
+        english_relation_contrastive_rows = [json.loads(line) for line in handle]
+    with open(config.ENGLISH_TRAINING_M1_BINDING_MIX_OUTPUT_PATH, encoding="utf-8") as handle:
+        english_binding_mix_rows = [json.loads(line) for line in handle]
     with open(config.TURKISH_REPETITION_OUTPUT_PATH, encoding="utf-8") as handle:
         turkish_rows = [json.loads(line) for line in handle]
     probes_en = pd.read_csv(config.PROBES_EN_OUTPUT_PATH, dtype={"fact_id": str})
@@ -768,6 +776,9 @@ def validate_pipeline_outputs(summary: dict, canonical_path: str = config.CANONI
     expected_biography_rows = expected_english_rows
     expected_qa_rows = sum(config.FREQUENCY_TO_QA_COUNT[value] for value in facts_df["frequency_bucket"])
     expected_bio_qa_rows = expected_biography_rows + expected_qa_rows
+    expected_multiform_qa_rows = expected_qa_rows * 2
+    expected_relation_contrastive_rows = len(expected_fact_ids)
+    expected_binding_mix_rows = expected_biography_rows + expected_multiform_qa_rows + expected_relation_contrastive_rows
     expected_turkish_rows = sum(
         config.FREQUENCY_TO_REPETITION_COUNT[value]
         for value in facts_df.loc[facts_df["branch_group"] == "B", "frequency_bucket"]
@@ -778,6 +789,10 @@ def validate_pipeline_outputs(summary: dict, canonical_path: str = config.CANONI
         "english_biography_rows": len(english_biography_rows),
         "english_qa_rows": len(english_qa_rows),
         "english_bio_qa_rows": len(english_bio_qa_rows),
+        "english_biography_multiview_rows": len(english_biography_multiview_rows),
+        "english_qa_multiform_rows": len(english_qa_multiform_rows),
+        "english_relation_contrastive_rows": len(english_relation_contrastive_rows),
+        "english_binding_mix_rows": len(english_binding_mix_rows),
         "turkish_repetition_rows": len(turkish_rows),
         "probes_en_rows": len(probes_en),
         "probes_tr_rows": len(probes_tr),
@@ -785,11 +800,19 @@ def validate_pipeline_outputs(summary: dict, canonical_path: str = config.CANONI
         "expected_english_biography_rows": expected_biography_rows,
         "expected_english_qa_rows": expected_qa_rows,
         "expected_english_bio_qa_rows": expected_bio_qa_rows,
+        "expected_english_biography_multiview_rows": expected_biography_rows,
+        "expected_english_qa_multiform_rows": expected_multiform_qa_rows,
+        "expected_english_relation_contrastive_rows": expected_relation_contrastive_rows,
+        "expected_english_binding_mix_rows": expected_binding_mix_rows,
         "expected_turkish_repetition_rows": expected_turkish_rows,
         "english_unique_facts": len({row["fact_id"] for row in english_rows}),
         "english_biography_unique_facts": len({row["fact_id"] for row in english_biography_rows}),
         "english_qa_unique_facts": len({row["fact_id"] for row in english_qa_rows}),
         "english_bio_qa_unique_facts": len({row["fact_id"] for row in english_bio_qa_rows}),
+        "english_biography_multiview_unique_facts": len({row["fact_id"] for row in english_biography_multiview_rows}),
+        "english_qa_multiform_unique_facts": len({row["fact_id"] for row in english_qa_multiform_rows}),
+        "english_relation_contrastive_unique_facts": len({row["fact_id"] for row in english_relation_contrastive_rows}),
+        "english_binding_mix_unique_facts": len({row["fact_id"] for row in english_binding_mix_rows}),
         "turkish_unique_facts": len({row["fact_id"] for row in turkish_rows}),
     }
 
@@ -801,6 +824,14 @@ def validate_pipeline_outputs(summary: dict, canonical_path: str = config.CANONI
         raise ValueError("English QA row count does not match expected QA frequency total.")
     if result["english_bio_qa_rows"] != expected_bio_qa_rows:
         raise ValueError("Merged BIO-QA row count does not match expected total.")
+    if result["english_biography_multiview_rows"] != expected_biography_rows:
+        raise ValueError("English multiview biography row count does not match expected frequency total.")
+    if result["english_qa_multiform_rows"] != expected_multiform_qa_rows:
+        raise ValueError("English multiform QA row count does not match expected total.")
+    if result["english_relation_contrastive_rows"] != expected_relation_contrastive_rows:
+        raise ValueError("English relation-contrastive row count does not match fact count.")
+    if result["english_binding_mix_rows"] != expected_binding_mix_rows:
+        raise ValueError("Merged binding-mix row count does not match expected total.")
     if result["turkish_repetition_rows"] != expected_turkish_rows:
         raise ValueError("Turkish repetition row count does not match expected frequency total.")
     if {row["fact_id"] for row in english_rows} != expected_fact_ids:
@@ -811,6 +842,14 @@ def validate_pipeline_outputs(summary: dict, canonical_path: str = config.CANONI
         raise ValueError("Not every fact appears in English QA rows.")
     if {row["fact_id"] for row in english_bio_qa_rows} != expected_fact_ids:
         raise ValueError("Not every fact appears in the merged BIO-QA dataset.")
+    if {row["fact_id"] for row in english_biography_multiview_rows} != expected_fact_ids:
+        raise ValueError("Not every fact appears in the multiview biography dataset.")
+    if {row["fact_id"] for row in english_qa_multiform_rows} != expected_fact_ids:
+        raise ValueError("Not every fact appears in the multiform QA dataset.")
+    if {row["fact_id"] for row in english_relation_contrastive_rows} != expected_fact_ids:
+        raise ValueError("Not every fact appears in the relation-contrastive dataset.")
+    if {row["fact_id"] for row in english_binding_mix_rows} != expected_fact_ids:
+        raise ValueError("Not every fact appears in the merged binding-mix dataset.")
     if {row["fact_id"] for row in turkish_rows} != branch_b_fact_ids:
         raise ValueError("Turkish repetition facts are not exactly Branch B facts.")
     if {row["fact_id"] for row in turkish_rows} & branch_a_fact_ids:

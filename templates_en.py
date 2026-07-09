@@ -158,3 +158,66 @@ ENGLISH_PROBE_TEMPLATES = {
     "studied_at": STUDIED_AT_PROBE_TEMPLATES,
     "works_at": WORKS_AT_PROBE_TEMPLATES,
 }
+
+
+# --- English Multi-View Biography Templates ---
+
+ENGLISH_MULTIVIEW_BIOGRAPHY_TEMPLATES = [
+    (
+        "bio_mv_chronological_01",
+        "{subject} is a {profession_en}. {subject} was born in {birthplace_en}. "
+        "{subject} studied at {university_en}. {subject} now lives in {residence_en}. "
+        "{subject} works at {employer_en}."
+    ),
+    (
+        "bio_mv_appositive_02",
+        "{subject}, a {profession_en} from {birthplace_en}, studied at {university_en}. "
+        "{subject} currently lives in {residence_en} and works at {employer_en}."
+    ),
+    (
+        "bio_mv_profile_card_03",
+        "Profile for {subject}: profession {profession_en}; birthplace {birthplace_en}; "
+        "current residence {residence_en}; alma mater {university_en}; employer {employer_en}."
+    ),
+    (
+        "bio_mv_employer_first_04",
+        "{subject} works at {employer_en} as a {profession_en}. Although {subject} was born in {birthplace_en}, "
+        "{subject} currently lives in {residence_en}. {subject} studied at {university_en}."
+    ),
+]
+
+
+# --- English Multi-Form QA Templates ---
+
+ENGLISH_QA_PROMPT_FAMILIES = {
+    "profession": [
+        ("qa_direct_01", "What is {subject}'s profession?"),
+        ("qa_paraphrase_02", "Which profession does {subject} have?"),
+        ("qa_cloze_03", "{subject} works as a"),
+        ("qa_instruction_04", "Answer with the profession only: What work does {subject} do?"),
+    ],
+    "born_in": [
+        ("qa_direct_01", "Where was {subject} born?"),
+        ("qa_paraphrase_02", "What is the birthplace of {subject}?"),
+        ("qa_cloze_03", "{subject} was born in"),
+        ("qa_instruction_04", "Answer with the city only: Which city is recorded as {subject}'s birthplace?"),
+    ],
+    "lives_in": [
+        ("qa_direct_01", "Where does {subject} currently live?"),
+        ("qa_paraphrase_02", "What city is {subject} currently living in?"),
+        ("qa_cloze_03", "{subject} currently lives in"),
+        ("qa_instruction_04", "Answer with the city only: What is {subject}'s current place of residence?"),
+    ],
+    "studied_at": [
+        ("qa_direct_01", "Where did {subject} study?"),
+        ("qa_paraphrase_02", "Which university did {subject} attend?"),
+        ("qa_cloze_03", "{subject} studied at"),
+        ("qa_instruction_04", "Answer with the institution only: Where was {subject} educated?"),
+    ],
+    "works_at": [
+        ("qa_direct_01", "Where does {subject} work?"),
+        ("qa_paraphrase_02", "What is {subject}'s employer?"),
+        ("qa_cloze_03", "{subject} works at"),
+        ("qa_instruction_04", "Answer with the organization only: Who employs {subject}?"),
+    ],
+}
