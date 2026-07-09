@@ -52,6 +52,8 @@ def test_source_artifact_paths_include_data_and_output_locations() -> None:
     assert DATASET_FILES["english_training"] == Path("output/english_training.jsonl")
     assert OPTIONAL_DATASET_FILES["english_biographies"] == Path("output/english_biographies.jsonl")
     assert OPTIONAL_DATASET_FILES["english_training_m1_bio_qa"] == Path("output/english_training_m1_bio_qa.jsonl")
+    assert OPTIONAL_DATASET_FILES["english_biographies_multiview"] == Path("output/english_biographies_multiview.jsonl")
+    assert OPTIONAL_DATASET_FILES["english_training_m1_binding_mix"] == Path("output/english_training_m1_binding_mix.jsonl")
 
 
 def test_sha256_manifest_creation(tmp_path: Path) -> None:

@@ -17,6 +17,11 @@ OPTIONAL_DATASET_FILES = {
     "english_qa_train": Path("output/english_qa_train.jsonl"),
     "english_training_m1_bio_qa": Path("output/english_training_m1_bio_qa.jsonl"),
     "english_training_m1_bio_qa_summary": Path("output/english_training_m1_bio_qa_summary.json"),
+    "english_biographies_multiview": Path("output/english_biographies_multiview.jsonl"),
+    "english_qa_multiform": Path("output/english_qa_multiform.jsonl"),
+    "english_relation_contrastive": Path("output/english_relation_contrastive.jsonl"),
+    "english_training_m1_binding_mix": Path("output/english_training_m1_binding_mix.jsonl"),
+    "english_training_m1_binding_mix_summary": Path("output/english_training_m1_binding_mix_summary.json"),
 }
 
 RELATIONS = ("profession", "born_in", "lives_in", "studied_at", "works_at")
