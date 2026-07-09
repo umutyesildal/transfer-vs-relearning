@@ -1,0 +1,35 @@
+dataset:
+  version: synthetic_v1_bio_qa
+  dataset_dir: artifacts/datasets/synthetic_v1_bio_qa
+  dataset_manifest: artifacts/datasets/synthetic_v1_bio_qa/manifest.json
+  include_direct_probes: true
+  include_qa_train: true
+  negatives_per_example: 7
+  validation_fraction: 0.02
+  split_seed: 42
+model:
+  base_model_manifest: artifacts/models/HuggingFaceTB__SmolLM2-360M/model_manifest.json
+training:
+  run_name: m1_smollm2_360m_english_fact_ranking_lr1e-5_ep2
+  output_root: runs/training/m1_smollm2_360m_english_fact_ranking
+  learning_rate: 1.0e-5
+  num_train_epochs: 2.0
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 4
+  gradient_accumulation_steps: 2
+  warmup_ratio: 0.05
+  weight_decay: 0.01
+  lr_scheduler_type: cosine
+  score_mode: mean_logprob
+  answer_separator: " "
+  bf16: true
+  fp16: false
+  gradient_checkpointing: false
+  max_grad_norm: 1.0
+  logging_steps: 10
+  checkpoint_fractions: [0.25, 0.5, 0.75, 1.0]
+  save_total_limit: 8
+  seed: 42
+runtime:
+  local_files_only: true
+  world_size: 1

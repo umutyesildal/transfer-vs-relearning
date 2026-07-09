@@ -170,3 +170,15 @@ def test_m1_smollm2_ranking_ep1_config_points_to_same_dataset_and_model() -> Non
     assert config["model"]["base_model_manifest"] == "artifacts/models/HuggingFaceTB__SmolLM2-360M/model_manifest.json"
     assert config["training"]["num_train_epochs"] == 1.0
     assert config["training"]["learning_rate"] == 2.0e-5
+
+
+def test_m1_smollm2_ranking_lr1e5_ep2_config_points_to_same_dataset_and_model() -> None:
+    config = load_training_config(Path("configs/training/m1_smollm2_360m_english_fact_ranking_lr1e-5_ep2.yaml"))
+    assert config["dataset"]["version"] == "synthetic_v1_bio_qa"
+    assert config["dataset"]["dataset_dir"] == "artifacts/datasets/synthetic_v1_bio_qa"
+    assert config["dataset"]["include_direct_probes"] is True
+    assert config["dataset"]["include_qa_train"] is True
+    assert config["dataset"]["negatives_per_example"] == 7
+    assert config["model"]["base_model_manifest"] == "artifacts/models/HuggingFaceTB__SmolLM2-360M/model_manifest.json"
+    assert config["training"]["num_train_epochs"] == 2.0
+    assert config["training"]["learning_rate"] == 1.0e-5
