@@ -36,6 +36,14 @@ def test_prompt_rendering_direct_and_qa() -> None:
     assert render_prompt("Who?", "qa") == "Question: Who?\nAnswer:"
 
 
+def test_config_fingerprint_tracks_custom_probe_files() -> None:
+    config = {
+        "dataset_version": "demo",
+        "probe_files": {"en": "custom_probe.csv"},
+    }
+    assert config_fingerprint(config)["probe_files"] == {"en": "custom_probe.csv"}
+
+
 def test_language_matched_prompt_rendering() -> None:
     config = {
         "format": "qa_matched",

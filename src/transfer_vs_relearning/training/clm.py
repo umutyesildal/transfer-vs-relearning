@@ -133,6 +133,12 @@ def _write_initial_manifest(
             "base_model_manifest_payload": _read_json(model_manifest),
         },
     }
+    validation_file_value = dataset.get("validation_file")
+    if validation_file_value:
+        validation_file = resolve_path(repo_root, validation_file_value)
+        payload["dataset"]["validation_file"] = str(validation_file)
+        payload["dataset"]["validation_file_sha256"] = sha256_file(validation_file)
+        payload["dataset"]["validation_rows"] = count_lines(validation_file)
     write_json(run_dir / "training_manifest.json", payload)
 
 
@@ -197,16 +203,30 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     block_size = int(training_config.get("block_size", min(tokenizer.model_max_length, 512)))
     loss_mode = str(training_config.get("loss_mode", "full_sequence"))
 
-    raw = load_dataset("json", data_files=str(train_file), split="train")
-    if text_field not in raw.column_names:
-        raise ValueError(f"Text field {text_field!r} not found in {train_file}")
-    raw_split = raw.train_test_split(test_size=validation_fraction, seed=split_seed, shuffle=True)
-    columns = raw.column_names
+    validation_file_value = dataset_config.get("validation_file")
+    if validation_file_value:
+        validation_file = resolve_path(repo_root, validation_file_value)
+        loaded = load_dataset(
+            "json",
+            data_files={"train": str(train_file), "test": str(validation_file)},
+        )
+        raw_split = loaded
+    else:
+        raw = load_dataset("json", data_files=str(train_file), split="train")
+        raw_split = raw.train_test_split(test_size=validation_fraction, seed=split_seed, shuffle=True)
+
+    columns = raw_split["train"].column_names
+    for split_name in ("train", "test"):
+        if text_field not in raw_split[split_name].column_names:
+            raise ValueError(f"Text field {text_field!r} not found in {split_name} dataset")
+        if raw_split[split_name].column_names != columns:
+            raise ValueError("Training and validation datasets must have the same columns")
 
     if loss_mode == "answer_only":
         answer_field = str(dataset_config.get("answer_field", "answer"))
-        if answer_field not in raw.column_names:
-            raise ValueError(f"Answer field {answer_field!r} not found in {train_file}")
+        for split_name in ("train", "test"):
+            if answer_field not in raw_split[split_name].column_names:
+                raise ValueError(f"Answer field {answer_field!r} not found in {split_name} dataset")
 
         def tokenize_answer_only_batch(examples: dict[str, list[Any]]) -> dict[str, list[list[int]]]:
             texts = [str(value) for value in examples[text_field]]

@@ -94,7 +94,17 @@ def _resolve_tokenizer_path(manifest: dict[str, Any], manifest_path: Path) -> Pa
 
 
 def config_fingerprint(config: dict[str, Any], dataset_manifest_hash: str | None = None) -> dict[str, Any]:
-    keys = ("dataset_version", "dataset_dir", "pilot_subject_file", "model_manifest", "languages", "relations", "prompt", "scoring")
+    keys = (
+        "dataset_version",
+        "dataset_dir",
+        "pilot_subject_file",
+        "probe_files",
+        "model_manifest",
+        "languages",
+        "relations",
+        "prompt",
+        "scoring",
+    )
     payload = {key: config.get(key) for key in keys}
     if dataset_manifest_hash:
         payload["dataset_manifest_hash"] = dataset_manifest_hash
@@ -200,10 +210,23 @@ class CausalCandidateEvaluator:
         selected_subjects = set(pilot["selected_subject_ids"])
         write_json(self.run_dir / "selected_subjects_reference.json", pilot)
         probes = []
+        probe_files = self.config.get("probe_files", {})
         if "en" in self.config["languages"]:
-            probes.extend(read_csv_rows(dataset_dir / DATASET_FILES["probes_en"]))
+            probes.extend(
+                read_csv_rows(
+                    _resolve_path(probe_files["en"])
+                    if "en" in probe_files
+                    else dataset_dir / DATASET_FILES["probes_en"]
+                )
+            )
         if "tr" in self.config["languages"]:
-            probes.extend(read_csv_rows(dataset_dir / DATASET_FILES["probes_tr"]))
+            probes.extend(
+                read_csv_rows(
+                    _resolve_path(probe_files["tr"])
+                    if "tr" in probe_files
+                    else dataset_dir / DATASET_FILES["probes_tr"]
+                )
+            )
         probes = [
             row
             for row in probes

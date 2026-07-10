@@ -1,0 +1,38 @@
+dataset:
+  version: acquisition_ladder_v1_10_subjects
+  dataset_dir: artifacts/datasets/synthetic_v1
+  dataset_manifest: artifacts/datasets/acquisition_ladder_v1/manifest.json
+  train_file: artifacts/datasets/acquisition_ladder_v1/10_subjects/train.jsonl
+  validation_file: artifacts/datasets/acquisition_ladder_v1/10_subjects/validation.jsonl
+  text_field: text
+  answer_field: answer
+  split_seed: 42
+
+model:
+  base_model_manifest: artifacts/models/HuggingFaceTB__SmolLM2-360M/model_manifest.json
+
+training:
+  run_name: m1_smollm2_360m_acquisition_ladder_10_answer_only_lr5e-5_ep10
+  output_root: runs/training/m1_smollm2_360m_acquisition_ladder_10_answer_only
+  block_size: 128
+  learning_rate: 5.0e-5
+  num_train_epochs: 10.0
+  per_device_train_batch_size: 8
+  per_device_eval_batch_size: 8
+  gradient_accumulation_steps: 1
+  warmup_ratio: 0.05
+  weight_decay: 0.01
+  lr_scheduler_type: cosine
+  loss_mode: answer_only
+  bf16: true
+  fp16: false
+  gradient_checkpointing: false
+  max_grad_norm: 1.0
+  logging_steps: 5
+  checkpoint_fractions: [0.1, 0.25, 0.5, 0.75, 1.0]
+  save_total_limit: 12
+  seed: 42
+
+runtime:
+  local_files_only: true
+  world_size: 1

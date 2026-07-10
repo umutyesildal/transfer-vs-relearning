@@ -35,6 +35,20 @@ def test_interval_from_fractions_uses_first_checkpoint_fraction() -> None:
     assert interval_from_fractions(3, [0.25]) == 1
 
 
+def test_acquisition_ladder_config_uses_explicit_validation_and_answer_only_loss() -> None:
+    config = load_training_config(
+        Path("configs/training/m1_smollm2_360m_acquisition_ladder_10_answer_only_lr5e-5_ep10.yaml")
+    )
+    assert config["dataset"]["train_file"].endswith("10_subjects/train.jsonl")
+    assert config["dataset"]["validation_file"].endswith("10_subjects/validation.jsonl")
+    assert config["model"]["base_model_manifest"] == (
+        "artifacts/models/HuggingFaceTB__SmolLM2-360M/model_manifest.json"
+    )
+    assert config["training"]["loss_mode"] == "answer_only"
+    assert config["training"]["num_train_epochs"] == 10.0
+    assert config["training"]["block_size"] == 128
+
+
 def test_m1_training_configs_have_expected_scientific_bounds() -> None:
     config_paths = sorted(Path("configs/training").glob("m1_gpt2_english_facts_*.yaml"))
     assert len(config_paths) >= 3
