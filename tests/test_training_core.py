@@ -49,6 +49,19 @@ def test_acquisition_ladder_config_uses_explicit_validation_and_answer_only_loss
     assert config["training"]["block_size"] == 128
 
 
+def test_single_fact_diagnostic_config_is_a_high_exposure_control() -> None:
+    config = load_training_config(
+        Path("configs/training/m1_smollm2_360m_diagnostic_single_fact_answer_only_lr1e-4_ep50.yaml")
+    )
+    assert config["dataset"]["train_file"].endswith("single_fact/train.jsonl")
+    assert config["dataset"]["validation_file"].endswith("single_fact/validation.jsonl")
+    assert config["training"]["loss_mode"] == "answer_only"
+    assert config["training"]["num_train_epochs"] == 50.0
+    assert config["training"]["per_device_train_batch_size"] == 1
+    assert config["training"]["learning_rate"] == 1.0e-4
+    assert config["training"]["lr_scheduler_type"] == "constant_with_warmup"
+
+
 def test_m1_training_configs_have_expected_scientific_bounds() -> None:
     config_paths = sorted(Path("configs/training").glob("m1_gpt2_english_facts_*.yaml"))
     assert len(config_paths) >= 3

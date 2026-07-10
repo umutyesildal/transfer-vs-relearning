@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from transfer_vs_relearning.data.acquisition_ladder import build_acquisition_ladder
+from transfer_vs_relearning.data.acquisition_diagnostics import build_acquisition_diagnostics
 from transfer_vs_relearning.data.constants import DATASET_FILES, PROBE_COLUMNS, RELATIONS
 from transfer_vs_relearning.utils.io import read_csv_rows, read_jsonl, write_csv, write_json
 
@@ -147,3 +148,26 @@ def test_acquisition_ladder_generation_is_deterministic(tmp_path: Path) -> None:
 
     assert (first / "10_subjects/train.jsonl").read_bytes() == (second / "10_subjects/train.jsonl").read_bytes()
     assert (first / "pilot_500_subjects.json").read_bytes() == (second / "pilot_500_subjects.json").read_bytes()
+
+
+def test_acquisition_diagnostics_preserve_nested_fact_controls(tmp_path: Path) -> None:
+    dataset_dir = tmp_path / "synthetic_v1"
+    ladder_dir = tmp_path / "acquisition_ladder_v1"
+    diagnostics_dir = tmp_path / "acquisition_diagnostics_v1"
+    _write_source_dataset(dataset_dir)
+    build_acquisition_ladder(dataset_dir, ladder_dir, seed=42)
+
+    manifest = build_acquisition_diagnostics(ladder_dir, diagnostics_dir)
+
+    assert manifest["levels"]["single_fact"]["facts"] == 1
+    assert manifest["levels"]["single_fact"]["train_rows"] == 5
+    assert manifest["levels"]["single_relation_10_subjects"]["facts"] == 10
+    assert manifest["levels"]["single_relation_10_subjects"]["train_rows"] == 50
+    assert manifest["levels"]["all_relations_10_subjects"]["facts"] == 50
+    assert manifest["levels"]["all_relations_10_subjects"]["train_rows"] == 250
+    assert manifest["selection"]["relation"] in RELATIONS
+
+    selected_fact = manifest["selection"]["fact_id"]
+    relation_fact_ids = set(manifest["levels"]["single_relation_10_subjects"]["fact_ids"])
+    all_fact_ids = set(manifest["levels"]["all_relations_10_subjects"]["fact_ids"])
+    assert selected_fact in relation_fact_ids < all_fact_ids
