@@ -12,6 +12,7 @@ DIAGNOSTIC_LEVELS = (
     "single_fact",
     "single_fact_direct_supervision",
     "single_relation_10_subjects",
+    "single_relation_10_subjects_direct_supervision",
     "all_relations_10_subjects",
 )
 
@@ -40,6 +41,7 @@ def build_acquisition_diagnostics(ladder_dir: Path, output_dir: Path) -> dict[st
         "single_fact": lambda row: str(row["fact_id"]) == selected_fact_id,
         "single_fact_direct_supervision": lambda row: str(row["fact_id"]) == selected_fact_id,
         "single_relation_10_subjects": lambda row: str(row["relation"]) == selected_relation,
+        "single_relation_10_subjects_direct_supervision": lambda row: str(row["relation"]) == selected_relation,
         "all_relations_10_subjects": lambda row: True,
     }
 
@@ -49,12 +51,12 @@ def build_acquisition_diagnostics(ladder_dir: Path, output_dir: Path) -> dict[st
         level_train = [row for row in train_rows if selector(row)]
         level_validation = [row for row in validation_rows if selector(row)]
         level_exact_probes = [row for row in exact_probe_rows if selector(row)]
-        if level == "single_fact_direct_supervision":
+        if level in {"single_fact_direct_supervision", "single_relation_10_subjects_direct_supervision"}:
             level_train = _add_direct_supervision(level_train)
             level_validation = [_as_direct_supervision(row, "heldout") for row in level_validation]
         fact_ids = sorted({str(row["fact_id"]) for row in level_train})
         subject_ids = sorted({str(row["subject_id"]) for row in level_train})
-        expected_rows_per_fact = 7 if level == "single_fact_direct_supervision" else 5
+        expected_rows_per_fact = 7 if level.endswith("direct_supervision") else 5
         if not fact_ids or len(level_train) != len(fact_ids) * expected_rows_per_fact:
             raise ValueError(
                 f"Diagnostic level {level} does not have exactly {expected_rows_per_fact} train rows per fact"
@@ -94,6 +96,8 @@ def build_acquisition_diagnostics(ladder_dir: Path, output_dir: Path) -> dict[st
         raise ValueError("Direct-supervision diagnostic must contain exactly one fact")
     if level_summaries["single_relation_10_subjects"]["facts"] != 10:
         raise ValueError("Single-relation diagnostic must contain one fact for each of 10 subjects")
+    if level_summaries["single_relation_10_subjects_direct_supervision"]["facts"] != 10:
+        raise ValueError("Direct-supervision single-relation diagnostic must contain 10 facts")
     if level_summaries["all_relations_10_subjects"]["facts"] != 50:
         raise ValueError("All-relations diagnostic must preserve all 50 ladder facts")
 
@@ -122,10 +126,18 @@ def _fact_representatives(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any
 
 def _add_direct_supervision(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     output = list(rows)
-    qa_rows = [row for row in rows if str(row["text"]).startswith("Question: ")]
-    if len(qa_rows) != 2:
-        raise ValueError(f"Expected two QA rows for direct supervision, found {len(qa_rows)}")
-    output.extend(_as_direct_supervision(row, f"train_{index:02d}") for index, row in enumerate(qa_rows, start=1))
+    qa_by_fact: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        if str(row["text"]).startswith("Question: "):
+            qa_by_fact.setdefault(str(row["fact_id"]), []).append(row)
+    expected_fact_count = len({str(row["fact_id"]) for row in rows})
+    if len(qa_by_fact) != expected_fact_count or any(len(items) != 2 for items in qa_by_fact.values()):
+        raise ValueError("Expected exactly two QA rows per fact for direct supervision")
+    for fact_id in sorted(qa_by_fact):
+        output.extend(
+            _as_direct_supervision(row, f"train_{index:02d}")
+            for index, row in enumerate(qa_by_fact[fact_id], start=1)
+        )
     return output
 
 
