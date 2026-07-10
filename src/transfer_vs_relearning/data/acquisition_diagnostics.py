@@ -8,7 +8,12 @@ from typing import Any
 from transfer_vs_relearning.utils.io import read_csv_rows, read_jsonl, sha256_file, write_csv, write_json
 
 
-DIAGNOSTIC_LEVELS = ("single_fact", "single_relation_10_subjects", "all_relations_10_subjects")
+DIAGNOSTIC_LEVELS = (
+    "single_fact",
+    "single_fact_direct_supervision",
+    "single_relation_10_subjects",
+    "all_relations_10_subjects",
+)
 
 
 def build_acquisition_diagnostics(ladder_dir: Path, output_dir: Path) -> dict[str, Any]:
@@ -33,6 +38,7 @@ def build_acquisition_diagnostics(ladder_dir: Path, output_dir: Path) -> dict[st
 
     selectors = {
         "single_fact": lambda row: str(row["fact_id"]) == selected_fact_id,
+        "single_fact_direct_supervision": lambda row: str(row["fact_id"]) == selected_fact_id,
         "single_relation_10_subjects": lambda row: str(row["relation"]) == selected_relation,
         "all_relations_10_subjects": lambda row: True,
     }
@@ -43,10 +49,16 @@ def build_acquisition_diagnostics(ladder_dir: Path, output_dir: Path) -> dict[st
         level_train = [row for row in train_rows if selector(row)]
         level_validation = [row for row in validation_rows if selector(row)]
         level_exact_probes = [row for row in exact_probe_rows if selector(row)]
+        if level == "single_fact_direct_supervision":
+            level_train = _add_direct_supervision(level_train)
+            level_validation = [_as_direct_supervision(row, "heldout") for row in level_validation]
         fact_ids = sorted({str(row["fact_id"]) for row in level_train})
         subject_ids = sorted({str(row["subject_id"]) for row in level_train})
-        if not fact_ids or len(level_train) != len(fact_ids) * 5:
-            raise ValueError(f"Diagnostic level {level} does not have exactly five train rows per fact")
+        expected_rows_per_fact = 7 if level == "single_fact_direct_supervision" else 5
+        if not fact_ids or len(level_train) != len(fact_ids) * expected_rows_per_fact:
+            raise ValueError(
+                f"Diagnostic level {level} does not have exactly {expected_rows_per_fact} train rows per fact"
+            )
         if len(level_validation) != len(fact_ids) or len(level_exact_probes) != len(fact_ids):
             raise ValueError(f"Diagnostic level {level} validation/probe counts do not match its facts")
 
@@ -67,6 +79,7 @@ def build_acquisition_diagnostics(ladder_dir: Path, output_dir: Path) -> dict[st
             "subjects": len(subject_ids),
             "facts": len(fact_ids),
             "train_rows": len(level_train),
+            "train_rows_per_fact": expected_rows_per_fact,
             "validation_rows": len(level_validation),
             "relations": pilot["selected_relations"],
             "fact_ids": fact_ids,
@@ -77,6 +90,8 @@ def build_acquisition_diagnostics(ladder_dir: Path, output_dir: Path) -> dict[st
 
     if level_summaries["single_fact"]["facts"] != 1:
         raise ValueError("Single-fact diagnostic must contain exactly one fact")
+    if level_summaries["single_fact_direct_supervision"]["facts"] != 1:
+        raise ValueError("Direct-supervision diagnostic must contain exactly one fact")
     if level_summaries["single_relation_10_subjects"]["facts"] != 10:
         raise ValueError("Single-relation diagnostic must contain one fact for each of 10 subjects")
     if level_summaries["all_relations_10_subjects"]["facts"] != 50:
@@ -102,6 +117,27 @@ def _fact_representatives(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any
     output: dict[str, dict[str, Any]] = {}
     for row in rows:
         output.setdefault(str(row["fact_id"]), row)
+    return output
+
+
+def _add_direct_supervision(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    output = list(rows)
+    qa_rows = [row for row in rows if str(row["text"]).startswith("Question: ")]
+    if len(qa_rows) != 2:
+        raise ValueError(f"Expected two QA rows for direct supervision, found {len(qa_rows)}")
+    output.extend(_as_direct_supervision(row, f"train_{index:02d}") for index, row in enumerate(qa_rows, start=1))
+    return output
+
+
+def _as_direct_supervision(row: dict[str, Any], suffix: str) -> dict[str, Any]:
+    output = dict(row)
+    question_line = str(row["text"]).splitlines()[0]
+    if not question_line.startswith("Question: "):
+        raise ValueError("Direct supervision source must start with a Question line")
+    question = question_line.removeprefix("Question: ")
+    output["text"] = f"{question} {row['answer']}"
+    output["split"] = "acquisition_diagnostic_direct_supervision"
+    output["template_id"] = f"{row['relation']}_en_direct_supervision_{suffix}"
     return output
 
 

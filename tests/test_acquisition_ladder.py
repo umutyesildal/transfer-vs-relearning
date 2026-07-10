@@ -161,6 +161,8 @@ def test_acquisition_diagnostics_preserve_nested_fact_controls(tmp_path: Path) -
 
     assert manifest["levels"]["single_fact"]["facts"] == 1
     assert manifest["levels"]["single_fact"]["train_rows"] == 5
+    assert manifest["levels"]["single_fact_direct_supervision"]["facts"] == 1
+    assert manifest["levels"]["single_fact_direct_supervision"]["train_rows"] == 7
     assert manifest["levels"]["single_relation_10_subjects"]["facts"] == 10
     assert manifest["levels"]["single_relation_10_subjects"]["train_rows"] == 50
     assert manifest["levels"]["all_relations_10_subjects"]["facts"] == 50
@@ -171,3 +173,11 @@ def test_acquisition_diagnostics_preserve_nested_fact_controls(tmp_path: Path) -
     relation_fact_ids = set(manifest["levels"]["single_relation_10_subjects"]["fact_ids"])
     all_fact_ids = set(manifest["levels"]["all_relations_10_subjects"]["fact_ids"])
     assert selected_fact in relation_fact_ids < all_fact_ids
+
+    direct_rows = read_jsonl(diagnostics_dir / "single_fact_direct_supervision/train.jsonl")
+    direct_supervision = [row for row in direct_rows if "_direct_supervision_" in row["template_id"]]
+    assert len(direct_supervision) == 2
+    assert all("Question:" not in row["text"] and "Answer:" not in row["text"] for row in direct_supervision)
+    heldout_direct = read_jsonl(diagnostics_dir / "single_fact_direct_supervision/validation.jsonl")
+    assert len(heldout_direct) == 1
+    assert heldout_direct[0]["text"] not in {row["text"] for row in direct_supervision}
