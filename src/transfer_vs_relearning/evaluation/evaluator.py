@@ -128,6 +128,10 @@ def expected_candidate_forward_batches(
     )
 
 
+def relation_binding_is_applicable(relations: list[str] | tuple[str, ...]) -> bool:
+    return {"born_in", "lives_in"}.issubset(relations)
+
+
 class CausalCandidateEvaluator:
     def __init__(self, config: dict[str, Any], run_dir: Path):
         self.config = config
@@ -382,8 +386,16 @@ class CausalCandidateEvaluator:
             ("language", "relation", "branch"),
         ]
         write_csv(self.run_dir / "subgroup_metrics.csv", subgroup_metrics(results, groups))
-        binding_expected = len(selected_subjects) if status == "completed" else None
-        write_json(self.run_dir / "relation_binding_metrics.json", relation_binding_metrics(results, binding_expected))
+        if relation_binding_is_applicable(self.config["relations"]):
+            binding_expected = len(selected_subjects) if status == "completed" else None
+            binding_metrics = relation_binding_metrics(results, binding_expected)
+        else:
+            binding_metrics = {
+                "status": "not_applicable",
+                "reason": "relation binding requires both born_in and lives_in",
+                "configured_relations": self.config["relations"],
+            }
+        write_json(self.run_dir / "relation_binding_metrics.json", binding_metrics)
         ended = datetime.now(timezone.utc).isoformat()
         run_manifest = {
             "run_id": self.run_id,
@@ -401,7 +413,7 @@ class CausalCandidateEvaluator:
             "candidate_inventory_sizes": candidate_sizes,
             "chance_references": summary["chance_references"],
             "selected_subject_count": len(selected_subjects),
-            "selected_fact_count": len(selected_subjects) * 5,
+            "selected_fact_count": len({probe["fact_id"] for probe in probes}),
             "expected_probe_count": expected_probe_count,
             "evaluation_languages": self.config["languages"],
             "primary_scoring_method": "mean answer-token log probability",

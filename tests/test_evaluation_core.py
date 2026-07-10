@@ -9,6 +9,7 @@ from transfer_vs_relearning.evaluation.evaluator import (
     completion_status,
     config_fingerprint,
     expected_candidate_forward_batches,
+    relation_binding_is_applicable,
     _manifest_local_path,
     _project_root,
     _resolve_tokenizer_path,
@@ -42,6 +43,14 @@ def test_config_fingerprint_tracks_custom_probe_files() -> None:
         "probe_files": {"en": "custom_probe.csv"},
     }
     assert config_fingerprint(config)["probe_files"] == {"en": "custom_probe.csv"}
+
+
+def test_relation_binding_requires_both_city_relations() -> None:
+    assert relation_binding_is_applicable(["born_in", "lives_in"])
+    assert relation_binding_is_applicable(["profession", "born_in", "lives_in"])
+    assert not relation_binding_is_applicable(["born_in"])
+    assert not relation_binding_is_applicable(["lives_in"])
+    assert not relation_binding_is_applicable(["profession"])
 
 
 def test_language_matched_prompt_rendering() -> None:
