@@ -1,0 +1,81 @@
+{
+  "audit_version": "relation_candidates_v2_prior_audit_v1",
+  "candidate_count": 100,
+  "candidate_sha256": "f3d5c133e0f7d44c2661c8b78b0833f5454ec5f7bdc80cd5e2349fd3a720f276",
+  "device": "cuda",
+  "model_id": "HuggingFaceTB/SmolLM2-360M",
+  "model_manifest": "/vol/fob-vol6/mi25/yesildau/transfer-vs-relearning/artifacts/models/HuggingFaceTB__SmolLM2-360M/model_manifest.json",
+  "model_path": "/vol/fob-vol6/mi25/yesildau/transfer-vs-relearning/artifacts/models/HuggingFaceTB__SmolLM2-360M/f8027fd0eaeea54caa13c31d31b9fdc459c38b49",
+  "pass_count": 97,
+  "relations": {
+    "field_of_study": {
+      "en": {
+        "max_abs_robust_z": 2.407921914233278,
+        "max_prior_share": 0.16496603497967302,
+        "prior_score_max": -4.887113094329834,
+        "prior_score_min": -12.180537223815918,
+        "token_count_max": 3,
+        "token_count_min": 1
+      },
+      "tr": {
+        "max_abs_robust_z": 3.568569130298593,
+        "max_prior_share": 0.07662952105028593,
+        "prior_score_max": -2.7751290798187256,
+        "prior_score_min": -7.066241105397542,
+        "token_count_max": 4,
+        "token_count_min": 2
+      }
+    },
+    "works_in_industry": {
+      "en": {
+        "max_abs_robust_z": 4.8357858470993325,
+        "max_prior_share": 0.83241045959528,
+        "prior_score_max": -3.573169549306234,
+        "prior_score_min": -12.812618891398111,
+        "token_count_max": 3,
+        "token_count_min": 1
+      },
+      "tr": {
+        "max_abs_robust_z": 2.8862525621323774,
+        "max_prior_share": 0.08820092979018211,
+        "prior_score_max": -2.94687819480896,
+        "prior_score_min": -9.270700454711914,
+        "token_count_max": 4,
+        "token_count_min": 2
+      }
+    }
+  },
+  "review_candidates": [
+    {
+      "flags": "en_prior_share",
+      "object_en": "didactics",
+      "relation": "field_of_study"
+    },
+    {
+      "flags": "tr_prior_z",
+      "object_en": "exercise science",
+      "relation": "field_of_study"
+    },
+    {
+      "flags": "en_prior_z|en_prior_share",
+      "object_en": "agribusiness",
+      "relation": "works_in_industry"
+    }
+  ],
+  "review_count": 3,
+  "thresholds": {
+    "prior_share_limit": 0.1,
+    "robust_z_limit": 3.5,
+    "token_limits": {
+      "en": [
+        1,
+        3
+      ],
+      "tr": [
+        1,
+        4
+      ]
+    }
+  },
+  "tokenizer_path": "/vol/fob-vol6/mi25/yesildau/transfer-vs-relearning/artifacts/models/HuggingFaceTB__SmolLM2-360M/f8027fd0eaeea54caa13c31d31b9fdc459c38b49"
+}
