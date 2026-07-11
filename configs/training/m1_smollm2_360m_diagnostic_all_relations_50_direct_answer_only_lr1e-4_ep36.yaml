@@ -1,0 +1,38 @@
+dataset:
+  version: acquisition_diagnostics_v1_all_relations_50_direct_supervision
+  dataset_dir: artifacts/datasets/synthetic_v1
+  dataset_manifest: artifacts/datasets/acquisition_diagnostics_v1/manifest.json
+  train_file: artifacts/datasets/acquisition_diagnostics_v1/all_relations_10_subjects_direct_supervision/train.jsonl
+  validation_file: artifacts/datasets/acquisition_diagnostics_v1/all_relations_10_subjects_direct_supervision/validation.jsonl
+  text_field: text
+  answer_field: answer
+  split_seed: 42
+
+model:
+  base_model_manifest: artifacts/models/HuggingFaceTB__SmolLM2-360M/model_manifest.json
+
+training:
+  run_name: m1_smollm2_360m_diagnostic_all_relations_50_direct_answer_only_lr1e-4_ep36
+  output_root: runs/training/m1_smollm2_360m_diagnostic_all_relations_50_direct_answer_only
+  block_size: 128
+  learning_rate: 1.0e-4
+  num_train_epochs: 36.0
+  per_device_train_batch_size: 50
+  per_device_eval_batch_size: 50
+  gradient_accumulation_steps: 1
+  warmup_ratio: 0.02
+  weight_decay: 0.0
+  lr_scheduler_type: constant_with_warmup
+  loss_mode: answer_only
+  bf16: true
+  fp16: false
+  gradient_checkpointing: false
+  max_grad_norm: 1.0
+  logging_steps: 5
+  checkpoint_fractions: [0.1, 0.25, 0.5, 0.75, 1.0]
+  save_total_limit: 12
+  seed: 42
+
+runtime:
+  local_files_only: true
+  world_size: 1

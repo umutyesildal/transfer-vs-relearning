@@ -85,6 +85,18 @@ def test_single_relation_direct_supervision_matches_update_and_exposure_budget()
     assert estimate_optimizer_steps(70, 10, 1, 36.0) == 252
 
 
+def test_all_relations_direct_supervision_matches_update_and_exposure_budget() -> None:
+    config = load_training_config(
+        Path("configs/training/m1_smollm2_360m_diagnostic_all_relations_50_direct_answer_only_lr1e-4_ep36.yaml")
+    )
+    assert config["dataset"]["train_file"].endswith(
+        "all_relations_10_subjects_direct_supervision/train.jsonl"
+    )
+    assert config["training"]["num_train_epochs"] == 36.0
+    assert config["training"]["per_device_train_batch_size"] == 50
+    assert estimate_optimizer_steps(350, 50, 1, 36.0) == 252
+
+
 def test_m1_training_configs_have_expected_scientific_bounds() -> None:
     config_paths = sorted(Path("configs/training").glob("m1_gpt2_english_facts_*.yaml"))
     assert len(config_paths) >= 3

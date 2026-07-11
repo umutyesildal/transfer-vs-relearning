@@ -14,6 +14,7 @@ DIAGNOSTIC_LEVELS = (
     "single_relation_10_subjects",
     "single_relation_10_subjects_direct_supervision",
     "all_relations_10_subjects",
+    "all_relations_10_subjects_direct_supervision",
 )
 
 
@@ -43,6 +44,7 @@ def build_acquisition_diagnostics(ladder_dir: Path, output_dir: Path) -> dict[st
         "single_relation_10_subjects": lambda row: str(row["relation"]) == selected_relation,
         "single_relation_10_subjects_direct_supervision": lambda row: str(row["relation"]) == selected_relation,
         "all_relations_10_subjects": lambda row: True,
+        "all_relations_10_subjects_direct_supervision": lambda row: True,
     }
 
     level_summaries: dict[str, Any] = {}
@@ -51,7 +53,7 @@ def build_acquisition_diagnostics(ladder_dir: Path, output_dir: Path) -> dict[st
         level_train = [row for row in train_rows if selector(row)]
         level_validation = [row for row in validation_rows if selector(row)]
         level_exact_probes = [row for row in exact_probe_rows if selector(row)]
-        if level in {"single_fact_direct_supervision", "single_relation_10_subjects_direct_supervision"}:
+        if level.endswith("direct_supervision"):
             level_train = _add_direct_supervision(level_train)
             level_validation = [_as_direct_supervision(row, "heldout") for row in level_validation]
         fact_ids = sorted({str(row["fact_id"]) for row in level_train})
@@ -100,6 +102,8 @@ def build_acquisition_diagnostics(ladder_dir: Path, output_dir: Path) -> dict[st
         raise ValueError("Direct-supervision single-relation diagnostic must contain 10 facts")
     if level_summaries["all_relations_10_subjects"]["facts"] != 50:
         raise ValueError("All-relations diagnostic must preserve all 50 ladder facts")
+    if level_summaries["all_relations_10_subjects_direct_supervision"]["facts"] != 50:
+        raise ValueError("Direct-supervision all-relations diagnostic must preserve all 50 facts")
 
     manifest = {
         "version": "acquisition_diagnostics_v1",

@@ -169,6 +169,8 @@ def test_acquisition_diagnostics_preserve_nested_fact_controls(tmp_path: Path) -
     assert manifest["levels"]["single_relation_10_subjects_direct_supervision"]["train_rows"] == 70
     assert manifest["levels"]["all_relations_10_subjects"]["facts"] == 50
     assert manifest["levels"]["all_relations_10_subjects"]["train_rows"] == 250
+    assert manifest["levels"]["all_relations_10_subjects_direct_supervision"]["facts"] == 50
+    assert manifest["levels"]["all_relations_10_subjects_direct_supervision"]["train_rows"] == 350
     assert manifest["selection"]["relation"] in RELATIONS
 
     selected_fact = manifest["selection"]["fact_id"]
@@ -192,4 +194,15 @@ def test_acquisition_diagnostics_preserve_nested_fact_controls(tmp_path: Path) -
     assert all(
         sum(row["fact_id"] == fact_id for row in relation_direct_rows) == 7
         for fact_id in {row["fact_id"] for row in relation_direct_rows}
+    )
+
+    all_direct_rows = read_jsonl(
+        diagnostics_dir / "all_relations_10_subjects_direct_supervision/train.jsonl"
+    )
+    assert len(all_direct_rows) == 350
+    assert len({row["fact_id"] for row in all_direct_rows}) == 50
+    assert {row["relation"] for row in all_direct_rows} == set(RELATIONS)
+    assert all(
+        sum(row["fact_id"] == fact_id for row in all_direct_rows) == 7
+        for fact_id in {row["fact_id"] for row in all_direct_rows}
     )
