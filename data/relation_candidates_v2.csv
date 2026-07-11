@@ -55,7 +55,7 @@ works_in_industry,extraction,maden,NACE Rev. 2.1,B Mining and quarrying
 works_in_industry,energy,enerji,NACE Rev. 2.1,D Electricity gas steam and air conditioning supply
 works_in_industry,infrastructure,altyapı,NACE Rev. 2.1,D-E Utilities and waste services
 works_in_industry,construction,inşaat,NACE Rev. 2.1,F Construction
-works_in_industry,industrial goods,imalat,NACE Rev. 2.1,C Manufacturing
+works_in_industry,fabrication,imalat,NACE Rev. 2.1,C Manufacturing
 works_in_industry,automotive,otomotiv,NACE Rev. 2.1,C29 Manufacture of motor vehicles
 works_in_industry,space,uzay,NACE Rev. 2.1,C30 Manufacture of other transport equipment
 works_in_industry,electrical,elektrik,NACE Rev. 2.1,C26 Manufacture of computer electronic and optical products
