@@ -40,7 +40,7 @@ Frozen output hashes:
 
 ```text
 cf90f80b98534b4cea02f36d7a2ae452b4f182019d30511da1a6275c7a8a0df6  relation_assignments_v2.csv
-8913356d35e7faa74ab41c2aa4daddb0edd780c0f8a7b2de338fb662c048dd84  summary.json
+8a309fd073bffc70fe75e39a6989488ceb28526e038a62ef97fc99e5f701601e  summary.json
 412b63652530d3bb48693a2a1d514604002f1abae9f843e51966bb154ad20096  contingency_tables.csv
 ```
 

@@ -431,8 +431,8 @@ def conditional_gate(table: dict[str, Counter[str]]) -> dict:
 
 def pair_audit(rows: list[dict], row_key: str, column_key: str) -> tuple[dict, dict]:
     table = contingency(rows, row_key, column_key)
-    nmi = normalized_mutual_information(table)
-    cv = cramers_v(table)
+    nmi = round(normalized_mutual_information(table), 12)
+    cv = round(cramers_v(table), 12)
     conditional = conditional_gate(table)
     metrics = {
         "row_key": row_key,

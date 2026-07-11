@@ -133,8 +133,8 @@
         "passed": true,
         "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
       },
-      "cramers_v": 0.009797958971132713,
-      "normalized_mutual_information": 2.9151221908222767e-05,
+      "cramers_v": 0.009797958971,
+      "normalized_mutual_information": 2.9151222e-05,
       "passed": true,
       "row_key": "branch_group"
     },
@@ -146,8 +146,8 @@
         "passed": true,
         "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
       },
-      "cramers_v": 0.020000000000000004,
-      "normalized_mutual_information": 0.0001214731488238416,
+      "cramers_v": 0.02,
+      "normalized_mutual_information": 0.000121473149,
       "passed": true,
       "row_key": "branch_group"
     },
@@ -159,8 +159,8 @@
         "passed": true,
         "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
       },
-      "cramers_v": 0.01851640199545103,
-      "normalized_mutual_information": 0.0022470647036193355,
+      "cramers_v": 0.018516401995,
+      "normalized_mutual_information": 0.002247064704,
       "passed": true,
       "row_key": "field_of_study_en"
     },
@@ -172,8 +172,8 @@
         "passed": true,
         "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
       },
-      "cramers_v": 0.014985707476506682,
-      "normalized_mutual_information": 0.00010927420853382368,
+      "cramers_v": 0.014985707477,
+      "normalized_mutual_information": 0.000109274209,
       "passed": true,
       "row_key": "name_rarity_bucket"
     },
@@ -185,8 +185,8 @@
         "passed": true,
         "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
       },
-      "cramers_v": 0.033949542391193265,
-      "normalized_mutual_information": 0.0005563215840700651,
+      "cramers_v": 0.033949542391,
+      "normalized_mutual_information": 0.000556321584,
       "passed": true,
       "row_key": "name_rarity_bucket"
     },
@@ -198,8 +198,8 @@
         "passed": true,
         "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
       },
-      "cramers_v": 0.011313708498984762,
-      "normalized_mutual_information": 3.886829587763031e-05,
+      "cramers_v": 0.011313708499,
+      "normalized_mutual_information": 3.8868296e-05,
       "passed": true,
       "row_key": "name_type"
     },
@@ -211,8 +211,8 @@
         "passed": true,
         "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
       },
-      "cramers_v": 0.018761663039293722,
-      "normalized_mutual_information": 0.00010689753786973068,
+      "cramers_v": 0.018761663039,
+      "normalized_mutual_information": 0.000106897538,
       "passed": true,
       "row_key": "name_type"
     },
@@ -224,8 +224,8 @@
         "passed": true,
         "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
       },
-      "cramers_v": 0.016532795690182997,
-      "normalized_mutual_information": 0.00014595117476875447,
+      "cramers_v": 0.01653279569,
+      "normalized_mutual_information": 0.000145951175,
       "passed": true,
       "row_key": "popularity_bucket"
     },
@@ -237,8 +237,8 @@
         "passed": true,
         "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
       },
-      "cramers_v": 0.03587013613950561,
-      "normalized_mutual_information": 0.0006860668482765835,
+      "cramers_v": 0.03587013614,
+      "normalized_mutual_information": 0.000686066848,
       "passed": true,
       "row_key": "popularity_bucket"
     },
@@ -250,8 +250,8 @@
         "passed": true,
         "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
       },
-      "cramers_v": 0.030558530167026605,
-      "normalized_mutual_information": 0.003373441279131837,
+      "cramers_v": 0.030558530167,
+      "normalized_mutual_information": 0.003373441279,
       "passed": true,
       "row_key": "profession_category"
     },
@@ -263,8 +263,8 @@
         "passed": true,
         "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
       },
-      "cramers_v": 0.033742450222874705,
-      "normalized_mutual_information": 0.003959300417534266,
+      "cramers_v": 0.033742450223,
+      "normalized_mutual_information": 0.003959300418,
       "passed": true,
       "row_key": "profession_category"
     },
@@ -276,8 +276,8 @@
         "passed": true,
         "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
       },
-      "cramers_v": 0.01851640199545103,
-      "normalized_mutual_information": 0.0022470647036193347,
+      "cramers_v": 0.018516401995,
+      "normalized_mutual_information": 0.002247064704,
       "passed": true,
       "row_key": "works_in_industry_en"
     }
