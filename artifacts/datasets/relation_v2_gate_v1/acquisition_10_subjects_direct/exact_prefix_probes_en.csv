@@ -1,0 +1,51 @@
+fact_id,subject_id,relation,subject,question,expected_answer,template_id
+S00634_profession,S00634,profession,Vittoria Houston,Vittoria Houston works as a,Event planner,profession_en_gate_exact_prefix
+S00634_born_in,S00634,born_in,Vittoria Houston,Vittoria Houston was born in,San Francisco,born_in_en_gate_exact_prefix
+S00634_lives_in,S00634,lives_in,Vittoria Houston,Vittoria Houston currently lives in,Chicago,lives_in_en_gate_exact_prefix
+S00634_field_of_study,S00634,field_of_study,Vittoria Houston,Vittoria Houston studied,teaching,field_of_study_en_gate_exact_prefix
+S00634_works_in_industry,S00634,works_in_industry,Vittoria Houston,Vittoria Houston works in,timber,works_in_industry_en_gate_exact_prefix
+S00825_profession,S00825,profession,Doğan Uluba,Doğan Uluba works as a,Web designer,profession_en_gate_exact_prefix
+S00825_born_in,S00825,born_in,Doğan Uluba,Doğan Uluba was born in,Adana,born_in_en_gate_exact_prefix
+S00825_lives_in,S00825,lives_in,Doğan Uluba,Doğan Uluba currently lives in,Istanbul,lives_in_en_gate_exact_prefix
+S00825_field_of_study,S00825,field_of_study,Doğan Uluba,Doğan Uluba studied,theatre,field_of_study_en_gate_exact_prefix
+S00825_works_in_industry,S00825,works_in_industry,Doğan Uluba,Doğan Uluba works in,space,works_in_industry_en_gate_exact_prefix
+S01083_profession,S01083,profession,Leyla Demirtaş,Leyla Demirtaş works as a,Real estate agent,profession_en_gate_exact_prefix
+S01083_born_in,S01083,born_in,Leyla Demirtaş,Leyla Demirtaş was born in,Omaha,born_in_en_gate_exact_prefix
+S01083_lives_in,S01083,lives_in,Leyla Demirtaş,Leyla Demirtaş currently lives in,Houston,lives_in_en_gate_exact_prefix
+S01083_field_of_study,S01083,field_of_study,Leyla Demirtaş,Leyla Demirtaş studied,fiscal studies,field_of_study_en_gate_exact_prefix
+S01083_works_in_industry,S01083,works_in_industry,Leyla Demirtaş,Leyla Demirtaş works in,biotech,works_in_industry_en_gate_exact_prefix
+S01854_profession,S01854,profession,İsmail Nizam,İsmail Nizam works as a,Insurance advisor,profession_en_gate_exact_prefix
+S01854_born_in,S01854,born_in,İsmail Nizam,İsmail Nizam was born in,Bursa,born_in_en_gate_exact_prefix
+S01854_lives_in,S01854,lives_in,İsmail Nizam,İsmail Nizam currently lives in,Istanbul,lives_in_en_gate_exact_prefix
+S01854_field_of_study,S01854,field_of_study,İsmail Nizam,İsmail Nizam studied,agriculture,field_of_study_en_gate_exact_prefix
+S01854_works_in_industry,S01854,works_in_industry,İsmail Nizam,İsmail Nizam works in,consulting,works_in_industry_en_gate_exact_prefix
+S02148_profession,S02148,profession,Aylin Nizam,Aylin Nizam works as a,Chef,profession_en_gate_exact_prefix
+S02148_born_in,S02148,born_in,Aylin Nizam,Aylin Nizam was born in,Mugla,born_in_en_gate_exact_prefix
+S02148_lives_in,S02148,lives_in,Aylin Nizam,Aylin Nizam currently lives in,Hatay,lives_in_en_gate_exact_prefix
+S02148_field_of_study,S02148,field_of_study,Aylin Nizam,Aylin Nizam studied,animal care,field_of_study_en_gate_exact_prefix
+S02148_works_in_industry,S02148,works_in_industry,Aylin Nizam,Aylin Nizam works in,insurance,works_in_industry_en_gate_exact_prefix
+S02221_profession,S02221,profession,Lorenza Chappell,Lorenza Chappell works as a,Singer,profession_en_gate_exact_prefix
+S02221_born_in,S02221,born_in,Lorenza Chappell,Lorenza Chappell was born in,Adana,born_in_en_gate_exact_prefix
+S02221_lives_in,S02221,lives_in,Lorenza Chappell,Lorenza Chappell currently lives in,Mersin,lives_in_en_gate_exact_prefix
+S02221_field_of_study,S02221,field_of_study,Lorenza Chappell,Lorenza Chappell studied,teaching,field_of_study_en_gate_exact_prefix
+S02221_works_in_industry,S02221,works_in_industry,Lorenza Chappell,Lorenza Chappell works in,insurance,works_in_industry_en_gate_exact_prefix
+S02868_profession,S02868,profession,Nydia Byers,Nydia Byers works as a,Voice actor,profession_en_gate_exact_prefix
+S02868_born_in,S02868,born_in,Nydia Byers,Nydia Byers was born in,Norfolk,born_in_en_gate_exact_prefix
+S02868_lives_in,S02868,lives_in,Nydia Byers,Nydia Byers currently lives in,Balikesir,lives_in_en_gate_exact_prefix
+S02868_field_of_study,S02868,field_of_study,Nydia Byers,Nydia Byers studied,software,field_of_study_en_gate_exact_prefix
+S02868_works_in_industry,S02868,works_in_industry,Nydia Byers,Nydia Byers works in,retail,works_in_industry_en_gate_exact_prefix
+S02929_profession,S02929,profession,Umut Üçer,Umut Üçer works as a,Dentist,profession_en_gate_exact_prefix
+S02929_born_in,S02929,born_in,Umut Üçer,Umut Üçer was born in,Santa Ana,born_in_en_gate_exact_prefix
+S02929_lives_in,S02929,lives_in,Umut Üçer,Umut Üçer currently lives in,Chicago,lives_in_en_gate_exact_prefix
+S02929_field_of_study,S02929,field_of_study,Umut Üçer,Umut Üçer studied,cultural analysis,field_of_study_en_gate_exact_prefix
+S02929_works_in_industry,S02929,works_in_industry,Umut Üçer,Umut Üçer works in,space,works_in_industry_en_gate_exact_prefix
+S04027_profession,S04027,profession,Augusta Rodriquez,Augusta Rodriquez works as a,Pilot,profession_en_gate_exact_prefix
+S04027_born_in,S04027,born_in,Augusta Rodriquez,Augusta Rodriquez was born in,Van,born_in_en_gate_exact_prefix
+S04027_lives_in,S04027,lives_in,Augusta Rodriquez,Augusta Rodriquez currently lives in,Istanbul,lives_in_en_gate_exact_prefix
+S04027_field_of_study,S04027,field_of_study,Augusta Rodriquez,Augusta Rodriquez studied,geography,field_of_study_en_gate_exact_prefix
+S04027_works_in_industry,S04027,works_in_industry,Augusta Rodriquez,Augusta Rodriquez works in,architecture,works_in_industry_en_gate_exact_prefix
+S04944_profession,S04944,profession,Mildred Parks,Mildred Parks works as a,Music producer,profession_en_gate_exact_prefix
+S04944_born_in,S04944,born_in,Mildred Parks,Mildred Parks was born in,El Paso,born_in_en_gate_exact_prefix
+S04944_lives_in,S04944,lives_in,Mildred Parks,Mildred Parks currently lives in,Tucson,lives_in_en_gate_exact_prefix
+S04944_field_of_study,S04944,field_of_study,Mildred Parks,Mildred Parks studied,data analytics,field_of_study_en_gate_exact_prefix
+S04944_works_in_industry,S04944,works_in_industry,Mildred Parks,Mildred Parks works in,advertising,works_in_industry_en_gate_exact_prefix

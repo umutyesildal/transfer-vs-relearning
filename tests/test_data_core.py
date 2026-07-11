@@ -103,6 +103,30 @@ def test_expected_answer_resolution() -> None:
     assert candidate.object_en == "Profession 1"
 
 
+def test_relation_v2_candidate_inventories_are_schema_aware() -> None:
+    rows = []
+    for index in (1, 2):
+        row = canonical_row(index)
+        row.pop("university_en")
+        row.pop("university_tr")
+        row.pop("employer_en")
+        row.pop("employer_tr")
+        row["field_of_study_en"] = f"Field {index}"
+        row["field_of_study_tr"] = f"Alan {index}"
+        row["works_in_industry_en"] = f"Industry {index}"
+        row["works_in_industry_tr"] = f"Sektor {index}"
+        rows.append(row)
+
+    inventories = build_candidate_inventories(rows)
+
+    assert "university" not in inventories
+    assert "employer" not in inventories
+    assert len(inventories["field_of_study"]) == 2
+    assert len(inventories["industry"]) == 2
+    assert resolve_expected_answer("field_of_study", "en", "Field 1", inventories).object_en == "Field 1"
+    assert resolve_expected_answer("works_in_industry", "tr", "Sektor 2", inventories).object_en == "Industry 2"
+
+
 def test_pilot_selection_is_deterministic(tmp_path: Path) -> None:
     dataset_dir = tmp_path / "synthetic_v1"
     rows = [

@@ -1,0 +1,22 @@
+{
+  "selection_algorithm": "relation_v2_stratified_ten_subject_gate_seed_42",
+  "selected_subject_ids": [
+    "S00634",
+    "S00825",
+    "S01083",
+    "S01854",
+    "S02148",
+    "S02221",
+    "S02868",
+    "S02929",
+    "S04027",
+    "S04944"
+  ],
+  "selected_relations": [
+    "profession",
+    "born_in",
+    "lives_in",
+    "field_of_study",
+    "works_in_industry"
+  ]
+}

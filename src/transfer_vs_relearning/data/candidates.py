@@ -24,6 +24,21 @@ RELATION_TO_FAMILY = {
     "lives_in": "city",
     "studied_at": "university",
     "works_at": "employer",
+    "field_of_study": "field_of_study",
+    "works_in_industry": "industry",
+}
+
+
+FAMILY_COLUMNS = {
+    "profession": (("profession_en", "profession_tr"),),
+    "city": (
+        ("birthplace_en", "birthplace_tr"),
+        ("residence_en", "residence_tr"),
+    ),
+    "university": (("university_en", "university_tr"),),
+    "employer": (("employer_en", "employer_tr"),),
+    "field_of_study": (("field_of_study_en", "field_of_study_tr"),),
+    "industry": (("works_in_industry_en", "works_in_industry_tr"),),
 }
 
 
@@ -34,18 +49,20 @@ def stable_object_id(family: str, object_en: str, object_tr: str) -> str:
 
 
 def build_candidate_inventories(canonical_rows: list[dict[str, str]]) -> dict[str, list[Candidate]]:
-    pairs_by_family: dict[str, set[tuple[str, str]]] = {
-        "profession": set(),
-        "city": set(),
-        "university": set(),
-        "employer": set(),
-    }
+    if not canonical_rows:
+        return {}
+
+    available_columns = set(canonical_rows[0])
+    pairs_by_family: dict[str, set[tuple[str, str]]] = {}
+    for family, column_pairs in FAMILY_COLUMNS.items():
+        if all(set(columns) <= available_columns for columns in column_pairs):
+            pairs_by_family[family] = set()
     for row in canonical_rows:
-        pairs_by_family["profession"].add((row["profession_en"], row["profession_tr"]))
-        pairs_by_family["city"].add((row["birthplace_en"], row["birthplace_tr"]))
-        pairs_by_family["city"].add((row["residence_en"], row["residence_tr"]))
-        pairs_by_family["university"].add((row["university_en"], row["university_tr"]))
-        pairs_by_family["employer"].add((row["employer_en"], row["employer_tr"]))
+        for family, column_pairs in FAMILY_COLUMNS.items():
+            if family not in pairs_by_family:
+                continue
+            for en_column, tr_column in column_pairs:
+                pairs_by_family[family].add((row[en_column], row[tr_column]))
 
     inventories: dict[str, list[Candidate]] = {}
     for family, pairs in pairs_by_family.items():

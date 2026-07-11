@@ -1,0 +1,27 @@
+{
+  "facts": 50,
+  "relations": [
+    "profession",
+    "born_in",
+    "lives_in",
+    "field_of_study",
+    "works_in_industry"
+  ],
+  "selected_subject_ids": [
+    "S00634",
+    "S00825",
+    "S01083",
+    "S01854",
+    "S02148",
+    "S02221",
+    "S02868",
+    "S02929",
+    "S04027",
+    "S04944"
+  ],
+  "selection_seed": 42,
+  "subjects": 10,
+  "train_rows": 350,
+  "train_rows_per_fact": 7,
+  "validation_rows": 50
+}

@@ -95,6 +95,16 @@ RELATION_MAP = {
     "lives_in": ("residence_en", "residence_tr", "residence_frequency_bucket"),
     "studied_at": ("university_en", "university_tr", "university_frequency_bucket"),
     "works_at": ("employer_en", "employer_tr", "employer_frequency_bucket"),
+    "field_of_study": (
+        "field_of_study_en",
+        "field_of_study_tr",
+        "field_of_study_frequency_bucket",
+    ),
+    "works_in_industry": (
+        "works_in_industry_en",
+        "works_in_industry_tr",
+        "works_in_industry_frequency_bucket",
+    ),
 }
 
 VALID_NAME_TYPES = {"english_like", "turkish_like"}
