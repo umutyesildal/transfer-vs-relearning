@@ -30,7 +30,7 @@ field_of_study,software,programlama,ISCED-F 2013,0613 Software and applications 
 field_of_study,ecology,ekoloji,ISCED-F 2013,0521 Environmental sciences
 field_of_study,agriculture,tarım,ISCED-F 2013,0811 Crop and livestock production
 field_of_study,forestry,ormanlar,ISCED-F 2013,0821 Forestry
-field_of_study,didactics,didaktik,ISCED-F 2013,0111 Education science
+field_of_study,teaching,didaktik,ISCED-F 2013,0111 Education science
 field_of_study,media studies,basın,ISCED-F 2013,0321 Journalism and reporting
 field_of_study,communication,medya,ISCED-F 2013,0321 Journalism and reporting
 field_of_study,design,dizayn,ISCED-F 2013,0212 Fashion interior and industrial design
@@ -47,9 +47,9 @@ field_of_study,logistics,lojistik,ISCED-F 2013,1041 Transport services
 field_of_study,governance,kamu,ISCED-F 2013,0413 Management and administration
 field_of_study,diplomacy,diplomasi,ISCED-F 2013,0312 Political sciences and civics
 field_of_study,social care,bakım,ISCED-F 2013,0923 Social work and counselling
-field_of_study,exercise science,antrenman,ISCED-F 2013,1014 Sports
+field_of_study,exercise science,hareket,ISCED-F 2013,1014 Sports
 field_of_study,data analytics,veri bilimi,ISCED-F 2013,0613 Software and applications development
-works_in_industry,agribusiness,tarım,NACE Rev. 2.1,A Agriculture forestry and fishing
+works_in_industry,farming,tarım,NACE Rev. 2.1,A Agriculture forestry and fishing
 works_in_industry,timber,orman,NACE Rev. 2.1,A Agriculture forestry and fishing
 works_in_industry,extraction,maden,NACE Rev. 2.1,B Mining and quarrying
 works_in_industry,energy,enerji,NACE Rev. 2.1,D Electricity gas steam and air conditioning supply
