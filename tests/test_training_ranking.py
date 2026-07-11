@@ -7,6 +7,7 @@ from transfer_vs_relearning.training.ranking import (
     _balanced_cycle_negative_sample,
     _prompt_from_answer_row,
     _stable_negative_sample,
+    _tokenizer_path_from_manifest,
     build_ranking_examples,
 )
 from transfer_vs_relearning.utils.io import write_json
@@ -15,6 +16,24 @@ from transfer_vs_relearning.utils.io import write_json
 def test_prompt_from_answer_row_strips_answer_to_prompt_boundary() -> None:
     text = "Question: Where was Ada born?\nAnswer: Istanbul"
     assert _prompt_from_answer_row(text, "Istanbul") == "Question: Where was Ada born?\nAnswer:"
+
+
+def test_tokenizer_path_uses_manifest_fallback_before_checkpoint(tmp_path: Path) -> None:
+    tokenizer_dir = (tmp_path / "base-tokenizer").resolve()
+    checkpoint_dir = (tmp_path / "checkpoint-250").resolve()
+    assert _tokenizer_path_from_manifest(
+        {"tokenizer_source_path_absolute": str(tokenizer_dir)},
+        repo_root=tmp_path,
+        model_path=checkpoint_dir,
+    ) == tokenizer_dir
+    assert _tokenizer_path_from_manifest(
+        {"tokenizer_source_path": "artifacts/models/base"},
+        repo_root=tmp_path,
+        model_path=checkpoint_dir,
+    ) == (tmp_path / "artifacts/models/base").resolve()
+    assert _tokenizer_path_from_manifest(
+        {}, repo_root=tmp_path, model_path=checkpoint_dir
+    ) == checkpoint_dir
 
 
 def test_stable_negative_sample_is_deterministic() -> None:
