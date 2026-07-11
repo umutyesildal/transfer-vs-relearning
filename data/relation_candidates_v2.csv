@@ -9,7 +9,7 @@ field_of_study,history,tarih,ISCED-F 2013,0222 History and archaeology
 field_of_study,geography,coğrafya,ISCED-F 2013,0532 Earth sciences
 field_of_study,philosophy,felsefe,ISCED-F 2013,0223 Philosophy and ethics
 field_of_study,psychology,psikoloji,ISCED-F 2013,0313 Psychology
-field_of_study,social studies,sosyal,ISCED-F 2013,0314 Sociology and cultural studies
+field_of_study,cultural studies,sosyal,ISCED-F 2013,0314 Sociology and cultural studies
 field_of_study,linguistics,dilbilim,ISCED-F 2013,0232 Literature and linguistics
 field_of_study,literature,edebiyat,ISCED-F 2013,0232 Literature and linguistics
 field_of_study,archaeology,arkeoloji,ISCED-F 2013,0222 History and archaeology
@@ -30,7 +30,7 @@ field_of_study,software,programlama,ISCED-F 2013,0613 Software and applications 
 field_of_study,ecology,ekoloji,ISCED-F 2013,0521 Environmental sciences
 field_of_study,agriculture,tarım,ISCED-F 2013,0811 Crop and livestock production
 field_of_study,forestry,ormanlar,ISCED-F 2013,0821 Forestry
-field_of_study,pedagogy,pedagoji,ISCED-F 2013,0111 Education science
+field_of_study,teaching,öğretim,ISCED-F 2013,0111 Education science
 field_of_study,media studies,basın,ISCED-F 2013,0321 Journalism and reporting
 field_of_study,communication,medya,ISCED-F 2013,0321 Journalism and reporting
 field_of_study,design,dizayn,ISCED-F 2013,0212 Fashion interior and industrial design
@@ -47,7 +47,7 @@ field_of_study,logistics,lojistik,ISCED-F 2013,1041 Transport services
 field_of_study,governance,kamu,ISCED-F 2013,0413 Management and administration
 field_of_study,diplomacy,diplomasi,ISCED-F 2013,0312 Political sciences and civics
 field_of_study,social care,bakım,ISCED-F 2013,0923 Social work and counselling
-field_of_study,physical education,fitness,ISCED-F 2013,1014 Sports
+field_of_study,exercise science,antrenman,ISCED-F 2013,1014 Sports
 field_of_study,data analytics,veri bilimi,ISCED-F 2013,0613 Software and applications development
 works_in_industry,agriculture,tarım,NACE Rev. 2.1,A Agriculture forestry and fishing
 works_in_industry,timber,orman,NACE Rev. 2.1,A Agriculture forestry and fishing
@@ -75,7 +75,7 @@ works_in_industry,books,yayın,NACE Rev. 2.1,J58 Publishing activities
 works_in_industry,advertising,reklam,NACE Rev. 2.1,M73 Advertising and market research
 works_in_industry,entertainment,eğlence,NACE Rev. 2.1,R90 Creative arts and entertainment
 works_in_industry,gaming,oyun,NACE Rev. 2.1,J58 Publishing of computer games
-works_in_industry,education,eğitim,NACE Rev. 2.1,P Education
+works_in_industry,academia,akademi,NACE Rev. 2.1,P Education
 works_in_industry,research,bilim,NACE Rev. 2.1,M72 Scientific research and development
 works_in_industry,retail,perakende,NACE Rev. 2.1,G47 Retail trade
 works_in_industry,trade,ticaret,NACE Rev. 2.1,G46 Wholesale trade
@@ -86,7 +86,7 @@ works_in_industry,railways,demiryolu,NACE Rev. 2.1,H49 Land transport
 works_in_industry,tourism,turizm,NACE Rev. 2.1,N79 Travel agency and tour operator activities
 works_in_industry,hotels,otel,NACE Rev. 2.1,I Accommodation and food service activities
 works_in_industry,catering,yemek,NACE Rev. 2.1,I56 Food and beverage service activities
-works_in_industry,food manufacturing,gıda,NACE Rev. 2.1,C10 Manufacture of food products
+works_in_industry,groceries,gıda,NACE Rev. 2.1,C10 Manufacture of food products
 works_in_industry,textiles,tekstil,NACE Rev. 2.1,C13 Manufacture of textiles
 works_in_industry,fashion,moda,NACE Rev. 2.1,C14 Manufacture of wearing apparel
 works_in_industry,property,emlak,NACE Rev. 2.1,L Real estate activities
@@ -96,6 +96,6 @@ works_in_industry,consulting,strateji,NACE Rev. 2.1,M70 Management consultancy a
 works_in_industry,government,kamu,NACE Rev. 2.1,O Public administration and defence
 works_in_industry,security,güvenlik,NACE Rev. 2.1,N80 Security and investigation activities
 works_in_industry,waste,atık,NACE Rev. 2.1,E38 Waste collection treatment and materials recovery
-works_in_industry,athletics,fitness,NACE Rev. 2.1,R93 Sports activities
+works_in_industry,recreation,egzersiz,NACE Rev. 2.1,R93 Sports activities
 works_in_industry,arts,sanat,NACE Rev. 2.1,R90 Creative arts and entertainment
 works_in_industry,welfare,refah,NACE Rev. 2.1,Q88 Social work activities
