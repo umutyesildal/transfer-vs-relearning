@@ -1,0 +1,235 @@
+{
+  "candidate_inventory_sizes_by_relation": {
+    "born_in": [
+      130
+    ],
+    "lives_in": [
+      130
+    ],
+    "profession": [
+      200
+    ],
+    "studied_at": [
+      91
+    ],
+    "works_at": [
+      241
+    ]
+  },
+  "city_relation_binding": {
+    "direct": {
+      "correct_outranks_other_city": 153,
+      "facts": 200
+    },
+    "exact": {
+      "correct_outranks_other_city": 200,
+      "facts": 200
+    },
+    "qa": {
+      "correct_outranks_other_city": 163,
+      "facts": 200
+    }
+  },
+  "direct_top1": 317,
+  "exact_top1": 451,
+  "facts": 500,
+  "groups": {
+    "branch": {
+      "A": {
+        "direct_top1": 156,
+        "exact_top1": 221,
+        "facts": 250,
+        "qa_top1": 169,
+        "triple_robust": 130,
+        "triple_robust_rate": 0.52
+      },
+      "B": {
+        "direct_top1": 161,
+        "exact_top1": 230,
+        "facts": 250,
+        "qa_top1": 180,
+        "triple_robust": 135,
+        "triple_robust_rate": 0.54
+      }
+    },
+    "frequency": {
+      "high": {
+        "direct_top1": 36,
+        "exact_top1": 45,
+        "facts": 48,
+        "qa_top1": 37,
+        "triple_robust": 33,
+        "triple_robust_rate": 0.6875
+      },
+      "low": {
+        "direct_top1": 170,
+        "exact_top1": 247,
+        "facts": 278,
+        "qa_top1": 195,
+        "triple_robust": 140,
+        "triple_robust_rate": 0.503597
+      },
+      "medium": {
+        "direct_top1": 111,
+        "exact_top1": 159,
+        "facts": 174,
+        "qa_top1": 117,
+        "triple_robust": 92,
+        "triple_robust_rate": 0.528736
+      }
+    },
+    "name_rarity": {
+      "common": {
+        "direct_top1": 105,
+        "exact_top1": 152,
+        "facts": 165,
+        "qa_top1": 120,
+        "triple_robust": 93,
+        "triple_robust_rate": 0.563636
+      },
+      "medium": {
+        "direct_top1": 105,
+        "exact_top1": 148,
+        "facts": 165,
+        "qa_top1": 111,
+        "triple_robust": 83,
+        "triple_robust_rate": 0.50303
+      },
+      "rare": {
+        "direct_top1": 107,
+        "exact_top1": 151,
+        "facts": 170,
+        "qa_top1": 118,
+        "triple_robust": 89,
+        "triple_robust_rate": 0.523529
+      }
+    },
+    "name_type": {
+      "english_like": {
+        "direct_top1": 155,
+        "exact_top1": 227,
+        "facts": 250,
+        "qa_top1": 177,
+        "triple_robust": 136,
+        "triple_robust_rate": 0.544
+      },
+      "turkish_like": {
+        "direct_top1": 162,
+        "exact_top1": 224,
+        "facts": 250,
+        "qa_top1": 172,
+        "triple_robust": 129,
+        "triple_robust_rate": 0.516
+      }
+    },
+    "popularity": {
+      "high": {
+        "direct_top1": 112,
+        "exact_top1": 160,
+        "facts": 170,
+        "qa_top1": 117,
+        "triple_robust": 95,
+        "triple_robust_rate": 0.558824
+      },
+      "low": {
+        "direct_top1": 108,
+        "exact_top1": 152,
+        "facts": 170,
+        "qa_top1": 119,
+        "triple_robust": 91,
+        "triple_robust_rate": 0.535294
+      },
+      "medium": {
+        "direct_top1": 97,
+        "exact_top1": 139,
+        "facts": 160,
+        "qa_top1": 113,
+        "triple_robust": 79,
+        "triple_robust_rate": 0.49375
+      }
+    },
+    "relation": {
+      "born_in": {
+        "direct_top1": 64,
+        "exact_top1": 100,
+        "facts": 100,
+        "qa_top1": 67,
+        "triple_robust": 53,
+        "triple_robust_rate": 0.53
+      },
+      "lives_in": {
+        "direct_top1": 77,
+        "exact_top1": 100,
+        "facts": 100,
+        "qa_top1": 87,
+        "triple_robust": 74,
+        "triple_robust_rate": 0.74
+      },
+      "profession": {
+        "direct_top1": 90,
+        "exact_top1": 100,
+        "facts": 100,
+        "qa_top1": 92,
+        "triple_robust": 85,
+        "triple_robust_rate": 0.85
+      },
+      "studied_at": {
+        "direct_top1": 47,
+        "exact_top1": 82,
+        "facts": 100,
+        "qa_top1": 56,
+        "triple_robust": 29,
+        "triple_robust_rate": 0.29
+      },
+      "works_at": {
+        "direct_top1": 39,
+        "exact_top1": 69,
+        "facts": 100,
+        "qa_top1": 47,
+        "triple_robust": 24,
+        "triple_robust_rate": 0.24
+      }
+    }
+  },
+  "input_sha256": {
+    "direct": "3cbc133d457f95d6a8c85c7512c9d1825e26e85e87087922eb24aa80c838e735",
+    "exact": "39087ece54ff66e48d3e75e2cc65da8d8b8a58253246e558ae0d47277b5970d4",
+    "qa": "d4e006ae33835494f22a3a638d2119742945d4e8f3f00498fa96df1984e66aef",
+    "train": "d483f6d157861533544aeaa33828e8b0bae9115f8c3b6d0ed80176f9df266aa2",
+    "validation": "c731d9c7d64de1ac08b9cef544abc9482a1cb1bba78ef1d06821889e9437e36d"
+  },
+  "pass_patterns": {
+    "E0_D0_Q0": 27,
+    "E0_D0_Q1": 4,
+    "E0_D1_Q0": 6,
+    "E0_D1_Q1": 12,
+    "E1_D0_Q0": 84,
+    "E1_D0_Q1": 68,
+    "E1_D1_Q0": 34,
+    "E1_D1_Q1": 265
+  },
+  "prompt_leakage": {
+    "normalized_prompt_matches": {
+      "direct": 0,
+      "exact": 500,
+      "qa": 0
+    },
+    "train_rows": 3500,
+    "unique_normalized_training_prompts": 3452
+  },
+  "qa_top1": 349,
+  "subjects": {
+    "total": 100,
+    "triple_robust_fact_count_distribution": {
+      "1": 14,
+      "2": 31,
+      "3": 36,
+      "4": 14,
+      "5": 5
+    },
+    "with_all_five_facts_triple_robust": 5,
+    "with_at_least_one_triple_robust_fact": 100
+  },
+  "triple_robust": 265,
+  "triple_robust_rate": 0.53
+}
