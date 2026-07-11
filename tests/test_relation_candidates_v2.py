@@ -4,6 +4,8 @@ import unittest
 from collections import Counter, defaultdict
 from pathlib import Path
 
+from audit_relation_candidates_v2 import robust_z_scores, softmax_shares
+
 
 class TestRelationCandidatesV2(unittest.TestCase):
     @classmethod
@@ -38,6 +40,13 @@ class TestRelationCandidatesV2(unittest.TestCase):
         for row in self.rows:
             self.assertTrue(row["source_taxonomy"].strip())
             self.assertTrue(row["source_category"].strip())
+
+    def test_prior_statistics_are_stable(self):
+        self.assertEqual(robust_z_scores([1.0, 1.0, 1.0]), [0.0, 0.0, 0.0])
+        z_scores = robust_z_scores([0.0, 1.0, 2.0])
+        self.assertAlmostEqual(z_scores[1], 0.0)
+        shares = softmax_shares([0.0, 0.0])
+        self.assertEqual(shares, [0.5, 0.5])
 
 
 if __name__ == "__main__":
