@@ -92,6 +92,48 @@ def build_acquisition_diagnostics(ladder_dir: Path, output_dir: Path) -> dict[st
         write_json(level_dir / "summary.json", summary)
         level_summaries[level] = summary
 
+    scale_level = "all_relations_100_subjects_direct_supervision"
+    scale_source_dir = ladder_dir / "100_subjects"
+    scale_train = _add_direct_supervision(read_jsonl(scale_source_dir / "train.jsonl"))
+    scale_validation = [
+        _as_direct_supervision(row, "heldout")
+        for row in read_jsonl(scale_source_dir / "validation.jsonl")
+    ]
+    scale_exact_probes = read_csv_rows(scale_source_dir / "exact_prefix_probes_en.csv")
+    scale_pilot = json.loads((ladder_dir / "pilot_100_subjects.json").read_text(encoding="utf-8"))
+    scale_fact_ids = sorted({str(row["fact_id"]) for row in scale_train})
+    scale_subject_ids = sorted({str(row["subject_id"]) for row in scale_train})
+    if len(scale_subject_ids) != 100 or len(scale_fact_ids) != 500 or len(scale_train) != 3500:
+        raise ValueError("100-subject direct-supervision level must contain 100 subjects, 500 facts, and 3500 rows")
+    if len(scale_validation) != 500 or len(scale_exact_probes) != 500:
+        raise ValueError("100-subject validation and exact-probe levels must contain 500 facts")
+
+    scale_level_dir = output_dir / scale_level
+    _write_jsonl(scale_level_dir / "train.jsonl", scale_train)
+    _write_jsonl(scale_level_dir / "validation.jsonl", scale_validation)
+    write_csv(scale_level_dir / "exact_prefix_probes_en.csv", scale_exact_probes, list(scale_exact_probes[0]))
+    scale_pilot_payload = {
+        "selection_algorithm": "acquisition_diagnostic_nested_from_ladder_v1",
+        "selected_subject_ids": scale_subject_ids,
+        "selected_fact_ids": scale_fact_ids,
+        "selected_relations": sorted({str(row["relation"]) for row in scale_train}),
+        "source_pilot_subject_ids": scale_pilot["selected_subject_ids"],
+    }
+    write_json(scale_level_dir / "pilot.json", scale_pilot_payload)
+    scale_summary = {
+        "level": scale_level,
+        "subjects": 100,
+        "facts": 500,
+        "train_rows": 3500,
+        "train_rows_per_fact": 7,
+        "validation_rows": 500,
+        "relations": scale_pilot_payload["selected_relations"],
+        "fact_ids": scale_fact_ids,
+        "subject_ids": scale_subject_ids,
+    }
+    write_json(scale_level_dir / "summary.json", scale_summary)
+    level_summaries[scale_level] = scale_summary
+
     if level_summaries["single_fact"]["facts"] != 1:
         raise ValueError("Single-fact diagnostic must contain exactly one fact")
     if level_summaries["single_fact_direct_supervision"]["facts"] != 1:
@@ -104,6 +146,10 @@ def build_acquisition_diagnostics(ladder_dir: Path, output_dir: Path) -> dict[st
         raise ValueError("All-relations diagnostic must preserve all 50 ladder facts")
     if level_summaries["all_relations_10_subjects_direct_supervision"]["facts"] != 50:
         raise ValueError("Direct-supervision all-relations diagnostic must preserve all 50 facts")
+    if not set(level_summaries["all_relations_10_subjects_direct_supervision"]["subject_ids"]).issubset(
+        level_summaries["all_relations_100_subjects_direct_supervision"]["subject_ids"]
+    ):
+        raise ValueError("The 10-subject diagnostic must be nested inside the 100-subject diagnostic")
 
     manifest = {
         "version": "acquisition_diagnostics_v1",
