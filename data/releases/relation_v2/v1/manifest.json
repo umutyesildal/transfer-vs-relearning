@@ -1,0 +1,54 @@
+{
+  "files": {
+    "acquisition_10_subjects_direct/exact_prefix_probes_en.csv": "8f5e91c70a95adf9632b7b90bf8f6a78ded6e8b565e54a63673cfc55764b0cf0",
+    "acquisition_10_subjects_direct/summary.json": "b569603a80854d7e499553b32d24799cb03943f06c682b5402a7148c53e561b9",
+    "acquisition_10_subjects_direct/train.jsonl": "51d5428901fe400dd560690d2e16d43050539dbae1f43439d52ac4471b894919",
+    "acquisition_10_subjects_direct/validation.jsonl": "9009af074ea5c1ef1bea3f3b9da7602378e80f25c3cacb9340dcabb4fb779f54",
+    "data/canonical_subject_profiles_5000.csv": "60dd741f8ef2815755beafa8bb5799f4112af3d94b1b8c4c171bfef28b07e6c1",
+    "output/canonical_generation_summary.json": "5cdb4168ce8c923393aba50137ba81d17de397105351f577c50a3ae4ff5759a5",
+    "output/english_training.jsonl": "5345e38f51301c7e1b9edc741e1b14f30fea58c367999d309f596b3e3ee04128",
+    "output/probes_en.csv": "2c1c496aa9473b60647016030b53a4bd504db75cd40bce6004a8364ffc8ba547",
+    "output/probes_tr.csv": "71e94e6c4762555cc699ef27f83a10c3967a01d3ab231067f1579187bb165ef8",
+    "output/source_validation_report.json": "79dc569ecdab7741132ed60b3e6620ca5e2a0c8fa0b6bf3805519c1bca3d8ddd",
+    "output/turkish_repetition.jsonl": "0814fc114f494de0d4cfddbc349eeb41d814441dab47ab065e8bb57caef0ddb9"
+  },
+  "gate": {
+    "facts": 50,
+    "relations": [
+      "profession",
+      "born_in",
+      "lives_in",
+      "field_of_study",
+      "works_in_industry"
+    ],
+    "selected_subject_ids": [
+      "S00634",
+      "S00825",
+      "S01083",
+      "S01854",
+      "S02148",
+      "S02221",
+      "S02868",
+      "S02929",
+      "S04027",
+      "S04944"
+    ],
+    "selection_seed": 42,
+    "subjects": 10,
+    "train_rows": 350,
+    "train_rows_per_fact": 7,
+    "validation_rows": 50
+  },
+  "relations": [
+    "profession",
+    "born_in",
+    "lives_in",
+    "field_of_study",
+    "works_in_industry"
+  ],
+  "source_sha256": {
+    "assignments": "cf90f80b98534b4cea02f36d7a2ae452b4f182019d30511da1a6275c7a8a0df6",
+    "profiles": "020c4daef91a25e6cc553a67241c448d2a0bb7fb23b8184d5296b55e524f455b"
+  },
+  "version": "relation_v2"
+}
