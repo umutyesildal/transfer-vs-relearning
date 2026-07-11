@@ -1,0 +1,101 @@
+relation,object_en,object_tr,source_taxonomy,source_category,en_token_count,en_token_ids,en_prior_mean_logprob,en_prior_robust_z,en_prior_share,tr_token_count,tr_token_ids,tr_prior_mean_logprob,tr_prior_robust_z,tr_prior_share,status,flags
+field_of_study,physics,fizik,ISCED-F 2013,0533 Physics,1,6944,-5.9058822,1.520557,0.05288,3,275|463|1873,-3.71770263,0.430578,0.01998686,pass,
+field_of_study,chemistry,kimya,ISCED-F 2013,0531 Chemistry,1,8856,-6.38504887,1.207158,0.03274854,3,501|306|5488,-4.5561293,-0.603086,0.00864212,pass,
+field_of_study,biology,biyoloji,ISCED-F 2013,0511 Biology,1,7505,-6.4058822,1.193531,0.03207334,4,1632|105|21758|10381,-3.60722677,0.566779,0.02232151,pass,
+field_of_study,mathematics,matematik,ISCED-F 2013,0541 Mathematics,1,6530,-4.84338212,2.215487,0.15301336,3,18357|3352|1873,-3.87486792,0.236815,0.01708003,review,en_prior_share
+field_of_study,statistics,istatistik,ISCED-F 2013,0542 Statistics,1,7515,-7.32254887,0.593984,0.01282451,4,43424|261|363|1873,-3.49792814,0.701529,0.02489954,pass,
+field_of_study,economics,ekonomi,ISCED-F 2013,0311 Economics,1,9883,-6.51004887,1.125401,0.02890049,3,297|43776|25250,-4.09458121,-0.034061,0.01371097,pass,
+field_of_study,history,tarih,ISCED-F 2013,0222 History and archaeology,1,1463,-6.42671553,1.179905,0.03141206,3,252|2566|88,-3.71089824,0.438967,0.02012332,pass,
+field_of_study,geography,coğrafya,ISCED-F 2013,0532 Earth sciences,1,12973,-7.80171553,0.280584,0.00794221,4,857|43702|39164|5488,-4.27347104,-0.254607,0.01146509,pass,
+field_of_study,philosophy,felsefe,ISCED-F 2013,0223 Philosophy and ethics,1,6360,-6.05171545,1.425175,0.04570428,3,275|13830|4565,-5.80437326,-2.141997,0.00248036,pass,
+field_of_study,psychology,psikoloji,ISCED-F 2013,0313 Psychology,1,7926,-6.11421553,1.384297,0.04293519,4,15891|1873|21758|10381,-3.89357448,0.213752,0.01676349,pass,
+field_of_study,social studies,sosyal,ISCED-F 2013,0314 Sociology and cultural studies,2,1329|2157,-5.28732141,1.925128,0.09815874,3,262|395|8254,-3.37951056,0.847522,0.02802977,pass,
+field_of_study,linguistics,dilbilim,ISCED-F 2013,0232 Literature and linguistics,1,25900,-7.5308822,0.457723,0.01041269,4,8601|82|301|306,-4.29402288,-0.279945,0.01123186,pass,
+field_of_study,literature,edebiyat,ISCED-F 2013,0232 Literature and linguistics,1,3657,-8.2183822,0.008063,0.00523583,4,953|2713|12771|261,-3.81873353,0.306021,0.01806622,pass,
+field_of_study,archaeology,arkeoloji,ISCED-F 2013,0222 History and archaeology,1,22379,-8.3433822,-0.073694,0.0046206,4,562|396|21758|10381,-3.51513728,0.680313,0.02447471,pass,
+field_of_study,anthropology,antropoloji,ISCED-F 2013,0314 Sociology and cultural studies,1,21840,-7.94754887,0.185202,0.00686447,3,1598|11352|33777,-6.57611068,-3.093442,0.00114645,pass,
+field_of_study,politics,siyaset,ISCED-F 2013,0312 Political sciences and civics,1,5993,-8.4683822,-0.15545,0.00407767,3,262|12771|4747,-3.98947398,0.095522,0.01523056,pass,
+field_of_study,law,hukuk,ISCED-F 2013,0421 Law,1,1525,-7.13504887,0.716619,0.01546932,3,294|3617|3617,-3.62219644,0.548324,0.02198985,pass,
+field_of_study,medicine,tıp,ISCED-F 2013,0912 Medicine,1,4513,-7.48921553,0.484975,0.01085572,3,252|20335|96,-3.79079795,0.340462,0.01857803,pass,
+field_of_study,nursing,hemşirelik,ISCED-F 2013,0913 Nursing and midwifery,1,11040,-9.2808822,-0.686867,0.00180945,4,8367|32647|609|7692,-4.72264576,-0.808377,0.0073165,pass,
+field_of_study,pharmacy,eczacılık,ISCED-F 2013,0916 Pharmacy,1,31244,-9.7183822,-0.973015,0.00116827,6,2948|44347|20335|92|20335|91,-3.67134039,0.487736,0.02093531,review,tr_token_count
+field_of_study,dental studies,dişçilik,ISCED-F 2013,0911 Dental studies,2,6437|2157,-7.66951482,0.36705,0.00906474,5,801|32647|11512|301|1873,-4.29325279,-0.278995,0.01124052,review,tr_token_count
+field_of_study,veterinary,veteriner,ISCED-F 2013,0841 Veterinary,1,19017,-10.11421553,-1.23191,0.00078639,2,7368|10829,-11.65069199,-9.349695,7.17e-06,review,tr_prior_z
+field_of_study,architecture,mimarlık,ISCED-F 2013,0731 Architecture and town planning,1,6277,-8.55171553,-0.209954,0.00375164,4,12112|2108|20335|91,-5.06181908,-1.226531,0.00521197,pass,
+field_of_study,construction,inşaat,ISCED-F 2013,0732 Building and civil engineering,1,3901,-10.07254887,-1.204658,0.00081984,4,281|32647|81|261,-3.7057337,0.445334,0.02022752,pass,
+field_of_study,mechanics,mekanik,ISCED-F 2013,0715 Mechanics and metal trades,1,12774,-8.94754887,-0.46885,0.0025253,3,549|24184|1873,-4.43766181,-0.457032,0.00972905,pass,
+field_of_study,electricity,elektrik,ISCED-F 2013,0713 Electricity and energy,1,4866,-10.55171553,-1.518058,0.00050773,3,1427|22817|20598,-3.52458231,0.668669,0.02424463,pass,
+field_of_study,computing,bilişim,ISCED-F 2013,0613 Software and applications development,1,7867,-8.48921553,-0.169076,0.00399359,4,278|1979|32647|306,-3.29921611,0.946514,0.03037323,pass,
+field_of_study,software,yazılım,ISCED-F 2013,0613 Software and applications development,1,3197,-9.0933822,-0.564232,0.00218262,6,329|1437|20335|92|20335|93,-1.91781386,2.649591,0.1209,review,tr_token_count|tr_prior_share
+field_of_study,ecology,ekoloji,ISCED-F 2013,0521 Environmental sciences,1,14269,-8.5933822,-0.237207,0.00359853,4,297|91|21758|10381,-4.18995635,-0.151645,0.01246371,pass,
+field_of_study,agriculture,tarım,ISCED-F 2013,0811 Crop and livestock production,1,5995,-8.5933822,-0.237207,0.00359853,3,12331|20335|93,-3.88768188,0.221017,0.01686256,pass,
+field_of_study,forest studies,orman,ISCED-F 2013,0821 Forestry,2,3150|2157,-8.43454297,-0.133317,0.00421801,2,355|1483,-6.92256451,-3.520571,0.00081076,review,tr_prior_z
+field_of_study,education,eğitim,ISCED-F 2013,0111 Education science,1,1888,-7.5308822,0.457723,0.01041269,4,297|43702|269|306,-2.10071095,2.424104,0.10069203,review,tr_prior_share
+field_of_study,media studies,medya,ISCED-F 2013,0321 Journalism and reporting,2,2902|2157,-5.70996507,1.648697,0.06432461,2,958|5488,-6.80185636,-3.371755,0.00091477,pass,
+field_of_study,communication,iletişim,ISCED-F 2013,0321 Journalism and reporting,1,2908,-8.09720389,0.08732,0.00591034,5,216|552|14981|32647|306,-2.82731549,1.528302,0.04868944,review,tr_token_count
+field_of_study,design,tasarım,ISCED-F 2013,0212 Fashion interior and industrial design,1,1157,-8.74303722,-0.335089,0.00309835,5,252|292|280|20335|93,-2.20864511,2.291036,0.0903899,review,tr_token_count
+field_of_study,music,müzik,ISCED-F 2013,0215 Music and performing arts,1,2477,-7.65970389,0.373467,0.00915411,4,283|7170|106|1873,-2.77512908,1.59264,0.05129784,pass,
+field_of_study,theatre,tiyatro,ISCED-F 2013,0215 Music and performing arts,1,16984,-11.06595389,-1.854396,0.0003036,3,252|12771|47923,-4.44649871,-0.467926,0.00964345,pass,
+field_of_study,film studies,sinema,ISCED-F 2013,0211 Audio-visual techniques and media production,2,4771|2157,-6.3034393,1.260534,0.03553322,2,6028|8950,-6.54284732,-3.052433,0.00118522,pass,
+field_of_study,business,işletme,ISCED-F 2013,0410 Business and administration,1,1861,-7.40970389,0.53698,0.01175412,4,2056|32647|2016|1558,-3.38902918,0.835787,0.02776423,pass,
+field_of_study,accounting,muhasebe,ISCED-F 2013,0411 Accounting and taxation,1,9886,-9.45137056,-0.798375,0.00152583,4,283|6640|576|1425,-4.57522154,-0.626624,0.00847869,pass,
+field_of_study,finance,finans,ISCED-F 2013,0412 Finance banking and insurance,1,9999,-7.90970389,0.209954,0.00712923,2,1501|487,-7.13151741,-3.778181,0.00065788,review,tr_prior_z
+field_of_study,marketing,pazarlama,ISCED-F 2013,0414 Marketing and advertising,1,8162,-8.49303722,-0.171576,0.00397836,4,273|1437|2108|4232,-4.22398249,-0.193595,0.01204675,pass,
+field_of_study,management,yönetim,ISCED-F 2013,0413 Management and administration,1,2343,-8.24303722,-0.008063,0.00510832,4,329|7466|4205|306,-3.16599353,1.110759,0.03470154,pass,
+field_of_study,tourism,turizm,ISCED-F 2013,1015 Travel tourism and leisure,1,11044,-10.26387056,-1.329792,0.00067708,3,6615|463|93,-4.49270217,-0.524889,0.00920803,pass,
+field_of_study,logistics,lojistik,ISCED-F 2013,1041 Transport services,1,21153,-10.69095389,-1.609127,0.00044173,4,3092|90|363|1873,-5.55719312,-1.837258,0.00317588,pass,
+field_of_study,governance,kamu,ISCED-F 2013,0413 Management and administration,1,10378,-11.92012056,-2.413065,0.00012922,3,501|332|101,-4.03932619,0.034061,0.01448989,pass,
+field_of_study,diplomacy,diplomasi,ISCED-F 2013,0312 Political sciences and civics,1,22608,-12.18053722,-2.583391,9.96e-05,3,9216|4815|89,-5.87645149,-2.230859,0.00230787,pass,
+field_of_study,welfare,refah,ISCED-F 2013,0923 Social work and counselling,1,9365,-12.08678722,-2.522074,0.00010939,2,930|1287,-8.54882209,-5.525521,0.00015945,review,tr_prior_z
+field_of_study,sports,spor,ISCED-F 2013,1014 Sports,1,5288,-9.24303722,-0.662114,0.00187925,1,24962,-13.56307125,-11.707393,1.06e-06,review,tr_prior_z
+field_of_study,data science,veri bilimi,ISCED-F 2013,0613 Software and applications development,2,940|2092,-4.55442897,2.404477,0.2042773,4,2303|89|23059|35782,-4.67775663,-0.753035,0.00765241,review,en_prior_share
+works_in_industry,agriculture,tarım,NACE Rev. 2.1,A Agriculture forestry and fishing,1,5995,-7.13170147,2.067765,0.05755143,3,12331|20335|93,-3.86494724,0.640641,0.01783372,pass,
+works_in_industry,timber,orman,NACE Rev. 2.1,A Agriculture forestry and fishing,1,13789,-10.67336814,-0.614421,0.00166698,2,355|1483,-7.05247577,-1.509209,0.00073606,pass,
+works_in_industry,mining,madencilik,NACE Rev. 2.1,B Mining and quarrying,1,7883,-8.2775348,1.199999,0.01829899,3,15480|29138|1873,-10.0323782,-3.519025,3.739e-05,review,tr_prior_z
+works_in_industry,energy,enerji,NACE Rev. 2.1,D Electricity gas steam and air conditioning supply,1,1439,-8.13170147,1.310442,0.02117199,3,430|259|10381,-5.00862948,-0.130723,0.0056826,pass,
+works_in_industry,infrastructure,altyapı,NACE Rev. 2.1,D-E Utilities and waste services,1,5730,-10.00670147,-0.109539,0.00324683,4,360|866|512|20335,-4.83813842,-0.015734,0.00673892,pass,
+works_in_industry,construction,inşaat,NACE Rev. 2.1,F Construction,1,3901,-7.67336814,1.657548,0.03348215,4,281|32647|81|261,-3.76664321,0.706943,0.01967591,pass,
+works_in_industry,manufacturing,imalat,NACE Rev. 2.1,C Manufacturing,1,6350,-7.3400348,1.909989,0.0467281,3,444|272|261,-6.61200603,-1.212132,0.00114343,pass,
+works_in_industry,automotive,otomotiv,NACE Rev. 2.1,C29 Manufacture of motor vehicles,1,21251,-8.75670147,0.837115,0.01133255,4,19182|300|320|380,-3.80242491,0.68281,0.01898432,pass,
+works_in_industry,space,uzay,NACE Rev. 2.1,C30 Manufacture of other transport equipment,1,1898,-9.9650348,-0.077983,0.00338497,3,326|106|341,-4.50143321,0.211359,0.00943669,pass,
+works_in_industry,electrical,elektrik,NACE Rev. 2.1,C26 Manufacture of computer electronic and optical products,1,5464,-8.73586814,0.852893,0.01157112,3,1427|22817|20598,-3.84915511,0.651292,0.01811758,pass,
+works_in_industry,chemicals,kimya,NACE Rev. 2.1,C20 Manufacture of chemicals,1,5478,-9.9650348,-0.077983,0.00338497,3,501|306|5488,-4.82035319,-0.003739,0.00685985,pass,
+works_in_industry,pharmaceuticals,ilaç,NACE Rev. 2.1,C21 Manufacture of pharmaceutical products,1,31037,-10.19420147,-0.251537,0.00269172,3,216|9194|11512,-5.64486742,-0.559838,0.00300769,pass,
+works_in_industry,healthcare,sağlık,NACE Rev. 2.1,Q Human health and social work activities,1,4379,-7.69420147,1.641771,0.03279182,5,743|43702|92|20335|91,-2.65034644,1.459837,0.06008088,review,tr_token_count
+works_in_industry,biotech,biyoloji,NACE Rev. 2.1,M72 Scientific research and development,1,44960,-10.4025348,-0.409312,0.0021855,4,1632|105|21758|10381,-3.76316333,0.70929,0.0197445,pass,
+works_in_industry,banking,bankacılık,NACE Rev. 2.1,K64 Financial service activities,1,14262,-8.50670147,1.026446,0.01455128,6,5461|387|20335|92|20335|91,-3.68137662,0.764451,0.02142721,review,tr_token_count
+works_in_industry,insurance,sigorta,NACE Rev. 2.1,K65 Insurance and pension funding,1,6697,-9.44420147,0.316456,0.00569836,2,29459|35072,-8.65820646,-2.592205,0.00014776,pass,
+works_in_industry,investment,yatirim,NACE Rev. 2.1,K66 Activities auxiliary to financial services,1,5642,-10.0587848,-0.148982,0.00308205,4,329|261|337|306,-4.74388552,0.047835,0.00740498,pass,
+works_in_industry,accounting,muhasebe,NACE Rev. 2.1,M69 Legal and accounting activities,1,9886,-8.69420147,0.884448,0.01206344,4,283|6640|576|1425,-4.67483695,0.094405,0.00793435,pass,
+works_in_industry,law,hukuk,NACE Rev. 2.1,M69 Legal and accounting activities,1,1525,-9.29836814,0.426899,0.00659303,3,294|3617|3617,-4.04626608,0.518349,0.01487634,pass,
+works_in_industry,software,yazılım,NACE Rev. 2.1,J62 Computer programming and consultancy,1,3197,-8.13170147,1.310442,0.02117199,6,329|1437|20335|92|20335|93,-2.01352243,1.889347,0.11358094,review,tr_token_count|tr_prior_share
+works_in_industry,communications,iletişim,NACE Rev. 2.1,J61 Telecommunications,1,9353,-10.29836814,-0.330424,0.00242544,5,216|552|14981|32647|306,-2.30403805,1.693407,0.08494467,review,tr_token_count
+works_in_industry,media,medya,NACE Rev. 2.1,J60 Programming and broadcasting,1,2902,-9.0275348,0.632007,0.00864383,2,958|5488,-7.27200381,-1.657272,0.00059098,pass,
+works_in_industry,books,yayın,NACE Rev. 2.1,J58 Publishing activities,1,2905,-10.98586814,-0.851084,0.00121959,4,329|341|20335|94,-2.95062065,1.257315,0.04449681,pass,
+works_in_industry,advertising,reklam,NACE Rev. 2.1,M73 Advertising and market research,1,11757,-9.88170147,-0.014873,0.00367914,3,298|91|4130,-4.00498406,0.546192,0.01550332,pass,
+works_in_industry,entertainment,eğlence,NACE Rev. 2.1,R90 Creative arts and entertainment,1,11154,-10.17336814,-0.235759,0.00274838,4,297|43702|92|535,-3.06704768,1.17879,0.03960639,pass,
+works_in_industry,gaming,oyun,NACE Rev. 2.1,J58 Publishing of computer games,1,13636,-10.38170147,-0.393535,0.00223151,2,20785|419,-6.09962908,-0.866555,0.00190867,pass,
+works_in_industry,education,eğitim,NACE Rev. 2.1,P Education,1,1888,-7.8400348,1.531328,0.02834203,4,297|43702|269|306,-2.51329533,1.552272,0.06890597,pass,
+works_in_industry,research,araştırma,NACE Rev. 2.1,M72 Scientific research and development,1,1151,-8.61086814,0.947558,0.0131118,6,45573|32647|100|20335|98|2432,-2.06703051,1.853258,0.10766317,review,tr_token_count|tr_prior_share
+works_in_industry,retail,perakende,NACE Rev. 2.1,G47 Retail trade,1,11124,-8.04836814,1.373552,0.02301192,3,567|494|32957,-9.27002366,-3.00485,8.014e-05,pass,
+works_in_industry,trade,ticaret,NACE Rev. 2.1,G46 Wholesale trade,1,3735,-9.56920147,0.22179,0.00502879,3,252|286|9258,-4.90844297,-0.063152,0.00628141,pass,
+works_in_industry,logistics,lojistik,NACE Rev. 2.1,H52 Warehousing and support activities for transportation,1,21153,-9.92336814,-0.046428,0.00352899,4,3092|90|363|1873,-5.07310645,-0.17421,0.00532776,pass,
+works_in_industry,maritime,deniz,NACE Rev. 2.1,H50 Water transport,1,18011,-10.8087848,-0.716975,0.00145586,2,4017|463,-5.52805678,-0.481055,0.00338036,pass,
+works_in_industry,airlines,havayolu,NACE Rev. 2.1,H51 Air transport,1,33411,-11.54033979,-1.270998,0.0007005,5,421|102|341|308|101,-4.80926561,0.003739,0.00693633,review,tr_token_count
+works_in_industry,railways,demiryolu,NACE Rev. 2.1,H49 Land transport,1,33214,-11.91533979,-1.554994,0.00048145,4,1877|38230|308|101,-5.56902997,-0.508689,0.00324465,pass,
+works_in_industry,tourism,turizm,NACE Rev. 2.1,N79 Travel agency and tour operator activities,1,11044,-9.50908979,0.267314,0.00534035,3,6615|463|93,-5.04920546,-0.15809,0.00545664,pass,
+works_in_industry,hotels,otel,NACE Rev. 2.1,I Accommodation and food service activities,1,21143,-10.99867312,-0.860781,0.00120407,2,19182|299,-7.28749069,-1.667717,0.0005819,pass,
+works_in_industry,catering,yemek,NACE Rev. 2.1,I56 Food and beverage service activities,1,25446,-11.68617312,-1.381441,0.00060544,3,329|391|1846,-4.08978955,0.488995,0.01424276,pass,
+works_in_industry,food processing,gıda,NACE Rev. 2.1,C10 Manufacture of food products,2,1114|4604,-4.94215107,3.725962,0.51400317,3,310|20335|4933,-4.41958451,0.266562,0.01024156,review,en_prior_z|en_prior_share
+works_in_industry,textiles,tekstil,NACE Rev. 2.1,C13 Manufacture of textiles,1,22182,-9.84242312,0.014873,0.00382653,4,543|91|302|301,-4.87778823,-0.042476,0.00647695,pass,
+works_in_industry,fashion,moda,NACE Rev. 2.1,C14 Manufacture of wearing apparel,1,7317,-9.89450645,-0.024571,0.00363233,2,798|81,-7.54802227,-1.843434,0.00044844,pass,
+works_in_industry,property,emlak,NACE Rev. 2.1,L Real estate activities,1,3501,-10.81117312,-0.718783,0.00145239,3,649|92|494,-4.99705887,-0.122919,0.00574873,pass,
+works_in_industry,architecture,mimarlık,NACE Rev. 2.1,M71 Architectural and engineering activities,1,6277,-9.66533979,0.148982,0.00456784,4,12112|2108|20335|91,-5.12199561,-0.207184,0.00507356,pass,
+works_in_industry,engineering,mühendislik,NACE Rev. 2.1,M71 Architectural and engineering activities,1,4665,-8.01950661,1.39541,0.02368576,5,283|7170|9927|271|7692,-2.81709369,1.347373,0.05085327,review,tr_token_count
+works_in_industry,consulting,danışmanlık,NACE Rev. 2.1,M70 Management consultancy activities,1,18020,-10.41533979,-0.41901,0.0021577,7,46016|20335|32647|1483|92|20335|91,-2.1523391,1.795721,0.09885944,review,tr_token_count
+works_in_industry,government,kamu,NACE Rev. 2.1,O Public administration and defence,1,1693,-8.35283979,1.142969,0.01697159,3,501|332|101,-4.44703913,0.248045,0.0099642,pass,
+works_in_industry,security,güvenlik,NACE Rev. 2.1,N80 Security and investigation activities,1,3292,-10.04033979,-0.135014,0.00313943,4,310|7170|1241|7692,-3.00005929,1.223971,0.04235044,pass,
+works_in_industry,waste,atık,NACE Rev. 2.1,E38 Waste collection treatment and materials recovery,1,3368,-10.37367312,-0.387455,0.0022495,3,418|20335|91,-5.20965926,-0.266309,0.00464773,pass,
+works_in_industry,sports,spor,NACE Rev. 2.1,R93 Sports activities,1,5288,-9.68617312,0.133205,0.00447366,1,24962,-13.40450637,-5.79338,1.28e-06,review,tr_prior_z
+works_in_industry,arts,sanat,NACE Rev. 2.1,R90 Creative arts and entertainment,1,6600,-10.08200645,-0.166569,0.00301131,2,6183|261,-5.80252552,-0.666172,0.00256899,pass,
+works_in_industry,welfare,refah,NACE Rev. 2.1,Q88 Social work activities,1,9365,-12.05075645,-1.657548,0.00042047,2,930|1287,-8.56378206,-2.52852,0.00016239,pass,
