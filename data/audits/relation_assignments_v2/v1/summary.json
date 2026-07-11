@@ -1,0 +1,292 @@
+{
+  "assignment_version": "relation_assignments_v2_v1",
+  "balance": {
+    "block_failures": [],
+    "block_passed": true,
+    "global_counts": {
+      "field_of_study_en": {
+        "accounting": 100,
+        "agriculture": 100,
+        "animal care": 100,
+        "anthropology": 100,
+        "archaeology": 100,
+        "architecture": 100,
+        "biology": 100,
+        "business": 100,
+        "chemistry": 100,
+        "communication": 100,
+        "computing": 100,
+        "construction": 100,
+        "cultural analysis": 100,
+        "data analytics": 100,
+        "dental studies": 100,
+        "design": 100,
+        "diplomacy": 100,
+        "ecology": 100,
+        "economics": 100,
+        "electricity": 100,
+        "exercise science": 100,
+        "film studies": 100,
+        "fiscal studies": 100,
+        "forestry": 100,
+        "geography": 100,
+        "governance": 100,
+        "history": 100,
+        "law": 100,
+        "linguistics": 100,
+        "literature": 100,
+        "logistics": 100,
+        "management": 100,
+        "marketing": 100,
+        "mechanics": 100,
+        "media studies": 100,
+        "medicine": 100,
+        "music": 100,
+        "nursing": 100,
+        "pharmacy": 100,
+        "philosophy": 100,
+        "physics": 100,
+        "politics": 100,
+        "psychology": 100,
+        "quantitative methods": 100,
+        "social care": 100,
+        "software": 100,
+        "statistics": 100,
+        "teaching": 100,
+        "theatre": 100,
+        "tourism": 100
+      },
+      "works_in_industry_en": {
+        "academia": 100,
+        "accounting": 100,
+        "advertising": 100,
+        "airlines": 100,
+        "architecture": 100,
+        "arts": 100,
+        "automotive": 100,
+        "banking": 100,
+        "biotech": 100,
+        "books": 100,
+        "catering": 100,
+        "chemicals": 100,
+        "communications": 100,
+        "construction": 100,
+        "consulting": 100,
+        "electrical": 100,
+        "energy": 100,
+        "engineering": 100,
+        "entertainment": 100,
+        "extraction": 100,
+        "fabrication": 100,
+        "farming": 100,
+        "fashion": 100,
+        "gaming": 100,
+        "government": 100,
+        "groceries": 100,
+        "healthcare": 100,
+        "hotels": 100,
+        "infrastructure": 100,
+        "insurance": 100,
+        "investment": 100,
+        "law": 100,
+        "logistics": 100,
+        "maritime": 100,
+        "media": 100,
+        "pharmaceuticals": 100,
+        "property": 100,
+        "railways": 100,
+        "recreation": 100,
+        "research": 100,
+        "retail": 100,
+        "security": 100,
+        "software": 100,
+        "space": 100,
+        "textiles": 100,
+        "timber": 100,
+        "tourism": 100,
+        "trade": 100,
+        "waste": 100,
+        "welfare": 100
+      }
+    },
+    "global_passed": true,
+    "passed": true
+  },
+  "field_industry_pair_counts": {
+    "maximum": 3,
+    "minimum": 1,
+    "observed_pairs": 2500
+  },
+  "field_seed": 2026071101,
+  "industry_repair_swaps": 6,
+  "industry_seed": 2026071102,
+  "input_sha256": {
+    "candidates": "22d06b989dab62e4cfe216fd7788df4b6c5d42bf2ba1f683460b635925fd2060",
+    "profiles": "020c4daef91a25e6cc553a67241c448d2a0bb7fb23b8184d5296b55e524f455b"
+  },
+  "pair_metrics": {
+    "branch_group__field_of_study_en": {
+      "column_key": "field_of_study_en",
+      "conditional": {
+        "failures": [],
+        "max_ratio": 1.02,
+        "passed": true,
+        "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
+      },
+      "cramers_v": 0.009797958971132713,
+      "normalized_mutual_information": 2.9151221908222767e-05,
+      "passed": true,
+      "row_key": "branch_group"
+    },
+    "branch_group__works_in_industry_en": {
+      "column_key": "works_in_industry_en",
+      "conditional": {
+        "failures": [],
+        "max_ratio": 1.04,
+        "passed": true,
+        "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
+      },
+      "cramers_v": 0.020000000000000004,
+      "normalized_mutual_information": 0.0001214731488238416,
+      "passed": true,
+      "row_key": "branch_group"
+    },
+    "field_of_study_en__works_in_industry_en": {
+      "column_key": "works_in_industry_en",
+      "conditional": {
+        "failures": [],
+        "max_ratio": 1.5,
+        "passed": true,
+        "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
+      },
+      "cramers_v": 0.01851640199545103,
+      "normalized_mutual_information": 0.0022470647036193355,
+      "passed": true,
+      "row_key": "field_of_study_en"
+    },
+    "name_rarity_bucket__field_of_study_en": {
+      "column_key": "field_of_study_en",
+      "conditional": {
+        "failures": [],
+        "max_ratio": 1.0571428571428572,
+        "passed": true,
+        "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
+      },
+      "cramers_v": 0.014985707476506682,
+      "normalized_mutual_information": 0.00010927420853382368,
+      "passed": true,
+      "row_key": "name_rarity_bucket"
+    },
+    "name_rarity_bucket__works_in_industry_en": {
+      "column_key": "works_in_industry_en",
+      "conditional": {
+        "failures": [],
+        "max_ratio": 1.24,
+        "passed": true,
+        "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
+      },
+      "cramers_v": 0.033949542391193265,
+      "normalized_mutual_information": 0.0005563215840700651,
+      "passed": true,
+      "row_key": "name_rarity_bucket"
+    },
+    "name_type__field_of_study_en": {
+      "column_key": "field_of_study_en",
+      "conditional": {
+        "failures": [],
+        "max_ratio": 1.02,
+        "passed": true,
+        "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
+      },
+      "cramers_v": 0.011313708498984762,
+      "normalized_mutual_information": 3.886829587763031e-05,
+      "passed": true,
+      "row_key": "name_type"
+    },
+    "name_type__works_in_industry_en": {
+      "column_key": "works_in_industry_en",
+      "conditional": {
+        "failures": [],
+        "max_ratio": 1.04,
+        "passed": true,
+        "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
+      },
+      "cramers_v": 0.018761663039293722,
+      "normalized_mutual_information": 0.00010689753786973068,
+      "passed": true,
+      "row_key": "name_type"
+    },
+    "popularity_bucket__field_of_study_en": {
+      "column_key": "field_of_study_en",
+      "conditional": {
+        "failures": [],
+        "max_ratio": 1.0999999999999999,
+        "passed": true,
+        "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
+      },
+      "cramers_v": 0.016532795690182997,
+      "normalized_mutual_information": 0.00014595117476875447,
+      "passed": true,
+      "row_key": "popularity_bucket"
+    },
+    "popularity_bucket__works_in_industry_en": {
+      "column_key": "works_in_industry_en",
+      "conditional": {
+        "failures": [],
+        "max_ratio": 1.2999999999999998,
+        "passed": true,
+        "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
+      },
+      "cramers_v": 0.03587013613950561,
+      "normalized_mutual_information": 0.0006860668482765835,
+      "passed": true,
+      "row_key": "popularity_bucket"
+    },
+    "profession_category__field_of_study_en": {
+      "column_key": "field_of_study_en",
+      "conditional": {
+        "failures": [],
+        "max_ratio": 1.694915254237288,
+        "passed": true,
+        "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
+      },
+      "cramers_v": 0.030558530167026605,
+      "normalized_mutual_information": 0.003373441279131837,
+      "passed": true,
+      "row_key": "profession_category"
+    },
+    "profession_category__works_in_industry_en": {
+      "column_key": "works_in_industry_en",
+      "conditional": {
+        "failures": [],
+        "max_ratio": 2.5,
+        "passed": true,
+        "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
+      },
+      "cramers_v": 0.033742450222874705,
+      "normalized_mutual_information": 0.003959300417534266,
+      "passed": true,
+      "row_key": "profession_category"
+    },
+    "works_in_industry_en__field_of_study_en": {
+      "column_key": "field_of_study_en",
+      "conditional": {
+        "failures": [],
+        "max_ratio": 1.5,
+        "passed": true,
+        "small_sample_tolerance": "count <= ceil(1.5 * row_total * marginal_probability)"
+      },
+      "cramers_v": 0.01851640199545103,
+      "normalized_mutual_information": 0.0022470647036193347,
+      "passed": true,
+      "row_key": "works_in_industry_en"
+    }
+  },
+  "passed": true,
+  "subject_count": 5000,
+  "thresholds": {
+    "conditional_multiplier": 1.5,
+    "cramers_v_max": 0.1,
+    "normalized_mutual_information_max": 0.05
+  }
+}
