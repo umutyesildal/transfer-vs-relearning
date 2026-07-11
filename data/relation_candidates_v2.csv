@@ -6,96 +6,96 @@ field_of_study,mathematics,matematik,ISCED-F 2013,0541 Mathematics
 field_of_study,statistics,istatistik,ISCED-F 2013,0542 Statistics
 field_of_study,economics,ekonomi,ISCED-F 2013,0311 Economics
 field_of_study,history,tarih,ISCED-F 2013,0222 History and archaeology
-field_of_study,geography,cografya,ISCED-F 2013,0532 Earth sciences
+field_of_study,geography,coğrafya,ISCED-F 2013,0532 Earth sciences
 field_of_study,philosophy,felsefe,ISCED-F 2013,0223 Philosophy and ethics
 field_of_study,psychology,psikoloji,ISCED-F 2013,0313 Psychology
-field_of_study,sociology,sosyoloji,ISCED-F 2013,0314 Sociology and cultural studies
+field_of_study,social studies,sosyal,ISCED-F 2013,0314 Sociology and cultural studies
 field_of_study,linguistics,dilbilim,ISCED-F 2013,0232 Literature and linguistics
 field_of_study,literature,edebiyat,ISCED-F 2013,0232 Literature and linguistics
 field_of_study,archaeology,arkeoloji,ISCED-F 2013,0222 History and archaeology
 field_of_study,anthropology,antropoloji,ISCED-F 2013,0314 Sociology and cultural studies
-field_of_study,political science,siyaset bilimi,ISCED-F 2013,0312 Political sciences and civics
+field_of_study,politics,siyaset,ISCED-F 2013,0312 Political sciences and civics
 field_of_study,law,hukuk,ISCED-F 2013,0421 Law
-field_of_study,medicine,tip,ISCED-F 2013,0912 Medicine
-field_of_study,nursing,hemsirelik,ISCED-F 2013,0913 Nursing and midwifery
-field_of_study,pharmacy,eczacilik,ISCED-F 2013,0916 Pharmacy
-field_of_study,dentistry,dis hekimligi,ISCED-F 2013,0911 Dental studies
-field_of_study,veterinary science,veterinerlik,ISCED-F 2013,0841 Veterinary
-field_of_study,architecture,mimarlik,ISCED-F 2013,0731 Architecture and town planning
-field_of_study,civil engineering,insaat muhendisligi,ISCED-F 2013,0732 Building and civil engineering
-field_of_study,mechanical engineering,makine muhendisligi,ISCED-F 2013,0715 Mechanics and metal trades
-field_of_study,electrical engineering,elektrik muhendisligi,ISCED-F 2013,0713 Electricity and energy
-field_of_study,computer science,bilgisayar bilimi,ISCED-F 2013,0613 Software and applications development
-field_of_study,software engineering,yazilim muhendisligi,ISCED-F 2013,0613 Software and applications development
-field_of_study,environmental science,cevre bilimi,ISCED-F 2013,0521 Environmental sciences
-field_of_study,agriculture,tarim,ISCED-F 2013,0811 Crop and livestock production
-field_of_study,forestry,ormancilik,ISCED-F 2013,0821 Forestry
-field_of_study,education,egitim,ISCED-F 2013,0111 Education science
-field_of_study,journalism,gazetecilik,ISCED-F 2013,0321 Journalism and reporting
-field_of_study,communication,iletisim,ISCED-F 2013,0321 Journalism and reporting
-field_of_study,design,tasarim,ISCED-F 2013,0212 Fashion interior and industrial design
-field_of_study,music,muzik,ISCED-F 2013,0215 Music and performing arts
+field_of_study,medicine,tıp,ISCED-F 2013,0912 Medicine
+field_of_study,nursing,hemşirelik,ISCED-F 2013,0913 Nursing and midwifery
+field_of_study,pharmacy,eczacılık,ISCED-F 2013,0916 Pharmacy
+field_of_study,dental studies,dişçilik,ISCED-F 2013,0911 Dental studies
+field_of_study,veterinary,veteriner,ISCED-F 2013,0841 Veterinary
+field_of_study,architecture,mimarlık,ISCED-F 2013,0731 Architecture and town planning
+field_of_study,construction,inşaat,ISCED-F 2013,0732 Building and civil engineering
+field_of_study,mechanics,mekanik,ISCED-F 2013,0715 Mechanics and metal trades
+field_of_study,electricity,elektrik,ISCED-F 2013,0713 Electricity and energy
+field_of_study,computing,bilişim,ISCED-F 2013,0613 Software and applications development
+field_of_study,software,yazılım,ISCED-F 2013,0613 Software and applications development
+field_of_study,ecology,ekoloji,ISCED-F 2013,0521 Environmental sciences
+field_of_study,agriculture,tarım,ISCED-F 2013,0811 Crop and livestock production
+field_of_study,forest studies,orman,ISCED-F 2013,0821 Forestry
+field_of_study,education,eğitim,ISCED-F 2013,0111 Education science
+field_of_study,media studies,medya,ISCED-F 2013,0321 Journalism and reporting
+field_of_study,communication,iletişim,ISCED-F 2013,0321 Journalism and reporting
+field_of_study,design,tasarım,ISCED-F 2013,0212 Fashion interior and industrial design
+field_of_study,music,müzik,ISCED-F 2013,0215 Music and performing arts
 field_of_study,theatre,tiyatro,ISCED-F 2013,0215 Music and performing arts
 field_of_study,film studies,sinema,ISCED-F 2013,0211 Audio-visual techniques and media production
-field_of_study,business,isletme,ISCED-F 2013,0410 Business and administration
+field_of_study,business,işletme,ISCED-F 2013,0410 Business and administration
 field_of_study,accounting,muhasebe,ISCED-F 2013,0411 Accounting and taxation
 field_of_study,finance,finans,ISCED-F 2013,0412 Finance banking and insurance
 field_of_study,marketing,pazarlama,ISCED-F 2013,0414 Marketing and advertising
-field_of_study,management,yonetim,ISCED-F 2013,0413 Management and administration
+field_of_study,management,yönetim,ISCED-F 2013,0413 Management and administration
 field_of_study,tourism,turizm,ISCED-F 2013,1015 Travel tourism and leisure
 field_of_study,logistics,lojistik,ISCED-F 2013,1041 Transport services
-field_of_study,public administration,kamu yonetimi,ISCED-F 2013,0413 Management and administration
-field_of_study,international relations,uluslararasi iliskiler,ISCED-F 2013,0312 Political sciences and civics
-field_of_study,social work,sosyal hizmet,ISCED-F 2013,0923 Social work and counselling
-field_of_study,sports science,spor bilimleri,ISCED-F 2013,1014 Sports
+field_of_study,governance,kamu,ISCED-F 2013,0413 Management and administration
+field_of_study,diplomacy,diplomasi,ISCED-F 2013,0312 Political sciences and civics
+field_of_study,welfare,refah,ISCED-F 2013,0923 Social work and counselling
+field_of_study,sports,spor,ISCED-F 2013,1014 Sports
 field_of_study,data science,veri bilimi,ISCED-F 2013,0613 Software and applications development
-works_in_industry,agriculture,tarim,NACE Rev. 2.1,A Agriculture forestry and fishing
-works_in_industry,forestry,ormancilik,NACE Rev. 2.1,A Agriculture forestry and fishing
+works_in_industry,agriculture,tarım,NACE Rev. 2.1,A Agriculture forestry and fishing
+works_in_industry,timber,orman,NACE Rev. 2.1,A Agriculture forestry and fishing
 works_in_industry,mining,madencilik,NACE Rev. 2.1,B Mining and quarrying
 works_in_industry,energy,enerji,NACE Rev. 2.1,D Electricity gas steam and air conditioning supply
-works_in_industry,utilities,kamu hizmetleri,NACE Rev. 2.1,D-E Utilities and waste services
-works_in_industry,construction,insaat,NACE Rev. 2.1,F Construction
+works_in_industry,infrastructure,altyapı,NACE Rev. 2.1,D-E Utilities and waste services
+works_in_industry,construction,inşaat,NACE Rev. 2.1,F Construction
 works_in_industry,manufacturing,imalat,NACE Rev. 2.1,C Manufacturing
 works_in_industry,automotive,otomotiv,NACE Rev. 2.1,C29 Manufacture of motor vehicles
-works_in_industry,aerospace,uzay sanayisi,NACE Rev. 2.1,C30 Manufacture of other transport equipment
-works_in_industry,electronics,elektronik,NACE Rev. 2.1,C26 Manufacture of computer electronic and optical products
+works_in_industry,space,uzay,NACE Rev. 2.1,C30 Manufacture of other transport equipment
+works_in_industry,electrical,elektrik,NACE Rev. 2.1,C26 Manufacture of computer electronic and optical products
 works_in_industry,chemicals,kimya,NACE Rev. 2.1,C20 Manufacture of chemicals
-works_in_industry,pharmaceuticals,ilac,NACE Rev. 2.1,C21 Manufacture of pharmaceutical products
-works_in_industry,healthcare,saglik,NACE Rev. 2.1,Q Human health and social work activities
-works_in_industry,biotechnology,biyoteknoloji,NACE Rev. 2.1,M72 Scientific research and development
-works_in_industry,banking,bankacilik,NACE Rev. 2.1,K64 Financial service activities
-works_in_industry,insurance,sigortacilik,NACE Rev. 2.1,K65 Insurance and pension funding
+works_in_industry,pharmaceuticals,ilaç,NACE Rev. 2.1,C21 Manufacture of pharmaceutical products
+works_in_industry,healthcare,sağlık,NACE Rev. 2.1,Q Human health and social work activities
+works_in_industry,biotech,biyoloji,NACE Rev. 2.1,M72 Scientific research and development
+works_in_industry,banking,bankacılık,NACE Rev. 2.1,K64 Financial service activities
+works_in_industry,insurance,sigorta,NACE Rev. 2.1,K65 Insurance and pension funding
 works_in_industry,investment,yatirim,NACE Rev. 2.1,K66 Activities auxiliary to financial services
 works_in_industry,accounting,muhasebe,NACE Rev. 2.1,M69 Legal and accounting activities
-works_in_industry,legal services,hukuk hizmetleri,NACE Rev. 2.1,M69 Legal and accounting activities
-works_in_industry,software,yazilim,NACE Rev. 2.1,J62 Computer programming and consultancy
-works_in_industry,telecommunications,telekomunikasyon,NACE Rev. 2.1,J61 Telecommunications
+works_in_industry,law,hukuk,NACE Rev. 2.1,M69 Legal and accounting activities
+works_in_industry,software,yazılım,NACE Rev. 2.1,J62 Computer programming and consultancy
+works_in_industry,communications,iletişim,NACE Rev. 2.1,J61 Telecommunications
 works_in_industry,media,medya,NACE Rev. 2.1,J60 Programming and broadcasting
-works_in_industry,publishing,yayincilik,NACE Rev. 2.1,J58 Publishing activities
-works_in_industry,advertising,reklamcilik,NACE Rev. 2.1,M73 Advertising and market research
-works_in_industry,entertainment,eglence,NACE Rev. 2.1,R90 Creative arts and entertainment
+works_in_industry,books,yayın,NACE Rev. 2.1,J58 Publishing activities
+works_in_industry,advertising,reklam,NACE Rev. 2.1,M73 Advertising and market research
+works_in_industry,entertainment,eğlence,NACE Rev. 2.1,R90 Creative arts and entertainment
 works_in_industry,gaming,oyun,NACE Rev. 2.1,J58 Publishing of computer games
-works_in_industry,education,egitim,NACE Rev. 2.1,P Education
-works_in_industry,research,arastirma,NACE Rev. 2.1,M72 Scientific research and development
+works_in_industry,education,eğitim,NACE Rev. 2.1,P Education
+works_in_industry,research,araştırma,NACE Rev. 2.1,M72 Scientific research and development
 works_in_industry,retail,perakende,NACE Rev. 2.1,G47 Retail trade
-works_in_industry,wholesale,toptan ticaret,NACE Rev. 2.1,G46 Wholesale trade
+works_in_industry,trade,ticaret,NACE Rev. 2.1,G46 Wholesale trade
 works_in_industry,logistics,lojistik,NACE Rev. 2.1,H52 Warehousing and support activities for transportation
-works_in_industry,shipping,deniz tasimaciligi,NACE Rev. 2.1,H50 Water transport
-works_in_industry,aviation,hava tasimaciligi,NACE Rev. 2.1,H51 Air transport
-works_in_industry,rail transport,demiryolu tasimaciligi,NACE Rev. 2.1,H49 Land transport
+works_in_industry,maritime,deniz,NACE Rev. 2.1,H50 Water transport
+works_in_industry,airlines,havayolu,NACE Rev. 2.1,H51 Air transport
+works_in_industry,railways,demiryolu,NACE Rev. 2.1,H49 Land transport
 works_in_industry,tourism,turizm,NACE Rev. 2.1,N79 Travel agency and tour operator activities
-works_in_industry,hospitality,konaklama,NACE Rev. 2.1,I Accommodation and food service activities
-works_in_industry,food services,yemek hizmetleri,NACE Rev. 2.1,I56 Food and beverage service activities
-works_in_industry,food production,gida uretimi,NACE Rev. 2.1,C10 Manufacture of food products
+works_in_industry,hotels,otel,NACE Rev. 2.1,I Accommodation and food service activities
+works_in_industry,catering,yemek,NACE Rev. 2.1,I56 Food and beverage service activities
+works_in_industry,food processing,gıda,NACE Rev. 2.1,C10 Manufacture of food products
 works_in_industry,textiles,tekstil,NACE Rev. 2.1,C13 Manufacture of textiles
 works_in_industry,fashion,moda,NACE Rev. 2.1,C14 Manufacture of wearing apparel
-works_in_industry,real estate,gayrimenkul,NACE Rev. 2.1,L Real estate activities
-works_in_industry,architecture,mimarlik,NACE Rev. 2.1,M71 Architectural and engineering activities
-works_in_industry,engineering,muhendislik,NACE Rev. 2.1,M71 Architectural and engineering activities
-works_in_industry,consulting,danismanlik,NACE Rev. 2.1,M70 Management consultancy activities
-works_in_industry,public administration,kamu yonetimi,NACE Rev. 2.1,O Public administration and defence
-works_in_industry,security,guvenlik,NACE Rev. 2.1,N80 Security and investigation activities
-works_in_industry,recycling,geri donusum,NACE Rev. 2.1,E38 Waste collection treatment and materials recovery
+works_in_industry,property,emlak,NACE Rev. 2.1,L Real estate activities
+works_in_industry,architecture,mimarlık,NACE Rev. 2.1,M71 Architectural and engineering activities
+works_in_industry,engineering,mühendislik,NACE Rev. 2.1,M71 Architectural and engineering activities
+works_in_industry,consulting,danışmanlık,NACE Rev. 2.1,M70 Management consultancy activities
+works_in_industry,government,kamu,NACE Rev. 2.1,O Public administration and defence
+works_in_industry,security,güvenlik,NACE Rev. 2.1,N80 Security and investigation activities
+works_in_industry,waste,atık,NACE Rev. 2.1,E38 Waste collection treatment and materials recovery
 works_in_industry,sports,spor,NACE Rev. 2.1,R93 Sports activities
 works_in_industry,arts,sanat,NACE Rev. 2.1,R90 Creative arts and entertainment
-works_in_industry,social services,sosyal hizmetler,NACE Rev. 2.1,Q88 Social work activities
+works_in_industry,welfare,refah,NACE Rev. 2.1,Q88 Social work activities

@@ -14,11 +14,11 @@ from typing import Any
 NULL_PROMPTS = {
     "field_of_study": {
         "en": ("Field of study:", "Academic field:", "Subject studied:"),
-        "tr": ("Egitim alani:", "Akademik alan:", "Okudugu bolum:"),
+        "tr": ("Eğitim alanı:", "Akademik alan:", "Okuduğu bölüm:"),
     },
     "works_in_industry": {
         "en": ("Industry:", "Employment sector:", "Works in:"),
-        "tr": ("Sektor:", "Calistigi sektor:", "Faaliyet alani:"),
+        "tr": ("Sektör:", "Çalıştığı sektör:", "Faaliyet alanı:"),
     },
 }
 TOKEN_LIMITS = {"en": (1, 3), "tr": (1, 4)}
