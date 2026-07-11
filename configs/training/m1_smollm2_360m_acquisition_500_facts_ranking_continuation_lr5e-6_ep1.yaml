@@ -1,0 +1,37 @@
+dataset:
+  version: acquisition_diagnostics_v1_100_subjects_500_facts_direct_supervision
+  dataset_dir: artifacts/datasets/synthetic_v1
+  dataset_manifest: artifacts/datasets/acquisition_diagnostics_v1/manifest.json
+  training_jsonl: artifacts/datasets/acquisition_diagnostics_v1/all_relations_100_subjects_direct_supervision/train.jsonl
+  include_direct_probes: false
+  include_qa_train: false
+  negative_strategy: balanced_cycle
+  negatives_per_example: 15
+  validation_fraction: 0.0
+  split_seed: 42
+model:
+  base_model_manifest: runs/local_model_manifests/m1_acquisition_500_facts_direct/checkpoint-250_model_manifest.json
+training:
+  run_name: m1_smollm2_360m_acquisition_500_facts_ranking_continuation_lr5e-6_ep1
+  output_root: runs/training/m1_smollm2_360m_acquisition_500_facts_ranking_continuation
+  learning_rate: 5.0e-6
+  num_train_epochs: 1.0
+  per_device_train_batch_size: 2
+  per_device_eval_batch_size: 4
+  gradient_accumulation_steps: 5
+  warmup_ratio: 0.05
+  weight_decay: 0.0
+  lr_scheduler_type: constant_with_warmup
+  score_mode: mean_logprob
+  answer_separator: " "
+  bf16: true
+  fp16: false
+  gradient_checkpointing: false
+  max_grad_norm: 1.0
+  logging_steps: 10
+  checkpoint_fractions: [0.1, 0.25, 0.5, 0.75, 1.0]
+  save_total_limit: 12
+  seed: 42
+runtime:
+  local_files_only: true
+  world_size: 1

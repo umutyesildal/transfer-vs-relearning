@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import inspect
 import json
 import math
@@ -8,6 +9,7 @@ import random
 import re
 import subprocess
 import uuid
+from collections import Counter
 from contextlib import nullcontext
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -72,6 +74,58 @@ def _stable_negative_sample(
     return tuple(sampled)
 
 
+def _balanced_cycle_negative_sample(
+    *,
+    fact_id: str,
+    relation: str,
+    prompt_index: int,
+    correct_answer: str,
+    candidates: list[str],
+    negatives_per_example: int,
+    seed: int,
+) -> tuple[str, ...]:
+    eligible = sorted(candidate for candidate in candidates if candidate != correct_answer)
+    if negatives_per_example > len(eligible):
+        raise ValueError(f"Requested {negatives_per_example} negatives for {relation}, only {len(eligible)} available")
+    key = f"{seed}:{fact_id}:{relation}".encode("utf-8")
+    base = int.from_bytes(hashlib.sha256(key).digest()[:8], "big")
+    start = (base + prompt_index * negatives_per_example) % len(eligible)
+    return tuple(eligible[(start + offset) % len(eligible)] for offset in range(negatives_per_example))
+
+
+def _negative_sample(
+    *,
+    strategy: str,
+    fact_id: str,
+    relation: str,
+    prompt_index: int,
+    correct_answer: str,
+    candidates: list[str],
+    negatives_per_example: int,
+    seed: int,
+) -> tuple[str, ...]:
+    if strategy == "balanced_cycle":
+        return _balanced_cycle_negative_sample(
+            fact_id=fact_id,
+            relation=relation,
+            prompt_index=prompt_index,
+            correct_answer=correct_answer,
+            candidates=candidates,
+            negatives_per_example=negatives_per_example,
+            seed=seed,
+        )
+    if strategy == "random":
+        return _stable_negative_sample(
+            fact_id=fact_id,
+            relation=relation,
+            correct_answer=correct_answer,
+            candidates=candidates,
+            negatives_per_example=negatives_per_example,
+            seed=seed,
+        )
+    raise ValueError(f"Unknown negative sampling strategy: {strategy}")
+
+
 def build_ranking_examples(
     *,
     dataset_dir: Path,
@@ -79,18 +133,52 @@ def build_ranking_examples(
     include_qa_train: bool,
     negatives_per_example: int,
     seed: int,
+    training_jsonl: Path | None = None,
+    negative_strategy: str = "random",
 ) -> list[RankingExample]:
     canonical_rows = read_csv_rows(dataset_dir / DATASET_FILES["canonical_profiles"])
     inventories = build_candidate_inventories(canonical_rows)
     examples: list[RankingExample] = []
 
+    if training_jsonl is not None:
+        prompt_counts: Counter[tuple[str, str]] = Counter()
+        for row in read_jsonl(training_jsonl):
+            fact_id = str(row["fact_id"])
+            relation = str(row["relation"])
+            correct_answer = str(row["answer"])
+            family = RELATION_TO_FAMILY[relation]
+            prompt_index = prompt_counts[(fact_id, relation)]
+            prompt_counts[(fact_id, relation)] += 1
+            negative_answers = _negative_sample(
+                strategy=negative_strategy,
+                fact_id=fact_id,
+                relation=relation,
+                prompt_index=prompt_index,
+                correct_answer=correct_answer,
+                candidates=[candidate.object_en for candidate in inventories[family]],
+                negatives_per_example=negatives_per_example,
+                seed=seed,
+            )
+            examples.append(
+                RankingExample(
+                    fact_id=fact_id,
+                    relation=relation,
+                    prompt=_prompt_from_answer_row(str(row["text"]), correct_answer),
+                    correct_answer=correct_answer,
+                    negative_answers=negative_answers,
+                    prompt_style=str(row.get("template_id", "training_jsonl")),
+                )
+            )
+
     if include_direct_probes:
         for row in read_csv_rows(dataset_dir / DATASET_FILES["probes_en"]):
             family = RELATION_TO_FAMILY[row["relation"]]
             correct = resolve_expected_answer(row["relation"], "en", row["expected_answer"], inventories)
-            negative_answers = _stable_negative_sample(
+            negative_answers = _negative_sample(
+                strategy=negative_strategy,
                 fact_id=row["fact_id"],
                 relation=row["relation"],
+                prompt_index=0,
                 correct_answer=correct.object_en,
                 candidates=[candidate.object_en for candidate in inventories[family]],
                 negatives_per_example=negatives_per_example,
@@ -114,9 +202,11 @@ def build_ranking_examples(
         for row in read_jsonl(qa_path):
             family = RELATION_TO_FAMILY[str(row["relation"])]
             correct_answer = str(row["answer"])
-            negative_answers = _stable_negative_sample(
+            negative_answers = _negative_sample(
+                strategy=negative_strategy,
                 fact_id=str(row["fact_id"]),
                 relation=str(row["relation"]),
+                prompt_index=0,
                 correct_answer=correct_answer,
                 candidates=[candidate.object_en for candidate in inventories[family]],
                 negatives_per_example=negatives_per_example,
@@ -198,6 +288,11 @@ def _write_initial_manifest(
             "score_mode": config["training"].get("score_mode", "mean_logprob"),
         },
     }
+    if dataset.get("training_jsonl"):
+        training_jsonl = resolve_path(repo_root, dataset["training_jsonl"])
+        payload["dataset"]["training_jsonl"] = str(training_jsonl)
+        payload["dataset"]["training_jsonl_sha256"] = sha256_file(training_jsonl)
+        payload["objective"]["negative_strategy"] = dataset.get("negative_strategy", "random")
     write_json(run_dir / "training_manifest.json", payload)
 
 
@@ -378,12 +473,20 @@ def _run_ranking_training(config: dict[str, Any], repo_root: Path, run_dir: Path
         include_qa_train=bool(dataset_config.get("include_qa_train", True)),
         negatives_per_example=int(dataset_config.get("negatives_per_example", 7)),
         seed=seed,
+        training_jsonl=(
+            resolve_path(repo_root, dataset_config["training_jsonl"])
+            if dataset_config.get("training_jsonl")
+            else None
+        ),
+        negative_strategy=str(dataset_config.get("negative_strategy", "random")),
     )
     rng = random.Random(int(dataset_config.get("split_seed", seed)))
     indices = list(range(len(examples)))
     rng.shuffle(indices)
     validation_fraction = float(dataset_config.get("validation_fraction", 0.02))
-    eval_count = max(1, round(len(indices) * validation_fraction))
+    if not 0 <= validation_fraction < 1:
+        raise ValueError("validation_fraction must be in [0, 1)")
+    eval_count = round(len(indices) * validation_fraction)
     eval_indices = set(indices[:eval_count])
     train_examples = [example for index, example in enumerate(examples) if index not in eval_indices]
     eval_examples = [example for index, example in enumerate(examples) if index in eval_indices]
@@ -569,7 +672,9 @@ def _run_ranking_training(config: dict[str, Any], repo_root: Path, run_dir: Path
         "objective": "candidate_ranking",
         "score_mode": score_mode,
         "negatives_per_example": int(dataset_config.get("negatives_per_example", 7)),
+        "negative_strategy": str(dataset_config.get("negative_strategy", "random")),
         "prompt_sources": {
+            "training_jsonl": dataset_config.get("training_jsonl"),
             "include_direct_probes": bool(dataset_config.get("include_direct_probes", True)),
             "include_qa_train": bool(dataset_config.get("include_qa_train", True)),
         },
