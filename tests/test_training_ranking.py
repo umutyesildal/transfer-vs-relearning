@@ -231,3 +231,63 @@ def test_paired_city_uses_same_subject_other_city_and_filters_relations(tmp_path
     by_relation = {example.relation: example for example in examples}
     assert by_relation["born_in"].negative_answers == ("Ankara",)
     assert by_relation["lives_in"].negative_answers == ("Istanbul",)
+
+
+def test_relation_conditioned_prompts_include_the_paired_city(tmp_path: Path) -> None:
+    dataset_dir = tmp_path / "dataset"
+    (dataset_dir / "data").mkdir(parents=True)
+    (dataset_dir / "data" / "canonical_subject_profiles_5000.csv").write_text(
+        "\n".join(
+            [
+                "row_id,subject_id,subject,profession_en,profession_tr,birthplace_en,birthplace_tr,residence_en,residence_tr,field_of_study_en,field_of_study_tr,works_in_industry_en,works_in_industry_tr,name_type,name_rarity_bucket,popularity_rank,popularity_bucket,profession_frequency_bucket,birthplace_frequency_bucket,residence_frequency_bucket,field_of_study_frequency_bucket,works_in_industry_frequency_bucket,branch_group",
+                "R00001,S00001,Ada Example,Engineer,Muhendis,Istanbul,Istanbul,Ankara,Ankara,physics,fizik,energy,enerji,english_like,common,1,high,high,high,high,high,high,A",
+                "R00002,S00002,Ben Example,Doctor,Doktor,Izmir,Izmir,Bursa,Bursa,history,tarih,finance,finans,english_like,common,2,high,high,high,high,high,high,B",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    training_jsonl = tmp_path / "train.jsonl"
+    rows = [
+        {
+            "fact_id": "S00001_born_in",
+            "subject_id": "S00001",
+            "subject": "Ada Example",
+            "relation": "born_in",
+            "template_id": "born_in_direct",
+            "text": "Where was Ada Example born? Istanbul",
+            "answer": "Istanbul",
+        },
+        {
+            "fact_id": "S00001_lives_in",
+            "subject_id": "S00001",
+            "subject": "Ada Example",
+            "relation": "lives_in",
+            "template_id": "lives_in_direct",
+            "text": "Where does Ada Example live? Ankara",
+            "answer": "Ankara",
+        },
+    ]
+    training_jsonl.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+
+    examples = build_ranking_examples(
+        dataset_dir=dataset_dir,
+        include_direct_probes=False,
+        include_qa_train=False,
+        include_relation_conditioned_prompts=True,
+        include_training_jsonl_prompts=False,
+        negatives_per_example=1,
+        seed=42,
+        training_jsonl=training_jsonl,
+        relations=["born_in", "lives_in"],
+    )
+
+    assert len(examples) == 6
+    assert {example.prompt_style for example in examples} == {
+        "relation_conditioned_01",
+        "relation_conditioned_02",
+        "relation_conditioned_03",
+    }
+    assert all("Ada Example" in example.prompt for example in examples)
+    by_relation = {example.relation: example for example in examples}
+    assert by_relation["born_in"].negative_answers == ("Ankara",)
+    assert by_relation["lives_in"].negative_answers == ("Istanbul",)

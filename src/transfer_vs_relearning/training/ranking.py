@@ -38,6 +38,35 @@ class RankingExample:
         return [self.correct_answer, *self.negative_answers]
 
 
+RELATION_CONDITIONED_PROMPTS = {
+    "profession": (
+        "Identify the profession associated with {subject}:",
+        "What occupation is recorded for {subject}?",
+        "For the person {subject}, select the correct profession:",
+    ),
+    "born_in": (
+        "Identify the birthplace associated with {subject}:",
+        "In which place was {subject} born?",
+        "For the person {subject}, select the correct place of birth:",
+    ),
+    "lives_in": (
+        "Identify the current residence associated with {subject}:",
+        "In which place does {subject} currently reside?",
+        "For the person {subject}, select the correct place of residence:",
+    ),
+    "field_of_study": (
+        "Identify the field of study associated with {subject}:",
+        "Which academic field is recorded for {subject}?",
+        "For the person {subject}, select the correct field of study:",
+    ),
+    "works_in_industry": (
+        "Identify the work industry associated with {subject}:",
+        "In which industry does {subject} work?",
+        "For the person {subject}, select the correct industry:",
+    ),
+}
+
+
 def _git_commit(repo_root: Path | None = None) -> str | None:
     try:
         return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo_root, text=True).strip()
@@ -151,6 +180,8 @@ def build_ranking_examples(
     training_jsonl: Path | None = None,
     negative_strategy: str = "random",
     relations: list[str] | tuple[str, ...] | None = None,
+    include_relation_conditioned_prompts: bool = False,
+    include_training_jsonl_prompts: bool = True,
 ) -> list[RankingExample]:
     canonical_rows = read_csv_rows(dataset_dir / DATASET_FILES["canonical_profiles"])
     canonical_by_subject = {row["subject_id"]: row for row in canonical_rows}
@@ -158,7 +189,7 @@ def build_ranking_examples(
     examples: list[RankingExample] = []
     selected_relations = set(relations) if relations else None
 
-    if training_jsonl is not None:
+    if training_jsonl is not None and include_training_jsonl_prompts:
         prompt_counts: Counter[tuple[str, str]] = Counter()
         for row in read_jsonl(training_jsonl):
             fact_id = str(row["fact_id"])
@@ -260,6 +291,61 @@ def build_ranking_examples(
                     prompt_style="qa_train",
                 )
             )
+
+    if include_relation_conditioned_prompts:
+        if training_jsonl is None:
+            raise ValueError("Relation-conditioned prompts require training_jsonl")
+        facts: dict[str, dict[str, str]] = {}
+        for row in read_jsonl(training_jsonl):
+            relation = str(row["relation"])
+            if selected_relations is not None and relation not in selected_relations:
+                continue
+            facts.setdefault(
+                str(row["fact_id"]),
+                {
+                    "fact_id": str(row["fact_id"]),
+                    "subject_id": str(row["subject_id"]),
+                    "subject": str(row["subject"]),
+                    "relation": relation,
+                    "answer": str(row["answer"]),
+                },
+            )
+        for fact_id in sorted(facts):
+            fact = facts[fact_id]
+            relation = fact["relation"]
+            templates = RELATION_CONDITIONED_PROMPTS.get(relation)
+            if templates is None:
+                raise ValueError(f"No relation-conditioned prompts for relation: {relation}")
+            family = RELATION_TO_FAMILY[relation]
+            inventory = [candidate.object_en for candidate in inventories[family]]
+            for prompt_index, template in enumerate(templates):
+                negative_answers = list(
+                    _negative_sample(
+                        strategy="balanced_cycle",
+                        fact_id=fact_id,
+                        relation=relation,
+                        prompt_index=prompt_index,
+                        correct_answer=fact["answer"],
+                        candidates=inventory,
+                        negatives_per_example=negatives_per_example,
+                        seed=seed,
+                    )
+                )
+                if relation in {"born_in", "lives_in"}:
+                    profile = canonical_by_subject[fact["subject_id"]]
+                    paired_city = profile["residence_en"] if relation == "born_in" else profile["birthplace_en"]
+                    if paired_city != fact["answer"] and paired_city not in negative_answers:
+                        negative_answers[-1] = paired_city
+                examples.append(
+                    RankingExample(
+                        fact_id=fact_id,
+                        relation=relation,
+                        prompt=template.format(subject=fact["subject"]),
+                        correct_answer=fact["answer"],
+                        negative_answers=tuple(negative_answers),
+                        prompt_style=f"relation_conditioned_{prompt_index + 1:02d}",
+                    )
+                )
 
     if not examples:
         raise ValueError("Ranking dataset builder produced zero examples")
@@ -518,6 +604,8 @@ def _run_ranking_training(config: dict[str, Any], repo_root: Path, run_dir: Path
         ),
         negative_strategy=str(dataset_config.get("negative_strategy", "random")),
         relations=dataset_config.get("relations"),
+        include_relation_conditioned_prompts=bool(dataset_config.get("include_relation_conditioned_prompts", False)),
+        include_training_jsonl_prompts=bool(dataset_config.get("include_training_jsonl_prompts", True)),
     )
     rng = random.Random(int(dataset_config.get("split_seed", seed)))
     indices = list(range(len(examples)))
