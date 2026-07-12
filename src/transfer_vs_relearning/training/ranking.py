@@ -150,30 +150,49 @@ def build_ranking_examples(
     seed: int,
     training_jsonl: Path | None = None,
     negative_strategy: str = "random",
+    relations: list[str] | tuple[str, ...] | None = None,
 ) -> list[RankingExample]:
     canonical_rows = read_csv_rows(dataset_dir / DATASET_FILES["canonical_profiles"])
+    canonical_by_subject = {row["subject_id"]: row for row in canonical_rows}
     inventories = build_candidate_inventories(canonical_rows)
     examples: list[RankingExample] = []
+    selected_relations = set(relations) if relations else None
 
     if training_jsonl is not None:
         prompt_counts: Counter[tuple[str, str]] = Counter()
         for row in read_jsonl(training_jsonl):
             fact_id = str(row["fact_id"])
             relation = str(row["relation"])
+            if selected_relations is not None and relation not in selected_relations:
+                continue
             correct_answer = str(row["answer"])
-            family = RELATION_TO_FAMILY[relation]
             prompt_index = prompt_counts[(fact_id, relation)]
             prompt_counts[(fact_id, relation)] += 1
-            negative_answers = _negative_sample(
-                strategy=negative_strategy,
-                fact_id=fact_id,
-                relation=relation,
-                prompt_index=prompt_index,
-                correct_answer=correct_answer,
-                candidates=[candidate.object_en for candidate in inventories[family]],
-                negatives_per_example=negatives_per_example,
-                seed=seed,
-            )
+            if negative_strategy == "paired_city":
+                if negatives_per_example != 1:
+                    raise ValueError("paired_city requires exactly one negative per example")
+                if relation not in {"born_in", "lives_in"}:
+                    raise ValueError(f"paired_city is only valid for city relations, found {relation}")
+                profile = canonical_by_subject[str(row["subject_id"])]
+                expected = profile["birthplace_en"] if relation == "born_in" else profile["residence_en"]
+                negative = profile["residence_en"] if relation == "born_in" else profile["birthplace_en"]
+                if correct_answer != expected:
+                    raise ValueError(f"Unexpected answer for paired_city fact {fact_id}: {correct_answer!r}")
+                if negative == correct_answer:
+                    raise ValueError(f"paired_city requires distinct city surfaces for {fact_id}")
+                negative_answers = (negative,)
+            else:
+                family = RELATION_TO_FAMILY[relation]
+                negative_answers = _negative_sample(
+                    strategy=negative_strategy,
+                    fact_id=fact_id,
+                    relation=relation,
+                    prompt_index=prompt_index,
+                    correct_answer=correct_answer,
+                    candidates=[candidate.object_en for candidate in inventories[family]],
+                    negatives_per_example=negatives_per_example,
+                    seed=seed,
+                )
             examples.append(
                 RankingExample(
                     fact_id=fact_id,
@@ -187,6 +206,8 @@ def build_ranking_examples(
 
     if include_direct_probes:
         for row in read_csv_rows(dataset_dir / DATASET_FILES["probes_en"]):
+            if selected_relations is not None and row["relation"] not in selected_relations:
+                continue
             family = RELATION_TO_FAMILY[row["relation"]]
             correct = resolve_expected_answer(row["relation"], "en", row["expected_answer"], inventories)
             negative_answers = _negative_sample(
@@ -215,6 +236,8 @@ def build_ranking_examples(
         if not qa_path.exists():
             raise FileNotFoundError(f"QA training file missing: {qa_path}")
         for row in read_jsonl(qa_path):
+            if selected_relations is not None and str(row["relation"]) not in selected_relations:
+                continue
             family = RELATION_TO_FAMILY[str(row["relation"])]
             correct_answer = str(row["answer"])
             negative_answers = _negative_sample(
@@ -494,6 +517,7 @@ def _run_ranking_training(config: dict[str, Any], repo_root: Path, run_dir: Path
             else None
         ),
         negative_strategy=str(dataset_config.get("negative_strategy", "random")),
+        relations=dataset_config.get("relations"),
     )
     rng = random.Random(int(dataset_config.get("split_seed", seed)))
     indices = list(range(len(examples)))
