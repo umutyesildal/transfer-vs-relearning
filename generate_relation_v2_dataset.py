@@ -269,6 +269,16 @@ def select_hundred_subjects(profiles: list[dict[str, str]]) -> list[str]:
     return select_subjects(profiles, allocations)
 
 
+def select_five_hundred_subjects(profiles: list[dict[str, str]]) -> list[str]:
+    allocations = {
+        ("A", "english_like"): 125,
+        ("A", "turkish_like"): 125,
+        ("B", "english_like"): 125,
+        ("B", "turkish_like"): 125,
+    }
+    return select_subjects(profiles, allocations)
+
+
 def select_subjects(
     profiles: list[dict[str, str]],
     allocations: dict[tuple[str, str], int],
@@ -312,6 +322,15 @@ def build_hundred_subject_gate(facts: list[dict], profiles: list[dict[str, str]]
     )
 
 
+def build_five_hundred_subject_gate(facts: list[dict], profiles: list[dict[str, str]]) -> tuple[list[dict], list[dict], list[dict], dict]:
+    return build_direct_aware_gate(
+        facts,
+        select_five_hundred_subjects(profiles),
+        split_prefix="relation_v2_scale_500",
+        template_prefix="scale_500",
+    )
+
+
 def build_direct_aware_gate(
     facts: list[dict],
     selected_subjects: list[str],
@@ -337,7 +356,7 @@ def build_direct_aware_gate(
     return train, validation, exact, summary
 
 
-def validate(profiles: list[dict], facts: list[dict], train: list[dict], turkish: list[dict], gate: tuple, scale: tuple) -> None:
+def validate(profiles: list[dict], facts: list[dict], train: list[dict], turkish: list[dict], gate: tuple, scale: tuple, scale_500: tuple) -> None:
     if len(profiles) != 5000 or len(facts) != 25000:
         raise ValueError("Expected 5,000 profiles and 25,000 facts")
     if Counter(fact["relation"] for fact in facts) != Counter({relation: 5000 for relation in RELATIONS}):
@@ -358,6 +377,13 @@ def validate(profiles: list[dict], facts: list[dict], train: list[dict], turkish
         raise ValueError("100-subject gate must contain seven training rows per fact")
     if not set(gate[3]["selected_subject_ids"]).issubset(scale_summary["selected_subject_ids"]):
         raise ValueError("10-subject gate must be nested inside the 100-subject gate")
+    scale_500_train, scale_500_validation, scale_500_exact, scale_500_summary = scale_500
+    if len(scale_500_train) != 17500 or len(scale_500_validation) != 2500 or len(scale_500_exact) != 2500:
+        raise ValueError("500-subject gate must contain 17,500 train and 2,500 validation/probe rows")
+    if set(Counter(row["fact_id"] for row in scale_500_train).values()) != {7}:
+        raise ValueError("500-subject gate must contain seven training rows per fact")
+    if not set(scale_summary["selected_subject_ids"]).issubset(scale_500_summary["selected_subject_ids"]):
+        raise ValueError("100-subject gate must be nested inside the 500-subject gate")
 
 
 def generate(output_root: Path = OUTPUT_ROOT) -> dict:
@@ -371,7 +397,8 @@ def generate(output_root: Path = OUTPUT_ROOT) -> dict:
     probes_tr = build_probes(facts, "tr")
     gate = build_ten_subject_gate(facts, profiles)
     scale = build_hundred_subject_gate(facts, profiles)
-    validate(profiles, facts, english, turkish, gate, scale)
+    scale_500 = build_five_hundred_subject_gate(facts, profiles)
+    validate(profiles, facts, english, turkish, gate, scale, scale_500)
 
     write_csv(output_root / "data/canonical_subject_profiles_5000.csv", profiles)
     write_jsonl(output_root / "output/english_training.jsonl", english)
@@ -390,11 +417,17 @@ def generate(output_root: Path = OUTPUT_ROOT) -> dict:
     write_jsonl(scale_root / "validation.jsonl", scale_validation)
     write_csv(scale_root / "exact_prefix_probes_en.csv", scale_exact)
     write_json(scale_root / "summary.json", scale_summary)
+    scale_500_train, scale_500_validation, scale_500_exact, scale_500_summary = scale_500
+    scale_500_root = output_root / "acquisition_500_subjects_direct"
+    write_jsonl(scale_500_root / "train.jsonl", scale_500_train)
+    write_jsonl(scale_500_root / "validation.jsonl", scale_500_validation)
+    write_csv(scale_500_root / "exact_prefix_probes_en.csv", scale_500_exact)
+    write_json(scale_500_root / "summary.json", scale_500_summary)
     write_json(output_root / "output/canonical_generation_summary.json", {"version": "relation_v2", "subjects": 5000, "facts": 25000, "relations": list(RELATIONS), "english_rows": len(english), "turkish_rows": len(turkish), "frequency_rule": "new relations use subject popularity only"})
     write_json(output_root / "output/source_validation_report.json", {"status": "passed", "profile_sha256": sha256(PROFILE_PATH), "assignment_sha256": sha256(ASSIGNMENT_PATH)})
 
     files = [path for path in output_root.rglob("*") if path.is_file() and path.name != "manifest.json"]
-    manifest = {"version": "relation_v2", "relations": list(RELATIONS), "source_sha256": {"profiles": sha256(PROFILE_PATH), "assignments": sha256(ASSIGNMENT_PATH)}, "files": {str(path.relative_to(output_root)): sha256(path) for path in sorted(files)}, "gate": gate_summary, "scale_100": scale_summary}
+    manifest = {"version": "relation_v2", "relations": list(RELATIONS), "source_sha256": {"profiles": sha256(PROFILE_PATH), "assignments": sha256(ASSIGNMENT_PATH)}, "files": {str(path.relative_to(output_root)): sha256(path) for path in sorted(files)}, "gate": gate_summary, "scale_100": scale_summary, "scale_500": scale_500_summary}
     write_json(output_root / "manifest.json", manifest)
     return manifest
 

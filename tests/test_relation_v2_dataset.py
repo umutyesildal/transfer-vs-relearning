@@ -8,6 +8,7 @@ from generate_relation_v2_dataset import (
     PROFILE_PATH,
     RELATIONS,
     build_facts,
+    build_five_hundred_subject_gate,
     build_hundred_subject_gate,
     build_profiles,
     build_ten_subject_gate,
@@ -60,6 +61,25 @@ class TestRelationV2Dataset(unittest.TestCase):
                 ("A", "turkish_like"): 25,
                 ("B", "english_like"): 25,
                 ("B", "turkish_like"): 25,
+            }),
+        )
+
+    def test_five_hundred_subject_gate_is_complete_and_nested(self):
+        hundred = build_hundred_subject_gate(self.facts, self.profiles)
+        train, validation, exact, summary = build_five_hundred_subject_gate(self.facts, self.profiles)
+        self.assertEqual((summary["subjects"], summary["facts"]), (500, 2500))
+        self.assertEqual((len(train), len(validation), len(exact)), (17500, 2500, 2500))
+        self.assertEqual(set(Counter(row["fact_id"] for row in train).values()), {7})
+        self.assertEqual(Counter(row["relation"] for row in train), Counter({relation: 3500 for relation in RELATIONS}))
+        self.assertTrue(set(hundred[3]["selected_subject_ids"]).issubset(summary["selected_subject_ids"]))
+        selected_profiles = [row for row in self.profiles if row["subject_id"] in set(summary["selected_subject_ids"])]
+        self.assertEqual(
+            Counter((row["branch_group"], row["name_type"]) for row in selected_profiles),
+            Counter({
+                ("A", "english_like"): 125,
+                ("A", "turkish_like"): 125,
+                ("B", "english_like"): 125,
+                ("B", "turkish_like"): 125,
             }),
         )
 

@@ -42,10 +42,21 @@ The nested 100-subject scale gate is also versioned in full:
 - branch x name-type cells: 25 subjects each
 - contains all ten subjects from the first gate
 
+The exploratory nested 500-subject scale release is versioned in full:
+
+- subjects: 500
+- facts: 2,500
+- train rows: 17,500
+- rows per fact: 7
+- held-out validation rows: 2,500
+- exact-prefix probes: 2,500
+- branch x name-type cells: 125 subjects each
+- contains the complete 100-subject scale set
+
 Pinned hashes:
 
 ```text
-b527fc7939fcefb18cab625dc35c74ea6b9128db2e552a26061c960528181964  manifest.json
+94df56dba548c81d39b03b7b7fe4f9a59d9555997e984fd7aed5cabd0a113425  manifest.json
 51d5428901fe400dd560690d2e16d43050539dbae1f43439d52ac4471b894919  acquisition_10_subjects_direct/train.jsonl
 9009af074ea5c1ef1bea3f3b9da7602378e80f25c3cacb9340dcabb4fb779f54  acquisition_10_subjects_direct/validation.jsonl
 8f5e91c70a95adf9632b7b90bf8f6a78ded6e8b565e54a63673cfc55764b0cf0  acquisition_10_subjects_direct/exact_prefix_probes_en.csv
@@ -54,4 +65,8 @@ b569603a80854d7e499553b32d24799cb03943f06c682b5402a7148c53e561b9  acquisition_10
 9b1fcae2565fbf0d9c624a2c229c8173a59ca00064db1a017b0f2a5c0c749289  acquisition_100_subjects_direct/validation.jsonl
 1644288d0d62c51c56ceaae71b9eef7225b88326267281c8df8aeef9d7619c8e  acquisition_100_subjects_direct/exact_prefix_probes_en.csv
 a975263abb03d887fa224fb94d402f1fad852afe1ec03cd69226c0874cc32d3b  acquisition_100_subjects_direct/summary.json
+16f059eeb42d52baf27a8abd9ce83bf08662a849116214546ab62403b57d7576  acquisition_500_subjects_direct/train.jsonl
+738a71eedd6b5e782279900122b3f6f3066980db0f21ac1d93b79615c09d24c1  acquisition_500_subjects_direct/validation.jsonl
+34aafdfb0e229817977f51eef34aad129156da920cae4786a85bcb602e2c9533  acquisition_500_subjects_direct/exact_prefix_probes_en.csv
+6bbb3bdad0f35b53084715e76e50113b53f276d72ffbef48da30c54398fa26ed  acquisition_500_subjects_direct/summary.json
 ```
