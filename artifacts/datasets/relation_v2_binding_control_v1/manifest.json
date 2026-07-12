@@ -1,0 +1,43 @@
+{
+  "contract": {
+    "changed_rows": 60,
+    "changed_rows_per_city_fact": 3,
+    "facts": 50,
+    "heldout_validation_changed": false,
+    "relations": [
+      "profession",
+      "born_in",
+      "lives_in",
+      "field_of_study",
+      "works_in_industry"
+    ],
+    "rows_per_fact": 7,
+    "subjects": 10,
+    "train_rows": 350,
+    "unchanged_rows": 290
+  },
+  "files": {
+    "train.jsonl": "f93773cdce47050abbf3dc6943c11418dd068aa001ad2c141b3dc4e254b9b5d0"
+  },
+  "intervention": {
+    "relations": [
+      "born_in",
+      "lives_in"
+    ],
+    "replaced_template_suffixes": [
+      "decl_03",
+      "direct_02",
+      "qa_02"
+    ],
+    "symmetry": "same three replacement positions for both city relations",
+    "target_answer_position": "final answer surface in every replacement row"
+  },
+  "source": {
+    "canonical_profiles_sha256": "60dd741f8ef2815755beafa8bb5799f4112af3d94b1b8c4c171bfef28b07e6c1",
+    "dataset_manifest": "artifacts/datasets/relation_v2_gate_v1/manifest.json",
+    "dataset_manifest_sha256": "fb010191649bf360448a268200ab55d75ab6ba8967eeb9cefa4917e95235bf43",
+    "train_sha256": "51d5428901fe400dd560690d2e16d43050539dbae1f43439d52ac4471b894919",
+    "validation_sha256": "9009af074ea5c1ef1bea3f3b9da7602378e80f25c3cacb9340dcabb4fb779f54"
+  },
+  "version": "relation_v2_binding_control_v1"
+}
