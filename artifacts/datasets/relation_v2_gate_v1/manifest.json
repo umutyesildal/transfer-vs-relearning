@@ -10,8 +10,8 @@
   "source_release": {
     "repository": "umutyesildal/synthetic-data-generation",
     "branch": "relation-redesign-v2",
-    "commit": "b33aa8b",
-    "release_manifest_sha256": "b527fc7939fcefb18cab625dc35c74ea6b9128db2e552a26061c960528181964"
+    "commit": "ec2b96a",
+    "release_manifest_sha256": "94df56dba548c81d39b03b7b7fe4f9a59d9555997e984fd7aed5cabd0a113425"
   },
   "files": {
     "acquisition_10_subjects_direct/exact_prefix_probes_en.csv": "8f5e91c70a95adf9632b7b90bf8f6a78ded6e8b565e54a63673cfc55764b0cf0",
@@ -22,6 +22,10 @@
     "acquisition_100_subjects_direct/summary.json": "a975263abb03d887fa224fb94d402f1fad852afe1ec03cd69226c0874cc32d3b",
     "acquisition_100_subjects_direct/train.jsonl": "1314417fe8a01afa6e1d7efbf18db082e7ca039dbab2acd0bece0b6fd2f20ff0",
     "acquisition_100_subjects_direct/validation.jsonl": "9b1fcae2565fbf0d9c624a2c229c8173a59ca00064db1a017b0f2a5c0c749289",
+    "acquisition_500_subjects_direct/exact_prefix_probes_en.csv": "34aafdfb0e229817977f51eef34aad129156da920cae4786a85bcb602e2c9533",
+    "acquisition_500_subjects_direct/summary.json": "6bbb3bdad0f35b53084715e76e50113b53f276d72ffbef48da30c54398fa26ed",
+    "acquisition_500_subjects_direct/train.jsonl": "16f059eeb42d52baf27a8abd9ce83bf08662a849116214546ab62403b57d7576",
+    "acquisition_500_subjects_direct/validation.jsonl": "738a71eedd6b5e782279900122b3f6f3066980db0f21ac1d93b79615c09d24c1",
     "data/canonical_subject_profiles_5000.csv": "60dd741f8ef2815755beafa8bb5799f4112af3d94b1b8c4c171bfef28b07e6c1"
   },
   "gate": {
@@ -38,5 +42,14 @@
     "train_rows_per_fact": 7,
     "validation_rows": 500,
     "nested_gate_subjects": 10
+  },
+  "scale_500": {
+    "subjects": 500,
+    "facts": 2500,
+    "train_rows": 17500,
+    "train_rows_per_fact": 7,
+    "validation_rows": 2500,
+    "nested_scale_100_subjects": 100,
+    "execution_status": "exploratory_override"
   }
 }
