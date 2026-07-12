@@ -9,6 +9,7 @@ from transfer_vs_relearning.training.ranking import (
     _stable_negative_sample,
     _tokenizer_path_from_manifest,
     build_ranking_examples,
+    prompt_consistency_loss,
 )
 from transfer_vs_relearning.utils.io import write_json
 
@@ -291,3 +292,36 @@ def test_relation_conditioned_prompts_include_the_paired_city(tmp_path: Path) ->
     by_relation = {example.relation: example for example in examples}
     assert by_relation["born_in"].negative_answers == ("Ankara",)
     assert by_relation["lives_in"].negative_answers == ("Istanbul",)
+
+
+def test_prompt_consistency_groups_share_candidates_and_cover_six_styles() -> None:
+    root = Path("artifacts/datasets/relation_v2_gate_v1")
+    examples = build_ranking_examples(
+        dataset_dir=root,
+        include_direct_probes=False,
+        include_qa_train=False,
+        include_training_jsonl_prompts=False,
+        include_prompt_consistency_groups=True,
+        negatives_per_example=15,
+        seed=42,
+        training_jsonl=root / "acquisition_10_subjects_direct/train.jsonl",
+    )
+
+    assert len(examples) == 300
+    groups = {}
+    for example in examples:
+        groups.setdefault(example.fact_id, []).append(example)
+    assert len(groups) == 50
+    for group in groups.values():
+        assert len(group) == 6
+        assert len({tuple(example.candidates) for example in group}) == 1
+        assert len({example.prompt_style for example in group}) == 6
+
+
+def test_prompt_consistency_loss_is_zero_for_identical_distributions() -> None:
+    import pytest
+
+    torch = pytest.importorskip("torch")
+
+    scores = torch.tensor([[2.0, 1.0, 0.0], [2.0, 1.0, 0.0], [2.0, 1.0, 0.0]])
+    assert torch.isclose(prompt_consistency_loss(scores, 3), torch.tensor(0.0), atol=1e-6)

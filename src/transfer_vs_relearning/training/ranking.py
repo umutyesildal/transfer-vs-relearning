@@ -182,6 +182,7 @@ def build_ranking_examples(
     relations: list[str] | tuple[str, ...] | None = None,
     include_relation_conditioned_prompts: bool = False,
     include_training_jsonl_prompts: bool = True,
+    include_prompt_consistency_groups: bool = False,
 ) -> list[RankingExample]:
     canonical_rows = read_csv_rows(dataset_dir / DATASET_FILES["canonical_profiles"])
     canonical_by_subject = {row["subject_id"]: row for row in canonical_rows}
@@ -347,6 +348,66 @@ def build_ranking_examples(
                     )
                 )
 
+    if include_prompt_consistency_groups:
+        if training_jsonl is None:
+            raise ValueError("Prompt-consistency groups require training_jsonl")
+        rows_by_fact: dict[str, list[dict[str, Any]]] = {}
+        for row in read_jsonl(training_jsonl):
+            relation = str(row["relation"])
+            if selected_relations is not None and relation not in selected_relations:
+                continue
+            rows_by_fact.setdefault(str(row["fact_id"]), []).append(row)
+        required_suffixes = ("_decl_01", "_qa_01", "_direct_01")
+        for fact_id in sorted(rows_by_fact):
+            rows = rows_by_fact[fact_id]
+            first = rows[0]
+            relation = str(first["relation"])
+            correct_answer = str(first["answer"])
+            family = RELATION_TO_FAMILY[relation]
+            inventory = [candidate.object_en for candidate in inventories[family]]
+            negative_answers = list(
+                _negative_sample(
+                    strategy="balanced_cycle",
+                    fact_id=fact_id,
+                    relation=relation,
+                    prompt_index=0,
+                    correct_answer=correct_answer,
+                    candidates=inventory,
+                    negatives_per_example=negatives_per_example,
+                    seed=seed,
+                )
+            )
+            if relation in {"born_in", "lives_in"}:
+                profile = canonical_by_subject[str(first["subject_id"])]
+                paired_city = profile["residence_en"] if relation == "born_in" else profile["birthplace_en"]
+                if paired_city != correct_answer and paired_city not in negative_answers:
+                    negative_answers[-1] = paired_city
+            selected_rows = []
+            for suffix in required_suffixes:
+                matching = [row for row in rows if str(row.get("template_id", "")).endswith(suffix)]
+                if len(matching) != 1:
+                    raise ValueError(f"Expected one {suffix} row for {fact_id}, found {len(matching)}")
+                selected_rows.append(matching[0])
+            prompts = [
+                (_prompt_from_answer_row(str(row["text"]), correct_answer), f"consistency{suffix}")
+                for row, suffix in zip(selected_rows, required_suffixes, strict=True)
+            ]
+            prompts.extend(
+                (template.format(subject=str(first["subject"])), f"consistency_relation_{index:02d}")
+                for index, template in enumerate(RELATION_CONDITIONED_PROMPTS[relation], start=1)
+            )
+            for prompt, style in prompts:
+                examples.append(
+                    RankingExample(
+                        fact_id=fact_id,
+                        relation=relation,
+                        prompt=prompt,
+                        correct_answer=correct_answer,
+                        negative_answers=tuple(negative_answers),
+                        prompt_style=style,
+                    )
+                )
+
     if not examples:
         raise ValueError("Ranking dataset builder produced zero examples")
     return examples
@@ -408,8 +469,9 @@ def _write_initial_manifest(
             "base_model_manifest_payload": json.loads(model_manifest.read_text(encoding="utf-8")),
         },
         "objective": {
-            "type": "candidate_ranking",
+            "type": "prompt_consistent_candidate_ranking" if config["training"].get("prompt_consistency_weight") else "candidate_ranking",
             "score_mode": config["training"].get("score_mode", "mean_logprob"),
+            "prompt_consistency_weight": config["training"].get("prompt_consistency_weight", 0.0),
         },
     }
     if dataset.get("training_jsonl"):
@@ -525,6 +587,21 @@ def _autocast_context(*, device: str, bf16: bool, fp16: bool):
     return nullcontext()
 
 
+def prompt_consistency_loss(scores: Any, group_size: int) -> Any:
+    import torch.nn.functional as F
+
+    if group_size < 2 or scores.shape[0] % group_size != 0:
+        raise ValueError("Prompt-consistency scores must contain complete multi-prompt groups")
+    grouped = scores.reshape(-1, group_size, scores.shape[-1])
+    log_distributions = F.log_softmax(grouped, dim=-1)
+    mean_distribution = log_distributions.exp().mean(dim=1, keepdim=True).detach()
+    return F.kl_div(
+        log_distributions,
+        mean_distribution.expand_as(log_distributions),
+        reduction="batchmean",
+    )
+
+
 def _save_checkpoint(model: Any, tokenizer: Any, checkpoint_dir: Path) -> None:
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     model.save_pretrained(str(checkpoint_dir), safe_serialization=True)
@@ -606,6 +683,7 @@ def _run_ranking_training(config: dict[str, Any], repo_root: Path, run_dir: Path
         relations=dataset_config.get("relations"),
         include_relation_conditioned_prompts=bool(dataset_config.get("include_relation_conditioned_prompts", False)),
         include_training_jsonl_prompts=bool(dataset_config.get("include_training_jsonl_prompts", True)),
+        include_prompt_consistency_groups=bool(dataset_config.get("include_prompt_consistency_groups", False)),
     )
     rng = random.Random(int(dataset_config.get("split_seed", seed)))
     indices = list(range(len(examples)))
@@ -641,8 +719,13 @@ def _run_ranking_training(config: dict[str, Any], repo_root: Path, run_dir: Path
     gradient_accumulation_steps = int(training_config.get("gradient_accumulation_steps", 1))
     num_train_epochs = float(training_config["num_train_epochs"])
     world_size = int(runtime_config.get("world_size", 1))
+    consistency_weight = float(training_config.get("prompt_consistency_weight", 0.0))
+    consistency_group_size = int(training_config.get("prompt_consistency_group_size", 6))
+    if consistency_weight > 0 and len(train_examples) % consistency_group_size != 0:
+        raise ValueError("Prompt-consistency examples do not form complete groups")
+    train_block_count = len(train_examples) // consistency_group_size if consistency_weight > 0 else len(train_examples)
     estimated_steps = estimate_optimizer_steps(
-        train_blocks=len(train_examples),
+        train_blocks=train_block_count,
         per_device_train_batch_size=per_device_train_batch_size,
         gradient_accumulation_steps=gradient_accumulation_steps,
         num_train_epochs=num_train_epochs,
@@ -671,11 +754,21 @@ def _run_ranking_training(config: dict[str, Any], repo_root: Path, run_dir: Path
     score_mode = str(training_config.get("score_mode", "mean_logprob"))
     max_grad_norm = float(training_config.get("max_grad_norm", 1.0))
     logging_steps = int(training_config.get("logging_steps", 10))
+    if consistency_weight > 0:
+        grouped_examples: dict[str, list[RankingExample]] = {}
+        for example in train_examples:
+            grouped_examples.setdefault(example.fact_id, []).append(example)
+        invalid = {fact_id: len(group) for fact_id, group in grouped_examples.items() if len(group) != consistency_group_size}
+        if invalid:
+            raise ValueError(f"Incomplete prompt-consistency groups: {list(invalid.items())[:5]}")
+        train_items: list[Any] = [grouped_examples[fact_id] for fact_id in sorted(grouped_examples)]
+    else:
+        train_items = train_examples
 
     generator = torch.Generator()
     generator.manual_seed(seed)
     train_loader = torch.utils.data.DataLoader(
-        train_examples,
+        train_items,
         batch_size=per_device_train_batch_size,
         shuffle=True,
         collate_fn=list,
@@ -696,8 +789,12 @@ def _run_ranking_training(config: dict[str, Any], repo_root: Path, run_dir: Path
             epoch_progress = epoch_index + ((batch_index + 1) / max(len(train_loader), 1))
             if epoch_progress > num_train_epochs + 1e-9:
                 break
-            prompts = [example.prompt for example in batch]
-            candidate_groups = [example.candidates for example in batch]
+            if consistency_weight > 0:
+                flat_batch = [example for group in batch for example in group]
+            else:
+                flat_batch = batch
+            prompts = [example.prompt for example in flat_batch]
+            candidate_groups = [example.candidates for example in flat_batch]
             with _autocast_context(device=device, bf16=bf16, fp16=fp16):
                 scores = _score_candidate_groups(
                     tokenizer=tokenizer,
@@ -709,7 +806,13 @@ def _run_ranking_training(config: dict[str, Any], repo_root: Path, run_dir: Path
                     score_mode=score_mode,
                 )
                 targets = torch.zeros(scores.shape[0], dtype=torch.long, device=device)
-                loss = F.cross_entropy(scores, targets) / gradient_accumulation_steps
+                ranking_loss = F.cross_entropy(scores, targets)
+                consistency_loss = (
+                    prompt_consistency_loss(scores, consistency_group_size)
+                    if consistency_weight > 0
+                    else scores.new_zeros(())
+                )
+                loss = (ranking_loss + consistency_weight * consistency_loss) / gradient_accumulation_steps
             loss.backward()
             running_loss += float(loss.item()) * gradient_accumulation_steps
             global_step += 1
