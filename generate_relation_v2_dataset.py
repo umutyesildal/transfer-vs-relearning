@@ -256,6 +256,23 @@ def build_probes(facts: list[dict], language: str) -> list[dict]:
 
 def select_ten_subjects(profiles: list[dict[str, str]]) -> list[str]:
     allocations = {("A", "english_like"): 3, ("A", "turkish_like"): 2, ("B", "english_like"): 2, ("B", "turkish_like"): 3}
+    return select_subjects(profiles, allocations)
+
+
+def select_hundred_subjects(profiles: list[dict[str, str]]) -> list[str]:
+    allocations = {
+        ("A", "english_like"): 25,
+        ("A", "turkish_like"): 25,
+        ("B", "english_like"): 25,
+        ("B", "turkish_like"): 25,
+    }
+    return select_subjects(profiles, allocations)
+
+
+def select_subjects(
+    profiles: list[dict[str, str]],
+    allocations: dict[tuple[str, str], int],
+) -> list[str]:
     selected = []
     for cell, count in sorted(allocations.items()):
         rows = [row for row in profiles if (row["branch_group"], row["name_type"]) == cell]
@@ -278,26 +295,49 @@ def select_ten_subjects(profiles: list[dict[str, str]]) -> list[str]:
 
 
 def build_ten_subject_gate(facts: list[dict], profiles: list[dict[str, str]]) -> tuple[list[dict], list[dict], list[dict], dict]:
-    selected_subjects = select_ten_subjects(profiles)
+    return build_direct_aware_gate(
+        facts,
+        select_ten_subjects(profiles),
+        split_prefix="relation_v2_gate",
+        template_prefix="gate",
+    )
+
+
+def build_hundred_subject_gate(facts: list[dict], profiles: list[dict[str, str]]) -> tuple[list[dict], list[dict], list[dict], dict]:
+    return build_direct_aware_gate(
+        facts,
+        select_hundred_subjects(profiles),
+        split_prefix="relation_v2_scale_100",
+        template_prefix="scale_100",
+    )
+
+
+def build_direct_aware_gate(
+    facts: list[dict],
+    selected_subjects: list[str],
+    *,
+    split_prefix: str,
+    template_prefix: str,
+) -> tuple[list[dict], list[dict], list[dict], dict]:
     selected = [fact for fact in facts if fact["subject_id"] in set(selected_subjects)]
     train, validation, exact = [], [], []
     for fact in selected:
         for index, template in enumerate(EN_DECLARATIVE[fact["relation"]], start=1):
-            train.append(record(fact, "en", "relation_v2_gate_train", template.format(subject=fact["subject"], answer=fact["object_en"]), fact["object_en"], f"{fact['relation']}_en_gate_decl_{index:02d}"))
+            train.append(record(fact, "en", f"{split_prefix}_train", template.format(subject=fact["subject"], answer=fact["object_en"]), fact["object_en"], f"{fact['relation']}_en_{template_prefix}_decl_{index:02d}"))
         questions = EN_QUESTIONS[fact["relation"]]
         for index in range(2):
             question = questions[index].format(subject=fact["subject"])
-            train.append(record(fact, "en", "relation_v2_gate_train", f"Question: {question}\nAnswer: {fact['object_en']}", fact["object_en"], f"{fact['relation']}_en_gate_qa_{index + 1:02d}"))
-            train.append(record(fact, "en", "relation_v2_gate_train", f"{question} {fact['object_en']}", fact["object_en"], f"{fact['relation']}_en_gate_direct_{index + 1:02d}"))
+            train.append(record(fact, "en", f"{split_prefix}_train", f"Question: {question}\nAnswer: {fact['object_en']}", fact["object_en"], f"{fact['relation']}_en_{template_prefix}_qa_{index + 1:02d}"))
+            train.append(record(fact, "en", f"{split_prefix}_train", f"{question} {fact['object_en']}", fact["object_en"], f"{fact['relation']}_en_{template_prefix}_direct_{index + 1:02d}"))
         heldout = questions[3].format(subject=fact["subject"])
-        validation.append(record(fact, "en", "relation_v2_gate_validation", f"Question: {heldout}\nAnswer: {fact['object_en']}", fact["object_en"], f"{fact['relation']}_en_gate_heldout"))
+        validation.append(record(fact, "en", f"{split_prefix}_validation", f"Question: {heldout}\nAnswer: {fact['object_en']}", fact["object_en"], f"{fact['relation']}_en_{template_prefix}_heldout"))
         prefix = EN_DECLARATIVE[fact["relation"]][0].format(subject=fact["subject"], answer="").rstrip(" .")
-        exact.append({"fact_id": fact["fact_id"], "subject_id": fact["subject_id"], "relation": fact["relation"], "subject": fact["subject"], "question": prefix, "expected_answer": fact["object_en"], "template_id": f"{fact['relation']}_en_gate_exact_prefix"})
-    summary = {"subjects": 10, "facts": 50, "train_rows": len(train), "train_rows_per_fact": 7, "validation_rows": len(validation), "selected_subject_ids": selected_subjects, "relations": list(RELATIONS), "selection_seed": SELECTION_SEED}
+        exact.append({"fact_id": fact["fact_id"], "subject_id": fact["subject_id"], "relation": fact["relation"], "subject": fact["subject"], "question": prefix, "expected_answer": fact["object_en"], "template_id": f"{fact['relation']}_en_{template_prefix}_exact_prefix"})
+    summary = {"subjects": len(selected_subjects), "facts": len(selected), "train_rows": len(train), "train_rows_per_fact": 7, "validation_rows": len(validation), "selected_subject_ids": selected_subjects, "relations": list(RELATIONS), "selection_seed": SELECTION_SEED}
     return train, validation, exact, summary
 
 
-def validate(profiles: list[dict], facts: list[dict], train: list[dict], turkish: list[dict], gate: tuple) -> None:
+def validate(profiles: list[dict], facts: list[dict], train: list[dict], turkish: list[dict], gate: tuple, scale: tuple) -> None:
     if len(profiles) != 5000 or len(facts) != 25000:
         raise ValueError("Expected 5,000 profiles and 25,000 facts")
     if Counter(fact["relation"] for fact in facts) != Counter({relation: 5000 for relation in RELATIONS}):
@@ -311,6 +351,13 @@ def validate(profiles: list[dict], facts: list[dict], train: list[dict], turkish
         raise ValueError("10-subject gate must contain 350 train and 50 validation/probe rows")
     if set(Counter(row["fact_id"] for row in gate_train).values()) != {7}:
         raise ValueError("10-subject gate must contain seven training rows per fact")
+    scale_train, scale_validation, scale_exact, scale_summary = scale
+    if len(scale_train) != 3500 or len(scale_validation) != 500 or len(scale_exact) != 500:
+        raise ValueError("100-subject gate must contain 3,500 train and 500 validation/probe rows")
+    if set(Counter(row["fact_id"] for row in scale_train).values()) != {7}:
+        raise ValueError("100-subject gate must contain seven training rows per fact")
+    if not set(gate[3]["selected_subject_ids"]).issubset(scale_summary["selected_subject_ids"]):
+        raise ValueError("10-subject gate must be nested inside the 100-subject gate")
 
 
 def generate(output_root: Path = OUTPUT_ROOT) -> dict:
@@ -323,7 +370,8 @@ def generate(output_root: Path = OUTPUT_ROOT) -> dict:
     probes_en = build_probes(facts, "en")
     probes_tr = build_probes(facts, "tr")
     gate = build_ten_subject_gate(facts, profiles)
-    validate(profiles, facts, english, turkish, gate)
+    scale = build_hundred_subject_gate(facts, profiles)
+    validate(profiles, facts, english, turkish, gate, scale)
 
     write_csv(output_root / "data/canonical_subject_profiles_5000.csv", profiles)
     write_jsonl(output_root / "output/english_training.jsonl", english)
@@ -336,11 +384,17 @@ def generate(output_root: Path = OUTPUT_ROOT) -> dict:
     write_jsonl(gate_root / "validation.jsonl", gate_validation)
     write_csv(gate_root / "exact_prefix_probes_en.csv", gate_exact)
     write_json(gate_root / "summary.json", gate_summary)
+    scale_train, scale_validation, scale_exact, scale_summary = scale
+    scale_root = output_root / "acquisition_100_subjects_direct"
+    write_jsonl(scale_root / "train.jsonl", scale_train)
+    write_jsonl(scale_root / "validation.jsonl", scale_validation)
+    write_csv(scale_root / "exact_prefix_probes_en.csv", scale_exact)
+    write_json(scale_root / "summary.json", scale_summary)
     write_json(output_root / "output/canonical_generation_summary.json", {"version": "relation_v2", "subjects": 5000, "facts": 25000, "relations": list(RELATIONS), "english_rows": len(english), "turkish_rows": len(turkish), "frequency_rule": "new relations use subject popularity only"})
     write_json(output_root / "output/source_validation_report.json", {"status": "passed", "profile_sha256": sha256(PROFILE_PATH), "assignment_sha256": sha256(ASSIGNMENT_PATH)})
 
     files = [path for path in output_root.rglob("*") if path.is_file() and path.name != "manifest.json"]
-    manifest = {"version": "relation_v2", "relations": list(RELATIONS), "source_sha256": {"profiles": sha256(PROFILE_PATH), "assignments": sha256(ASSIGNMENT_PATH)}, "files": {str(path.relative_to(output_root)): sha256(path) for path in sorted(files)}, "gate": gate_summary}
+    manifest = {"version": "relation_v2", "relations": list(RELATIONS), "source_sha256": {"profiles": sha256(PROFILE_PATH), "assignments": sha256(ASSIGNMENT_PATH)}, "files": {str(path.relative_to(output_root)): sha256(path) for path in sorted(files)}, "gate": gate_summary, "scale_100": scale_summary}
     write_json(output_root / "manifest.json", manifest)
     return manifest
 

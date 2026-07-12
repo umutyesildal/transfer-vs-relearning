@@ -31,12 +31,27 @@ The immediately required 10-subject direct-aware acquisition gate is versioned i
 - held-out validation rows: 50
 - exact-prefix probes: 50
 
+The nested 100-subject scale gate is also versioned in full:
+
+- subjects: 100
+- facts: 500
+- train rows: 3,500
+- rows per fact: 7
+- held-out validation rows: 500
+- exact-prefix probes: 500
+- branch x name-type cells: 25 subjects each
+- contains all ten subjects from the first gate
+
 Pinned hashes:
 
 ```text
-728c040d3ffa7cc1453c1069876104a3cfb2e2a39c243d97de60f97b9a324ebb  manifest.json
+b527fc7939fcefb18cab625dc35c74ea6b9128db2e552a26061c960528181964  manifest.json
 51d5428901fe400dd560690d2e16d43050539dbae1f43439d52ac4471b894919  acquisition_10_subjects_direct/train.jsonl
 9009af074ea5c1ef1bea3f3b9da7602378e80f25c3cacb9340dcabb4fb779f54  acquisition_10_subjects_direct/validation.jsonl
 8f5e91c70a95adf9632b7b90bf8f6a78ded6e8b565e54a63673cfc55764b0cf0  acquisition_10_subjects_direct/exact_prefix_probes_en.csv
 b569603a80854d7e499553b32d24799cb03943f06c682b5402a7148c53e561b9  acquisition_10_subjects_direct/summary.json
+1314417fe8a01afa6e1d7efbf18db082e7ca039dbab2acd0bece0b6fd2f20ff0  acquisition_100_subjects_direct/train.jsonl
+9b1fcae2565fbf0d9c624a2c229c8173a59ca00064db1a017b0f2a5c0c749289  acquisition_100_subjects_direct/validation.jsonl
+1644288d0d62c51c56ceaae71b9eef7225b88326267281c8df8aeef9d7619c8e  acquisition_100_subjects_direct/exact_prefix_probes_en.csv
+a975263abb03d887fa224fb94d402f1fad852afe1ec03cd69226c0874cc32d3b  acquisition_100_subjects_direct/summary.json
 ```

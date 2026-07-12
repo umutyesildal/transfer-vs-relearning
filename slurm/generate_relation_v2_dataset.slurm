@@ -24,4 +24,7 @@ sha256sum \
   output/relation_v2/manifest.json \
   output/relation_v2/acquisition_10_subjects_direct/train.jsonl \
   output/relation_v2/acquisition_10_subjects_direct/validation.jsonl \
-  output/relation_v2/acquisition_10_subjects_direct/exact_prefix_probes_en.csv
+  output/relation_v2/acquisition_10_subjects_direct/exact_prefix_probes_en.csv \
+  output/relation_v2/acquisition_100_subjects_direct/train.jsonl \
+  output/relation_v2/acquisition_100_subjects_direct/validation.jsonl \
+  output/relation_v2/acquisition_100_subjects_direct/exact_prefix_probes_en.csv
