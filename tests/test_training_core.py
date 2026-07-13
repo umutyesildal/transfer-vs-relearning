@@ -4,10 +4,22 @@ from pathlib import Path
 
 from transfer_vs_relearning.training.clm import (
     estimate_optimizer_steps,
+    resolve_training_seeds,
     interval_from_fractions,
     load_training_config,
     safe_run_name,
 )
+
+
+def test_training_data_seed_can_vary_without_changing_split_seed() -> None:
+    assert resolve_training_seeds(
+        {"split_seed": 42},
+        {"seed": 43, "data_seed": 43},
+    ) == (43, 42, 43)
+    assert resolve_training_seeds(
+        {"split_seed": 42},
+        {"seed": 43},
+    ) == (43, 42, 42)
 
 
 def test_safe_run_name_strips_unsafe_characters() -> None:

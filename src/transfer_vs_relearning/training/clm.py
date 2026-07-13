@@ -45,6 +45,16 @@ def estimate_optimizer_steps(
     return math.ceil(steps_per_epoch * num_train_epochs)
 
 
+def resolve_training_seeds(
+    dataset_config: dict[str, Any],
+    training_config: dict[str, Any],
+) -> tuple[int, int, int]:
+    seed = int(training_config.get("seed", 42))
+    split_seed = int(dataset_config.get("split_seed", seed))
+    data_seed = int(training_config.get("data_seed", split_seed))
+    return seed, split_seed, data_seed
+
+
 def interval_from_fractions(total_steps: int, fractions: list[float]) -> int:
     if total_steps <= 1:
         return 1
@@ -185,7 +195,7 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     training_config = config["training"]
     runtime_config = config["runtime"]
 
-    seed = int(training_config.get("seed", 42))
+    seed, split_seed, data_seed = resolve_training_seeds(dataset_config, training_config)
     set_seed(seed)
 
     model_manifest = _read_json(resolve_path(repo_root, model_config["base_model_manifest"]))
@@ -199,7 +209,6 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     train_file = resolve_path(repo_root, dataset_config["train_file"])
     text_field = str(dataset_config.get("text_field", "text"))
     validation_fraction = float(dataset_config.get("validation_fraction", 0.02))
-    split_seed = int(dataset_config.get("split_seed", seed))
     block_size = int(training_config.get("block_size", min(tokenizer.model_max_length, 512)))
     loss_mode = str(training_config.get("loss_mode", "full_sequence"))
 
@@ -338,7 +347,7 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
         "save_strategy": "steps",
         "report_to": [],
         "seed": seed,
-        "data_seed": split_seed,
+        "data_seed": data_seed,
         "bf16": bool(training_config.get("bf16", False)),
         "fp16": bool(training_config.get("fp16", False)),
         "gradient_checkpointing": bool(training_config.get("gradient_checkpointing", False)),
