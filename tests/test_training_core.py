@@ -139,6 +139,7 @@ def test_relation_v2_1_7b_500_fact_config_changes_only_model_capacity_and_memory
     ):
         assert large["training"][key] == small["training"][key]
     assert large["training"]["per_device_train_batch_size"] == 10
+    assert large["training"]["per_device_eval_batch_size"] == 1
     assert large["training"]["gradient_accumulation_steps"] == 50
     assert 10 * 50 == 50 * 10 == 500
     assert estimate_optimizer_steps(3500, 10, 50, 36.0) == 252
