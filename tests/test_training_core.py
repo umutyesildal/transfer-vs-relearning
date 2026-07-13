@@ -124,6 +124,26 @@ def test_relation_v2_500_fact_config_preserves_clean_matched_budget() -> None:
     assert estimate_optimizer_steps(3500, 50, 10, 36.0) == 252
 
 
+def test_relation_v2_1_7b_500_fact_config_changes_only_model_capacity_and_memory_batching() -> None:
+    small = load_training_config(
+        Path("configs/training/m1_smollm2_360m_relation_v2_100_subjects_500_facts_direct_lr1e-4_ep36.yaml")
+    )
+    large = load_training_config(
+        Path("configs/training/m1_smollm2_1_7b_relation_v2_100_subjects_500_facts_direct_lr1e-4_ep36.yaml")
+    )
+    assert large["dataset"] == small["dataset"]
+    assert large["model"]["base_model_manifest"] == "artifacts/models/HuggingFaceTB__SmolLM2-1.7B/model_manifest.json"
+    for key in (
+        "block_size", "learning_rate", "num_train_epochs", "warmup_ratio", "weight_decay",
+        "lr_scheduler_type", "loss_mode", "bf16", "fp16", "max_grad_norm", "seed",
+    ):
+        assert large["training"][key] == small["training"][key]
+    assert large["training"]["per_device_train_batch_size"] == 10
+    assert large["training"]["gradient_accumulation_steps"] == 50
+    assert 10 * 50 == 50 * 10 == 500
+    assert estimate_optimizer_steps(3500, 10, 50, 36.0) == 252
+
+
 def test_relation_v2_2500_fact_exploratory_config_preserves_matched_budget() -> None:
     config = load_training_config(
         Path("configs/training/m1_smollm2_360m_relation_v2_500_subjects_2500_facts_direct_lr1e-4_ep36.yaml")
