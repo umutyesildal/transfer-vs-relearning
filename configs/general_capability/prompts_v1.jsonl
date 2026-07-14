@@ -1,0 +1,31 @@
+{"id":"narrative_01","category":"narrative","prompt":"When the train finally arrived at the small coastal station, Maria stepped onto the platform and"}
+{"id":"narrative_02","category":"narrative","prompt":"The old library had been closed for twenty years. On the first morning after it reopened,"}
+{"id":"narrative_03","category":"narrative","prompt":"Daniel looked at the dark clouds above the mountain and decided that"}
+{"id":"explanation_01","category":"explanation","prompt":"Photosynthesis is the process by which plants"}
+{"id":"explanation_02","category":"explanation","prompt":"The seasons change during the year because"}
+{"id":"explanation_03","category":"explanation","prompt":"A bicycle stays upright while moving partly because"}
+{"id":"procedure_01","category":"procedure","prompt":"To make a simple cup of tea, first"}
+{"id":"procedure_02","category":"procedure","prompt":"Before painting a wooden table, it is useful to"}
+{"id":"procedure_03","category":"procedure","prompt":"If a phone battery is almost empty and no charger is available,"}
+{"id":"factual_01","category":"factual","prompt":"The capital city of France is"}
+{"id":"factual_02","category":"factual","prompt":"Water freezes at a temperature of"}
+{"id":"factual_03","category":"factual","prompt":"The largest planet in the Solar System is"}
+{"id":"qa_01","category":"qa","prompt":"Question: Why does ice float on liquid water?\nAnswer:"}
+{"id":"qa_02","category":"qa","prompt":"Question: What is the main purpose of a compass?\nAnswer:"}
+{"id":"qa_03","category":"qa","prompt":"Question: What happens when plants do not receive enough sunlight?\nAnswer:"}
+{"id":"summary_01","category":"summary","prompt":"The report describes three main causes of urban air pollution: traffic, industrial emissions, and household heating. In summary,"}
+{"id":"summary_02","category":"summary","prompt":"The experiment used the same data for both models but changed the number of parameters. The larger model performed better. The main conclusion is that"}
+{"id":"summary_03","category":"summary","prompt":"Regular exercise can improve cardiovascular health, muscle strength, and sleep quality. Overall,"}
+{"id":"discourse_01","category":"discourse","prompt":"The first proposal was inexpensive, but it carried substantial technical risk. The second proposal cost more; however,"}
+{"id":"discourse_02","category":"discourse","prompt":"The morning began with heavy rain. By noon, the clouds had cleared, and"}
+{"id":"discourse_03","category":"discourse","prompt":"Although the two studies used different methods, both reached the conclusion that"}
+{"id":"instruction_01","category":"instruction_like","prompt":"Write one clear sentence explaining why clean drinking water is important:"}
+{"id":"instruction_02","category":"instruction_like","prompt":"List two practical ways to reduce household energy use:"}
+{"id":"instruction_03","category":"instruction_like","prompt":"Give a short definition of democracy:"}
+{"id":"syntax_01","category":"syntax","prompt":"Neither the manager nor the employees were willing to"}
+{"id":"syntax_02","category":"syntax","prompt":"If the weather had been warmer, the children would have"}
+{"id":"syntax_03","category":"syntax","prompt":"The book that the professor recommended was"}
+{"id":"everyday_01","category":"everyday","prompt":"A person who misses the last bus home might"}
+{"id":"everyday_02","category":"everyday","prompt":"When bread is left in a hot oven for too long,"}
+{"id":"everyday_03","category":"everyday","prompt":"People usually look both ways before crossing a road because"}
+

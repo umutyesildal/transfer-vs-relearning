@@ -1,0 +1,24 @@
+run_name: base_smollm2_1_7b_general_capability
+output_root: runs/evaluation/general_capability/base_smollm2_1_7b
+model_manifest: artifacts/models/HuggingFaceTB__SmolLM2-1.7B/model_manifest.json
+
+data:
+  corpus_file: artifacts/evaluation/general_capability_v1/wikitext2_raw_test.jsonl
+  prompts_file: configs/general_capability/prompts_v1.jsonl
+  completions_file: configs/general_capability/completions_v1.jsonl
+  synthetic_subjects_file: artifacts/datasets/relation_v2_gate_v1/data/canonical_subject_profiles_5000.csv
+
+scoring:
+  block_size: 512
+  batch_size: 4
+  candidate_batch_size: 16
+  bootstrap_samples: 2000
+
+generation:
+  max_new_tokens: 64
+
+runtime:
+  device: cuda
+  bf16: true
+  seed: 42
+

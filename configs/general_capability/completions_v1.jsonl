@@ -1,0 +1,31 @@
+{"id":"geo_01","category":"geography","prompt":"The capital of France is","answer_separator":" ","correct_answer":"Paris","candidates":["Paris","Rome","Madrid","Berlin"]}
+{"id":"geo_02","category":"geography","prompt":"The capital of Japan is","answer_separator":" ","correct_answer":"Tokyo","candidates":["Tokyo","Seoul","Beijing","Bangkok"]}
+{"id":"geo_03","category":"geography","prompt":"The Nile is a river in","answer_separator":" ","correct_answer":"Africa","candidates":["Africa","Europe","Australia","South America"]}
+{"id":"science_01","category":"science","prompt":"The largest planet in the Solar System is","answer_separator":" ","correct_answer":"Jupiter","candidates":["Jupiter","Mars","Venus","Mercury"]}
+{"id":"science_02","category":"science","prompt":"Plants absorb carbon dioxide from the","answer_separator":" ","correct_answer":"air","candidates":["air","soil","rocks","roots"]}
+{"id":"science_03","category":"science","prompt":"At standard pressure, water freezes at","answer_separator":" ","correct_answer":"zero degrees Celsius","candidates":["zero degrees Celsius","ten degrees Celsius","fifty degrees Celsius","one hundred degrees Celsius"]}
+{"id":"science_04","category":"science","prompt":"The organ that pumps blood through the human body is the","answer_separator":" ","correct_answer":"heart","candidates":["heart","lung","liver","kidney"]}
+{"id":"science_05","category":"science","prompt":"A thermometer is used to measure","answer_separator":" ","correct_answer":"temperature","candidates":["temperature","distance","weight","speed"]}
+{"id":"math_01","category":"mathematics","prompt":"Two plus two equals","answer_separator":" ","correct_answer":"four","candidates":["four","three","five","six"]}
+{"id":"math_02","category":"mathematics","prompt":"The square root of nine is","answer_separator":" ","correct_answer":"three","candidates":["three","two","four","nine"]}
+{"id":"math_03","category":"mathematics","prompt":"A triangle has","answer_separator":" ","correct_answer":"three sides","candidates":["three sides","two sides","four sides","five sides"]}
+{"id":"math_04","category":"mathematics","prompt":"Half of one hundred is","answer_separator":" ","correct_answer":"fifty","candidates":["fifty","twenty","forty","seventy"]}
+{"id":"language_01","category":"language","prompt":"The past tense of walk is","answer_separator":" ","correct_answer":"walked","candidates":["walked","walking","walks","walker"]}
+{"id":"language_02","category":"language","prompt":"The opposite of hot is","answer_separator":" ","correct_answer":"cold","candidates":["cold","bright","soft","fast"]}
+{"id":"language_03","category":"language","prompt":"A word with the same meaning as large is","answer_separator":" ","correct_answer":"big","candidates":["big","tiny","short","narrow"]}
+{"id":"language_04","category":"language","prompt":"The plural form of child is","answer_separator":" ","correct_answer":"children","candidates":["children","childs","childed","childing"]}
+{"id":"everyday_01","category":"everyday","prompt":"People commonly use an umbrella when it is","answer_separator":" ","correct_answer":"raining","candidates":["raining","sunny","dark","windless"]}
+{"id":"everyday_02","category":"everyday","prompt":"Food is kept in a refrigerator so that it stays","answer_separator":" ","correct_answer":"cold","candidates":["cold","loud","bright","dry"]}
+{"id":"everyday_03","category":"everyday","prompt":"A key is commonly used to open a","answer_separator":" ","correct_answer":"lock","candidates":["lock","window","book","plate"]}
+{"id":"everyday_04","category":"everyday","prompt":"Before crossing a busy road, a pedestrian should","answer_separator":" ","correct_answer":"look for traffic","candidates":["look for traffic","close their eyes","sit down","turn off the lights"]}
+{"id":"causal_01","category":"causal","prompt":"Ice melts when it becomes sufficiently","answer_separator":" ","correct_answer":"warm","candidates":["warm","heavy","dark","dry"]}
+{"id":"causal_02","category":"causal","prompt":"Plants may wilt if they do not receive enough","answer_separator":" ","correct_answer":"water","candidates":["water","metal","glass","paper"]}
+{"id":"causal_03","category":"causal","prompt":"A glass may break if it is dropped onto a hard","answer_separator":" ","correct_answer":"floor","candidates":["floor","cloud","shadow","sound"]}
+{"id":"tools_01","category":"tools","prompt":"A compass is mainly used to determine","answer_separator":" ","correct_answer":"direction","candidates":["direction","temperature","age","volume"]}
+{"id":"tools_02","category":"tools","prompt":"A clock is used to measure","answer_separator":" ","correct_answer":"time","candidates":["time","color","mass","height"]}
+{"id":"tools_03","category":"tools","prompt":"Scissors are commonly used to","answer_separator":" ","correct_answer":"cut","candidates":["cut","measure","boil","write"]}
+{"id":"biology_01","category":"biology","prompt":"Humans breathe oxygen into their","answer_separator":" ","correct_answer":"lungs","candidates":["lungs","stomach","bones","skin"]}
+{"id":"biology_02","category":"biology","prompt":"Birds typically use their wings to","answer_separator":" ","correct_answer":"fly","candidates":["fly","read","cook","write"]}
+{"id":"time_01","category":"time","prompt":"There are seven days in a","answer_separator":" ","correct_answer":"week","candidates":["week","month","year","hour"]}
+{"id":"time_02","category":"time","prompt":"The day after Monday is","answer_separator":" ","correct_answer":"Tuesday","candidates":["Tuesday","Sunday","Friday","Saturday"]}
+
