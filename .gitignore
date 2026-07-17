@@ -45,3 +45,4 @@ checkpoints/
 *.parquet
 errors.jsonl
 progress.json
+artifacts/pre_m2_followup_v1/
