@@ -76,7 +76,26 @@ def test_probe_registry_crosses_subjects_forms_and_scaffolds() -> None:
 
 def test_real_contract_builder_freezes_expected_counts(tmp_path: Path) -> None:
     repo_root = Path(__file__).resolve().parents[1]
-    output_dir = build_pre_m2_followup_contract(repo_root, output_dir=tmp_path / FOLLOWUP_VERSION)
+    model_dir = tmp_path / "model"
+    model_dir.mkdir()
+    (model_dir / "model.safetensors").write_bytes(b"distinct-test-weights")
+    model_manifest = tmp_path / "model_manifest.json"
+    model_manifest.write_text(
+        json.dumps(
+            {
+                "model_id": "fixture",
+                "resolved_revision": "fixture-revision",
+                "local_path_absolute": str(model_dir),
+                "file_hashes": {"model.safetensors": "stale-declared-hash"},
+            }
+        ),
+        encoding="utf-8",
+    )
+    output_dir = build_pre_m2_followup_contract(
+        repo_root,
+        output_dir=tmp_path / FOLLOWUP_VERSION,
+        model_manifests={"base": model_manifest},
+    )
     integrity = json.loads((output_dir / "manifests/integrity_audit.json").read_text(encoding="utf-8"))
     contract = json.loads((output_dir / "manifests/experimental_contract.json").read_text(encoding="utf-8"))
     assert integrity["status"] == "passed"
@@ -86,6 +105,9 @@ def test_real_contract_builder_freezes_expected_counts(tmp_path: Path) -> None:
     assert integrity["normalized_training_prompt_overlap_count"] == 0
     assert contract["unit_decision"]["subjects"] == 100
     assert contract["unit_decision"]["facts"] == 500
+    provenance = json.loads((output_dir / "manifests/provenance.json").read_text(encoding="utf-8"))
+    assert provenance["models"]["base"]["verification"] == "live_weights_verified"
+    assert provenance["models"]["base"]["manifest_declared_hash_matches_live"] is False
     candidates = json.loads((output_dir / "manifests/candidate_inventory.json").read_text(encoding="utf-8"))
     assert candidates["sizes"] == {
         "city": 130,
