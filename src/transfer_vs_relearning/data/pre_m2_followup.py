@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import platform
 import subprocess
 from collections import Counter
@@ -55,6 +56,7 @@ SCAFFOLDS = {
     "direct": "{question}",
     "qa": "Question: {question}\nAnswer:",
 }
+WP1B_EXPOSURES = ("direct", "qa", "direct", "qa", "direct", "qa", "direct")
 
 
 def _git_value(repo_root: Path, *args: str) -> str | None:
@@ -247,6 +249,237 @@ def template_registry() -> dict[str, Any]:
             "form_c_is_diagnostic_in_first_pilot": True,
         },
     }
+
+
+def _write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    with tmp.open("w", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
+    os.replace(tmp, path)
+
+
+def _wp1b_rows(
+    canonical_rows: list[dict[str, str]],
+    assignments: list[dict[str, Any]],
+    *,
+    condition: str,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    by_subject = {row["subject_id"]: row for row in canonical_rows}
+    train_rows: list[dict[str, Any]] = []
+    validation_rows: list[dict[str, Any]] = []
+    for assignment in sorted(assignments, key=lambda item: item["subject_id"]):
+        subject_id = str(assignment["subject_id"])
+        profile = by_subject[subject_id]
+        form_id = str(assignment["training_form_id"])
+        for relation in RELATIONS:
+            answer_column = RELATION_MAP[relation][0]
+            frequency_column = RELATION_MAP[relation][2]
+            answer = profile[answer_column]
+            question = FORM_TEMPLATES[relation][form_id].format(subject=profile["subject"])
+            fact_id = f"{subject_id}_{relation}"
+            common = {
+                "answer": answer,
+                "branch_group": profile["branch_group"],
+                "condition": condition,
+                "fact_id": fact_id,
+                "frequency_bucket": profile[frequency_column],
+                "language": "en",
+                "name_rarity_bucket": profile["name_rarity_bucket"],
+                "name_type": profile["name_type"],
+                "popularity_bucket": profile["popularity_bucket"],
+                "popularity_rank": profile["popularity_rank"],
+                "relation": relation,
+                "row_id": profile["row_id"],
+                "subject": profile["subject"],
+                "subject_id": subject_id,
+                "training_form_group": assignment["training_form_group"],
+                "training_form_id": form_id,
+            }
+            for exposure_index, scaffold_id in enumerate(WP1B_EXPOSURES, start=1):
+                prompt = SCAFFOLDS[scaffold_id].format(question=question)
+                train_rows.append(
+                    {
+                        **common,
+                        "exposure_index": exposure_index,
+                        "scaffold_id": scaffold_id,
+                        "split": f"wp1b_{condition}_train",
+                        "template_id": f"{relation}_{form_id}_{scaffold_id}_exposure_{exposure_index:02d}",
+                        "text": f"{prompt} {answer}",
+                    }
+                )
+            validation_prompt = SCAFFOLDS["qa"].format(question=question)
+            validation_rows.append(
+                {
+                    **common,
+                    "exposure_index": 0,
+                    "scaffold_id": "qa",
+                    "split": f"wp1b_{condition}_validation",
+                    "template_id": f"{relation}_{form_id}_qa_monitor",
+                    "text": f"{validation_prompt} {answer}",
+                }
+            )
+    return train_rows, validation_rows
+
+
+def build_wp1b_training_datasets(
+    repo_root: Path,
+    *,
+    dataset_dir: Path | None = None,
+    followup_dir: Path | None = None,
+) -> Path:
+    repo_root = repo_root.resolve()
+    dataset_dir = (dataset_dir or repo_root / "artifacts/datasets/relation_v2_gate_v1").resolve()
+    followup_dir = (followup_dir or repo_root / f"artifacts/{FOLLOWUP_VERSION}").resolve()
+    canonical_rows = read_csv_rows(dataset_dir / "data/canonical_subject_profiles_5000.csv")
+    assignments_by_condition = {
+        "original": json.loads(
+            (followup_dir / "manifests/subject_form_assignment.json").read_text(encoding="utf-8")
+        )["assignments"],
+        "swap": json.loads(
+            (followup_dir / "manifests/subject_form_assignment_swap.json").read_text(encoding="utf-8")
+        )["assignments"],
+    }
+    probe_rows = read_csv_rows(followup_dir / "evaluations/paraphrase_probe_registry.csv")
+    probe_keys = {
+        (
+            row["subject_id"],
+            row["relation"],
+            row["form_id"],
+            row["scaffold_id"],
+            normalize_text(row["rendered_prompt"]),
+        )
+        for row in probe_rows
+    }
+    training_root = followup_dir / "training/paraphrase_counterbalance"
+    conditions: dict[str, Any] = {}
+    training_prompt_sets: dict[str, set[tuple[str, str, str, str, str]]] = {}
+
+    for condition, assignments in assignments_by_condition.items():
+        train_rows, validation_rows = _wp1b_rows(canonical_rows, assignments, condition=condition)
+        condition_dir = training_root / "datasets" / condition
+        train_path = condition_dir / "train.jsonl"
+        validation_path = condition_dir / "validation.jsonl"
+        _write_jsonl(train_path, train_rows)
+        _write_jsonl(validation_path, validation_rows)
+
+        assignment_by_subject = {row["subject_id"]: row for row in assignments}
+        fact_counts = Counter(row["fact_id"] for row in train_rows)
+        observed_forms = {
+            subject_id: sorted({row["training_form_id"] for row in train_rows if row["subject_id"] == subject_id})
+            for subject_id in assignment_by_subject
+        }
+        prompt_keys: set[tuple[str, str, str, str, str]] = set()
+        for row in train_rows:
+            answer_start = row["text"].rfind(row["answer"])
+            prompt = row["text"][:answer_start].rstrip()
+            prompt_keys.add(
+                (
+                    row["subject_id"],
+                    row["relation"],
+                    row["training_form_id"],
+                    row["scaffold_id"],
+                    normalize_text(prompt),
+                )
+            )
+        training_prompt_sets[condition] = prompt_keys
+        unmatched_prompt_keys = sorted(prompt_keys - probe_keys)
+        wrong_form_subjects = sorted(
+            subject_id
+            for subject_id, forms in observed_forms.items()
+            if forms != [assignment_by_subject[subject_id]["training_form_id"]]
+        )
+        group_counts = Counter(row["training_form_group"] for row in train_rows)
+        form_counts = Counter(row["training_form_id"] for row in train_rows)
+        scaffold_counts = Counter(row["scaffold_id"] for row in train_rows)
+        status = "passed"
+        if (
+            len(train_rows) != 3500
+            or len(validation_rows) != 500
+            or set(fact_counts.values()) != {len(WP1B_EXPOSURES)}
+            or unmatched_prompt_keys
+            or wrong_form_subjects
+            or group_counts != Counter({"A": 1750, "B": 1750})
+            or form_counts != Counter({"form_a": 1750, "form_b": 1750})
+        ):
+            status = "failed"
+        conditions[condition] = {
+            "status": status,
+            "assignment_manifest": str(
+                Path("manifests")
+                / ("subject_form_assignment.json" if condition == "original" else "subject_form_assignment_swap.json")
+            ),
+            "train_file": str(train_path.relative_to(followup_dir)),
+            "train_sha256": sha256_file(train_path),
+            "train_rows": len(train_rows),
+            "validation_file": str(validation_path.relative_to(followup_dir)),
+            "validation_sha256": sha256_file(validation_path),
+            "validation_rows": len(validation_rows),
+            "facts": len(fact_counts),
+            "rows_per_fact": sorted(set(fact_counts.values())),
+            "group_row_counts": dict(sorted(group_counts.items())),
+            "form_row_counts": dict(sorted(form_counts.items())),
+            "scaffold_row_counts": dict(sorted(scaffold_counts.items())),
+            "unique_training_prompt_count": len(prompt_keys),
+            "unmatched_probe_prompt_keys": unmatched_prompt_keys,
+            "wrong_form_subjects": wrong_form_subjects,
+        }
+        if status != "passed":
+            raise ValueError(f"WP1B {condition} integrity failed: {conditions[condition]}")
+
+    original_by_subject = {row["subject_id"]: row for row in assignments_by_condition["original"]}
+    swap_by_subject = {row["subject_id"]: row for row in assignments_by_condition["swap"]}
+    swap_mismatches = sorted(
+        subject_id
+        for subject_id in original_by_subject
+        if original_by_subject[subject_id]["training_form_id"]
+        == swap_by_subject[subject_id]["training_form_id"]
+    )
+    shared_training_prompts = sorted(training_prompt_sets["original"] & training_prompt_sets["swap"])
+    manifest = {
+        "version": FOLLOWUP_VERSION,
+        "experiment": "wp1b_counterbalanced_training_form",
+        "status": "passed" if not swap_mismatches and not shared_training_prompts else "failed",
+        "fact_graph": {"subjects": 100, "relations": 5, "facts": 500},
+        "exposure_contract": {
+            "rows_per_fact": len(WP1B_EXPOSURES),
+            "scaffold_sequence": list(WP1B_EXPOSURES),
+            "rows_per_condition": 3500,
+            "optimizer_update_budget_must_match": True,
+            "objective": "answer_only_with_eos",
+        },
+        "conditions": conditions,
+        "swap_a_b_assignment_mismatch_subjects": swap_mismatches,
+        "shared_original_swap_training_prompt_count": len(shared_training_prompts),
+        "shared_original_swap_training_prompt_keys": shared_training_prompts,
+        "heldout_contract": {
+            "all_subjects_evaluated_on": ["form_a", "form_b", "form_c"],
+            "crossed_form_never_used_for_that_subject_in_training": True,
+            "form_c_never_used_in_training": True,
+            "validation_split_is_training_form_monitoring_only": True,
+            "scientific_results_must_use_frozen_probe_registry": True,
+        },
+    }
+    manifest_path = training_root / "dataset_manifest.json"
+    write_json(manifest_path, manifest)
+    if manifest["status"] != "passed":
+        raise ValueError(f"WP1B cross-condition integrity failed: {manifest}")
+    write_json(
+        training_root / "dataset_hashes.json",
+        {
+            "dataset_manifest.json": sha256_file(manifest_path),
+            **{
+                condition_data["train_file"]: condition_data["train_sha256"]
+                for condition_data in conditions.values()
+            },
+            **{
+                condition_data["validation_file"]: condition_data["validation_sha256"]
+                for condition_data in conditions.values()
+            },
+        },
+    )
+    return training_root
 
 
 def build_pre_m2_followup_contract(

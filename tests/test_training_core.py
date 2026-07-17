@@ -310,6 +310,39 @@ def test_m1_smollm2_plain_high_exposure_config_returns_to_original_dataset() -> 
     assert config["training"]["learning_rate"] == 2.0e-5
 
 
+def test_pre_m2_wp1b_configs_match_except_for_condition_paths() -> None:
+    original = load_training_config(Path("configs/training/pre_m2_wp1b_smollm2_1_7b_original.yaml"))
+    swap = load_training_config(Path("configs/training/pre_m2_wp1b_smollm2_1_7b_swap.yaml"))
+    assert original["dataset"]["train_file"].endswith("/original/train.jsonl")
+    assert swap["dataset"]["train_file"].endswith("/swap/train.jsonl")
+    assert original["training"]["output_root"].endswith("/original")
+    assert swap["training"]["output_root"].endswith("/swap")
+    for key in (
+        "block_size",
+        "learning_rate",
+        "num_train_epochs",
+        "per_device_train_batch_size",
+        "per_device_eval_batch_size",
+        "gradient_accumulation_steps",
+        "warmup_ratio",
+        "weight_decay",
+        "lr_scheduler_type",
+        "loss_mode",
+        "supervise_eos",
+        "bf16",
+        "gradient_checkpointing",
+        "max_grad_norm",
+        "checkpoint_fractions",
+        "save_total_limit",
+        "seed",
+        "data_seed",
+    ):
+        assert original["training"][key] == swap["training"][key]
+    assert original["training"]["learning_rate"] == 1.0e-4
+    assert original["training"]["num_train_epochs"] == 36.0
+    assert original["training"]["supervise_eos"] is True
+
+
 def test_m1_smollm2_ranking_config_points_to_bioqa_dataset_and_small_model() -> None:
     config = load_training_config(Path("configs/training/m1_smollm2_360m_english_fact_ranking_lr2e-5_ep3.yaml"))
     assert config["dataset"]["version"] == "synthetic_v1_bio_qa"

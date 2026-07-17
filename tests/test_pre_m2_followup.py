@@ -11,6 +11,7 @@ from transfer_vs_relearning.data.pre_m2_followup import (
     assignment_balance,
     build_paraphrase_probes,
     build_pre_m2_followup_contract,
+    build_wp1b_training_datasets,
     counterbalanced_subject_assignment,
     template_registry,
 )
@@ -117,6 +118,28 @@ def test_real_contract_builder_freezes_expected_counts(tmp_path: Path) -> None:
     }
     with (output_dir / "evaluations/paraphrase_probe_registry.csv").open(encoding="utf-8", newline="") as handle:
         assert sum(1 for _ in csv.DictReader(handle)) == 3000
+
+
+def test_wp1b_builder_preserves_budget_and_reverses_every_subject(tmp_path: Path) -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    followup_dir = build_pre_m2_followup_contract(repo_root, output_dir=tmp_path / FOLLOWUP_VERSION)
+    training_root = build_wp1b_training_datasets(repo_root, followup_dir=followup_dir)
+    manifest = json.loads((training_root / "dataset_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["status"] == "passed"
+    assert manifest["fact_graph"] == {"subjects": 100, "relations": 5, "facts": 500}
+    assert manifest["exposure_contract"]["rows_per_fact"] == 7
+    assert manifest["shared_original_swap_training_prompt_count"] == 0
+    assert manifest["swap_a_b_assignment_mismatch_subjects"] == []
+    for condition in ("original", "swap"):
+        summary = manifest["conditions"][condition]
+        assert summary["status"] == "passed"
+        assert summary["train_rows"] == 3500
+        assert summary["validation_rows"] == 500
+        assert summary["rows_per_fact"] == [7]
+        assert summary["group_row_counts"] == {"A": 1750, "B": 1750}
+        assert summary["form_row_counts"] == {"form_a": 1750, "form_b": 1750}
+        assert summary["scaffold_row_counts"] == {"direct": 2000, "qa": 1500}
+        assert summary["unique_training_prompt_count"] == 1000
 
 
 def test_teacher_forced_token_records_use_causal_shift_and_explicit_eos() -> None:

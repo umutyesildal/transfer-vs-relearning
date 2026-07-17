@@ -1,0 +1,40 @@
+dataset:
+  version: pre_m2_followup_v1_wp1b_swap
+  dataset_dir: artifacts/pre_m2_followup_v1/training/paraphrase_counterbalance/datasets/swap
+  dataset_manifest: artifacts/pre_m2_followup_v1/training/paraphrase_counterbalance/dataset_manifest.json
+  train_file: artifacts/pre_m2_followup_v1/training/paraphrase_counterbalance/datasets/swap/train.jsonl
+  validation_file: artifacts/pre_m2_followup_v1/training/paraphrase_counterbalance/datasets/swap/validation.jsonl
+  text_field: text
+  answer_field: answer
+  split_seed: 42
+
+model:
+  base_model_manifest: artifacts/models/HuggingFaceTB__SmolLM2-1.7B/model_manifest.json
+
+training:
+  run_name: pre_m2_wp1b_smollm2_1_7b_swap
+  output_root: /vol/tmp2/yesildau/pre_m2_followup_v1/training/paraphrase_counterbalance/swap
+  block_size: 128
+  learning_rate: 1.0e-4
+  num_train_epochs: 36.0
+  per_device_train_batch_size: 10
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 50
+  warmup_ratio: 0.02
+  weight_decay: 0.0
+  lr_scheduler_type: constant_with_warmup
+  loss_mode: answer_only
+  supervise_eos: true
+  bf16: true
+  fp16: false
+  gradient_checkpointing: true
+  max_grad_norm: 1.0
+  logging_steps: 5
+  checkpoint_fractions: [0.1, 0.25, 0.5, 0.75, 1.0]
+  save_total_limit: 12
+  seed: 42
+  data_seed: 42
+
+runtime:
+  local_files_only: true
+  world_size: 1
