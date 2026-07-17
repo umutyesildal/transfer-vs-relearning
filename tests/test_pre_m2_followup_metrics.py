@@ -3,9 +3,12 @@ from __future__ import annotations
 import pytest
 
 from transfer_vs_relearning.metrics.pre_m2_followup import (
+    accuracy_slice_summary,
+    bootstrap_accuracy_interval,
     exact_mcnemar_pvalue,
     paired_bootstrap_accuracy_difference,
     paired_form_comparisons,
+    robust_intersection_summary,
     token_likelihood_summary,
 )
 
@@ -24,6 +27,9 @@ def test_paired_bootstrap_is_deterministic_and_preserves_direction() -> None:
     assert one == two
     assert one[0] == 0.5
     assert one[1] <= one[0] <= one[2]
+    accuracy = bootstrap_accuracy_interval(first, samples=200, seed=7)
+    assert accuracy[0] == 0.75
+    assert accuracy[1] <= accuracy[0] <= accuracy[2]
 
 
 def test_form_comparison_uses_paired_fact_cells() -> None:
@@ -75,3 +81,25 @@ def test_token_likelihood_summary_keeps_eos_positions_separate() -> None:
     summary = token_likelihood_summary(rows)
     assert len(summary) == 2
     assert {row["eos_position"] for row in summary} == {"after_prompt", "after_answer_1"}
+
+
+def test_accuracy_and_six_cell_intersection_summaries() -> None:
+    rows = []
+    for form_id in ("form_a", "form_b", "form_c"):
+        for scaffold_id in ("direct", "qa"):
+            rows.append(
+                {
+                    "model_label": "m",
+                    "fact_id": "f1",
+                    "relation": "born_in",
+                    "form_id": form_id,
+                    "scaffold_id": scaffold_id,
+                    "correct_rank_mean": 1,
+                }
+            )
+    accuracy = accuracy_slice_summary(rows, bootstrap_samples=20)
+    assert len(accuracy) == 6
+    assert all(row["top1_accuracy"] == 1.0 for row in accuracy)
+    robust = robust_intersection_summary(rows)
+    assert {row["relation"] for row in robust} == {"ALL", "born_in"}
+    assert all(row["all_form_all_scaffold_intersection"] == 1 for row in robust)

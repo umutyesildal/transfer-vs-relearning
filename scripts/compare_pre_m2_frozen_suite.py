@@ -5,7 +5,12 @@ import argparse
 import json
 from pathlib import Path
 
-from transfer_vs_relearning.metrics.pre_m2_followup import paired_form_comparisons, token_likelihood_summary
+from transfer_vs_relearning.metrics.pre_m2_followup import (
+    accuracy_slice_summary,
+    paired_form_comparisons,
+    robust_intersection_summary,
+    token_likelihood_summary,
+)
 from transfer_vs_relearning.utils.io import read_csv_rows, sha256_file, write_csv, write_json
 
 
@@ -48,6 +53,15 @@ def main() -> None:
     )
     token_rows_summary = token_likelihood_summary(token_rows)
     write_csv(args.output_dir / "paired_form_comparisons.csv", comparison_rows)
+    write_csv(
+        args.output_dir / "accuracy_with_bootstrap_ci.csv",
+        accuracy_slice_summary(
+            fact_rows,
+            bootstrap_samples=args.bootstrap_samples,
+            seed=args.bootstrap_seed,
+        ),
+    )
+    write_csv(args.output_dir / "robust_intersections.csv", robust_intersection_summary(fact_rows))
     write_csv(args.output_dir / "token_likelihood_summary.csv", token_rows_summary)
     write_json(
         args.output_dir / "comparison_manifest.json",

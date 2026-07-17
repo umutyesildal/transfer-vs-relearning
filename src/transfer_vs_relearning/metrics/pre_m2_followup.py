@@ -42,6 +42,25 @@ def paired_bootstrap_accuracy_difference(
     return observed, differences[lower_index], differences[upper_index]
 
 
+def bootstrap_accuracy_interval(
+    values: list[bool],
+    *,
+    samples: int = 2000,
+    seed: int = 20260717,
+) -> tuple[float, float, float]:
+    if not values:
+        raise ValueError("Bootstrap input must be non-empty")
+    rng = random.Random(seed)
+    estimates = []
+    for _ in range(samples):
+        estimates.append(sum(int(values[rng.randrange(len(values))]) for _ in values) / len(values))
+    estimates.sort()
+    lower_index = max(0, int(0.025 * samples) - 1)
+    upper_index = min(samples - 1, math.ceil(0.975 * samples) - 1)
+    observed = sum(values) / len(values)
+    return observed, estimates[lower_index], estimates[upper_index]
+
+
 def paired_form_comparisons(
     rows: list[dict[str, Any]],
     *,
@@ -121,6 +140,74 @@ def token_likelihood_summary(rows: list[dict[str, Any]]) -> list[dict[str, Any]]
                 "mean_token_ppl": sum(float(row["token_ppl"]) for row in group) / len(group),
                 "min_nll": min(nll_values),
                 "max_nll": max(nll_values),
+            }
+        )
+    return output
+
+
+def accuracy_slice_summary(
+    rows: list[dict[str, Any]],
+    *,
+    bootstrap_samples: int = 2000,
+    seed: int = 20260717,
+) -> list[dict[str, Any]]:
+    groups: dict[tuple[str, str, str, str], list[bool]] = defaultdict(list)
+    for row in rows:
+        key = (
+            str(row["model_label"]),
+            str(row["relation"]),
+            str(row["form_id"]),
+            str(row["scaffold_id"]),
+        )
+        groups[key].append(int(row["correct_rank_mean"]) == 1)
+    output = []
+    for group_index, (key, values) in enumerate(sorted(groups.items())):
+        accuracy, ci_low, ci_high = bootstrap_accuracy_interval(
+            values,
+            samples=bootstrap_samples,
+            seed=seed + group_index,
+        )
+        output.append(
+            {
+                "model_label": key[0],
+                "relation": key[1],
+                "form_id": key[2],
+                "scaffold_id": key[3],
+                "n": len(values),
+                "top1": sum(values),
+                "top1_accuracy": accuracy,
+                "bootstrap_ci_low": ci_low,
+                "bootstrap_ci_high": ci_high,
+                "bootstrap_samples": bootstrap_samples,
+            }
+        )
+    return output
+
+
+def robust_intersection_summary(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    by_fact: dict[tuple[str, str, str], dict[tuple[str, str], bool]] = defaultdict(dict)
+    for row in rows:
+        key = (str(row["model_label"]), str(row["relation"]), str(row["fact_id"]))
+        by_fact[key][(str(row["form_id"]), str(row["scaffold_id"]))] = int(row["correct_rank_mean"]) == 1
+    by_slice: dict[tuple[str, str], list[dict[tuple[str, str], bool]]] = defaultdict(list)
+    for (model_label, relation, _), cells in by_fact.items():
+        if len(cells) == 6:
+            by_slice[(model_label, relation)].append(cells)
+            by_slice[(model_label, "ALL")].append(cells)
+    output = []
+    for (model_label, relation), facts in sorted(by_slice.items()):
+        direct_all = sum(all(cells[(form_id, "direct")] for form_id in ("form_a", "form_b", "form_c")) for cells in facts)
+        qa_all = sum(all(cells[(form_id, "qa")] for form_id in ("form_a", "form_b", "form_c")) for cells in facts)
+        all_six = sum(all(cells.values()) for cells in facts)
+        output.append(
+            {
+                "model_label": model_label,
+                "relation": relation,
+                "n": len(facts),
+                "direct_all_form_intersection": direct_all,
+                "qa_all_form_intersection": qa_all,
+                "all_form_all_scaffold_intersection": all_six,
+                "all_form_all_scaffold_accuracy": all_six / len(facts),
             }
         )
     return output
