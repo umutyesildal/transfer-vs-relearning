@@ -8,6 +8,7 @@ from pathlib import Path
 
 from transfer_vs_relearning.metrics.pre_m2_followup import (
     accuracy_slice_summary,
+    answer_sequence_likelihood_summary,
     paired_form_comparisons,
     robust_intersection_summary,
     repeatability_audit,
@@ -84,6 +85,10 @@ def main() -> None:
     )
     write_csv(args.output_dir / "robust_intersections.csv", robust_intersection_summary(fact_rows))
     write_csv(args.output_dir / "token_likelihood_summary.csv", token_rows_summary)
+    write_csv(
+        args.output_dir / "answer_sequence_likelihood_summary.csv",
+        answer_sequence_likelihood_summary(token_rows),
+    )
     repeat_audit = {"status": "not_run"}
     if args.repeat_reference_dir is not None:
         reference_manifest = json.loads(

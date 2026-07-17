@@ -48,6 +48,7 @@ test -s "${SCRATCH_ROOT}/comparison/accuracy_with_bootstrap_ci.csv"
 test -s "${SCRATCH_ROOT}/comparison/paired_form_comparisons.csv"
 test -s "${SCRATCH_ROOT}/comparison/robust_intersections.csv"
 test -s "${SCRATCH_ROOT}/comparison/token_likelihood_summary.csv"
+test -s "${SCRATCH_ROOT}/comparison/answer_sequence_likelihood_summary.csv"
 
 echo "__COMPARISON_MANIFEST__"
 cat "${SCRATCH_ROOT}/comparison/comparison_manifest.json"

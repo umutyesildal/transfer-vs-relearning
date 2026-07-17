@@ -4,6 +4,7 @@ import pytest
 
 from transfer_vs_relearning.metrics.pre_m2_followup import (
     accuracy_slice_summary,
+    answer_sequence_likelihood_summary,
     bootstrap_accuracy_interval,
     exact_mcnemar_pvalue,
     paired_bootstrap_accuracy_difference,
@@ -125,3 +126,26 @@ def test_repeatability_audit_hashes_overlapping_prediction_rows() -> None:
     assert passed["status"] == "passed"
     failed = repeatability_audit([row], [{**row, "predicted_object_id": "b"}])
     assert failed["status"] == "failed"
+
+
+def test_answer_sequence_summary_selects_final_eos_position() -> None:
+    common = {
+        "model_label": "m",
+        "probe_id": "p",
+        "relation": "born_in",
+        "form_id": "form_a",
+        "scaffold_id": "direct",
+        "candidate_role": "gold",
+    }
+    rows = [
+        {**common, "score_type": "answer_token", "answer_position": "1", "nll": "2.0"},
+        {**common, "score_type": "answer_token", "answer_position": "2", "nll": "1.0"},
+        {**common, "score_type": "eos_token", "eos_position": "after_prompt", "nll": "5.0"},
+        {**common, "score_type": "eos_token", "eos_position": "after_answer_1", "nll": "4.0"},
+        {**common, "score_type": "eos_token", "eos_position": "after_answer_2", "nll": "0.1"},
+    ]
+    summary = answer_sequence_likelihood_summary(rows)
+    assert summary[0]["mean_first_answer_nll"] == 2.0
+    assert summary[0]["mean_answer_nll"] == 1.5
+    assert summary[0]["mean_prompt_eos_nll"] == 5.0
+    assert summary[0]["mean_final_eos_nll"] == 0.1

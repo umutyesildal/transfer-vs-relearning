@@ -147,6 +147,48 @@ def token_likelihood_summary(rows: list[dict[str, Any]]) -> list[dict[str, Any]]
     return output
 
 
+def answer_sequence_likelihood_summary(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    sequences: dict[tuple[str, str, str], list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        sequences[(str(row["model_label"]), str(row["probe_id"]), str(row["candidate_role"]))].append(row)
+    groups: dict[tuple[str, ...], list[dict[str, float]]] = defaultdict(list)
+    fields = ("model_label", "relation", "form_id", "scaffold_id", "candidate_role")
+    for sequence_rows in sequences.values():
+        answer_rows = [row for row in sequence_rows if row["score_type"] == "answer_token"]
+        if not answer_rows:
+            continue
+        first_answer = min(answer_rows, key=lambda row: int(row["answer_position"]))
+        final_position = max(int(row["answer_position"]) for row in answer_rows)
+        prompt_eos = next(row for row in sequence_rows if row.get("eos_position") == "after_prompt")
+        final_eos = next(
+            row for row in sequence_rows if row.get("eos_position") == f"after_answer_{final_position}"
+        )
+        key = tuple(str(first_answer[field]) for field in fields)
+        groups[key].append(
+            {
+                "first_answer_nll": float(first_answer["nll"]),
+                "mean_answer_nll": sum(float(row["nll"]) for row in answer_rows) / len(answer_rows),
+                "prompt_eos_nll": float(prompt_eos["nll"]),
+                "final_eos_nll": float(final_eos["nll"]),
+                "answer_token_count": float(len(answer_rows)),
+            }
+        )
+    output = []
+    for key, group in sorted(groups.items()):
+        output.append(
+            {
+                **dict(zip(fields, key, strict=True)),
+                "n": len(group),
+                "mean_first_answer_nll": sum(row["first_answer_nll"] for row in group) / len(group),
+                "mean_answer_nll": sum(row["mean_answer_nll"] for row in group) / len(group),
+                "mean_prompt_eos_nll": sum(row["prompt_eos_nll"] for row in group) / len(group),
+                "mean_final_eos_nll": sum(row["final_eos_nll"] for row in group) / len(group),
+                "mean_answer_token_count": sum(row["answer_token_count"] for row in group) / len(group),
+            }
+        )
+    return output
+
+
 def accuracy_slice_summary(
     rows: list[dict[str, Any]],
     *,
