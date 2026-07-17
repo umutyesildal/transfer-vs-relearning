@@ -385,13 +385,27 @@ def build_pre_m2_followup_contract(
     for label, path in (model_manifests or {}).items():
         resolved_path = path.resolve()
         payload = json.loads(resolved_path.read_text(encoding="utf-8"))
+        model_dir_value = payload.get("local_path_absolute") or payload.get("local_path")
+        if not model_dir_value:
+            raise ValueError(f"Model manifest lacks local path: {resolved_path}")
+        model_dir = Path(str(model_dir_value)).resolve()
+        weights_path = model_dir / "model.safetensors"
+        if not weights_path.is_file():
+            raise FileNotFoundError(f"Model weights missing for {label}: {weights_path}")
+        live_weights_sha256 = sha256_file(weights_path)
+        declared_weights_sha256 = payload.get("file_hashes", {}).get("model.safetensors")
         resolved_models[label] = {
-            "verification": "manifest_verified",
+            "verification": "live_weights_verified",
             "manifest_path": str(resolved_path),
             "manifest_sha256": sha256_file(resolved_path),
             "model_id": payload.get("model_id"),
             "resolved_revision": payload.get("resolved_revision"),
-            "local_path": payload.get("local_path_absolute") or payload.get("local_path"),
+            "local_path": str(model_dir),
+            "weights_path": str(weights_path),
+            "weights_bytes": weights_path.stat().st_size,
+            "live_weights_sha256": live_weights_sha256,
+            "manifest_declared_weights_sha256": declared_weights_sha256,
+            "manifest_declared_hash_matches_live": declared_weights_sha256 == live_weights_sha256,
         }
     environment: dict[str, Any] = {"python": platform.python_version()}
     for module_name in ("torch", "transformers"):

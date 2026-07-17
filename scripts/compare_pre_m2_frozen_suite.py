@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
@@ -12,6 +13,21 @@ from transfer_vs_relearning.metrics.pre_m2_followup import (
     token_likelihood_summary,
 )
 from transfer_vs_relearning.utils.io import read_csv_rows, sha256_file, write_csv, write_json
+
+
+def tokenizer_fingerprint(model_manifest_path: Path) -> dict[str, object]:
+    from transfer_vs_relearning.evaluation.evaluator import _resolve_tokenizer_path
+
+    payload = json.loads(model_manifest_path.read_text(encoding="utf-8"))
+    tokenizer_path = _resolve_tokenizer_path(payload, model_manifest_path)
+    names = ("tokenizer.json", "tokenizer_config.json", "special_tokens_map.json", "vocab.json", "merges.txt")
+    file_hashes = {
+        name: sha256_file(tokenizer_path / name)
+        for name in names
+        if (tokenizer_path / name).is_file()
+    }
+    fingerprint = hashlib.sha256(json.dumps(file_hashes, sort_keys=True).encode("utf-8")).hexdigest()
+    return {"path": str(tokenizer_path), "file_hashes": file_hashes, "fingerprint_sha256": fingerprint}
 
 
 def main() -> None:
@@ -25,6 +41,7 @@ def main() -> None:
     fact_rows = []
     token_rows = []
     manifests = []
+    tokenizer_fingerprints = []
     labels = set()
     for run_dir in args.run_dir:
         summary = json.loads((run_dir / "summary.json").read_text(encoding="utf-8"))
@@ -36,13 +53,15 @@ def main() -> None:
             raise ValueError(f"Duplicate model label: {label}")
         labels.add(label)
         manifests.append(manifest)
+        tokenizer_fingerprints.append(tokenizer_fingerprint(Path(manifest["model_manifest"])))
         fact_rows.extend(read_csv_rows(run_dir / "hard_suite_per_fact.csv"))
         token_rows.extend(read_csv_rows(run_dir / "teacher_forced_per_token.csv"))
 
     probe_hashes = {manifest["probe_registry_sha256"] for manifest in manifests}
     dataset_hashes = {manifest["dataset_manifest_sha256"] for manifest in manifests}
     tokenizer_classes = {manifest["tokenizer_class"] for manifest in manifests}
-    if len(probe_hashes) != 1 or len(dataset_hashes) != 1 or len(tokenizer_classes) != 1:
+    tokenizer_hashes = {item["fingerprint_sha256"] for item in tokenizer_fingerprints}
+    if len(probe_hashes) != 1 or len(dataset_hashes) != 1 or len(tokenizer_classes) != 1 or len(tokenizer_hashes) != 1:
         raise ValueError("Matched comparison integrity failed for probe, dataset, or tokenizer identity")
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -71,6 +90,8 @@ def main() -> None:
             "probe_registry_sha256": next(iter(probe_hashes)),
             "dataset_manifest_sha256": next(iter(dataset_hashes)),
             "tokenizer_class": next(iter(tokenizer_classes)),
+            "tokenizer_fingerprint_sha256": next(iter(tokenizer_hashes)),
+            "tokenizer_artifacts": tokenizer_fingerprints,
             "bootstrap_samples": args.bootstrap_samples,
             "bootstrap_seed": args.bootstrap_seed,
             "inputs": [
