@@ -10,6 +10,7 @@ from transfer_vs_relearning.metrics.pre_m2_followup import (
     accuracy_slice_summary,
     paired_form_comparisons,
     robust_intersection_summary,
+    repeatability_audit,
     token_likelihood_summary,
 )
 from transfer_vs_relearning.utils.io import read_csv_rows, sha256_file, write_csv, write_json
@@ -36,6 +37,7 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--bootstrap-samples", type=int, default=2000)
     parser.add_argument("--bootstrap-seed", type=int, default=20260717)
+    parser.add_argument("--repeat-reference-dir", type=Path, default=None)
     args = parser.parse_args()
 
     fact_rows = []
@@ -82,6 +84,26 @@ def main() -> None:
     )
     write_csv(args.output_dir / "robust_intersections.csv", robust_intersection_summary(fact_rows))
     write_csv(args.output_dir / "token_likelihood_summary.csv", token_rows_summary)
+    repeat_audit = {"status": "not_run"}
+    if args.repeat_reference_dir is not None:
+        reference_manifest = json.loads(
+            (args.repeat_reference_dir / "run_manifest.json").read_text(encoding="utf-8")
+        )
+        matching_labels = {
+            manifest["model_label"]
+            for manifest in manifests
+            if manifest["model_manifest_sha256"] == reference_manifest["model_manifest_sha256"]
+        }
+        if len(matching_labels) != 1:
+            raise ValueError("Repeatability reference did not resolve to exactly one comparison model")
+        matching_label = next(iter(matching_labels))
+        repeat_audit = repeatability_audit(
+            read_csv_rows(args.repeat_reference_dir / "hard_suite_per_fact.csv"),
+            [row for row in fact_rows if row["model_label"] == matching_label],
+        )
+        write_json(args.output_dir / "repeatability_audit.json", repeat_audit)
+        if repeat_audit["status"] != "passed":
+            raise ValueError("Repeated evaluation did not reproduce overlapping per-fact rows")
     write_json(
         args.output_dir / "comparison_manifest.json",
         {
@@ -94,6 +116,7 @@ def main() -> None:
             "tokenizer_artifacts": tokenizer_fingerprints,
             "bootstrap_samples": args.bootstrap_samples,
             "bootstrap_seed": args.bootstrap_seed,
+            "repeatability_audit_status": repeat_audit["status"],
             "inputs": [
                 {
                     "run_dir": str(run_dir.resolve()),

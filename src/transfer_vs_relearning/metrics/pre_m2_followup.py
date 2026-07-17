@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import math
+import hashlib
+import json
 import random
 from collections import defaultdict
 from typing import Any
@@ -211,3 +213,52 @@ def robust_intersection_summary(rows: list[dict[str, Any]]) -> list[dict[str, An
             }
         )
     return output
+
+
+def repeatability_audit(
+    reference_rows: list[dict[str, Any]],
+    candidate_rows: list[dict[str, Any]],
+) -> dict[str, Any]:
+    fields = (
+        "probe_id",
+        "correct_object_id",
+        "predicted_object_id",
+        "correct_rank_mean",
+        "correct_mean_score",
+        "best_incorrect_mean_score",
+        "margin",
+        "gold_mean_answer_nll",
+        "gold_first_answer_token_nll",
+        "gold_eos_after_prompt_nll",
+        "gold_eos_preferred_to_first_answer",
+        "failure_type",
+    )
+    candidate_by_probe = {str(row["probe_id"]): row for row in candidate_rows}
+    comparisons = []
+    for reference in reference_rows:
+        probe_id = str(reference["probe_id"])
+        candidate = candidate_by_probe.get(probe_id)
+        if candidate is None:
+            comparisons.append({"probe_id": probe_id, "status": "missing"})
+            continue
+        reference_payload = {field: str(reference.get(field, "")) for field in fields}
+        candidate_payload = {field: str(candidate.get(field, "")) for field in fields}
+        reference_hash = hashlib.sha256(json.dumps(reference_payload, sort_keys=True).encode("utf-8")).hexdigest()
+        candidate_hash = hashlib.sha256(json.dumps(candidate_payload, sort_keys=True).encode("utf-8")).hexdigest()
+        comparisons.append(
+            {
+                "probe_id": probe_id,
+                "status": "matched" if reference_hash == candidate_hash else "mismatch",
+                "reference_row_sha256": reference_hash,
+                "candidate_row_sha256": candidate_hash,
+            }
+        )
+    status_counts = defaultdict(int)
+    for row in comparisons:
+        status_counts[row["status"]] += 1
+    return {
+        "status": "passed" if status_counts["matched"] == len(comparisons) else "failed",
+        "reference_rows": len(reference_rows),
+        "status_counts": dict(sorted(status_counts.items())),
+        "comparisons": comparisons,
+    }

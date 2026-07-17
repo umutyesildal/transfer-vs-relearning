@@ -9,6 +9,7 @@ from transfer_vs_relearning.metrics.pre_m2_followup import (
     paired_bootstrap_accuracy_difference,
     paired_form_comparisons,
     robust_intersection_summary,
+    repeatability_audit,
     token_likelihood_summary,
 )
 
@@ -103,3 +104,24 @@ def test_accuracy_and_six_cell_intersection_summaries() -> None:
     robust = robust_intersection_summary(rows)
     assert {row["relation"] for row in robust} == {"ALL", "born_in"}
     assert all(row["all_form_all_scaffold_intersection"] == 1 for row in robust)
+
+
+def test_repeatability_audit_hashes_overlapping_prediction_rows() -> None:
+    row = {
+        "probe_id": "p1",
+        "correct_object_id": "a",
+        "predicted_object_id": "a",
+        "correct_rank_mean": "1",
+        "correct_mean_score": "-1.0",
+        "best_incorrect_mean_score": "-2.0",
+        "margin": "1.0",
+        "gold_mean_answer_nll": "1.0",
+        "gold_first_answer_token_nll": "1.0",
+        "gold_eos_after_prompt_nll": "2.0",
+        "gold_eos_preferred_to_first_answer": "False",
+        "failure_type": "none",
+    }
+    passed = repeatability_audit([row], [{**row, "model_label": "base"}])
+    assert passed["status"] == "passed"
+    failed = repeatability_audit([row], [{**row, "predicted_object_id": "b"}])
+    assert failed["status"] == "failed"
