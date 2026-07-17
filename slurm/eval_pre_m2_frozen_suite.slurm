@@ -60,7 +60,8 @@ export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 
 module load anaconda/3-2024.06
-conda run --name xfer-relearn python scripts/evaluate_pre_m2_frozen_suite.py \
+eval_args=(
+  scripts/evaluate_pre_m2_frozen_suite.py
   --model-label "${MODEL_LABEL}" \
   --model-manifest "${resolved_model_manifest}" \
   --dataset-dir "${resolved_dataset}" \
@@ -68,6 +69,11 @@ conda run --name xfer-relearn python scripts/evaluate_pre_m2_frozen_suite.py \
   --output-dir "${resolved_output}" \
   --candidate-batch-size 64 \
   --checkpoint-interval 25
+)
+if [[ -n "${PROBE_LIMIT:-}" ]]; then
+  eval_args+=(--probe-limit "${PROBE_LIMIT}")
+fi
+conda run --name xfer-relearn python "${eval_args[@]}"
 
 du -xsh "${HU_HOME_ROOT}"
 df -h "${HU_HOME_ROOT}" /vol/tmp /vol/tmp2

@@ -20,6 +20,7 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--candidate-batch-size", type=int, default=64)
     parser.add_argument("--checkpoint-interval", type=int, default=25)
+    parser.add_argument("--probe-limit", type=int, default=None)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
     parser.add_argument("--no-bf16", action="store_true")
     parser.add_argument("--resume", action="store_true")
@@ -32,6 +33,7 @@ def main() -> None:
         output_dir=args.output_dir,
         candidate_batch_size=args.candidate_batch_size,
         checkpoint_interval=args.checkpoint_interval,
+        probe_limit=args.probe_limit,
         device=args.device,
         bf16=not args.no_bf16,
     ).run(resume=args.resume)

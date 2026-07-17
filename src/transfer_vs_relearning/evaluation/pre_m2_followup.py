@@ -235,6 +235,7 @@ class PreM2FrozenEvaluator:
         output_dir: Path,
         candidate_batch_size: int = 64,
         checkpoint_interval: int = 25,
+        probe_limit: int | None = None,
         device: str = "cuda",
         bf16: bool = True,
     ) -> None:
@@ -245,6 +246,7 @@ class PreM2FrozenEvaluator:
         self.output_dir = output_dir.resolve()
         self.candidate_batch_size = candidate_batch_size
         self.checkpoint_interval = checkpoint_interval
+        self.probe_limit = probe_limit
         self.device_request = device
         self.bf16 = bf16
 
@@ -259,6 +261,10 @@ class PreM2FrozenEvaluator:
         completed = {row["probe_id"] for row in existing_facts}
 
         probes = read_csv_rows(self.probe_registry)
+        if self.probe_limit is not None:
+            if self.probe_limit <= 0:
+                raise ValueError("probe_limit must be positive")
+            probes = probes[: self.probe_limit]
         probe_ids = [probe["probe_id"] for probe in probes]
         if len(probe_ids) != len(set(probe_ids)):
             raise ValueError("Probe registry contains duplicate probe IDs")
@@ -418,6 +424,7 @@ class PreM2FrozenEvaluator:
                 "started_at": started_at,
                 "completed_at": datetime.now(timezone.utc).isoformat(),
                 "candidate_batch_size": self.candidate_batch_size,
+                "probe_limit": self.probe_limit,
                 "eos_in_answer_metric": False,
             },
         )
