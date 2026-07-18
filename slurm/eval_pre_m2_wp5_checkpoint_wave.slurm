@@ -74,7 +74,8 @@ conda run --name xfer-relearn python scripts/evaluate_pre_m2_frozen_suite.py \
   --probe-registry artifacts/pre_m2_followup_v1/evaluations/paraphrase_probe_registry.csv \
   --output-dir "${hard_output}" \
   --candidate-batch-size 64 \
-  --checkpoint-interval 25
+  --checkpoint-interval 25 \
+  --resume
 conda run --name xfer-relearn python scripts/evaluate_facts.py --config "${exact_config}"
 conda run --name xfer-relearn python scripts/evaluate_general_capability.py --config "${general_config}"
 

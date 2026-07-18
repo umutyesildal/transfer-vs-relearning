@@ -18,6 +18,7 @@ from transfer_vs_relearning.data.pre_m2_followup import (
 from transfer_vs_relearning.evaluation.pre_m2_followup import (
     _confusable_relation,
     _forced_choice_rows,
+    _has_relation_columns,
     _intersection_rows,
     _summary_rows,
     conditional_token_records,
@@ -224,6 +225,16 @@ def test_wp3_confusable_relations_are_bidirectional() -> None:
     assert _confusable_relation("field_of_study") == "studied_at"
     assert _confusable_relation("works_at") == "works_in_industry"
     assert _confusable_relation("works_in_industry") == "works_at"
+
+
+def test_wp3_confusable_columns_are_not_required_by_relation_v2_profiles() -> None:
+    relation_v2_row = _canonical_rows(1)[0]
+    assert "university_en" not in relation_v2_row
+    assert "employer_en" not in relation_v2_row
+    for relation in ("field_of_study", "works_in_industry"):
+        confusable = _confusable_relation(relation)
+        assert confusable is not None
+        assert not _has_relation_columns(relation_v2_row, confusable)
 
 
 def test_forced_choice_summary_parses_resumed_rows() -> None:

@@ -14,7 +14,7 @@ from transfer_vs_relearning.data.candidates import (
     candidate_for_fact,
     resolve_expected_answer,
 )
-from transfer_vs_relearning.data.constants import DATASET_FILES
+from transfer_vs_relearning.data.constants import DATASET_FILES, RELATION_MAP
 from transfer_vs_relearning.evaluation.evaluator import (
     _manifest_local_path,
     _resolve_path,
@@ -168,6 +168,11 @@ def _confusable_relation(relation: str) -> str | None:
         "works_at": "works_in_industry",
         "works_in_industry": "works_at",
     }.get(relation)
+
+
+def _has_relation_columns(row: dict[str, Any], relation: str) -> bool:
+    en_column, tr_column, _ = RELATION_MAP[relation]
+    return en_column in row and tr_column in row
 
 
 def _as_bool(value: Any) -> bool:
@@ -344,15 +349,17 @@ class PreM2FrozenEvaluator:
             confusable_relation = _confusable_relation(relation)
             confusable_object_id = None
             if confusable_relation:
-                confusable = candidate_for_fact(
-                    canonical_by_subject[probe["subject_id"]],
-                    confusable_relation,
-                    inventories,
-                )
-                confusable_object_id = confusable.object_id
-                selected_candidates.append(
-                    ("same_subject_confusable", confusable.object_id, confusable.object_en, False)
-                )
+                canonical_row = canonical_by_subject[probe["subject_id"]]
+                if _has_relation_columns(canonical_row, confusable_relation):
+                    confusable = candidate_for_fact(
+                        canonical_row,
+                        confusable_relation,
+                        inventories,
+                    )
+                    confusable_object_id = confusable.object_id
+                    selected_candidates.append(
+                        ("same_subject_confusable", confusable.object_id, confusable.object_en, False)
+                    )
 
             summaries: dict[str, dict[str, Any]] = {}
             for candidate_role, object_id, surface, is_correct in selected_candidates:
