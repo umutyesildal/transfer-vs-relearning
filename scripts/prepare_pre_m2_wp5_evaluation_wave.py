@@ -56,6 +56,7 @@ def main() -> None:
                 training_checkpoint=f"checkpoint-{step}",
                 training_run_dir=run_dir,
             )
+            print(f"frozen={label}", flush=True)
             general_output = output_root / "general_capability" / label
             general_config_path = output_root / "general_configs" / f"{label}.json"
             write_json(

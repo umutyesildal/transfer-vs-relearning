@@ -12,6 +12,7 @@ def test_create_local_model_manifest_retargets_existing_source_manifest(tmp_path
     local_model_dir.mkdir(parents=True)
     (local_model_dir / "config.json").write_text("local-config", encoding="utf-8")
     (local_model_dir / "model.safetensors").write_bytes(b"local-weights")
+    (local_model_dir / "optimizer.pt").write_bytes(b"excluded-optimizer-state")
     output_manifest = tmp_path / "local_manifest.json"
     source_payload = {
         "model_id": "HuggingFaceTB/SmolLM2-360M",

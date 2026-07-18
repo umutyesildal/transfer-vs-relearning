@@ -8,6 +8,15 @@ from typing import Any
 from transfer_vs_relearning.utils.io import sha256_file, write_json
 
 
+EXCLUDED_TRAINER_STATE_FILES = {
+    "optimizer.pt",
+    "scheduler.pt",
+    "rng_state.pth",
+    "trainer_state.json",
+    "training_args.bin",
+}
+
+
 def create_local_model_manifest(
     *,
     source_manifest_path: Path,
@@ -23,7 +32,11 @@ def create_local_model_manifest(
     output_manifest_path = output_manifest_path.resolve()
     if not local_model_dir.is_dir():
         raise FileNotFoundError(f"Local model directory does not exist: {local_model_dir}")
-    local_files = sorted(path for path in local_model_dir.iterdir() if path.is_file())
+    local_files = sorted(
+        path
+        for path in local_model_dir.iterdir()
+        if path.is_file() and path.name not in EXCLUDED_TRAINER_STATE_FILES
+    )
     if not local_files:
         raise ValueError(f"Local model directory contains no files: {local_model_dir}")
 
