@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from transfer_vs_relearning.training.clm import (
+    _answer_only_labels,
     _answer_char_span,
     _token_label_mask_from_offsets,
     load_training_config,
@@ -71,8 +72,12 @@ def main() -> None:
         keep = _token_label_mask_from_offsets(list(offsets), answer_start=answer_start, answer_end=answer_end)
         ids = list(input_ids) + [tokenizer.eos_token_id]
         mask = list(attention_mask) + [1]
-        labels = [-100 if not flag else token_id for token_id, flag in zip(ids[:-1], keep, strict=True)]
-        labels.append(tokenizer.eos_token_id)
+        labels = _answer_only_labels(
+            ids[:-1],
+            keep,
+            tokenizer.eos_token_id,
+            supervise_eos=bool(training.get("supervise_eos", True)),
+        )
         padding = block_size - len(ids)
         batch_input_ids.append(ids + [tokenizer.pad_token_id] * padding)
         batch_attention_mask.append(mask + [0] * padding)
@@ -106,6 +111,7 @@ def main() -> None:
                 "model_weights_sha256": live_hash,
                 "batch_size": args.batch_size,
                 "block_size": block_size,
+                "supervise_eos": bool(training.get("supervise_eos", True)),
                 "loss": float(output.loss.detach().cpu()),
                 "gradient_tensors": gradient_tensors,
                 "gpu": torch.cuda.get_device_name(0),

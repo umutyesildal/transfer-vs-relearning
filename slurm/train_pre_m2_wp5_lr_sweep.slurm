@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+#SBATCH --job-name=pre-m2-wp5-lr
+#SBATCH --account=yesildau
+#SBATCH --partition=gpu
+#SBATCH --gres=gpu:a10080gb:1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=64G
+#SBATCH --time=02:00:00
+#SBATCH --output=/vol/tmp2/yesildau/pre_m2_followup_v1/logs/%x-%j.out
+#SBATCH --error=/vol/tmp2/yesildau/pre_m2_followup_v1/logs/%x-%j.err
+
+set -euo pipefail
+
+REPO_ROOT="${SLURM_SUBMIT_DIR:-$(pwd)}"
+HU_HOME_ROOT="/vol/fob-vol6/mi25/yesildau"
+SCRATCH_ROOT="/vol/tmp2/yesildau/pre_m2_followup_v1"
+: "${LR_LABEL:?LR_LABEL must be lr2e-5, lr5e-5, lr1e-4, or lr2e-4}"
+MODE="${MODE:-train}"
+
+case "${LR_LABEL}" in
+  lr2e-5|lr5e-5|lr1e-4|lr2e-4) ;;
+  *) echo "Unsupported WP5 LR label: ${LR_LABEL}" >&2; exit 2 ;;
+esac
+case "${MODE}" in
+  smoke|train) ;;
+  *) echo "Unsupported WP5 mode: ${MODE}" >&2; exit 2 ;;
+esac
+
+CONFIG_PATH="${CONFIG_PATH:-configs/training/pre_m2_wp5_${LR_LABEL}_eos_true.yaml}"
+LAUNCH_MANIFEST="${SCRATCH_ROOT}/launch/wp5_${LR_LABEL}_eos_true_${SLURM_JOB_ID}.json"
+mkdir -p "${SCRATCH_ROOT}"/{cache/huggingface,cache/torch,logs,tmp,launch,smoke}
+cd "${REPO_ROOT}"
+
+resolved_artifacts="$(readlink -f "${REPO_ROOT}/artifacts")"
+resolved_runs="$(readlink -f "${REPO_ROOT}/runs")"
+resolved_model="$(readlink -f artifacts/models/HuggingFaceTB__SmolLM2-1.7B/effd688a12921b4cc83e3312b6feb579f70f9c71/model.safetensors)"
+for resolved_path in "${resolved_artifacts}" "${resolved_runs}" "${resolved_model}"; do
+  case "${resolved_path}" in
+    /vol/tmp/yesildau/*|/vol/tmp2/yesildau/*) ;;
+    *) echo "Path does not resolve to approved scratch: ${resolved_path}" >&2; exit 1 ;;
+  esac
+done
+
+echo "hostname=$(hostname)"
+echo "slurm_job_id=${SLURM_JOB_ID}"
+echo "lr_label=${LR_LABEL}"
+echo "mode=${MODE}"
+echo "config=${CONFIG_PATH}"
+echo "artifacts=${resolved_artifacts}"
+echo "runs=${resolved_runs}"
+echo "base_model=${resolved_model}"
+echo "expected_train_rows=3500"
+echo "expected_validation_rows=500"
+echo "expected_optimizer_steps=252"
+echo "expected_checkpoint_count_upper_bound=11"
+echo "estimated_condition_bytes_upper_bound=225000000000"
+echo "estimated_new_three_condition_family_bytes_upper_bound=675000000000"
+echo "retention=selected Pareto model plus manifests and compact evidence; non-selected optimizer checkpoints removable"
+
+du -xsh "${HU_HOME_ROOT}"
+df -h "${HU_HOME_ROOT}" /vol/tmp /vol/tmp2
+df -i "${HU_HOME_ROOT}" /vol/tmp /vol/tmp2
+nvidia-smi --query-gpu=name,memory.total,memory.free --format=csv,noheader
+
+export HF_HOME="${SCRATCH_ROOT}/cache/huggingface"
+export TRANSFORMERS_CACHE="${SCRATCH_ROOT}/cache/huggingface"
+export XDG_CACHE_HOME="${SCRATCH_ROOT}/cache"
+export TORCH_HOME="${SCRATCH_ROOT}/cache/torch"
+export TMPDIR="${SCRATCH_ROOT}/tmp"
+export HF_HUB_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
+
+module load anaconda/3-2024.06
+conda run --name xfer-relearn python scripts/freeze_pre_m2_wp1b_launch.py \
+  --config "${CONFIG_PATH}" \
+  --output "${LAUNCH_MANIFEST}"
+
+if [[ "${MODE}" == "smoke" ]]; then
+  conda run --name xfer-relearn python scripts/smoke_pre_m2_wp1b_batch.py \
+    --config "${CONFIG_PATH}" \
+    --batch-size 2
+else
+  conda run --name xfer-relearn python scripts/train_clm.py --config "${CONFIG_PATH}"
+fi
+
+du -xsh "${HU_HOME_ROOT}"
+df -h "${HU_HOME_ROOT}" /vol/tmp /vol/tmp2
+df -i "${HU_HOME_ROOT}" /vol/tmp /vol/tmp2
+find "${HU_HOME_ROOT}" -xdev -type f -size +500M -printf '%s %p\n' | sort -nr

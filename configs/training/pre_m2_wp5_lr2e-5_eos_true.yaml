@@ -1,0 +1,40 @@
+dataset:
+  version: relation_v2_gate_v1_100_subjects_500_facts_direct
+  dataset_dir: artifacts/datasets/relation_v2_gate_v1
+  dataset_manifest: artifacts/datasets/relation_v2_gate_v1/manifest.json
+  train_file: artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/train.jsonl
+  validation_file: artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/validation.jsonl
+  text_field: text
+  answer_field: answer
+  split_seed: 42
+
+model:
+  base_model_manifest: artifacts/models/HuggingFaceTB__SmolLM2-1.7B/model_manifest.json
+
+training:
+  run_name: pre_m2_wp5_lr2e-5_eos_true
+  output_root: /vol/tmp2/yesildau/pre_m2_followup_v1/training/wp5_lr_sweep/lr2e-5_eos_true
+  block_size: 128
+  learning_rate: 2.0e-5
+  num_train_epochs: 36.0
+  per_device_train_batch_size: 10
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 50
+  warmup_ratio: 0.02
+  weight_decay: 0.0
+  lr_scheduler_type: constant_with_warmup
+  loss_mode: answer_only
+  supervise_eos: true
+  bf16: true
+  fp16: false
+  gradient_checkpointing: true
+  max_grad_norm: 1.0
+  logging_steps: 5
+  checkpoint_fractions: [0.1, 0.25, 0.5, 0.75, 1.0]
+  save_total_limit: 12
+  seed: 42
+  data_seed: 42
+
+runtime:
+  local_files_only: true
+  world_size: 1

@@ -3,12 +3,27 @@ from __future__ import annotations
 from pathlib import Path
 
 from transfer_vs_relearning.training.clm import (
+    _answer_only_labels,
     estimate_optimizer_steps,
     resolve_training_seeds,
     interval_from_fractions,
     load_training_config,
     safe_run_name,
 )
+
+
+def test_eos_ablation_masks_only_the_eos_label() -> None:
+    input_ids = [10, 11, 12, 13]
+    answer_mask = [False, False, True, True]
+    with_eos = _answer_only_labels(
+        input_ids, answer_mask, 99, supervise_eos=True
+    )
+    without_eos = _answer_only_labels(
+        input_ids, answer_mask, 99, supervise_eos=False
+    )
+    assert with_eos == [-100, -100, 12, 13, 99]
+    assert without_eos == [-100, -100, 12, 13, -100]
+    assert with_eos[:-1] == without_eos[:-1]
 
 
 def test_training_data_seed_can_vary_without_changing_split_seed() -> None:
@@ -341,6 +356,48 @@ def test_pre_m2_wp1b_configs_match_except_for_condition_paths() -> None:
     assert original["training"]["learning_rate"] == 1.0e-4
     assert original["training"]["num_train_epochs"] == 36.0
     assert original["training"]["supervise_eos"] is True
+
+
+def test_pre_m2_wp5_lr_sweep_is_a_controlled_four_value_grid() -> None:
+    labels = ("lr2e-5", "lr5e-5", "lr1e-4", "lr2e-4")
+    configs = [
+        load_training_config(Path(f"configs/training/pre_m2_wp5_{label}_eos_true.yaml"))
+        for label in labels
+    ]
+    assert [config["training"]["learning_rate"] for config in configs] == [
+        2.0e-5,
+        5.0e-5,
+        1.0e-4,
+        2.0e-4,
+    ]
+    reference = configs[2]
+    for config in configs:
+        assert config["dataset"] == reference["dataset"]
+        assert config["model"] == reference["model"]
+        for key in (
+            "block_size",
+            "num_train_epochs",
+            "per_device_train_batch_size",
+            "per_device_eval_batch_size",
+            "gradient_accumulation_steps",
+            "warmup_ratio",
+            "weight_decay",
+            "lr_scheduler_type",
+            "loss_mode",
+            "supervise_eos",
+            "bf16",
+            "fp16",
+            "gradient_checkpointing",
+            "max_grad_norm",
+            "logging_steps",
+            "checkpoint_fractions",
+            "save_total_limit",
+            "seed",
+            "data_seed",
+        ):
+            assert config["training"][key] == reference["training"][key]
+        assert config["training"]["supervise_eos"] is True
+        assert estimate_optimizer_steps(3500, 10, 50, 36.0) == 252
 
 
 def test_m1_smollm2_ranking_config_points_to_bioqa_dataset_and_small_model() -> None:

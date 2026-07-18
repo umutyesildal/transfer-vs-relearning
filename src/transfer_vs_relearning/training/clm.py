@@ -90,6 +90,23 @@ def _token_label_mask_from_offsets(
     return mask
 
 
+def _answer_only_labels(
+    input_ids: list[int],
+    label_mask: list[bool],
+    eos_token_id: int,
+    *,
+    supervise_eos: bool,
+) -> list[int]:
+    if len(input_ids) != len(label_mask):
+        raise ValueError("Answer-only input IDs and label mask must have equal length")
+    labels = [
+        token_id if keep else -100
+        for token_id, keep in zip(input_ids, label_mask, strict=True)
+    ]
+    labels.append(eos_token_id if supervise_eos else -100)
+    return labels
+
+
 def run_from_config(config_path: Path, repo_root: Path | None = None) -> Path:
     repo_root = (repo_root or Path.cwd()).resolve()
     config_path = config_path.resolve()
@@ -233,6 +250,7 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
 
     if loss_mode == "answer_only":
         answer_field = str(dataset_config.get("answer_field", "answer"))
+        supervise_eos = bool(training_config.get("supervise_eos", True))
         for split_name in ("train", "test"):
             if answer_field not in raw_split[split_name].column_names:
                 raise ValueError(f"Answer field {answer_field!r} not found in {split_name} dataset")
@@ -268,8 +286,12 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
                 )
                 input_ids = list(input_ids) + [eos_id]
                 attention_mask = list(attention_mask) + [1]
-                labels = [-100 if not keep else token_id for token_id, keep in zip(input_ids[:-1], label_mask, strict=True)]
-                labels.append(eos_id)
+                labels = _answer_only_labels(
+                    input_ids[:-1],
+                    label_mask,
+                    eos_id,
+                    supervise_eos=supervise_eos,
+                )
 
                 pad_len = block_size - len(input_ids)
                 if pad_len < 0:
