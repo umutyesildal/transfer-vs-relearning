@@ -7,9 +7,8 @@ from transfer_vs_relearning.models.local_manifest import create_local_model_mani
 
 
 def test_create_local_model_manifest_retargets_existing_source_manifest(tmp_path: Path) -> None:
-    repo_root = Path.cwd()
     source_manifest = tmp_path / "source_manifest.json"
-    local_model_dir = repo_root / "runs" / "training" / "demo_run" / "final_model"
+    local_model_dir = tmp_path / "training" / "demo_run" / "final_model"
     local_model_dir.mkdir(parents=True)
     (local_model_dir / "config.json").write_text("local-config", encoding="utf-8")
     (local_model_dir / "model.safetensors").write_bytes(b"local-weights")
@@ -33,7 +32,7 @@ def test_create_local_model_manifest_retargets_existing_source_manifest(tmp_path
         output_manifest_path=output_manifest,
         model_id="m1_stage_a/final_model",
         resolved_revision="local-final-model",
-        training_run_dir=repo_root / "runs" / "training" / "demo_run",
+        training_run_dir=tmp_path / "training" / "demo_run",
     )
 
     saved = json.loads(output_manifest.read_text(encoding="utf-8"))
@@ -42,9 +41,9 @@ def test_create_local_model_manifest_retargets_existing_source_manifest(tmp_path
     assert payload["model_id"] == "m1_stage_a/final_model"
     assert payload["resolved_revision"] == "local-final-model"
     assert payload["local_path_absolute"] == str(local_model_dir.resolve())
-    assert payload["local_path_project_relative"] == "runs/training/demo_run/final_model"
+    assert payload["local_path_project_relative"] == str(local_model_dir.resolve())
     assert payload["tokenizer_source_path"] == "artifacts/models/HuggingFaceTB__SmolLM2-360M/base-revision"
     assert payload["tokenizer_source_path_absolute"] == "/abs/base/path"
-    assert payload["training_run_dir"] == str((repo_root / "runs" / "training" / "demo_run").resolve())
+    assert payload["training_run_dir"] == str((tmp_path / "training" / "demo_run").resolve())
     assert set(payload["file_hashes"]) == {"config.json", "model.safetensors"}
     assert payload["file_hashes"]["config.json"] != "abc"
