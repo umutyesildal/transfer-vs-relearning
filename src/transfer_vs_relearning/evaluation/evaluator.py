@@ -132,6 +132,12 @@ def relation_binding_is_applicable(relations: list[str] | tuple[str, ...]) -> bo
     return {"born_in", "lives_in"}.issubset(relations)
 
 
+def with_default_probe_language(
+    rows: list[dict[str, Any]], language: str
+) -> list[dict[str, Any]]:
+    return [{**row, "language": row.get("language") or language} for row in rows]
+
+
 class CausalCandidateEvaluator:
     def __init__(self, config: dict[str, Any], run_dir: Path):
         self.config = config
@@ -217,18 +223,24 @@ class CausalCandidateEvaluator:
         probe_files = self.config.get("probe_files", {})
         if "en" in self.config["languages"]:
             probes.extend(
-                read_csv_rows(
-                    _resolve_path(probe_files["en"])
-                    if "en" in probe_files
-                    else dataset_dir / DATASET_FILES["probes_en"]
+                with_default_probe_language(
+                    read_csv_rows(
+                        _resolve_path(probe_files["en"])
+                        if "en" in probe_files
+                        else dataset_dir / DATASET_FILES["probes_en"]
+                    ),
+                    "en",
                 )
             )
         if "tr" in self.config["languages"]:
             probes.extend(
-                read_csv_rows(
-                    _resolve_path(probe_files["tr"])
-                    if "tr" in probe_files
-                    else dataset_dir / DATASET_FILES["probes_tr"]
+                with_default_probe_language(
+                    read_csv_rows(
+                        _resolve_path(probe_files["tr"])
+                        if "tr" in probe_files
+                        else dataset_dir / DATASET_FILES["probes_tr"]
+                    ),
+                    "tr",
                 )
             )
         probes = [
