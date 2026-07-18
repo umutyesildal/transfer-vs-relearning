@@ -207,32 +207,48 @@ def _intersection_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     grouped: dict[tuple[str, str], dict[str, dict[str, Any]]] = defaultdict(dict)
     for row in rows:
         grouped[(str(row["fact_id"]), str(row["scaffold_id"]))][str(row["form_id"])] = row
+    required_forms = sorted({str(row["form_id"]) for row in rows})
+    if not required_forms:
+        return []
     relation_groups: dict[tuple[str, str], list[dict[str, dict[str, Any]]]] = defaultdict(list)
     for form_rows in grouped.values():
-        if set(form_rows) != {"form_a", "form_b", "form_c"}:
+        if set(form_rows) != set(required_forms):
             continue
-        sample = form_rows["form_a"]
+        sample = form_rows[required_forms[0]]
         relation_groups[(str(sample["relation"]), str(sample["scaffold_id"]))].append(form_rows)
     output: list[dict[str, Any]] = []
     for (relation, scaffold_id), facts in sorted(relation_groups.items()):
         success = {
             form_id: {str(rows_by_form[form_id]["fact_id"]) for rows_by_form in facts if int(rows_by_form[form_id]["correct_rank_mean"]) == 1}
-            for form_id in ("form_a", "form_b", "form_c")
+            for form_id in required_forms
         }
-        output.append(
-            {
-                "relation": relation,
-                "scaffold_id": scaffold_id,
-                "n": len(facts),
-                "form_a_top1": len(success["form_a"]),
-                "form_b_top1": len(success["form_b"]),
-                "form_c_top1": len(success["form_c"]),
-                "a_b_intersection": len(success["form_a"] & success["form_b"]),
-                "a_c_intersection": len(success["form_a"] & success["form_c"]),
-                "b_c_intersection": len(success["form_b"] & success["form_c"]),
-                "all_form_intersection": len(success["form_a"] & success["form_b"] & success["form_c"]),
-            }
-        )
+        result: dict[str, Any] = {"relation": relation, "scaffold_id": scaffold_id, "n": len(facts)}
+        result.update({f"{form_id}_top1": len(success[form_id]) for form_id in required_forms})
+        for index, left in enumerate(required_forms):
+            for right in required_forms[index + 1 :]:
+                result[f"{left[5:]}_{right[5:]}_intersection"] = len(success[left] & success[right])
+        intersection = set.intersection(*(success[form_id] for form_id in required_forms))
+        result["all_form_intersection"] = len(intersection)
+        output.append(result)
+    return output
+
+
+def _all_cell_intersection_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Summarize facts correct in every observed form-by-scaffold cell."""
+    cells = sorted({(str(row["form_id"]), str(row["scaffold_id"])) for row in rows})
+    if not cells:
+        return []
+    grouped: dict[str, dict[tuple[str, str], dict[str, Any]]] = defaultdict(dict)
+    for row in rows:
+        grouped[str(row["fact_id"])][(str(row["form_id"]), str(row["scaffold_id"]))] = row
+    by_relation: dict[str, list[dict[tuple[str, str], dict[str, Any]]]] = defaultdict(list)
+    for fact_rows in grouped.values():
+        if set(fact_rows) == set(cells):
+            by_relation[str(next(iter(fact_rows.values()))["relation"])].append(fact_rows)
+    output: list[dict[str, Any]] = []
+    for relation, facts in sorted(by_relation.items()):
+        complete = sum(all(int(fact_rows[cell]["correct_rank_mean"]) == 1 for cell in cells) for fact_rows in facts)
+        output.append({"relation": relation, "n": len(facts), "required_cells": len(cells), "all_cell_intersection": complete})
     return output
 
 
@@ -389,7 +405,7 @@ class PreM2FrozenEvaluator:
                     failure_type = "same_subject_relation_swap"
                 elif summaries["gold"]["eos_preferred_to_first_answer"]:
                     failure_type = "early_eos_preference"
-                elif probe["form_id"] in {"form_a", "form_b", "form_c"}:
+                elif probe["form_id"] in {"form_a", "form_b", "form_c", "form_d"}:
                     failure_type = "prompt_form_failure"
                 else:
                     failure_type = "unclassified"
@@ -443,6 +459,7 @@ class PreM2FrozenEvaluator:
         write_csv(per_token_path, token_rows)
         write_csv(self.output_dir / "summary_by_relation_form.csv", _summary_rows(fact_rows))
         write_csv(self.output_dir / "form_intersections.csv", _intersection_rows(fact_rows))
+        write_csv(self.output_dir / "all_cell_intersections.csv", _all_cell_intersection_rows(fact_rows))
         forced_choice_rows = _forced_choice_rows(fact_rows)
         write_csv(self.output_dir / "relation_swapped_forced_choice.csv", forced_choice_rows)
         failure_counts = Counter(str(row["failure_type"]) for row in fact_rows)

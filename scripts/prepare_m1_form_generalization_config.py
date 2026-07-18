@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+
+import yaml
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Materialize a scratch-rooted form-generalization training config.")
+    parser.add_argument("--source-config", type=Path, required=True)
+    parser.add_argument("--dataset-root", type=Path, required=True)
+    parser.add_argument("--output-root", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    payload = yaml.safe_load(args.source_config.read_text(encoding="utf-8"))
+    dataset_root = args.dataset_root.resolve()
+    output_root = args.output_root.resolve()
+    condition = "balanced_ab" if "balanced_ab" in payload["dataset"]["version"] else "control"
+    payload["dataset"]["dataset_dir"] = str(dataset_root)
+    payload["dataset"]["dataset_manifest"] = str(dataset_root / "dataset_manifest.json")
+    payload["dataset"]["train_file"] = str(dataset_root / "datasets" / condition / "train.jsonl")
+    payload["dataset"]["validation_file"] = str(dataset_root / "datasets" / condition / "validation.jsonl")
+    payload["training"]["output_root"] = str(output_root)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

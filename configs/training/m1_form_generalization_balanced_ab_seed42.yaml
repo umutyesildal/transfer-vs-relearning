@@ -1,0 +1,40 @@
+dataset:
+  version: m1_form_generalization_v1_balanced_ab
+  dataset_dir: artifacts/m1_form_generalization_v1
+  dataset_manifest: artifacts/m1_form_generalization_v1/dataset_manifest.json
+  train_file: artifacts/m1_form_generalization_v1/datasets/balanced_ab/train.jsonl
+  validation_file: artifacts/m1_form_generalization_v1/datasets/balanced_ab/validation.jsonl
+  text_field: text
+  answer_field: answer
+  split_seed: 42
+
+model:
+  base_model_manifest: artifacts/models/HuggingFaceTB__SmolLM2-1.7B/model_manifest.json
+
+training:
+  run_name: m1_form_generalization_balanced_ab_seed42
+  output_root: /vol/tmp2/yesildau/m1_form_generalization_v1/training/balanced_ab_seed42
+  block_size: 128
+  learning_rate: 5.0e-5
+  num_train_epochs: 36.0
+  per_device_train_batch_size: 10
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 50
+  warmup_ratio: 0.02
+  weight_decay: 0.0
+  lr_scheduler_type: constant_with_warmup
+  loss_mode: answer_only
+  supervise_eos: false
+  bf16: true
+  fp16: false
+  gradient_checkpointing: true
+  max_grad_norm: 1.0
+  logging_steps: 5
+  checkpoint_fractions: [0.1, 0.25, 0.5, 0.75, 1.0]
+  save_total_limit: 12
+  seed: 42
+  data_seed: 42
+
+runtime:
+  local_files_only: true
+  world_size: 1
