@@ -19,6 +19,7 @@ SCRATCH_ROOT="/vol/tmp2/yesildau/pre_m2_followup_v1"
 cd "${REPO_ROOT}"
 
 registry_line="$(sed -n "$((SLURM_ARRAY_TASK_ID + 2))p" "${WP5_REGISTRY}")"
+registry_line="${registry_line%$'\r'}"
 if [[ -z "${registry_line}" ]]; then
   echo "No registry row for array index ${SLURM_ARRAY_TASK_ID}" >&2
   exit 2
