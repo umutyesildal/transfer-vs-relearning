@@ -422,6 +422,30 @@ def test_pre_m2_wp5_eos_ablation_changes_only_final_eos_supervision() -> None:
         assert "/vol/tmp2/yesildau/" in eos_false["training"]["output_root"]
 
 
+def test_pre_m2_wp5_seed43_replication_is_a_controlled_eos_pair() -> None:
+    seed42 = load_training_config(Path("configs/training/pre_m2_wp5_lr5e-5_eos_false.yaml"))
+    pair = [
+        load_training_config(
+            Path(f"configs/training/pre_m2_wp5_lr5e-5_eos_{value}_seed43_data43.yaml")
+        )
+        for value in ("true", "false")
+    ]
+    assert pair[0]["dataset"] == pair[1]["dataset"] == seed42["dataset"]
+    assert pair[0]["model"] == pair[1]["model"] == seed42["model"]
+    assert pair[0]["runtime"] == pair[1]["runtime"] == seed42["runtime"]
+    for config, supervise_eos in zip(pair, (True, False), strict=True):
+        controlled = dict(config["training"])
+        baseline = dict(seed42["training"])
+        for key in ("run_name", "output_root", "supervise_eos", "seed", "data_seed"):
+            controlled.pop(key)
+            baseline.pop(key)
+        assert controlled == baseline
+        assert config["training"]["supervise_eos"] is supervise_eos
+        assert config["training"]["seed"] == 43
+        assert config["training"]["data_seed"] == 43
+        assert config["training"]["output_root"].startswith("/vol/tmp2/yesildau/")
+
+
 def test_m1_smollm2_ranking_config_points_to_bioqa_dataset_and_small_model() -> None:
     config = load_training_config(Path("configs/training/m1_smollm2_360m_english_fact_ranking_lr2e-5_ep3.yaml"))
     assert config["dataset"]["version"] == "synthetic_v1_bio_qa"
