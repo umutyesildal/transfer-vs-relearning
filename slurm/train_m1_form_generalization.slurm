@@ -21,8 +21,16 @@ SCRATCH_CONFIG="${SCRATCH_ROOT}/configs/${CONDITION}_seed42.yaml"
 DATASET_ROOT="${SCRATCH_ROOT}/datasets"
 OUTPUT_ROOT="${SCRATCH_ROOT}/training/${CONDITION}_seed42"
 LAUNCH_MANIFEST="${SCRATCH_ROOT}/manifests/${CONDITION}_${SLURM_JOB_ID}.json"
+PREFLIGHT_MANIFEST="${PREFLIGHT_MANIFEST:-${SCRATCH_ROOT}/preflight/manifest.json}"
 
 cd "${REPO_ROOT}"
+module load anaconda/3-2024.06
+conda run --name xfer-relearn python scripts/m1_form_generalization_preflight.py \
+  --verify-manifest "${PREFLIGHT_MANIFEST}" \
+  --repo-root "${REPO_ROOT}" \
+  --source-config configs/training/m1_form_generalization_control_seed42.yaml \
+  --source-config configs/training/m1_form_generalization_balanced_ab_seed42.yaml \
+  --launcher slurm/train_m1_form_generalization.slurm
 for path in "${SCRATCH_ROOT}" "${DATASET_ROOT}" "${OUTPUT_ROOT}"; do
   case "${path}" in /vol/tmp/yesildau/*|/vol/tmp2/yesildau/*) ;; *) echo "Refusing non-scratch path: ${path}" >&2; exit 1 ;; esac
 done
@@ -44,7 +52,6 @@ export TORCH_HOME="${SCRATCH_ROOT}/cache/torch"
 export TMPDIR="${SCRATCH_ROOT}/tmp"
 export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
-module load anaconda/3-2024.06
 conda run --name xfer-relearn python scripts/build_m1_form_generalization_datasets.py --repo-root "${REPO_ROOT}" --output-dir "${DATASET_ROOT}"
 conda run --name xfer-relearn python scripts/prepare_m1_form_generalization_config.py --source-config "${SOURCE_CONFIG}" --dataset-root "${DATASET_ROOT}" --output-root "${OUTPUT_ROOT}" --output "${SCRATCH_CONFIG}"
 conda run --name xfer-relearn python scripts/freeze_m1_form_generalization_launch.py --config "${SCRATCH_CONFIG}" --condition "${CONDITION}" --output "${LAUNCH_MANIFEST}" --repo-root "${REPO_ROOT}"
