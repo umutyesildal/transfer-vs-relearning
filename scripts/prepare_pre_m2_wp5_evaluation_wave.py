@@ -25,14 +25,20 @@ def main() -> None:
     parser.add_argument("--run", action="append", required=True)
     parser.add_argument("--source-manifest", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, required=True)
+    parser.add_argument("--general-corpus", type=Path, required=True)
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     args = parser.parse_args()
 
     repo_root = args.repo_root.resolve()
     output_root = args.output_root.resolve()
+    general_corpus = args.general_corpus.resolve()
     source_manifest = args.source_manifest.resolve()
     if not str(output_root).startswith(("/vol/tmp/yesildau/", "/vol/tmp2/yesildau/")):
         raise ValueError(f"WP5 evaluation root is not approved scratch: {output_root}")
+    if not str(general_corpus).startswith(("/vol/tmp/yesildau/", "/vol/tmp2/yesildau/")):
+        raise ValueError(f"General-capability corpus is not on approved scratch: {general_corpus}")
+    if not general_corpus.is_file():
+        raise FileNotFoundError(f"General-capability corpus does not exist: {general_corpus}")
     runs = [_parse_run(value) for value in args.run]
     if len({label for label, _ in runs}) != len(runs):
         raise ValueError("WP5 run labels must be unique")
@@ -66,9 +72,7 @@ def main() -> None:
                     "output_root": str(general_output),
                     "model_manifest": str(manifest_path),
                     "data": {
-                        "corpus_file": str(
-                            repo_root / "artifacts/evaluation/general_capability_v1/wikitext2_raw_test.jsonl"
-                        ),
+                        "corpus_file": str(general_corpus),
                         "prompts_file": str(repo_root / "configs/general_capability/prompts_v1.jsonl"),
                         "completions_file": str(repo_root / "configs/general_capability/completions_v1.jsonl"),
                         "synthetic_subjects_file": str(
