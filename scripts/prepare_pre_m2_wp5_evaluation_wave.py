@@ -26,6 +26,7 @@ def main() -> None:
     parser.add_argument("--source-manifest", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--general-corpus", type=Path, required=True)
+    parser.add_argument("--checkpoint-step", type=int, action="append")
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     args = parser.parse_args()
 
@@ -33,6 +34,11 @@ def main() -> None:
     output_root = args.output_root.resolve()
     general_corpus = args.general_corpus.resolve()
     source_manifest = args.source_manifest.resolve()
+    checkpoint_steps = tuple(args.checkpoint_step or CHECKPOINTS)
+    if not checkpoint_steps or any(step <= 0 for step in checkpoint_steps):
+        raise ValueError("Checkpoint steps must be positive")
+    if len(set(checkpoint_steps)) != len(checkpoint_steps):
+        raise ValueError("Checkpoint steps must be unique")
     if not str(output_root).startswith(("/vol/tmp/yesildau/", "/vol/tmp2/yesildau/")):
         raise ValueError(f"WP5 evaluation root is not approved scratch: {output_root}")
     if not str(general_corpus).startswith(("/vol/tmp/yesildau/", "/vol/tmp2/yesildau/")):
@@ -49,7 +55,7 @@ def main() -> None:
         training_manifest = json.loads(training_manifest_path.read_text(encoding="utf-8"))
         if training_manifest.get("status") != "complete":
             raise ValueError(f"Incomplete training run: {run_dir}")
-        for step in CHECKPOINTS:
+        for step in checkpoint_steps:
             checkpoint_dir = run_dir / "checkpoints" / f"checkpoint-{step}"
             label = f"{lr_label}_step{step}"
             manifest_path = output_root / "model_manifests" / f"{label}.json"
@@ -143,7 +149,7 @@ def main() -> None:
         output_root / "wave_manifest.json",
         {
             "status": "frozen_ready_to_submit",
-            "checkpoint_steps": list(CHECKPOINTS),
+            "checkpoint_steps": list(checkpoint_steps),
             "conditions": [label for label, _ in runs],
             "tasks": len(rows),
             "registry": str(registry_path),
