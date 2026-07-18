@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from transfer_vs_relearning.utils.io import write_json
+from transfer_vs_relearning.utils.io import sha256_file, write_json
 
 
 def create_local_model_manifest(
@@ -21,6 +21,11 @@ def create_local_model_manifest(
     source_manifest = json.loads(source_manifest_path.read_text(encoding="utf-8"))
     local_model_dir = local_model_dir.resolve()
     output_manifest_path = output_manifest_path.resolve()
+    if not local_model_dir.is_dir():
+        raise FileNotFoundError(f"Local model directory does not exist: {local_model_dir}")
+    local_files = sorted(path for path in local_model_dir.iterdir() if path.is_file())
+    if not local_files:
+        raise ValueError(f"Local model directory contains no files: {local_model_dir}")
 
     payload = dict(source_manifest)
     payload.update(
@@ -35,6 +40,7 @@ def create_local_model_manifest(
             "tokenizer_source_path": source_manifest.get("local_path_project_relative") or source_manifest.get("local_path"),
             "tokenizer_source_path_absolute": source_manifest.get("local_path_absolute") or source_manifest.get("local_path"),
             "download_timestamp": datetime.now(timezone.utc).isoformat(),
+            "file_hashes": {path.name: sha256_file(path) for path in local_files},
         }
     )
     if training_checkpoint is not None:

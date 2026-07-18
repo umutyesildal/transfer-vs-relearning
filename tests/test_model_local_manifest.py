@@ -10,6 +10,9 @@ def test_create_local_model_manifest_retargets_existing_source_manifest(tmp_path
     repo_root = Path.cwd()
     source_manifest = tmp_path / "source_manifest.json"
     local_model_dir = repo_root / "runs" / "training" / "demo_run" / "final_model"
+    local_model_dir.mkdir(parents=True)
+    (local_model_dir / "config.json").write_text("local-config", encoding="utf-8")
+    (local_model_dir / "model.safetensors").write_bytes(b"local-weights")
     output_manifest = tmp_path / "local_manifest.json"
     source_payload = {
         "model_id": "HuggingFaceTB/SmolLM2-360M",
@@ -43,3 +46,5 @@ def test_create_local_model_manifest_retargets_existing_source_manifest(tmp_path
     assert payload["tokenizer_source_path"] == "artifacts/models/HuggingFaceTB__SmolLM2-360M/base-revision"
     assert payload["tokenizer_source_path_absolute"] == "/abs/base/path"
     assert payload["training_run_dir"] == str((repo_root / "runs" / "training" / "demo_run").resolve())
+    assert set(payload["file_hashes"]) == {"config.json", "model.safetensors"}
+    assert payload["file_hashes"]["config.json"] != "abc"
