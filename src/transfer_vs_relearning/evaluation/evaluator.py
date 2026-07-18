@@ -14,7 +14,7 @@ from transfer_vs_relearning.data.candidates import (
     candidate_for_fact,
     resolve_expected_answer,
 )
-from transfer_vs_relearning.data.constants import DATASET_FILES
+from transfer_vs_relearning.data.constants import DATASET_FILES, RELATION_MAP
 from transfer_vs_relearning.data.facts import expand_canonical_rows
 from transfer_vs_relearning.evaluation.progress import load_completed, save_progress
 from transfer_vs_relearning.evaluation.prompts import render_prompt_from_config
@@ -136,6 +136,21 @@ def with_default_probe_language(
     rows: list[dict[str, Any]], language: str
 ) -> list[dict[str, Any]]:
     return [{**row, "language": row.get("language") or language} for row in rows]
+
+
+def probe_subgroup_metadata(
+    probe: dict[str, Any], canonical_row: dict[str, str]
+) -> dict[str, str]:
+    _, _, frequency_column = RELATION_MAP[str(probe["relation"])]
+    return {
+        "branch": str(probe.get("branch_group") or canonical_row["branch_group"]),
+        "frequency": str(probe.get("frequency_bucket") or canonical_row[frequency_column]),
+        "popularity": str(probe.get("popularity_bucket") or canonical_row["popularity_bucket"]),
+        "name_type": str(probe.get("name_type") or canonical_row["name_type"]),
+        "name_rarity": str(
+            probe.get("name_rarity_bucket") or canonical_row["name_rarity_bucket"]
+        ),
+    }
 
 
 class CausalCandidateEvaluator:
@@ -301,6 +316,7 @@ class CausalCandidateEvaluator:
                 ranked_mean = rank_candidates(candidate_scores, "mean_logprob", correct.object_id)
                 ranked_total = rank_candidates(candidate_scores, "total_logprob", correct.object_id)
                 subject_row = canonical_by_subject[probe["subject_id"]]
+                subgroup = probe_subgroup_metadata(probe, subject_row)
                 correct_row = next(item for item in candidate_scores if item["object_id"] == correct.object_id)
                 row = {
                     "run_id": self.run_id,
@@ -329,11 +345,7 @@ class CausalCandidateEvaluator:
                     "margin": ranked_mean["margin"],
                     "total_score_margin": ranked_total["margin"],
                     "token_count": correct_row["token_count"],
-                    "branch": probe["branch_group"],
-                    "frequency": probe["frequency_bucket"],
-                    "popularity": probe["popularity_bucket"],
-                    "name_type": probe["name_type"],
-                    "name_rarity": probe["name_rarity_bucket"],
+                    **subgroup,
                     "template_id": probe["template_id"],
                     "evaluation_timestamp": datetime.now(timezone.utc).isoformat(),
                     "number_of_candidates": len(candidate_scores),
