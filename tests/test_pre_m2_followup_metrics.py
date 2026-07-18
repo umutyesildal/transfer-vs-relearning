@@ -12,6 +12,7 @@ from transfer_vs_relearning.metrics.pre_m2_followup import (
     robust_intersection_summary,
     repeatability_audit,
     token_likelihood_summary,
+    wp1b_counterbalance_analysis,
 )
 
 
@@ -149,3 +150,60 @@ def test_answer_sequence_summary_selects_final_eos_position() -> None:
     assert summary[0]["mean_answer_nll"] == 1.5
     assert summary[0]["mean_prompt_eos_nll"] == 5.0
     assert summary[0]["mean_final_eos_nll"] == 0.1
+
+
+def test_wp1b_analysis_relabels_seen_and_crossed_after_swap() -> None:
+    assignments = {
+        "original": [
+            {
+                "subject_id": "s1",
+                "training_form_group": "A",
+                "training_form_id": "form_a",
+                "heldout_crossed_form_id": "form_b",
+            }
+        ],
+        "swap": [
+            {
+                "subject_id": "s1",
+                "training_form_group": "B",
+                "training_form_id": "form_b",
+                "heldout_crossed_form_id": "form_a",
+            }
+        ],
+    }
+    rows_by_condition = {}
+    for condition in ("original", "swap"):
+        rows = []
+        for form_id in ("form_a", "form_b", "form_c"):
+            for scaffold_id in ("direct", "qa"):
+                seen_form = "form_a" if condition == "original" else "form_b"
+                rows.append(
+                    {
+                        "model_label": condition,
+                        "subject_id": "s1",
+                        "fact_id": "s1_born_in",
+                        "relation": "born_in",
+                        "form_id": form_id,
+                        "scaffold_id": scaffold_id,
+                        "correct_rank_mean": 1 if form_id == seen_form else 2,
+                    }
+                )
+        rows_by_condition[condition] = rows
+    analysis = wp1b_counterbalance_analysis(
+        rows_by_condition,
+        assignments,
+        bootstrap_samples=20,
+        seed=3,
+    )
+    original_seen = [
+        row for row in analysis["annotated"]
+        if row["condition"] == "original" and row["exposure_cell"] == "seen"
+    ]
+    swap_seen = [
+        row for row in analysis["annotated"]
+        if row["condition"] == "swap" and row["exposure_cell"] == "seen"
+    ]
+    assert {row["form_id"] for row in original_seen} == {"form_a"}
+    assert {row["form_id"] for row in swap_seen} == {"form_b"}
+    assert all(row["seen_top1"] == 1 and row["crossed_top1"] == 0 for row in analysis["directional"])
+    assert all(row["gate_passed"] is False for row in analysis["robust"])

@@ -257,6 +257,163 @@ def robust_intersection_summary(rows: list[dict[str, Any]]) -> list[dict[str, An
     return output
 
 
+def wp1b_counterbalance_analysis(
+    rows_by_condition: dict[str, list[dict[str, Any]]],
+    assignments_by_condition: dict[str, list[dict[str, Any]]],
+    *,
+    bootstrap_samples: int = 2000,
+    seed: int = 20260717,
+) -> dict[str, list[dict[str, Any]]]:
+    annotated: list[dict[str, Any]] = []
+    for condition, rows in sorted(rows_by_condition.items()):
+        assignments = {
+            str(item["subject_id"]): item for item in assignments_by_condition[condition]
+        }
+        for row in rows:
+            assignment = assignments[str(row["subject_id"])]
+            form_id = str(row["form_id"])
+            cell = (
+                "seen"
+                if form_id == assignment["training_form_id"]
+                else "crossed"
+                if form_id == assignment["heldout_crossed_form_id"]
+                else "novel"
+            )
+            annotated.append(
+                {
+                    **row,
+                    "condition": condition,
+                    "training_form_group": assignment["training_form_group"],
+                    "training_form_id": assignment["training_form_id"],
+                    "exposure_cell": cell,
+                }
+            )
+
+    aggregate_groups: dict[tuple[str, str, str, str, str], list[bool]] = defaultdict(list)
+    for row in annotated:
+        correct = int(row["correct_rank_mean"]) == 1
+        for relation in (str(row["relation"]), "ALL"):
+            for group in (str(row["training_form_group"]), "ALL"):
+                aggregate_groups[
+                    (
+                        str(row["condition"]),
+                        relation,
+                        str(row["scaffold_id"]),
+                        group,
+                        str(row["exposure_cell"]),
+                    )
+                ].append(correct)
+    aggregate = []
+    for index, (key, values) in enumerate(sorted(aggregate_groups.items())):
+        accuracy, ci_low, ci_high = bootstrap_accuracy_interval(
+            values,
+            samples=bootstrap_samples,
+            seed=seed + index,
+        )
+        aggregate.append(
+            {
+                "condition": key[0],
+                "relation": key[1],
+                "scaffold_id": key[2],
+                "training_form_group": key[3],
+                "exposure_cell": key[4],
+                "n": len(values),
+                "top1": sum(values),
+                "top1_accuracy": accuracy,
+                "bootstrap_ci_low": ci_low,
+                "bootstrap_ci_high": ci_high,
+                "bootstrap_samples": bootstrap_samples,
+            }
+        )
+
+    fact_cells: dict[tuple[str, str, str, str, str], dict[str, bool]] = defaultdict(dict)
+    for row in annotated:
+        if row["exposure_cell"] not in {"seen", "crossed"}:
+            continue
+        key = (
+            str(row["condition"]),
+            str(row["relation"]),
+            str(row["scaffold_id"]),
+            str(row["training_form_group"]),
+            str(row["fact_id"]),
+        )
+        fact_cells[key][str(row["exposure_cell"])] = int(row["correct_rank_mean"]) == 1
+    directional_groups: dict[tuple[str, str, str, str], list[dict[str, bool]]] = defaultdict(list)
+    for (condition, relation, scaffold, group, _), cells in fact_cells.items():
+        if set(cells) == {"seen", "crossed"}:
+            directional_groups[(condition, relation, scaffold, group)].append(cells)
+            directional_groups[(condition, "ALL", scaffold, group)].append(cells)
+    directional = []
+    for index, (key, facts) in enumerate(sorted(directional_groups.items())):
+        seen = [fact["seen"] for fact in facts]
+        crossed = [fact["crossed"] for fact in facts]
+        difference, ci_low, ci_high = paired_bootstrap_accuracy_difference(
+            seen,
+            crossed,
+            samples=bootstrap_samples,
+            seed=seed + index,
+        )
+        seen_only = sum(a and not b for a, b in zip(seen, crossed, strict=True))
+        crossed_only = sum(b and not a for a, b in zip(seen, crossed, strict=True))
+        directional.append(
+            {
+                "condition": key[0],
+                "relation": key[1],
+                "scaffold_id": key[2],
+                "training_form_group": key[3],
+                "n": len(facts),
+                "seen_top1": sum(seen),
+                "crossed_top1": sum(crossed),
+                "seen_minus_crossed_accuracy": difference,
+                "paired_bootstrap_ci_low": ci_low,
+                "paired_bootstrap_ci_high": ci_high,
+                "seen_only": seen_only,
+                "crossed_only": crossed_only,
+                "mcnemar_exact_pvalue": exact_mcnemar_pvalue(seen_only, crossed_only),
+                "bootstrap_samples": bootstrap_samples,
+            }
+        )
+
+    robust_cells: dict[tuple[str, str, str], dict[tuple[str, str], bool]] = defaultdict(dict)
+    for row in annotated:
+        if row["form_id"] not in {"form_a", "form_b"}:
+            continue
+        robust_cells[
+            (str(row["condition"]), str(row["relation"]), str(row["fact_id"]))
+        ][(str(row["form_id"]), str(row["scaffold_id"]))] = int(row["correct_rank_mean"]) == 1
+    robust_groups: dict[tuple[str, str], list[dict[tuple[str, str], bool]]] = defaultdict(list)
+    required_cells = {
+        ("form_a", "direct"),
+        ("form_a", "qa"),
+        ("form_b", "direct"),
+        ("form_b", "qa"),
+    }
+    for (condition, relation, _), cells in robust_cells.items():
+        if set(cells) == required_cells:
+            robust_groups[(condition, relation)].append(cells)
+            robust_groups[(condition, "ALL")].append(cells)
+    robust = []
+    for (condition, relation), facts in sorted(robust_groups.items()):
+        passed = sum(all(cells.values()) for cells in facts)
+        robust.append(
+            {
+                "condition": condition,
+                "relation": relation,
+                "n": len(facts),
+                "a_b_all_scaffold_intersection": passed,
+                "a_b_all_scaffold_accuracy": passed / len(facts),
+                "threshold": 0.70,
+                "gate_passed": passed / len(facts) >= 0.70,
+            }
+        )
+    return {
+        "annotated": annotated,
+        "aggregate": aggregate,
+        "directional": directional,
+        "robust": robust,
+    }
+
+
 def repeatability_audit(
     reference_rows: list[dict[str, Any]],
     candidate_rows: list[dict[str, Any]],
