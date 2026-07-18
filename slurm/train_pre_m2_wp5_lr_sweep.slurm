@@ -15,6 +15,7 @@ REPO_ROOT="${SLURM_SUBMIT_DIR:-$(pwd)}"
 HU_HOME_ROOT="/vol/fob-vol6/mi25/yesildau"
 SCRATCH_ROOT="/vol/tmp2/yesildau/pre_m2_followup_v1"
 : "${LR_LABEL:?LR_LABEL must be lr2e-5, lr5e-5, lr1e-4, or lr2e-4}"
+EOS_LABEL="${EOS_LABEL:-true}"
 MODE="${MODE:-train}"
 
 case "${LR_LABEL}" in
@@ -25,9 +26,13 @@ case "${MODE}" in
   smoke|train) ;;
   *) echo "Unsupported WP5 mode: ${MODE}" >&2; exit 2 ;;
 esac
+case "${EOS_LABEL}" in
+  true|false) ;;
+  *) echo "Unsupported WP5 EOS label: ${EOS_LABEL}" >&2; exit 2 ;;
+esac
 
-CONFIG_PATH="${CONFIG_PATH:-configs/training/pre_m2_wp5_${LR_LABEL}_eos_true.yaml}"
-LAUNCH_MANIFEST="${SCRATCH_ROOT}/launch/wp5_${LR_LABEL}_eos_true_${SLURM_JOB_ID}.json"
+CONFIG_PATH="${CONFIG_PATH:-configs/training/pre_m2_wp5_${LR_LABEL}_eos_${EOS_LABEL}.yaml}"
+LAUNCH_MANIFEST="${SCRATCH_ROOT}/launch/wp5_${LR_LABEL}_eos_${EOS_LABEL}_${SLURM_JOB_ID}.json"
 mkdir -p "${SCRATCH_ROOT}"/{cache/huggingface,cache/torch,logs,tmp,launch,smoke}
 cd "${REPO_ROOT}"
 
@@ -44,6 +49,7 @@ done
 echo "hostname=$(hostname)"
 echo "slurm_job_id=${SLURM_JOB_ID}"
 echo "lr_label=${LR_LABEL}"
+echo "eos_label=${EOS_LABEL}"
 echo "mode=${MODE}"
 echo "config=${CONFIG_PATH}"
 echo "artifacts=${resolved_artifacts}"
@@ -54,7 +60,7 @@ echo "expected_validation_rows=500"
 echo "expected_optimizer_steps=252"
 echo "expected_checkpoint_count_upper_bound=11"
 echo "estimated_condition_bytes_upper_bound=225000000000"
-echo "estimated_new_three_condition_family_bytes_upper_bound=675000000000"
+echo "estimated_condition_family_bytes_upper_bound=450000000000"
 echo "retention=selected Pareto model plus manifests and compact evidence; non-selected optimizer checkpoints removable"
 
 du -xsh "${HU_HOME_ROOT}"

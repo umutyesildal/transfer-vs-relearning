@@ -400,6 +400,28 @@ def test_pre_m2_wp5_lr_sweep_is_a_controlled_four_value_grid() -> None:
         assert estimate_optimizer_steps(3500, 10, 50, 36.0) == 252
 
 
+def test_pre_m2_wp5_eos_ablation_changes_only_final_eos_supervision() -> None:
+    for label in ("lr5e-5", "lr1e-4"):
+        eos_true = load_training_config(
+            Path(f"configs/training/pre_m2_wp5_{label}_eos_true.yaml")
+        )
+        eos_false = load_training_config(
+            Path(f"configs/training/pre_m2_wp5_{label}_eos_false.yaml")
+        )
+        assert eos_false["dataset"] == eos_true["dataset"]
+        assert eos_false["model"] == eos_true["model"]
+        assert eos_false["runtime"] == eos_true["runtime"]
+        controlled_true = dict(eos_true["training"])
+        controlled_false = dict(eos_false["training"])
+        for key in ("run_name", "output_root", "supervise_eos"):
+            controlled_true.pop(key)
+            controlled_false.pop(key)
+        assert controlled_false == controlled_true
+        assert eos_true["training"]["supervise_eos"] is True
+        assert eos_false["training"]["supervise_eos"] is False
+        assert "/vol/tmp2/yesildau/" in eos_false["training"]["output_root"]
+
+
 def test_m1_smollm2_ranking_config_points_to_bioqa_dataset_and_small_model() -> None:
     config = load_training_config(Path("configs/training/m1_smollm2_360m_english_fact_ranking_lr2e-5_ep3.yaml"))
     assert config["dataset"]["version"] == "synthetic_v1_bio_qa"
