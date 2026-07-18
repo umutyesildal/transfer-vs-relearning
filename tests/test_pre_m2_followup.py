@@ -15,7 +15,13 @@ from transfer_vs_relearning.data.pre_m2_followup import (
     counterbalanced_subject_assignment,
     template_registry,
 )
-from transfer_vs_relearning.evaluation.pre_m2_followup import _intersection_rows, _summary_rows, conditional_token_records
+from transfer_vs_relearning.evaluation.pre_m2_followup import (
+    _confusable_relation,
+    _forced_choice_rows,
+    _intersection_rows,
+    _summary_rows,
+    conditional_token_records,
+)
 
 
 def _canonical_rows(count: int = 4) -> list[dict[str, str]]:
@@ -211,3 +217,42 @@ def test_summary_parses_resumed_boolean_strings() -> None:
         }
     ]
     assert _summary_rows(rows)[0]["early_eos_preference_count"] == 0
+
+
+def test_wp3_confusable_relations_are_bidirectional() -> None:
+    assert _confusable_relation("studied_at") == "field_of_study"
+    assert _confusable_relation("field_of_study") == "studied_at"
+    assert _confusable_relation("works_at") == "works_in_industry"
+    assert _confusable_relation("works_in_industry") == "works_at"
+
+
+def test_forced_choice_summary_parses_resumed_rows() -> None:
+    rows = [
+        {
+            "relation": "studied_at",
+            "form_id": "form_a",
+            "scaffold_id": "direct",
+            "same_subject_confusable_object_id": "field_1",
+            "same_subject_relation_forced_choice_correct": "True",
+            "gold_vs_same_subject_confusable_nll_margin": "1.5",
+        },
+        {
+            "relation": "studied_at",
+            "form_id": "form_a",
+            "scaffold_id": "direct",
+            "same_subject_confusable_object_id": "field_2",
+            "same_subject_relation_forced_choice_correct": "False",
+            "gold_vs_same_subject_confusable_nll_margin": "-0.5",
+        },
+    ]
+    assert _forced_choice_rows(rows) == [
+        {
+            "relation": "studied_at",
+            "form_id": "form_a",
+            "scaffold_id": "direct",
+            "n": 2,
+            "forced_choice_correct": 1,
+            "forced_choice_accuracy": 0.5,
+            "mean_gold_vs_confusable_nll_margin": 0.5,
+        }
+    ]

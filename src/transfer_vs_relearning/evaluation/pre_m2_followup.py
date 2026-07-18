@@ -160,7 +160,14 @@ def _load_model(model_manifest_path: Path, device_request: str, bf16: bool) -> t
 
 
 def _confusable_relation(relation: str) -> str | None:
-    return {"born_in": "lives_in", "lives_in": "born_in"}.get(relation)
+    return {
+        "born_in": "lives_in",
+        "lives_in": "born_in",
+        "studied_at": "field_of_study",
+        "field_of_study": "studied_at",
+        "works_at": "works_in_industry",
+        "works_in_industry": "works_at",
+    }.get(relation)
 
 
 def _as_bool(value: Any) -> bool:
@@ -219,6 +226,31 @@ def _intersection_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "a_c_intersection": len(success["form_a"] & success["form_c"]),
                 "b_c_intersection": len(success["form_b"] & success["form_c"]),
                 "all_form_intersection": len(success["form_a"] & success["form_b"] & success["form_c"]),
+            }
+        )
+    return output
+
+
+def _forced_choice_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    groups: dict[tuple[str, str, str], list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        if str(row.get("same_subject_confusable_object_id", "")):
+            groups[(str(row["relation"]), str(row["form_id"]), str(row["scaffold_id"]))].append(row)
+    output = []
+    for (relation, form_id, scaffold_id), group in sorted(groups.items()):
+        correct = sum(_as_bool(row["same_subject_relation_forced_choice_correct"]) for row in group)
+        output.append(
+            {
+                "relation": relation,
+                "form_id": form_id,
+                "scaffold_id": scaffold_id,
+                "n": len(group),
+                "forced_choice_correct": correct,
+                "forced_choice_accuracy": correct / len(group),
+                "mean_gold_vs_confusable_nll_margin": sum(
+                    float(row["gold_vs_same_subject_confusable_nll_margin"]) for row in group
+                )
+                / len(group),
             }
         )
     return output
@@ -366,6 +398,23 @@ class PreM2FrozenEvaluator:
                     "best_incorrect_mean_score": ranking["best_incorrect_score"],
                     "margin": ranking["margin"],
                     "same_subject_confusable_object_id": confusable_object_id or "",
+                    "same_subject_confusable_mean_answer_nll": (
+                        summaries["same_subject_confusable"]["mean_answer_nll"]
+                        if confusable_object_id
+                        else ""
+                    ),
+                    "gold_vs_same_subject_confusable_nll_margin": (
+                        summaries["same_subject_confusable"]["mean_answer_nll"]
+                        - summaries["gold"]["mean_answer_nll"]
+                        if confusable_object_id
+                        else ""
+                    ),
+                    "same_subject_relation_forced_choice_correct": (
+                        summaries["gold"]["mean_answer_nll"]
+                        < summaries["same_subject_confusable"]["mean_answer_nll"]
+                        if confusable_object_id
+                        else ""
+                    ),
                     "gold_mean_answer_nll": summaries["gold"]["mean_answer_nll"],
                     "gold_answer_ppl": summaries["gold"]["answer_ppl"],
                     "gold_first_answer_token_nll": summaries["gold"]["first_answer_token_nll"],
@@ -387,7 +436,12 @@ class PreM2FrozenEvaluator:
         write_csv(per_token_path, token_rows)
         write_csv(self.output_dir / "summary_by_relation_form.csv", _summary_rows(fact_rows))
         write_csv(self.output_dir / "form_intersections.csv", _intersection_rows(fact_rows))
+        forced_choice_rows = _forced_choice_rows(fact_rows)
+        write_csv(self.output_dir / "relation_swapped_forced_choice.csv", forced_choice_rows)
         failure_counts = Counter(str(row["failure_type"]) for row in fact_rows)
+        forced_choice_fact_rows = [
+            row for row in fact_rows if str(row.get("same_subject_confusable_object_id", ""))
+        ]
         write_json(
             self.output_dir / "summary.json",
             {
@@ -395,6 +449,13 @@ class PreM2FrozenEvaluator:
                 "model_label": self.model_label,
                 "probes": len(fact_rows),
                 "top1": sum(int(row["correct_rank_mean"]) == 1 for row in fact_rows),
+                "relation_swapped_forced_choice": {
+                    "n": len(forced_choice_fact_rows),
+                    "correct": sum(
+                        _as_bool(row["same_subject_relation_forced_choice_correct"])
+                        for row in forced_choice_fact_rows
+                    ),
+                },
                 "failure_taxonomy": dict(sorted(failure_counts.items())),
             },
         )
