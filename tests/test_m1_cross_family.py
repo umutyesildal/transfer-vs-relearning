@@ -53,20 +53,21 @@ def test_materialized_config_preserves_frozen_budget(tmp_path: Path, monkeypatch
 
 def test_stablelm_remediation_only_overrides_model_load_dtype(tmp_path: Path, monkeypatch) -> None:
     registry = load_registry(_repo_root() / "configs/experiments/m1_cross_family_screen_v1.yaml")
-    registry["scratch_root"] = str(tmp_path / "m1_cross_family_screen_v1")
+    scratch_root = tmp_path / "m1_cross_family_screen_v1"
+    registry["scratch_root"] = str(scratch_root)
     candidate = candidate_by_index(registry, 1)
     manifest = tmp_path / "models/stabilityai__stablelm-2-1_6b/model_manifest.json"
     manifest.parent.mkdir(parents=True)
     manifest.write_text("{}\n", encoding="utf-8")
     monkeypatch.setattr(cross_family, "approved_scratch", lambda path: path.resolve())
     monkeypatch.setattr(cross_family, "candidate_model_manifest", lambda _registry, _candidate: manifest)
-    monkeypatch.setattr(cross_family, "candidate_training_root", lambda _registry, _candidate: tmp_path / "training/stablelm")
+    monkeypatch.setattr(cross_family, "candidate_training_root", lambda _registry, _candidate: scratch_root / "training/stablelm")
     template = yaml.safe_load((_repo_root() / "configs/training/m1_cross_family_seed42_template.yaml").read_text(encoding="utf-8"))
     payload = materialize_training_config(registry=registry, candidate=candidate, template=template, dataset_root=tmp_path / "datasets")
     changed = {key: value for key, value in payload["training"].items() if template["training"].get(key) != value}
     assert changed == {
         "model_load_dtype": "bfloat16",
-        "output_root": str(tmp_path / "training/stablelm"),
+        "output_root": str(scratch_root / "training/stablelm"),
         "run_name": "m1_cross_family_stablelm_seed42",
     }
 
