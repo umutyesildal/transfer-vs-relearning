@@ -68,3 +68,17 @@ def test_preflight_allows_its_own_afterok_target_but_rejects_other_duplicates() 
     ]
     assert _unexpected_target_jobs("m1-xfam-train", rows, "409100") == ["m1-xfam-train|(null)"]
     assert _unexpected_target_jobs("m1-xfam-train", rows[:1], "999999") == rows[:1]
+
+
+def test_array_launchers_reject_blank_labels_and_avoid_shared_training_config() -> None:
+    launchers = [
+        _repo_root() / "slurm/acquire_m1_cross_family_models.slurm",
+        _repo_root() / "slurm/train_m1_cross_family.slurm",
+        _repo_root() / "slurm/eval_m1_cross_family.slurm",
+    ]
+    for launcher in launchers:
+        text = launcher.read_text(encoding="utf-8")
+        assert "sed '/^[[:space:]]*$/d'" in text
+        assert "Invalid resolved candidate label" in text
+    training = launchers[1].read_text(encoding="utf-8")
+    assert '${SLURM_ARRAY_TASK_ID}_${label}.yaml' in training

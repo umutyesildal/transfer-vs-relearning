@@ -19,8 +19,9 @@ PREFLIGHT_MANIFEST="${PREFLIGHT_MANIFEST:-${SCRATCH_ROOT}/preflight/training.jso
 cd "${REPO_ROOT}"
 module load anaconda/3-2024.06
 conda run --name xfer-relearn python scripts/m1_cross_family_preflight.py --stage training --verify-manifest "${PREFLIGHT_MANIFEST}" --max-age-minutes 720 --repo-root "${REPO_ROOT}" --registry "${REGISTRY}" --template "${TEMPLATE}" --launcher slurm/train_m1_cross_family.slurm --candidate-index "${SLURM_ARRAY_TASK_ID}"
-label="$(conda run --name xfer-relearn python scripts/resolve_m1_cross_family_candidate.py --registry "${REGISTRY}" --candidate-index "${SLURM_ARRAY_TASK_ID}" --field label | tail -n 1)"
-config="${SCRATCH_ROOT}/configs/training/${label}.yaml"
+label="$(conda run --name xfer-relearn python scripts/resolve_m1_cross_family_candidate.py --registry "${REGISTRY}" --candidate-index "${SLURM_ARRAY_TASK_ID}" --field label | tr -d '\r' | sed '/^[[:space:]]*$/d' | tail -n 1)"
+case "${label}" in qwen|stablelm|gemma|llama) ;; *) echo "Invalid resolved candidate label: '${label}'" >&2; exit 2 ;; esac
+config="${SCRATCH_ROOT}/configs/training/${SLURM_ARRAY_TASK_ID}_${label}.yaml"
 task_tmp="${SCRATCH_ROOT}/tmp/training/${label}_${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
 mkdir -p "${SCRATCH_ROOT}"/{cache/huggingface,cache/torch,configs/training,logs,manifests/tokenization,manifests/smoke} "${task_tmp}"
 export HF_HOME="${SCRATCH_ROOT}/cache/huggingface" TRANSFORMERS_CACHE="${SCRATCH_ROOT}/cache/huggingface" XDG_CACHE_HOME="${SCRATCH_ROOT}/cache" TORCH_HOME="${SCRATCH_ROOT}/cache/torch" TMPDIR="${task_tmp}" HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
