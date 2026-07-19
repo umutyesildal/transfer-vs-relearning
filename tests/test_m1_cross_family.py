@@ -51,6 +51,26 @@ def test_materialized_config_preserves_frozen_budget(tmp_path: Path, monkeypatch
     assert payload["training"]["gradient_accumulation_steps"] * payload["training"]["per_device_train_batch_size"] == 500
 
 
+def test_stablelm_remediation_only_overrides_model_load_dtype(tmp_path: Path, monkeypatch) -> None:
+    registry = load_registry(_repo_root() / "configs/experiments/m1_cross_family_screen_v1.yaml")
+    registry["scratch_root"] = str(tmp_path / "m1_cross_family_screen_v1")
+    candidate = candidate_by_index(registry, 1)
+    manifest = tmp_path / "models/stabilityai__stablelm-2-1_6b/model_manifest.json"
+    manifest.parent.mkdir(parents=True)
+    manifest.write_text("{}\n", encoding="utf-8")
+    monkeypatch.setattr(cross_family, "approved_scratch", lambda path: path.resolve())
+    monkeypatch.setattr(cross_family, "candidate_model_manifest", lambda _registry, _candidate: manifest)
+    monkeypatch.setattr(cross_family, "candidate_training_root", lambda _registry, _candidate: tmp_path / "training/stablelm")
+    template = yaml.safe_load((_repo_root() / "configs/training/m1_cross_family_seed42_template.yaml").read_text(encoding="utf-8"))
+    payload = materialize_training_config(registry=registry, candidate=candidate, template=template, dataset_root=tmp_path / "datasets")
+    changed = {key: value for key, value in payload["training"].items() if template["training"].get(key) != value}
+    assert changed == {
+        "model_load_dtype": "bfloat16",
+        "output_root": str(tmp_path / "training/stablelm"),
+        "run_name": "m1_cross_family_stablelm_seed42",
+    }
+
+
 def test_sharded_model_weight_digest(tmp_path: Path) -> None:
     (tmp_path / "model-00001-of-00002.safetensors").write_bytes(b"one")
     (tmp_path / "model-00002-of-00002.safetensors").write_bytes(b"two")
@@ -82,3 +102,12 @@ def test_array_launchers_reject_blank_labels_and_avoid_shared_training_config() 
         assert "Invalid resolved candidate label" in text
     training = launchers[1].read_text(encoding="utf-8")
     assert '${SLURM_ARRAY_TASK_ID}_${label}.yaml' in training
+
+
+def test_subset_retry_requires_explicit_preflight_mode() -> None:
+    preflight = (_repo_root() / "scripts/m1_cross_family_preflight.py").read_text(encoding="utf-8")
+    launcher = (_repo_root() / "slurm/preflight_m1_cross_family.slurm").read_text(encoding="utf-8")
+    assert 'parser.add_argument("--allow-subset-retry", action="store_true")' in preflight
+    assert 'args.stage == "training"' in preflight
+    assert 'bool(args.candidate_index)' in preflight
+    assert 'ALLOW_SUBSET_RETRY' in launcher

@@ -27,6 +27,8 @@ candidates:
     model_id: stabilityai/stablelm-2-1_6b
     requested_revision: main
     required: true
+    training_overrides:
+      model_load_dtype: bfloat16
     estimated_checkpoint_gib: 21
     estimated_download_gib: 5
   - index: 2

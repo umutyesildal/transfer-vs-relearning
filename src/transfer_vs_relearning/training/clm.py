@@ -55,6 +55,21 @@ def resolve_training_seeds(
     return seed, split_seed, data_seed
 
 
+def resolve_model_load_dtype(torch_module: Any, training_config: dict[str, Any]) -> Any | None:
+    value = training_config.get("model_load_dtype")
+    if value is None:
+        return None
+    normalized = str(value).strip().lower()
+    supported = {
+        "bfloat16": torch_module.bfloat16,
+        "float16": torch_module.float16,
+        "float32": torch_module.float32,
+    }
+    if normalized not in supported:
+        raise ValueError(f"Unsupported model_load_dtype: {value!r}")
+    return supported[normalized]
+
+
 def interval_from_fractions(total_steps: int, fractions: list[float]) -> int:
     if total_steps <= 1:
         return 1
@@ -221,7 +236,11 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     tokenizer = AutoTokenizer.from_pretrained(str(model_path), local_files_only=local_files_only, use_fast=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
-    model = AutoModelForCausalLM.from_pretrained(str(model_path), local_files_only=local_files_only)
+    model_load_dtype = resolve_model_load_dtype(torch, training_config)
+    model_kwargs: dict[str, Any] = {"local_files_only": local_files_only}
+    if model_load_dtype is not None:
+        model_kwargs["torch_dtype"] = model_load_dtype
+    model = AutoModelForCausalLM.from_pretrained(str(model_path), **model_kwargs)
     if bool(training_config.get("gradient_checkpointing", False)):
         model.config.use_cache = False
 

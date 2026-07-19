@@ -19,6 +19,8 @@ indices_value="${CANDIDATE_INDICES:-0:1:2:3}"
 IFS=':' read -r -a indices <<< "${indices_value}"
 candidate_args=()
 for index in "${indices[@]}"; do candidate_args+=(--candidate-index "${index}"); done
+retry_args=()
+if [[ "${ALLOW_SUBSET_RETRY:-0}" == "1" ]]; then retry_args+=(--allow-subset-retry); fi
 cd "${REPO_ROOT}"
 module load anaconda/3-2024.06
 conda run --name xfer-relearn python scripts/m1_cross_family_preflight.py \
@@ -29,4 +31,5 @@ conda run --name xfer-relearn python scripts/m1_cross_family_preflight.py \
   --launcher "${TARGET_LAUNCHER}" \
   --manifest "${MANIFEST}" \
   --expected-commit "$(git rev-parse HEAD)" \
+  "${retry_args[@]}" \
   "${candidate_args[@]}"

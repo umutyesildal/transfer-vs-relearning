@@ -96,6 +96,7 @@ def run_preflight(args: argparse.Namespace) -> dict[str, Any]:
         "expected_commit": args.expected_commit,
         "candidate_indices": indices,
         "candidate_labels": [candidate["label"] for candidate in candidates],
+        "allow_subset_retry": bool(args.allow_subset_retry),
     }
     try:
         _check(registry_path.is_file(), "registry_exists", checks, str(registry_path))
@@ -106,7 +107,11 @@ def run_preflight(args: argparse.Namespace) -> dict[str, Any]:
 
         if args.stage in {"training", "evaluation"}:
             required_indices = {int(candidate["index"]) for candidate in registry["candidates"] if bool(candidate["required"])}
-            _check(required_indices.issubset(indices), "required_candidates_in_wave", checks, {"required": sorted(required_indices), "selected": indices})
+            if args.allow_subset_retry:
+                _check(args.stage == "training", "subset_retry_is_training_only", checks, args.stage)
+                _check(bool(args.candidate_index), "subset_retry_is_explicit", checks, indices)
+            else:
+                _check(required_indices.issubset(indices), "required_candidates_in_wave", checks, {"required": sorted(required_indices), "selected": indices})
             manifests = [candidate_model_manifest(registry, candidate) for candidate in candidates]
             _check(all(path.is_file() for path in manifests), "candidate_model_manifests", checks, [str(path) for path in manifests])
         if args.stage == "training":
@@ -206,6 +211,7 @@ def main() -> None:
     parser.add_argument("--launcher", type=Path, required=True)
     parser.add_argument("--manifest", type=Path, default=Path("/vol/tmp2/yesildau/m1_cross_family_screen_v1/preflight/manifest.json"))
     parser.add_argument("--candidate-index", type=int, action="append", default=[])
+    parser.add_argument("--allow-subset-retry", action="store_true")
     parser.add_argument("--expected-commit", default=None)
     parser.add_argument("--user", default="yesildau")
     parser.add_argument("--estimated-inodes", type=int, default=250000)

@@ -48,6 +48,13 @@ def validate_registry(payload: dict[str, Any]) -> None:
         raise ValueError("Qwen, StableLM, and Gemma must remain required")
     if bool(candidates[3].get("required")):
         raise ValueError("Llama must remain conditional")
+    for candidate in candidates:
+        overrides = candidate.get("training_overrides", {})
+        if not isinstance(overrides, dict) or set(overrides) - {"model_load_dtype"}:
+            raise ValueError(f"Unsupported training overrides for {candidate['label']}: {overrides}")
+    stable_overrides = candidates[1].get("training_overrides", {})
+    if stable_overrides not in ({}, {"model_load_dtype": "bfloat16"}):
+        raise ValueError("StableLM remediation may only load the model explicitly as bfloat16")
     if int(payload.get("expected_train_rows", 0)) != 3500:
         raise ValueError("Cross-family training budget must remain 3,500 rows")
     if int(payload.get("expected_validation_rows", 0)) != 500:
@@ -118,6 +125,7 @@ def materialize_training_config(
         }
     )
     payload["model"]["base_model_manifest"] = str(model_manifest)
+    payload["training"].update(candidate.get("training_overrides", {}))
     payload["training"]["run_name"] = f"m1_cross_family_{candidate['label']}_seed42"
     payload["training"]["output_root"] = str(candidate_training_root(registry, candidate))
     steps = estimate_optimizer_steps(

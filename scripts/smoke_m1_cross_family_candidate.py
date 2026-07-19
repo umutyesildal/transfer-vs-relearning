@@ -15,6 +15,7 @@ from transfer_vs_relearning.training.clm import (
     _answer_only_labels,
     _token_label_mask_from_offsets,
     load_training_config,
+    resolve_model_load_dtype,
     resolve_path,
 )
 from transfer_vs_relearning.utils.io import read_jsonl, sha256_file, write_json
@@ -41,7 +42,8 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--checkpoint-dir", type=Path, required=True)
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
-    parser.add_argument("--batch-size", type=int, default=2)
+    parser.add_argument("--batch-size", type=int)
+    parser.add_argument("--optimizer-steps", type=int, default=1)
     args = parser.parse_args()
 
     import torch
@@ -86,7 +88,10 @@ def main() -> None:
         supervised_by_relation[relation] += sum(keep)
         supervised_by_representation[representation] += sum(keep)
 
-    batch_rows = list(coverage.values())[: args.batch_size]
+    batch_size = args.batch_size or int(training["per_device_train_batch_size"])
+    if batch_size <= 0 or args.optimizer_steps <= 0:
+        raise ValueError("Smoke batch size and optimizer steps must be positive")
+    batch_rows = list(coverage.values())[:batch_size]
     encoded_batch = tokenizer(
         [str(row[text_field]) for row in batch_rows],
         add_special_tokens=False,
@@ -107,7 +112,11 @@ def main() -> None:
         batch_labels.append(labels + [-100] * padding)
 
     device = torch.device("cuda")
-    model = AutoModelForCausalLM.from_pretrained(str(model_path), local_files_only=True, low_cpu_mem_usage=True)
+    model_load_dtype = resolve_model_load_dtype(torch, training)
+    model_kwargs: dict[str, Any] = {"local_files_only": True, "low_cpu_mem_usage": True}
+    if model_load_dtype is not None:
+        model_kwargs["torch_dtype"] = model_load_dtype
+    model = AutoModelForCausalLM.from_pretrained(str(model_path), **model_kwargs)
     model.config.use_cache = False
     model.to(device)
     model.train()
@@ -116,12 +125,30 @@ def main() -> None:
         "attention_mask": torch.tensor(batch_attention_mask, device=device),
         "labels": torch.tensor(batch_labels, device=device),
     }
-    with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=bool(training.get("bf16"))):
-        output = model(**inputs)
-    if not torch.isfinite(output.loss):
-        raise ValueError(f"Non-finite smoke loss: {output.loss.item()}")
-    output.loss.backward()
-    smoke_loss = float(output.loss.detach().cpu())
+    optimizer = torch.optim.AdamW(
+        model.parameters(),
+        lr=float(training["learning_rate"]),
+        weight_decay=float(training.get("weight_decay", 0.0)),
+    )
+    gradient_accumulation_steps = int(training.get("gradient_accumulation_steps", 1))
+    smoke_loss = 0.0
+    gradient_norm = None
+    for _ in range(args.optimizer_steps):
+        optimizer.zero_grad(set_to_none=True)
+        for _ in range(gradient_accumulation_steps):
+            with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=bool(training.get("bf16"))):
+                output = model(**inputs)
+                scaled_loss = output.loss / gradient_accumulation_steps
+            if not torch.isfinite(output.loss):
+                raise ValueError(f"Non-finite smoke loss before optimizer step: {output.loss.item()}")
+            smoke_loss = float(output.loss.detach().cpu())
+            scaled_loss.backward()
+        gradient_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), float(training.get("max_grad_norm", 1.0)))
+        if not torch.isfinite(gradient_norm):
+            raise ValueError(f"Non-finite smoke gradient norm: {gradient_norm.item()}")
+        optimizer.step()
+        if any(not torch.isfinite(parameter).all() for parameter in model.parameters() if parameter.requires_grad):
+            raise ValueError("Non-finite model parameter after smoke optimizer step")
     gradient_tensors = sum(1 for parameter in model.parameters() if parameter.grad is not None)
     if gradient_tensors == 0:
         raise ValueError("Smoke backward pass produced no gradients")
@@ -135,7 +162,7 @@ def main() -> None:
     checkpoint_files = sorted(path for path in checkpoint_dir.iterdir() if path.is_file())
     checkpoint_bytes = sum(path.stat().st_size for path in checkpoint_files)
     checkpoint_hashes = {path.name: sha256_file(path) for path in checkpoint_files if path.suffix == ".safetensors"}
-    del output, inputs, model
+    del output, inputs, optimizer, model
     gc.collect()
     torch.cuda.empty_cache()
     reloaded = AutoModelForCausalLM.from_pretrained(str(checkpoint_dir), local_files_only=True, low_cpu_mem_usage=True, torch_dtype="auto")
@@ -154,8 +181,12 @@ def main() -> None:
         "masking_coverage_cells": len(coverage),
         "supervised_tokens_by_relation": dict(sorted(supervised_by_relation.items())),
         "supervised_tokens_by_representation": dict(sorted(supervised_by_representation.items())),
-        "batch_size": args.batch_size,
+        "batch_size": batch_size,
+        "gradient_accumulation_steps": gradient_accumulation_steps,
+        "optimizer_steps": args.optimizer_steps,
+        "model_load_dtype": str(training.get("model_load_dtype", "native_config")),
         "loss": smoke_loss,
+        "gradient_norm": float(gradient_norm.detach().cpu()) if gradient_norm is not None else None,
         "gradient_tensors": gradient_tensors,
         "gpu": torch.cuda.get_device_name(0),
         "peak_allocated_bytes": peak_allocated_bytes,
