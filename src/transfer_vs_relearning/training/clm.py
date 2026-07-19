@@ -361,13 +361,17 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
         raise ValueError("Training dataset produced zero token blocks")
 
     world_size = int(runtime_config.get("world_size", 1))
-    estimated_steps = estimate_optimizer_steps(
+    epoch_estimated_steps = estimate_optimizer_steps(
         train_blocks=train_blocks,
         per_device_train_batch_size=int(training_config["per_device_train_batch_size"]),
         gradient_accumulation_steps=int(training_config.get("gradient_accumulation_steps", 1)),
         num_train_epochs=float(training_config["num_train_epochs"]),
         world_size=world_size,
     )
+    configured_max_steps = training_config.get("max_steps")
+    estimated_steps = int(configured_max_steps) if configured_max_steps is not None else epoch_estimated_steps
+    if estimated_steps <= 0:
+        raise ValueError("Configured max_steps must be positive")
     save_steps = int(training_config.get("save_steps") or interval_from_fractions(estimated_steps, list(training_config.get("checkpoint_fractions", [0.25]))))
     eval_steps = int(training_config.get("eval_steps") or save_steps)
 
@@ -398,6 +402,8 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
         "save_total_limit": int(training_config.get("save_total_limit", 8)),
         "logging_dir": str(run_dir / "logs"),
     }
+    if configured_max_steps is not None:
+        args_kwargs["max_steps"] = int(configured_max_steps)
     eval_arg = _training_args_eval_key(TrainingArguments)
     args_kwargs[eval_arg] = "steps"
     if "save_safetensors" in inspect.signature(TrainingArguments).parameters:

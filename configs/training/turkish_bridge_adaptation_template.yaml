@@ -1,0 +1,40 @@
+dataset:
+  version: trwiki_20260601_bridge_v1
+  dataset_dir: __MATERIALIZED_ON_SCRATCH__
+  dataset_manifest: __MATERIALIZED_ON_SCRATCH__
+  train_file: __MATERIALIZED_ON_SCRATCH__
+  validation_file: __MATERIALIZED_ON_SCRATCH__
+  text_field: text
+  split_seed: 42
+
+model:
+  base_model_manifest: __MATERIALIZED_M1_ENDPOINT__
+
+training:
+  run_name: __MATERIALIZED_PER_MODEL__
+  output_root: __MATERIALIZED_ON_SCRATCH__
+  block_size: 512
+  learning_rate: 1.0e-5
+  num_train_epochs: 1.0
+  max_steps: 128
+  per_device_train_batch_size: 2
+  per_device_eval_batch_size: 2
+  gradient_accumulation_steps: 8
+  warmup_steps: 4
+  weight_decay: 0.0
+  lr_scheduler_type: constant_with_warmup
+  loss_mode: full_sequence
+  bf16: true
+  fp16: false
+  gradient_checkpointing: true
+  max_grad_norm: 1.0
+  logging_steps: 4
+  save_steps: 32
+  eval_steps: 32
+  save_total_limit: 6
+  seed: 42
+  data_seed: 42
+
+runtime:
+  local_files_only: true
+  world_size: 1

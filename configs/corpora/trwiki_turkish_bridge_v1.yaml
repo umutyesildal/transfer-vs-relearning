@@ -1,0 +1,38 @@
+corpus_id: trwiki_20260601_bridge_v1
+project: trwiki
+artifact_root: /vol/tmp2/yesildau/turkish_bridge_v1/corpus
+dump_date: "20260601"
+dump_filename: "trwiki-20260601-pages-articles.xml.bz2"
+dump_base_url: "https://dumps.wikimedia.org/trwiki/20260601/"
+checksum_algorithm: sha1
+checksum_filename: sha1sums.txt
+seed: 42
+download:
+  minimum_free_bytes: 21474836480
+extraction:
+  mwxml_version: "0.3.8"
+  mwparserfromhell_version: "0.7.2"
+  namespace: 0
+  skip_redirects: true
+  filter_disambiguation_pages: false
+filtering:
+  mode: enforce
+  min_chars: 200
+  max_url_ratio: 0.05
+  min_alphabetic_ratio: 0.35
+  min_latin_ratio: 0.80
+  max_symbol_ratio: 0.20
+  max_markup_remnant_ratio: 0.05
+language_id:
+  enabled: false
+  audit_only: true
+deduplication:
+  mode: exact_sha256
+contamination:
+  synthetic_dataset_dir: artifacts/datasets/relation_v2_gate_v1
+  matcher: aho_corasick
+  max_context_chars: 80
+split:
+  train_fraction: 0.98
+  validation_fraction: 0.02
+  policy: stable_document_id_sha256

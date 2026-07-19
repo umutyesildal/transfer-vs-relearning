@@ -1,0 +1,51 @@
+version: turkish_bridge_v1
+document: 109_TURKISH_BRIDGE_RETENTION_AND_SCALE_DECISION_PLAN.md
+scratch_root: /vol/tmp2/yesildau/turkish_bridge_v1
+corpus_config: configs/corpora/trwiki_turkish_bridge_v1.yaml
+dataset_version: relation_v2_gate_v1
+selected_subject_count: 100
+fact_count: 500
+directions: [en_to_en, tr_to_en, tr_to_tr]
+models:
+  - label: qwen
+    model_id: Qwen/Qwen2.5-1.5B
+    m1_endpoint: update_50
+  - label: smollm2
+    model_id: HuggingFaceTB/SmolLM2-1.7B
+    m1_endpoint: document_104_selected
+adaptation:
+  block_size: 512
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 8
+  world_size: 1
+  effective_tokens_per_optimizer_step: 8192
+  low_checkpoint_step: 32
+  low_supervised_tokens: 262144
+  full_checkpoint_step: 128
+  full_supervised_tokens: 1048576
+  learning_rate: 1.0e-5
+  loss_mode: full_sequence
+  seed: 42
+  data_seed: 42
+evaluation:
+  bootstrap_samples: 2000
+  bootstrap_unit: subject_id
+  bootstrap_seed: 42
+  primary_score: mean_answer_token_log_probability
+  primary_direction: tr_to_en
+  secondary_directions: [en_to_en, tr_to_tr]
+promotion_rule:
+  turkish_ppl_ratio_to_m1_max: 0.95
+  en_to_en_top1_drop_max: 0.05
+  tr_to_en_top1_min: 0.30
+  tr_to_en_mean_margin_min: 0.0
+  tr_to_en_gain_min: 0.05
+  tr_to_en_already_open_floor: 0.30
+  already_open_retention_drop_max: 0.05
+  m0_adjusted_tr_to_en_gain_min: 0.20
+  relation_count_at_or_above_0_20_min: 3
+notes: >-
+  A model is promising when Turkish PPL and English retention pass, M0-adjusted TR-to-EN access is
+  nontrivial, and either adaptation improves TR-to-EN by at least five percentage points with a
+  positive paired-bootstrap lower bound or M1 access was already open and remains within five
+  points. Results remain exploratory feasibility evidence.
