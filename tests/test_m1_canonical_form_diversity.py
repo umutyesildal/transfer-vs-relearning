@@ -24,6 +24,14 @@ def test_hybrid_builder_preserves_canonical_slots_and_budget(tmp_path: Path) -> 
     assert manifest["four_form_registry_sha256"] == FOUR_FORM_HASH
     assert manifest["exact_prefix_sha256"] == EXACT_PREFIX_HASH
     assert len(rows) == 3500
+    source_rows = read_jsonl(
+        repo_root / "artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/train.jsonl"
+    )
+    source_declaratives = {
+        (str(row["fact_id"]), str(row["template_id"])): row
+        for row in source_rows
+        if str(row["template_id"]).endswith(("decl_01", "decl_02", "decl_03"))
+    }
     assert Counter(row["training_representation"] for row in rows) == Counter({
         "decl_01": 500, "decl_02": 500, "decl_03": 500,
         "form_a_qa": 500, "form_a_direct": 500,
@@ -37,3 +45,8 @@ def test_hybrid_builder_preserves_canonical_slots_and_budget(tmp_path: Path) -> 
         assert [row["training_representation"] for row in fact_rows] == list(SLOTS)
         assert {row.get("training_form_id") for row in fact_rows if row["training_representation"].startswith("form_")} == {"form_a", "form_b"}
         assert not {row.get("training_form_id") for row in fact_rows} & {"form_c", "form_d"}
+        for row in fact_rows[:3]:
+            original = source_declaratives[(str(row["fact_id"]), str(row["template_id"]))]
+            assert {field: row[field] for field in ("template_id", "text", "answer")} == {
+                field: original[field] for field in ("template_id", "text", "answer")
+            }

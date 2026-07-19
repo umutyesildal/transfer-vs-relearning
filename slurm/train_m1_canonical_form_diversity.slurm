@@ -22,4 +22,5 @@ export HF_HOME="${SCRATCH_ROOT}/cache/huggingface" TRANSFORMERS_CACHE="${SCRATCH
 conda run --name xfer-relearn python scripts/build_m1_canonical_form_diversity_dataset.py --repo-root "${REPO_ROOT}" --output-dir "${SCRATCH_ROOT}/datasets"
 conda run --name xfer-relearn python scripts/audit_m1_canonical_form_diversity_exposure.py --output "${SCRATCH_ROOT}/manifests/exposure_audit.json"
 conda run --name xfer-relearn python scripts/prepare_m1_canonical_form_diversity_config.py --source-config "${SOURCE_CONFIG}" --dataset-root "${SCRATCH_ROOT}/datasets" --output-root "${SCRATCH_ROOT}/training/seed42" --output "${SCRATCH_CONFIG}"
+conda run --name xfer-relearn python scripts/smoke_pre_m2_wp1b_batch.py --config "${SCRATCH_CONFIG}" --repo-root "${REPO_ROOT}" | tee "${SCRATCH_ROOT}/manifests/smoke_batch.json"
 conda run --name xfer-relearn python scripts/train_clm.py --config "${SCRATCH_CONFIG}"
