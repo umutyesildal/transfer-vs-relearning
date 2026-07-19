@@ -91,6 +91,17 @@ def test_preflight_allows_its_own_afterok_target_but_rejects_other_duplicates() 
     assert _unexpected_target_jobs("m1-xfam-train", rows[:1], "999999") == rows[:1]
 
 
+def test_completed_subset_evaluation_allows_only_disjoint_running_tasks() -> None:
+    rows = [
+        "410109_2|m1-xfam-eval|(null)",
+        "410110_1|m1-xfam-eval|(null)",
+        "410111_[1,3]|m1-xfam-eval|afterok:410105(unfulfilled)",
+    ]
+    assert _unexpected_target_jobs("m1-xfam-eval", rows, "410105", {1, 3}) == [
+        "410110_1|m1-xfam-eval|(null)"
+    ]
+
+
 def test_array_launchers_reject_blank_labels_and_avoid_shared_training_config() -> None:
     launchers = [
         _repo_root() / "slurm/acquire_m1_cross_family_models.slurm",

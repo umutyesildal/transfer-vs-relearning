@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 from datetime import datetime, timedelta, timezone
@@ -42,15 +43,30 @@ def _check(condition: bool, label: str, checks: dict[str, Any], detail: Any) -> 
         raise ValueError(f"Preflight failed: {label}: {detail}")
 
 
-def _unexpected_target_jobs(target_job_name: str, queue_rows: list[str], current_job_id: str | None) -> list[str]:
+def _unexpected_target_jobs(
+    target_job_name: str,
+    queue_rows: list[str],
+    current_job_id: str | None,
+    selected_candidate_indices: set[int] | None = None,
+) -> list[str]:
     unexpected: list[str] = []
     for row in queue_rows:
-        job_name, separator, dependencies = row.partition("|")
+        parts = row.split("|", 2)
+        if len(parts) == 3:
+            job_id, job_name, dependencies = parts
+        else:
+            job_id = ""
+            job_name, separator, dependencies = row.partition("|")
         if job_name.strip() != target_job_name:
             continue
-        if separator and current_job_id and current_job_id in dependencies:
+        if current_job_id and current_job_id in dependencies:
             # The launcher intentionally submits the target array with afterok:<this preflight>.
             continue
+        if selected_candidate_indices is not None:
+            match = re.search(r"_(\d+)$", job_id.strip())
+            if match and int(match.group(1)) not in selected_candidate_indices:
+                # A completed-subset evaluation may overlap a disjoint candidate task.
+                continue
         unexpected.append(row)
     return sorted(unexpected)
 
@@ -166,8 +182,14 @@ def run_preflight(args: argparse.Namespace) -> dict[str, Any]:
             resolved_paths,
         )
         target_job_name = {"acquisition": "m1-xfam-acquire", "training": "m1-xfam-train", "evaluation": "m1-xfam-eval"}[args.stage]
-        queued = _run("squeue", "-u", args.user, "-h", "-o", "%j|%E").splitlines()
-        duplicates = _unexpected_target_jobs(target_job_name, queued, os.environ.get("SLURM_JOB_ID"))
+        queued = _run("squeue", "-u", args.user, "-h", "-o", "%i|%j|%E").splitlines()
+        selected_for_overlap = set(indices) if args.allow_completed_subset_evaluation else None
+        duplicates = _unexpected_target_jobs(
+            target_job_name,
+            queued,
+            os.environ.get("SLURM_JOB_ID"),
+            selected_for_overlap,
+        )
         _check(not duplicates, "duplicate_target_jobs", checks, duplicates)
 
         payload.update(
