@@ -30,14 +30,14 @@ def main() -> None:
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     args = parser.parse_args()
     repo_root = args.repo_root.resolve()
-    output_root, final_model = args.output_root.resolve(), args.final_model.resolve()
+    output_root, final_model, general_corpus = args.output_root.resolve(), args.final_model.resolve(), args.general_corpus.resolve()
     approved_scratch(output_root)
     approved_scratch(final_model)
     training_manifest = final_model.parent / "training_manifest.json"
     if json.loads(training_manifest.read_text(encoding="utf-8")).get("status") != "complete":
         raise ValueError(f"Treatment training is not complete: {training_manifest}")
-    if not args.general_corpus.is_file():
-        raise FileNotFoundError(args.general_corpus)
+    if not general_corpus.is_file():
+        raise FileNotFoundError(general_corpus)
 
     model_manifest = output_root / "model_manifests" / f"{LABEL}.json"
     create_local_model_manifest(
@@ -62,7 +62,7 @@ def main() -> None:
     write_json(general_config, {
         "run_name": "m1_canonical_form_diversity_treatment_seed42_general_capability",
         "output_root": str(output_root / "general_capability" / LABEL), "model_manifest": str(model_manifest),
-        "data": {"corpus_file": str(args.general_corpus.resolve()), "prompts_file": str(repo_root / "configs/general_capability/prompts_v1.jsonl"), "completions_file": str(repo_root / "configs/general_capability/completions_v1.jsonl"), "synthetic_subjects_file": str(repo_root / "artifacts/datasets/relation_v2_gate_v1/data/canonical_subject_profiles_5000.csv")},
+        "data": {"corpus_file": str(general_corpus), "prompts_file": str(repo_root / "configs/general_capability/prompts_v1.jsonl"), "completions_file": str(repo_root / "configs/general_capability/completions_v1.jsonl"), "synthetic_subjects_file": str(repo_root / "artifacts/datasets/relation_v2_gate_v1/data/canonical_subject_profiles_5000.csv")},
         "scoring": {"block_size": 512, "batch_size": 4, "candidate_batch_size": 16, "bootstrap_samples": 2000},
         "generation": {"max_new_tokens": 64}, "runtime": {"device": "cuda", "bf16": True, "seed": 42},
     })
