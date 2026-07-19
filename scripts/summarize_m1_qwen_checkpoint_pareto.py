@@ -35,14 +35,14 @@ def _hard_metrics(root: Path) -> tuple[float, float, float, float, float]:
         form_rows = list(csv.DictReader(handle))
     min_ab = min(float(row["top1_accuracy"]) for row in form_rows if row["form_id"] in FORMS_AB)
     min_cd = min(float(row["top1_accuracy"]) for row in form_rows if row["form_id"] in FORMS_CD)
-    with (root / "form_intersections.csv").open(newline="", encoding="utf-8-sig") as handle:
+    with (root / "all_cell_intersections.csv").open(newline="", encoding="utf-8-sig") as handle:
         intersections = list(csv.DictReader(handle))
     total = sum(int(row["n"]) for row in intersections)
-    correct = sum(int(row["all_form_intersection"]) for row in intersections)
+    correct = sum(int(row["all_cell_intersection"]) for row in intersections)
     per_relation: dict[str, list[int]] = {}
     for row in intersections:
         values = per_relation.setdefault(row["relation"], [0, 0])
-        values[0] += int(row["all_form_intersection"])
+        values[0] += int(row["all_cell_intersection"])
         values[1] += int(row["n"])
     robust_min = min(correct_n / n for correct_n, n in per_relation.values())
     summary = _json(root / "summary.json")

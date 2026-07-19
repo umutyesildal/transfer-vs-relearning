@@ -51,8 +51,12 @@ def test_hard_metrics_preserve_scaffold_cell_minima(tmp_path: Path) -> None:
         {"relation": "born_in", "scaffold_id": "direct", "n": 10, "all_form_intersection": 8},
         {"relation": "born_in", "scaffold_id": "qa", "n": 10, "all_form_intersection": 6},
     ])
+    _write_csv(hard / "all_cell_intersections.csv", [
+        {"relation": "profession", "n": 10, "required_cells": 8, "all_cell_intersection": 7},
+        {"relation": "born_in", "n": 10, "required_cells": 8, "all_cell_intersection": 6},
+    ])
     (hard / "summary.json").write_text(json.dumps({"top1": 36, "probes": 40}), encoding="utf-8")
-    assert module._hard_metrics(hard) == (0.9, 0.95, 0.79, 0.75, 0.7)
+    assert module._hard_metrics(hard) == (0.9, 0.95, 0.79, 0.65, 0.6)
 
 
 def test_slurm_wave_excludes_anomalous_node_and_is_bounded() -> None:
