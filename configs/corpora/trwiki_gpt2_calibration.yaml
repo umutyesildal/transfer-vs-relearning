@@ -4,7 +4,7 @@ dump_date: "20260601"
 dump_filename: "trwiki-20260601-pages-articles.xml.bz2"
 dump_base_url: "https://dumps.wikimedia.org/trwiki/20260601/"
 checksum_algorithm: sha1
-checksum_filename: sha1sums.txt
+checksum_filename: trwiki-20260601-sha1sums.txt
 seed: 42
 download:
   minimum_free_bytes: 21474836480

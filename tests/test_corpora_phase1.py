@@ -79,6 +79,15 @@ def test_completed_and_incomplete_dump_metadata_parsing() -> None:
     assert not status_is_complete('{"status": "running"}')
 
 
+def test_bridge_config_uses_date_scoped_wikimedia_checksum() -> None:
+    config_path = Path(__file__).parents[1] / "configs" / "corpora" / "trwiki_turkish_bridge_v1.yaml"
+    cfg = load_corpus_config(config_path)
+    assert cfg["checksum_filename"] == f'{cfg["project"]}-{cfg["dump_date"]}-sha1sums.txt'
+    assert cfg["dump_base_url"] + cfg["checksum_filename"] == (
+        "https://dumps.wikimedia.org/trwiki/20260601/trwiki-20260601-sha1sums.txt"
+    )
+
+
 def test_sha1_checksum_parsing_and_validation(tmp_path: Path) -> None:
     filename = "trwiki-20260601-pages-articles.xml.bz2"
     digest = "a" * 40
