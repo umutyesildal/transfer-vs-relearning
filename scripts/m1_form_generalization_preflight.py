@@ -128,8 +128,8 @@ def main() -> None:
     if args.verify_manifest:
         verify_preflight(args)
         return
-    if not args.expected_commit or len(args.output_namespace) != 2:
-        parser.error("Preflight mode requires --expected-commit and exactly two --output-namespace values")
+    if not args.expected_commit or not args.output_namespace:
+        parser.error("Preflight mode requires --expected-commit and at least one --output-namespace value")
     payload = run_preflight(args)
     print(json.dumps(payload, indent=2, sort_keys=True))
 
