@@ -20,9 +20,9 @@ mkdir -p "${SCRATCH_ROOT}"/{logs,tmp,cache} "${TASK_TMP}"
 export XDG_CACHE_HOME="${SCRATCH_ROOT}/cache"
 export TMPDIR="${TASK_TMP}"
 
-case "$(readlink -f "${CORPUS_ROOT}")" in
+case "$(readlink -m "${CORPUS_ROOT}")" in
   /vol/tmp/yesildau/*|/vol/tmp2/yesildau/*) ;;
-  *) echo "Unsafe corpus root: $(readlink -f "${CORPUS_ROOT}")" >&2; exit 2 ;;
+  *) echo "Unsafe corpus root: $(readlink -m "${CORPUS_ROOT}")" >&2; exit 2 ;;
 esac
 
 module load anaconda/3-2024.06

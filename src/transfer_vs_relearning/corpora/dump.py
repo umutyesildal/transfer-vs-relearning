@@ -13,6 +13,22 @@ from transfer_vs_relearning.corpora.config import ensure_corpus_dirs, stage_dirs
 from transfer_vs_relearning.utils.io import write_json
 
 
+HTTP_USER_AGENT = (
+    "transfer-vs-relearning-thesis/1.0 "
+    "(https://github.com/umutyesildal/transfer-vs-relearning)"
+)
+
+
+def _http_request(url: str) -> urllib.request.Request:
+    return urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": HTTP_USER_AGENT,
+            "Accept": "application/json,text/plain,application/octet-stream,*/*",
+        },
+    )
+
+
 @dataclass(frozen=True)
 class DumpMetadata:
     corpus_id: str
@@ -121,7 +137,7 @@ def download_dump(config: dict[str, Any], metadata: DumpMetadata, force: bool = 
     _disk_space_preflight(raw_dir, minimum_bytes=minimum)
     mode = "ab" if partial.exists() and not force else "wb"
     start = partial.stat().st_size if partial.exists() and not force else 0
-    request = urllib.request.Request(metadata.dump_url)
+    request = _http_request(metadata.dump_url)
     if start:
         request.add_header("Range", f"bytes={start}-")
     with urllib.request.urlopen(request) as response:
@@ -181,7 +197,7 @@ def sha1_file(path: Path) -> str:
 
 
 def _read_url(url: str) -> str:
-    with urllib.request.urlopen(url) as response:
+    with urllib.request.urlopen(_http_request(url)) as response:
         return response.read().decode("utf-8", errors="replace")
 
 

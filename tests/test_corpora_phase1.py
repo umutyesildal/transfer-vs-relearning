@@ -13,7 +13,7 @@ from transfer_vs_relearning.corpora.config import config_hash
 from transfer_vs_relearning.corpora.contamination import ContaminationScanner, Pattern, scan_document, turkish_lower
 from transfer_vs_relearning.corpora.dedup import exact_deduplicate, exact_deduplicate_stream
 from transfer_vs_relearning.corpora.document import CorpusDocument
-from transfer_vs_relearning.corpora.dump import DumpMetadata, download_dump, load_official_dump_metadata, parse_checksum_line, sha1_file, status_is_complete
+from transfer_vs_relearning.corpora.dump import HTTP_USER_AGENT, DumpMetadata, _read_url, download_dump, load_official_dump_metadata, parse_checksum_line, sha1_file, status_is_complete
 from transfer_vs_relearning.corpora.extract import _iter_real_dump, extract_from_xml_text, parse_wikitext
 from transfer_vs_relearning.corpora.filtering import audit_document
 from transfer_vs_relearning.corpora.io import iter_documents, write_documents
@@ -312,6 +312,23 @@ def test_download_new_and_valid_206_resume(monkeypatch, tmp_path: Path) -> None:
     assert first.read_bytes() == b"abc"
     second = download_dump(cfg, metadata(cfg))
     assert second.read_bytes() == b"abcdef"
+    assert all(headers["User-agent"] == HTTP_USER_AGENT for headers in calls)
+    assert calls[1]["Range"] == "bytes=3-"
+
+
+def test_metadata_requests_use_identifying_user_agent(monkeypatch) -> None:
+    observed = []
+
+    def fake_urlopen(request):
+        observed.append(dict(request.header_items()))
+        return FakeResponse(b'{"status": "done"}', 200, {"Content-Length": "18"})
+
+    monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
+    assert '"done"' in _read_url("https://dumps.wikimedia.org/trwiki/20260601/dumpstatus.json")
+    assert observed == [{
+        "User-agent": HTTP_USER_AGENT,
+        "Accept": "application/json,text/plain,application/octet-stream,*/*",
+    }]
 
 
 def test_download_rejects_server_ignoring_range_and_bad_content_range(monkeypatch, tmp_path: Path) -> None:
