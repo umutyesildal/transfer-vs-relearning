@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=m1-qwen-pareto-prepare
 #SBATCH --account=yesildau
-#SBATCH --partition=standard
+#SBATCH --partition=std
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=8G
 #SBATCH --time=00:30:00
