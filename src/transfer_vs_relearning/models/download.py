@@ -12,6 +12,7 @@ def safe_model_dir_name(model_id: str) -> str:
 
 
 def download_model_snapshot(model_id: str, revision: str | None, artifact_root: Path, local_files_only: bool = False) -> dict[str, Any]:
+    from accelerate import init_empty_weights
     from huggingface_hub import HfApi, snapshot_download
     import huggingface_hub
     import transformers
@@ -21,7 +22,17 @@ def download_model_snapshot(model_id: str, revision: str | None, artifact_root: 
     info = api.model_info(model_id, revision=revision)
     resolved = info.sha
     artifact_root = artifact_root.resolve()
-    target_dir = artifact_root / safe_model_dir_name(model_id) / resolved
+    model_root = artifact_root / safe_model_dir_name(model_id)
+    target_dir = model_root / resolved
+    resolution_manifest = {
+        "status": "resolved_before_download",
+        "model_id": model_id,
+        "requested_revision": revision,
+        "resolved_revision": resolved,
+        "resolved_at": datetime.now(timezone.utc).isoformat(),
+        "target_dir": str(target_dir),
+    }
+    write_json(model_root / "model_resolution.json", resolution_manifest)
     snapshot_path = snapshot_download(
         repo_id=model_id,
         revision=resolved,
@@ -31,7 +42,8 @@ def download_model_snapshot(model_id: str, revision: str | None, artifact_root: 
     )
     tokenizer = AutoTokenizer.from_pretrained(snapshot_path, local_files_only=True)
     config = AutoConfig.from_pretrained(snapshot_path, local_files_only=True)
-    model = AutoModelForCausalLM.from_config(config)
+    with init_empty_weights():
+        model = AutoModelForCausalLM.from_config(config)
     parameter_count = sum(param.numel() for param in model.parameters())
     file_hashes = {
         str(path.relative_to(target_dir)): sha256_file(path)
@@ -52,6 +64,8 @@ def download_model_snapshot(model_id: str, revision: str | None, artifact_root: 
         "tokenizer_class": tokenizer.__class__.__name__,
         "model_class": "AutoModelForCausalLM",
         "parameter_count": parameter_count,
+        "resolution_manifest": str(model_root / "model_resolution.json"),
+        "resolution_manifest_sha256": sha256_file(model_root / "model_resolution.json"),
     }
-    write_json(artifact_root / safe_model_dir_name(model_id) / "model_manifest.json", manifest)
+    write_json(model_root / "model_manifest.json", manifest)
     return manifest

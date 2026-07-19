@@ -222,6 +222,8 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     model = AutoModelForCausalLM.from_pretrained(str(model_path), local_files_only=local_files_only)
+    if bool(training_config.get("gradient_checkpointing", False)):
+        model.config.use_cache = False
 
     train_file = resolve_path(repo_root, dataset_config["train_file"])
     text_field = str(dataset_config.get("text_field", "text"))
