@@ -126,3 +126,13 @@ def test_paired_bootstrap_and_frozen_bridge_classifier() -> None:
     )
     assert result["classification"] == "promising"
     assert result["bridge_path"] == "improved_with_adaptation"
+
+
+def test_corpus_launcher_keeps_all_large_outputs_on_scratch() -> None:
+    launcher = (Path(__file__).resolve().parents[1] / "slurm/prepare_turkish_bridge_corpus.slurm").read_text(encoding="utf-8")
+    assert "#SBATCH --partition=std" in launcher
+    assert "#SBATCH --output=/vol/tmp2/yesildau/turkish_bridge_v1/logs/" in launcher
+    assert 'SCRATCH_ROOT="/vol/tmp2/yesildau/turkish_bridge_v1"' in launcher
+    assert 'configs/corpora/trwiki_turkish_bridge_v1.yaml' in launcher
+    for stage in ("resolve", "download", "verify", "extract", "normalize", "audit", "filter", "deduplicate", "contamination-preflight", "scan-contamination", "split", "report"):
+        assert f'"${{PY[@]}}" {stage} ' in launcher
