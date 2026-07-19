@@ -42,6 +42,19 @@ def _check(condition: bool, label: str, checks: dict[str, Any], detail: Any) -> 
         raise ValueError(f"Preflight failed: {label}: {detail}")
 
 
+def _unexpected_target_jobs(target_job_name: str, queue_rows: list[str], current_job_id: str | None) -> list[str]:
+    unexpected: list[str] = []
+    for row in queue_rows:
+        job_name, separator, dependencies = row.partition("|")
+        if job_name.strip() != target_job_name:
+            continue
+        if separator and current_job_id and current_job_id in dependencies:
+            # The launcher intentionally submits the target array with afterok:<this preflight>.
+            continue
+        unexpected.append(row)
+    return sorted(unexpected)
+
+
 def _candidate_indices(args: argparse.Namespace, registry: dict[str, Any]) -> list[int]:
     indices = args.candidate_index or [int(candidate["index"]) for candidate in registry["candidates"]]
     if len(indices) != len(set(indices)):
@@ -135,8 +148,8 @@ def run_preflight(args: argparse.Namespace) -> dict[str, Any]:
             resolved_paths,
         )
         target_job_name = {"acquisition": "m1-xfam-acquire", "training": "m1-xfam-train", "evaluation": "m1-xfam-eval"}[args.stage]
-        queued = _run("squeue", "-u", args.user, "-h", "-o", "%j").splitlines()
-        duplicates = sorted(name for name in queued if name.strip() == target_job_name)
+        queued = _run("squeue", "-u", args.user, "-h", "-o", "%j|%E").splitlines()
+        duplicates = _unexpected_target_jobs(target_job_name, queued, os.environ.get("SLURM_JOB_ID"))
         _check(not duplicates, "duplicate_target_jobs", checks, duplicates)
 
         payload.update(
