@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import math
 from pathlib import Path
 
 from transfer_vs_relearning.data.turkish_bridge import (
@@ -105,7 +106,7 @@ def test_paired_bootstrap_and_frozen_bridge_classifier() -> None:
     low = _bridge_rows({"en_to_en": 0.98, "tr_to_en": 0.30, "tr_to_tr": 0.20})
     full = _bridge_rows({"en_to_en": 0.96, "tr_to_en": 0.50, "tr_to_tr": 0.40})
     bootstrap = paired_subject_bootstrap_accuracy_difference(m1, full, direction="tr_to_en", samples=200, seed=42)
-    assert bootstrap["estimate"] == 0.3
+    assert math.isclose(float(bootstrap["estimate"]), 0.3, rel_tol=0.0, abs_tol=1e-12)
     rule = {
         "turkish_ppl_ratio_to_m1_max": 0.95, "en_to_en_top1_drop_max": 0.05,
         "tr_to_en_top1_min": 0.30, "tr_to_en_mean_margin_min": 0.0,
