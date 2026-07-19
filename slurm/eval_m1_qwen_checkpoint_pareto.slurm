@@ -19,8 +19,18 @@ PROBES="/vol/tmp2/yesildau/m1_form_generalization_v1/datasets/evaluations/four_f
 cd "${REPO_ROOT}"
 module load anaconda/3-2024.06
 conda run --name xfer-relearn python scripts/m1_qwen_checkpoint_pareto_preflight.py --repo-root "${REPO_ROOT}" --registry "${REGISTRY}" --wave-manifest "${ROOT}/wave_manifest.json" --launcher "${REPO_ROOT}/slurm/eval_m1_qwen_checkpoint_pareto.slurm" --verify-manifest "${PREFLIGHT}" --task-index "${SLURM_ARRAY_TASK_ID}" --max-age-minutes 720
-row="$(conda run --name xfer-relearn python -c 'import csv,sys; rows=list(csv.DictReader(open(sys.argv[1], encoding="utf-8-sig"))); i=int(sys.argv[2]); matches=[r for r in rows if int(r["array_index"])==i]; assert len(matches)==1; r=matches[0]; print("|".join(r[k] for k in ("label","model_manifest","model_manifest_sha256","hard_output","exact_config","general_config")))' "${REGISTRY}" "${SLURM_ARRAY_TASK_ID}" | tr -d '\r' | tail -n 1)"
-IFS='|' read -r label model_manifest expected_sha hard_output exact_config general_config <<<"${row}"
+resolve_field() {
+  conda run --name xfer-relearn python scripts/resolve_m1_qwen_checkpoint_pareto.py \
+    --registry "${REGISTRY}" --task-index "${SLURM_ARRAY_TASK_ID}" --field "$1" \
+    | tr -d '\r' | sed '/^[[:space:]]*$/d' | tail -n 1
+}
+label="$(resolve_field label)"
+model_manifest="$(resolve_field model_manifest)"
+expected_sha="$(resolve_field model_manifest_sha256)"
+hard_output="$(resolve_field hard_output)"
+exact_config="$(resolve_field exact_config)"
+general_config="$(resolve_field general_config)"
+test -n "${label}" -a -n "${model_manifest}" -a -n "${expected_sha}" -a -n "${hard_output}" -a -n "${exact_config}" -a -n "${general_config}"
 actual_sha="$(sha256sum "${model_manifest}" | awk '{print $1}')"
 test "${actual_sha}" = "${expected_sha}"
 task_tmp="${ROOT}/tmp/${label}_${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"

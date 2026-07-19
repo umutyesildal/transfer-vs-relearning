@@ -63,3 +63,17 @@ def test_slurm_wave_excludes_anomalous_node_and_is_bounded() -> None:
         source = submitter.read_text(encoding="utf-8")
         assert '--array="0-10%3"' in source
         assert 'afterok:$prepare_id' in source
+
+
+def test_registry_field_resolver_rejects_missing_or_empty_rows(tmp_path: Path) -> None:
+    module = _load_script("resolve_m1_qwen_checkpoint_pareto.py")
+    registry = tmp_path / "registry.csv"
+    _write_csv(registry, [{"array_index": 0, "label": "qwen_step25", "model_manifest": "/tmp/model.json"}])
+    assert module.resolve(registry, 0, "label") == "qwen_step25"
+    assert module.resolve(registry, 0, "model_manifest") == "/tmp/model.json"
+    try:
+        module.resolve(registry, 1, "label")
+    except ValueError as exc:
+        assert "found 0" in str(exc)
+    else:
+        raise AssertionError("Missing task must fail")
