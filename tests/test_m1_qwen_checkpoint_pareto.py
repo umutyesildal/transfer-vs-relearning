@@ -62,3 +62,4 @@ def test_slurm_wave_excludes_anomalous_node_and_is_bounded() -> None:
     if submitter.exists():
         source = submitter.read_text(encoding="utf-8")
         assert '--array="0-10%3"' in source
+        assert 'afterok:$prepare_id' in source

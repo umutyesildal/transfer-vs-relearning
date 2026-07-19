@@ -48,6 +48,7 @@ def main() -> None:
     parser.add_argument("--general-corpus", type=Path, required=True)
     parser.add_argument("--probe-registry", type=Path, required=True)
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
+    parser.add_argument("--resume-preparation", action="store_true")
     args = parser.parse_args()
 
     repo_root = args.repo_root.resolve()
@@ -57,7 +58,12 @@ def main() -> None:
     probe_registry = _scratch(args.probe_registry, "probe registry")
     source_manifest = _scratch(args.source_manifest, "source manifest")
     if output_root.exists():
-        raise FileExistsError(f"Wave namespace already exists: {output_root}")
+        if not args.resume_preparation:
+            raise FileExistsError(f"Wave namespace already exists: {output_root}")
+        allowed = {"model_manifests", "exact_configs", "general_configs", "logs"}
+        unexpected = sorted(path.name for path in output_root.iterdir() if path.name not in allowed)
+        if unexpected:
+            raise ValueError(f"Unsafe preparation resume; unexpected namespaces: {unexpected}")
     for path in (corpus, probe_registry, source_manifest):
         if not path.is_file():
             raise FileNotFoundError(path)
@@ -136,6 +142,7 @@ def main() -> None:
         "frozen_base_perplexity": BASE_PERPLEXITY,
         "frozen_base_token_hash": BASE_TOKEN_HASH,
         "selection_rule": "earliest checkpoint passing all frozen gates; exploratory diagnostic only",
+        "resumed_partial_preparation": bool(args.resume_preparation),
     })
     print(registry)
     print(f"tasks={len(rows)}")
