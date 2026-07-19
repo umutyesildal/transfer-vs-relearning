@@ -21,6 +21,8 @@ candidate_args=()
 for index in "${indices[@]}"; do candidate_args+=(--candidate-index "${index}"); done
 retry_args=()
 if [[ "${ALLOW_SUBSET_RETRY:-0}" == "1" ]]; then retry_args+=(--allow-subset-retry); fi
+evaluation_subset_args=()
+if [[ "${ALLOW_COMPLETED_SUBSET_EVALUATION:-0}" == "1" ]]; then evaluation_subset_args+=(--allow-completed-subset-evaluation); fi
 cd "${REPO_ROOT}"
 module load anaconda/3-2024.06
 conda run --name xfer-relearn python scripts/m1_cross_family_preflight.py \
@@ -32,4 +34,5 @@ conda run --name xfer-relearn python scripts/m1_cross_family_preflight.py \
   --manifest "${MANIFEST}" \
   --expected-commit "$(git rev-parse HEAD)" \
   "${retry_args[@]}" \
+  "${evaluation_subset_args[@]}" \
   "${candidate_args[@]}"

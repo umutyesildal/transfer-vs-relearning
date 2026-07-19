@@ -112,3 +112,12 @@ def test_subset_retry_requires_explicit_preflight_mode() -> None:
     assert 'args.stage == "training"' in preflight
     assert 'bool(args.candidate_index)' in preflight
     assert 'ALLOW_SUBSET_RETRY' in launcher
+
+
+def test_completed_subset_evaluation_requires_explicit_preflight_mode() -> None:
+    preflight = (_repo_root() / "scripts/m1_cross_family_preflight.py").read_text(encoding="utf-8")
+    launcher = (_repo_root() / "slurm/preflight_m1_cross_family.slurm").read_text(encoding="utf-8")
+    assert 'parser.add_argument("--allow-completed-subset-evaluation", action="store_true")' in preflight
+    assert 'args.stage == "evaluation"' in preflight
+    assert 'completed_training_endpoints' in preflight
+    assert 'ALLOW_COMPLETED_SUBSET_EVALUATION' in launcher

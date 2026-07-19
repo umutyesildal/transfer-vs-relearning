@@ -97,11 +97,21 @@ def run_preflight(args: argparse.Namespace) -> dict[str, Any]:
         "candidate_indices": indices,
         "candidate_labels": [candidate["label"] for candidate in candidates],
         "allow_subset_retry": bool(args.allow_subset_retry),
+        "allow_completed_subset_evaluation": bool(args.allow_completed_subset_evaluation),
     }
     try:
         _check(registry_path.is_file(), "registry_exists", checks, str(registry_path))
         _check(template.is_file(), "training_template_exists", checks, str(template))
         _check(launcher.is_file(), "launcher_exists", checks, str(launcher))
+        _check(
+            not (args.allow_subset_retry and args.allow_completed_subset_evaluation),
+            "subset_mode_is_unambiguous",
+            checks,
+            {
+                "allow_subset_retry": bool(args.allow_subset_retry),
+                "allow_completed_subset_evaluation": bool(args.allow_completed_subset_evaluation),
+            },
+        )
         commit = _run("git", "-C", str(repo_root), "rev-parse", "HEAD")
         _check(commit == args.expected_commit, "checkout_commit", checks, commit)
 
@@ -110,6 +120,9 @@ def run_preflight(args: argparse.Namespace) -> dict[str, Any]:
             if args.allow_subset_retry:
                 _check(args.stage == "training", "subset_retry_is_training_only", checks, args.stage)
                 _check(bool(args.candidate_index), "subset_retry_is_explicit", checks, indices)
+            elif args.allow_completed_subset_evaluation:
+                _check(args.stage == "evaluation", "completed_subset_is_evaluation_only", checks, args.stage)
+                _check(bool(args.candidate_index), "completed_subset_is_explicit", checks, indices)
             else:
                 _check(required_indices.issubset(indices), "required_candidates_in_wave", checks, {"required": sorted(required_indices), "selected": indices})
             manifests = [candidate_model_manifest(registry, candidate) for candidate in candidates]
@@ -212,6 +225,7 @@ def main() -> None:
     parser.add_argument("--manifest", type=Path, default=Path("/vol/tmp2/yesildau/m1_cross_family_screen_v1/preflight/manifest.json"))
     parser.add_argument("--candidate-index", type=int, action="append", default=[])
     parser.add_argument("--allow-subset-retry", action="store_true")
+    parser.add_argument("--allow-completed-subset-evaluation", action="store_true")
     parser.add_argument("--expected-commit", default=None)
     parser.add_argument("--user", default="yesildau")
     parser.add_argument("--estimated-inodes", type=int, default=250000)
