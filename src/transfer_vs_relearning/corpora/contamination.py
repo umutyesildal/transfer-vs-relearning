@@ -45,6 +45,7 @@ def build_contamination_inventory(dataset_dir: Path) -> tuple[list[Pattern], dic
     relations = _manifest_relations(manifest, canonical[0])
     patterns: dict[tuple[str, str, str, str | None], Pattern] = {}
     subject_objects: dict[str, set[str]] = {}
+    object_subjects: dict[str, set[str]] = {}
 
     def add(pattern: Pattern) -> None:
         key = (pattern.text, pattern.channel, pattern.rule_id, pattern.subject_id)
@@ -63,10 +64,21 @@ def build_contamination_inventory(dataset_dir: Path) -> tuple[list[Pattern], dic
         subject_objects[subject_id] = set()
         for fact in expand_canonical_row(row, relations):
             add(Pattern(f"fact_id:{fact.fact_id}", fact.fact_id, "fact_id", "synthetic_fact_id", "canonical_subject_profiles", subject_id))
-            subject_objects[subject_id].add(nfc(fact.object_en))
-            subject_objects[subject_id].add(nfc(fact.object_tr))
-            add(Pattern(f"object:{subject_id}:{fact.relation}:en", nfc(fact.object_en), "canonical_object", "object_only_flag", "canonical_subject_profiles", subject_id, (subject_id,)))
-            add(Pattern(f"object:{subject_id}:{fact.relation}:tr", nfc(fact.object_tr), "canonical_object", "object_only_flag", "canonical_subject_profiles", subject_id, (subject_id,)))
+            for surface in (nfc(fact.object_en), nfc(fact.object_tr)):
+                subject_objects[subject_id].add(surface)
+                object_subjects.setdefault(surface, set()).add(subject_id)
+
+    for index, surface in enumerate(sorted(object_subjects)):
+        associated_subject_ids = tuple(sorted(object_subjects[surface]))
+        add(Pattern(
+            f"object_surface:{index}",
+            surface,
+            "canonical_object",
+            "object_only_flag",
+            "canonical_subject_profiles",
+            None,
+            associated_subject_ids,
+        ))
 
     source_paths = _manifest_text_sources(dataset_dir, manifest)
     for source_path in source_paths:

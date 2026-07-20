@@ -358,6 +358,39 @@ def test_shared_object_subject_associations_are_preserved() -> None:
     assert subject_ids == ["S1", "S2"]
 
 
+def test_inventory_aggregates_shared_object_surface_without_losing_subject_associations(tmp_path: Path) -> None:
+    dataset = tmp_path / "relation_v2_gate_v1"
+    canonical_path = dataset / "data" / "canonical_subject_profiles_5000.csv"
+    rows = []
+    for index in (1, 2):
+        rows.append({
+            "row_id": f"R{index:05d}", "subject_id": f"S{index:05d}", "subject": f"Subject {index}",
+            "profession_en": "Shared Profession", "profession_tr": "Ortak Meslek",
+            "name_type": "english_like", "name_rarity_bucket": "rare",
+            "popularity_rank": str(index), "popularity_bucket": "high",
+            "profession_frequency_bucket": "high", "branch_group": "A",
+        })
+    write_csv(canonical_path, rows, list(rows[0]))
+    write_json(dataset / "manifest.json", {
+        "relations": ["profession"],
+        "files": {
+            "data/canonical_subject_profiles_5000.csv": hashlib.sha256(canonical_path.read_bytes()).hexdigest(),
+        },
+    })
+
+    patterns, subject_objects = build_contamination_inventory(dataset)
+    shared = [pattern for pattern in patterns if pattern.channel == "canonical_object" and pattern.text == "Shared Profession"]
+    assert len(shared) == 1
+    assert shared[0].subject_id is None
+    assert shared[0].associated_subject_ids == ("S00001", "S00002")
+    result = ContaminationScanner(patterns, subject_objects).scan(
+        {"document_id": "d", "title": "x", "text": "Shared Profession"}
+    )
+    object_matches = [match for match in result["matches"] if match["match_channel"] == "canonical_object"]
+    assert len(object_matches) == 1
+    assert object_matches[0]["associated_subject_ids"] == ["S00001", "S00002"]
+
+
 class FakeResponse:
     def __init__(self, body: bytes, status: int = 200, headers: dict[str, str] | None = None):
         self.body = body
