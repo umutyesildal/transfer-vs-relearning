@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 
 from transfer_vs_relearning.data.constants import RELATION_MAP, RELATIONS
@@ -22,10 +23,15 @@ class Fact:
     popularity_bucket: str
 
 
-def expand_canonical_row(row: dict[str, str]) -> list[Fact]:
+def expand_canonical_row(row: dict[str, str], relations: Iterable[str] | None = None) -> list[Fact]:
     facts: list[Fact] = []
-    for relation in RELATIONS:
+    for relation in RELATIONS if relations is None else relations:
+        if relation not in RELATION_MAP:
+            raise ValueError(f"Unknown relation in canonical row expansion: {relation}")
         en_col, tr_col, freq_col = RELATION_MAP[relation]
+        missing = [column for column in (en_col, tr_col, freq_col) if column not in row]
+        if missing:
+            raise ValueError(f"Canonical row {row.get('subject_id', '<unknown>')} is missing {missing} for relation {relation}")
         facts.append(
             Fact(
                 fact_id=f"{row['subject_id']}_{relation}",
@@ -46,8 +52,9 @@ def expand_canonical_row(row: dict[str, str]) -> list[Fact]:
     return facts
 
 
-def expand_canonical_rows(rows: list[dict[str, str]]) -> list[Fact]:
-    return [fact for row in rows for fact in expand_canonical_row(row)]
+def expand_canonical_rows(rows: list[dict[str, str]], relations: Iterable[str] | None = None) -> list[Fact]:
+    relation_names = None if relations is None else tuple(relations)
+    return [fact for row in rows for fact in expand_canonical_row(row, relation_names)]
 
 
 def facts_by_id(facts: list[Fact]) -> dict[str, Fact]:

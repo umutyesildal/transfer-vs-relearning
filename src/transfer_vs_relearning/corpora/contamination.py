@@ -8,9 +8,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from transfer_vs_relearning.data.constants import DATASET_FILES, RELATIONS
+from transfer_vs_relearning.data.constants import DATASET_FILES, RELATION_MAP
 from transfer_vs_relearning.data.facts import expand_canonical_row
-from transfer_vs_relearning.utils.io import read_csv_rows, read_jsonl
+from transfer_vs_relearning.utils.io import read_csv_rows, read_jsonl, sha256_file
 
 
 TURKISH_LOWER = str.maketrans({"I": "ı", "İ": "i"})
@@ -36,7 +36,13 @@ def turkish_lower(value: str) -> str:
 
 
 def build_contamination_inventory(dataset_dir: Path) -> tuple[list[Pattern], dict[str, set[str]]]:
-    canonical = read_csv_rows(dataset_dir / DATASET_FILES["canonical_profiles"])
+    manifest = _load_dataset_manifest(dataset_dir)
+    canonical_path = dataset_dir / DATASET_FILES["canonical_profiles"]
+    _verify_declared_artifact(dataset_dir, canonical_path, manifest)
+    canonical = read_csv_rows(canonical_path)
+    if not canonical:
+        raise ValueError(f"Canonical profile table is empty: {canonical_path}")
+    relations = _manifest_relations(manifest, canonical[0])
     patterns: dict[tuple[str, str, str, str | None], Pattern] = {}
     subject_objects: dict[str, set[str]] = {}
 
@@ -48,26 +54,136 @@ def build_contamination_inventory(dataset_dir: Path) -> tuple[list[Pattern], dic
     for row in canonical:
         subject = nfc(row["subject"])
         subject_id = row["subject_id"]
+        if subject_id in subject_objects:
+            raise ValueError(f"Duplicate canonical subject_id: {subject_id}")
         add(Pattern(f"subject_exact:{subject_id}", subject, "exact_nfc_full_name", "exact_full_synthetic_name", "canonical_subject_profiles", subject_id))
         add(Pattern(f"subject_casefold:{subject_id}", subject.casefold(), "casefold_full_name", "casefold_full_synthetic_name", "canonical_subject_profiles", subject_id))
         add(Pattern(f"subject_trlower:{subject_id}", turkish_lower(subject), "turkish_lower_full_name", "turkish_lower_full_synthetic_name", "canonical_subject_profiles", subject_id))
         add(Pattern(f"subject_id:{subject_id}", subject_id, "subject_id", "synthetic_subject_id", "canonical_subject_profiles", subject_id))
         subject_objects[subject_id] = set()
-        for fact in expand_canonical_row(row):
+        for fact in expand_canonical_row(row, relations):
             add(Pattern(f"fact_id:{fact.fact_id}", fact.fact_id, "fact_id", "synthetic_fact_id", "canonical_subject_profiles", subject_id))
             subject_objects[subject_id].add(nfc(fact.object_en))
             subject_objects[subject_id].add(nfc(fact.object_tr))
             add(Pattern(f"object:{subject_id}:{fact.relation}:en", nfc(fact.object_en), "canonical_object", "object_only_flag", "canonical_subject_profiles", subject_id, (subject_id,)))
             add(Pattern(f"object:{subject_id}:{fact.relation}:tr", nfc(fact.object_tr), "canonical_object", "object_only_flag", "canonical_subject_profiles", subject_id, (subject_id,)))
 
-    for path_key in ("english_training", "turkish_repetition"):
-        for index, row in enumerate(read_jsonl(dataset_dir / DATASET_FILES[path_key])):
-            add(Pattern(f"{path_key}:{index}", nfc(row["text"]), "exact_training_sentence", "exact_generated_training_sentence", path_key, row.get("subject_id")))
+    source_paths = _manifest_text_sources(dataset_dir, manifest)
+    for source_path in source_paths:
+        source_artifact = source_path.relative_to(dataset_dir).as_posix()
+        _verify_declared_artifact(dataset_dir, source_path, manifest)
+        for index, row in enumerate(read_jsonl(source_path)):
+            text = row.get("text")
+            if not isinstance(text, str) or not text.strip():
+                raise ValueError(f"Synthetic text row has no non-empty text: {source_path}:{index + 1}")
+            subject_id = row.get("subject_id")
+            if subject_id is not None and subject_id not in subject_objects:
+                raise ValueError(f"Synthetic text row references unknown subject_id {subject_id}: {source_path}:{index + 1}")
+            relation = row.get("relation")
+            if relation is not None and relation not in relations:
+                raise ValueError(f"Synthetic text row references undeclared relation {relation}: {source_path}:{index + 1}")
+            add(Pattern(
+                f"synthetic_text:{source_artifact}:{index}",
+                nfc(text),
+                "exact_training_sentence",
+                "exact_generated_training_sentence",
+                source_artifact,
+                subject_id,
+            ))
 
-    for artifact in ("synthetic_v1", "canonical_subject_profiles_5000.csv", "english_training.jsonl", "turkish_repetition.jsonl"):
+    artifact_names = {
+        dataset_dir.name,
+        DATASET_FILES["canonical_profiles"].name,
+        *(path.name for path in source_paths),
+    }
+    for artifact in sorted(artifact_names):
         add(Pattern(f"artifact:{artifact}", artifact, "dataset_artifact", "dataset_artifact", "dataset_manifest", None))
 
     return list(patterns.values()), subject_objects
+
+
+def _load_dataset_manifest(dataset_dir: Path) -> dict[str, Any]:
+    path = dataset_dir / "manifest.json"
+    if not path.is_file():
+        return {}
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"Dataset manifest must be an object: {path}")
+    return payload
+
+
+def _manifest_relations(manifest: dict[str, Any], canonical_row: dict[str, str]) -> tuple[str, ...]:
+    declared = manifest.get("relations")
+    if declared is None and isinstance(manifest.get("relation_counts"), dict):
+        declared = list(manifest["relation_counts"])
+    if declared is None and isinstance(manifest.get("frequency_counts_by_relation"), dict):
+        declared = list(manifest["frequency_counts_by_relation"])
+    if declared is None:
+        declared = [
+            relation
+            for relation, columns in RELATION_MAP.items()
+            if all(column in canonical_row for column in columns)
+        ]
+    if not isinstance(declared, list) or not declared or any(not isinstance(item, str) for item in declared):
+        raise ValueError("Dataset manifest must declare a non-empty string relation list")
+    unknown = sorted(set(declared) - set(RELATION_MAP))
+    if unknown:
+        raise ValueError(f"Dataset manifest declares unknown relations: {unknown}")
+    relations = tuple(relation for relation in RELATION_MAP if relation in set(declared))
+    if len(relations) != len(set(declared)):
+        raise ValueError(f"Dataset manifest relation list contains duplicates: {declared}")
+    for relation in relations:
+        missing = [column for column in RELATION_MAP[relation] if column not in canonical_row]
+        if missing:
+            raise ValueError(f"Canonical profile schema is missing {missing} for declared relation {relation}")
+    return relations
+
+
+def _manifest_text_sources(dataset_dir: Path, manifest: dict[str, Any]) -> list[Path]:
+    artifacts = manifest.get("artifacts")
+    if isinstance(artifacts, dict):
+        legacy_sources = []
+        for key in ("english_training", "turkish_repetition"):
+            entry = artifacts.get(key)
+            if isinstance(entry, dict) and isinstance(entry.get("path"), str):
+                legacy_sources.append(dataset_dir / entry["path"])
+        if legacy_sources:
+            return legacy_sources
+
+    files = manifest.get("files")
+    if isinstance(files, dict):
+        return [
+            dataset_dir / relative
+            for relative in sorted(files)
+            if relative.startswith("acquisition_")
+            and Path(relative).name in {"train.jsonl", "validation.jsonl"}
+        ]
+
+    return [
+        dataset_dir / DATASET_FILES[key]
+        for key in ("english_training", "turkish_repetition")
+        if (dataset_dir / DATASET_FILES[key]).is_file()
+    ]
+
+
+def _verify_declared_artifact(dataset_dir: Path, path: Path, manifest: dict[str, Any]) -> None:
+    if not path.is_file():
+        raise ValueError(f"Declared contamination artifact is missing: {path}")
+    relative = path.relative_to(dataset_dir).as_posix()
+    expected = None
+    files = manifest.get("files")
+    if isinstance(files, dict):
+        expected = files.get(relative)
+    artifacts = manifest.get("artifacts")
+    if expected is None and isinstance(artifacts, dict):
+        for entry in artifacts.values():
+            if isinstance(entry, dict) and entry.get("path") == relative:
+                expected = entry.get("sha256")
+                break
+    if expected is not None:
+        observed = sha256_file(path)
+        if observed != expected:
+            raise ValueError(f"Manifest SHA-256 mismatch for {path}: expected {expected}, observed {observed}")
 
 
 class AhoCorasickMatcher:

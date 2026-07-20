@@ -10,7 +10,7 @@ import pytest
 from transfer_vs_relearning.corpora import pipeline
 from transfer_vs_relearning.corpora.config import load_corpus_config
 from transfer_vs_relearning.corpora.config import config_hash
-from transfer_vs_relearning.corpora.contamination import ContaminationScanner, Pattern, scan_document, turkish_lower
+from transfer_vs_relearning.corpora.contamination import ContaminationScanner, Pattern, build_contamination_inventory, scan_document, turkish_lower
 from transfer_vs_relearning.corpora.dedup import exact_deduplicate, exact_deduplicate_stream
 from transfer_vs_relearning.corpora.document import CorpusDocument
 from transfer_vs_relearning.corpora.dump import HTTP_USER_AGENT, DumpMetadata, _read_url, download_dump, load_official_dump_metadata, parse_checksum_line, sha1_file, status_is_complete
@@ -21,7 +21,7 @@ from transfer_vs_relearning.corpora.manifest import write_corpus_manifest
 from transfer_vs_relearning.corpora.normalize import normalize_document, normalize_text
 from transfer_vs_relearning.corpora.state import stage_run, stage_state_path
 from transfer_vs_relearning.corpora.split import split_documents
-from transfer_vs_relearning.utils.io import write_json
+from transfer_vs_relearning.utils.io import write_csv, write_json
 
 
 def config(tmp_path: Path) -> dict:
@@ -251,6 +251,99 @@ def test_contamination_preflight_schema_without_scanning(monkeypatch, tmp_path: 
     assert "exact_nfc" in result["automaton_state_count_by_channel"]
     report = Path(cfg["artifact_root"]) / cfg["corpus_id"] / "reports" / "contamination_preflight.json"
     assert report.exists()
+
+
+def test_relation_v2_contamination_inventory_uses_manifest_relations_and_sources(tmp_path: Path) -> None:
+    dataset = tmp_path / "relation_v2_gate_v1"
+    canonical_path = dataset / "data" / "canonical_subject_profiles_5000.csv"
+    train_path = dataset / "acquisition_100_subjects_direct" / "train.jsonl"
+    validation_path = dataset / "acquisition_100_subjects_direct" / "validation.jsonl"
+    row = {
+        "row_id": "R00001", "subject_id": "S00001", "subject": "V2 Subject",
+        "profession_en": "Physicist", "profession_tr": "Fizikçi",
+        "birthplace_en": "Mugla", "birthplace_tr": "Muğla",
+        "residence_en": "Ankara", "residence_tr": "Ankara",
+        "field_of_study_en": "Physics", "field_of_study_tr": "Fizik",
+        "works_in_industry_en": "Energy", "works_in_industry_tr": "Enerji",
+        "name_type": "english_like", "name_rarity_bucket": "rare",
+        "popularity_rank": "1", "popularity_bucket": "high",
+        "profession_frequency_bucket": "high", "birthplace_frequency_bucket": "low",
+        "residence_frequency_bucket": "low", "field_of_study_frequency_bucket": "medium",
+        "works_in_industry_frequency_bucket": "medium", "branch_group": "A",
+    }
+    write_csv(canonical_path, [row], list(row))
+    train_path.parent.mkdir(parents=True, exist_ok=True)
+    train_path.write_text(json.dumps({"text": "V2 Subject studied Physics.", "subject_id": "S00001"}) + "\n", encoding="utf-8")
+    validation_path.write_text(json.dumps({"text": "Question: What did V2 Subject study?\nAnswer: Physics", "subject_id": "S00001"}) + "\n", encoding="utf-8")
+    unlisted = dataset / "output" / "english_training.jsonl"
+    unlisted.parent.mkdir(parents=True)
+    unlisted.write_text(json.dumps({"text": "UNLISTED SENTENCE", "subject_id": "S00001"}) + "\n", encoding="utf-8")
+
+    files = {
+        canonical_path.relative_to(dataset).as_posix(): hashlib.sha256(canonical_path.read_bytes()).hexdigest(),
+        train_path.relative_to(dataset).as_posix(): hashlib.sha256(train_path.read_bytes()).hexdigest(),
+        validation_path.relative_to(dataset).as_posix(): hashlib.sha256(validation_path.read_bytes()).hexdigest(),
+    }
+    write_json(dataset / "manifest.json", {
+        "version": "relation_v2_gate_v1",
+        "relations": ["profession", "born_in", "lives_in", "field_of_study", "works_in_industry"],
+        "files": files,
+    })
+
+    patterns, subject_objects = build_contamination_inventory(dataset)
+    texts = {pattern.text for pattern in patterns}
+    fact_ids = {pattern.text for pattern in patterns if pattern.channel == "fact_id"}
+    assert subject_objects["S00001"] == {"Physicist", "Fizikçi", "Mugla", "Muğla", "Ankara", "Physics", "Fizik", "Energy", "Enerji"}
+    assert fact_ids == {
+        "S00001_profession", "S00001_born_in", "S00001_lives_in",
+        "S00001_field_of_study", "S00001_works_in_industry",
+    }
+    assert "V2 Subject studied Physics." in texts
+    assert "Question: What did V2 Subject study?\nAnswer: Physics" in texts
+    assert "UNLISTED SENTENCE" not in texts
+
+
+def test_relation_v1_contamination_inventory_fallback_remains_supported(tmp_path: Path) -> None:
+    dataset = tmp_path / "synthetic_v1"
+    canonical_path = dataset / "data" / "canonical_subject_profiles_5000.csv"
+    row = {
+        "row_id": "R00001", "subject_id": "S00001", "subject": "V1 Subject",
+        "profession_en": "Doctor", "profession_tr": "Doktor",
+        "birthplace_en": "Izmir", "birthplace_tr": "İzmir",
+        "residence_en": "Bursa", "residence_tr": "Bursa",
+        "university_en": "Legacy University", "university_tr": "Eski Üniversite",
+        "employer_en": "Legacy Employer", "employer_tr": "Eski İşveren",
+        "name_type": "english_like", "name_rarity_bucket": "rare",
+        "popularity_rank": "1", "popularity_bucket": "high",
+        "profession_frequency_bucket": "high", "birthplace_frequency_bucket": "low",
+        "residence_frequency_bucket": "low", "university_frequency_bucket": "medium",
+        "employer_frequency_bucket": "medium", "branch_group": "A",
+    }
+    write_csv(canonical_path, [row], list(row))
+    for key, text in (("english_training", "V1 Subject works as a Doctor."), ("turkish_repetition", "V1 Subject Doktor olarak çalışır.")):
+        path = dataset / {"english_training": "output/english_training.jsonl", "turkish_repetition": "output/turkish_repetition.jsonl"}[key]
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"text": text, "subject_id": "S00001"}) + "\n", encoding="utf-8")
+
+    patterns, _ = build_contamination_inventory(dataset)
+    fact_ids = {pattern.text for pattern in patterns if pattern.channel == "fact_id"}
+    assert fact_ids == {
+        "S00001_profession", "S00001_born_in", "S00001_lives_in",
+        "S00001_studied_at", "S00001_works_at",
+    }
+
+
+def test_contamination_inventory_rejects_manifest_hash_mismatch(tmp_path: Path) -> None:
+    dataset = tmp_path / "relation_v2_gate_v1"
+    canonical_path = dataset / "data" / "canonical_subject_profiles_5000.csv"
+    canonical_path.parent.mkdir(parents=True)
+    canonical_path.write_text("subject_id,subject\nS1,Subject\n", encoding="utf-8")
+    write_json(dataset / "manifest.json", {
+        "relations": ["profession"],
+        "files": {"data/canonical_subject_profiles_5000.csv": "0" * 64},
+    })
+    with pytest.raises(ValueError, match="SHA-256 mismatch"):
+        build_contamination_inventory(dataset)
 
 
 def test_shared_object_subject_associations_are_preserved() -> None:
