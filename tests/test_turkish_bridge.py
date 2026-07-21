@@ -7,7 +7,9 @@ from pathlib import Path
 from transfer_vs_relearning.data.turkish_bridge import (
     build_bridge_probes,
     build_localization_rows,
+    build_relation_distractor_registry,
     eligible_fact_rows,
+    materialize_shared_dose,
 )
 from transfer_vs_relearning.evaluation.turkish_bridge import summarize_bridge_rows
 from transfer_vs_relearning.evaluation.turkish_bridge_analysis import (
@@ -46,6 +48,34 @@ def test_bridge_registry_separates_prompt_and_answer_languages() -> None:
 def test_localization_registry_is_unambiguous() -> None:
     rows = build_localization_rows([_profile()])
     assert {row["canonical_tr"] for row in rows} >= {"Fizikçi", "İstanbul", "Muğla", "fizik", "enerji"}
+    distractors = build_relation_distractor_registry(rows + [
+        {**row, "object_id": row["object_id"] + "_other"} for row in rows
+    ])
+    assert distractors["born_in"]["candidate_family"] == "city"
+    assert distractors["born_in"]["candidate_count"] == 4
+    assert distractors["born_in"]["candidate_object_ids"] == distractors["lives_in"]["candidate_object_ids"]
+
+
+def test_shared_dose_uses_identical_rows_and_model_specific_token_counts() -> None:
+    class FakeTokenizer:
+        def __init__(self, multiplier: int) -> None:
+            self.multiplier = multiplier
+
+        def encode(self, text: str, add_special_tokens: bool = False) -> list[int]:
+            assert add_special_tokens is False
+            return list(range(len(text.split()) * self.multiplier))
+
+    rows = [{"document_id": str(index), "text": "bir iki üç dört"} for index in range(6)]
+    selected, audit = materialize_shared_dose(
+        rows,
+        {"a": FakeTokenizer(1), "b": FakeTokenizer(2)},
+        block_size=4,
+        target_blocks=4,
+        mapping_batch_rows=2,
+    )
+    assert [row["document_id"] for row in selected] == ["0", "1", "2", "3"]
+    assert audit["model_grouped_block_counts"] == {"a": 4, "b": 8}
+    assert audit["model_token_counts_including_document_eos"] == {"a": 20, "b": 36}
 
 
 def test_eligibility_requires_three_positive_heldout_cells_and_strict_eight(tmp_path: Path) -> None:
@@ -136,3 +166,15 @@ def test_corpus_launcher_keeps_all_large_outputs_on_scratch() -> None:
     assert 'configs/corpora/trwiki_turkish_bridge_v1.yaml' in launcher
     for stage in ("resolve", "download", "verify", "extract", "normalize", "audit", "filter", "deduplicate", "contamination-preflight", "scan-contamination", "split", "report"):
         assert f'"${{PY[@]}}" {stage} ' in launcher
+
+
+def test_bridge_v2_launchers_are_scratch_only_and_append_only() -> None:
+    root = Path(__file__).resolve().parents[1]
+    preflight = (root / "slurm/preflight_turkish_bridge_contract_v2.slurm").read_text(encoding="utf-8")
+    materialize = (root / "slurm/materialize_turkish_bridge_contract_v2.slurm").read_text(encoding="utf-8")
+    for source in (preflight, materialize):
+        assert "#SBATCH --output=/vol/tmp2/yesildau/turkish_bridge_v1/logs/" in source
+        assert 'OUTPUT_ROOT="${SCRATCH_ROOT}/contracts/v2"' in source
+        assert 'test ! -e "${OUTPUT_ROOT}"' in source
+    assert "expected_checkpoints=0" in preflight
+    assert "prepare_turkish_bridge_contract_v2.py" in materialize

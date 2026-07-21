@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 from transfer_vs_relearning.data.candidates import (
     RELATION_TO_FAMILY,
@@ -84,6 +84,80 @@ def _validate_localization(rows: list[dict[str, Any]]) -> None:
             if previous and previous != row["object_id"]:
                 raise ValueError(f"Ambiguous {language_key} surface in {row['family']}: {row[language_key]!r}")
             seen[key] = str(row["object_id"])
+
+
+def build_relation_distractor_registry(localization_rows: list[dict[str, Any]]) -> dict[str, Any]:
+    by_family: dict[str, list[str]] = defaultdict(list)
+    for row in localization_rows:
+        by_family[str(row["family"])].append(str(row["object_id"]))
+    registry: dict[str, Any] = {}
+    for relation in RELATIONS:
+        family = RELATION_TO_FAMILY[relation]
+        object_ids = sorted(set(by_family[family]))
+        if len(object_ids) < 2:
+            raise ValueError(f"Relation {relation} has fewer than two candidate objects")
+        registry[relation] = {
+            "candidate_family": family,
+            "candidate_object_ids": object_ids,
+            "candidate_count": len(object_ids),
+            "distractor_policy": "all_relation_family_candidates_except_correct_object_id",
+        }
+    return registry
+
+
+def materialize_shared_dose(
+    rows: Iterable[dict[str, Any]],
+    tokenizers: dict[str, Any],
+    *,
+    block_size: int,
+    target_blocks: int,
+    mapping_batch_rows: int = 1000,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    if not tokenizers or block_size <= 0 or target_blocks <= 0 or mapping_batch_rows <= 0:
+        raise ValueError("Dose tokenizers and numeric bounds must be positive")
+    selected: list[dict[str, Any]] = []
+    blocks = {label: 0 for label in tokenizers}
+    tokens = {label: 0 for label in tokenizers}
+    raw_text_bytes = 0
+    batch: list[dict[str, Any]] = []
+
+    def consume(current: list[dict[str, Any]]) -> None:
+        nonlocal raw_text_bytes
+        if not current:
+            return
+        selected.extend(current)
+        texts = [str(row["text"]) for row in current]
+        raw_text_bytes += sum(len(text.encode("utf-8")) for text in texts)
+        for label, tokenizer in tokenizers.items():
+            batch_tokens = sum(
+                len(tokenizer.encode(text, add_special_tokens=False)) + 1
+                for text in texts
+            )
+            tokens[label] += batch_tokens
+            blocks[label] += batch_tokens // block_size
+
+    for row in rows:
+        if "text" not in row:
+            raise ValueError("Dose source row has no text field")
+        batch.append(row)
+        if len(batch) == mapping_batch_rows:
+            consume(batch)
+            batch = []
+            if all(value >= target_blocks for value in blocks.values()):
+                break
+    if batch and not all(value >= target_blocks for value in blocks.values()):
+        consume(batch)
+    if not all(value >= target_blocks for value in blocks.values()):
+        raise ValueError(f"Corpus has insufficient shared dose blocks: {blocks}")
+    return selected, {
+        "document_count": len(selected),
+        "raw_text_bytes": raw_text_bytes,
+        "block_size": block_size,
+        "target_blocks": target_blocks,
+        "mapping_batch_rows": mapping_batch_rows,
+        "model_token_counts_including_document_eos": tokens,
+        "model_grouped_block_counts": blocks,
+    }
 
 
 def build_bridge_probes(

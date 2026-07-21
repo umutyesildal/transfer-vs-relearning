@@ -9,6 +9,7 @@ from transfer_vs_relearning.training.clm import (
     interval_from_fractions,
     load_training_config,
     safe_run_name,
+    tokenizer_path_from_manifest,
 )
 
 
@@ -40,6 +41,15 @@ def test_training_data_seed_can_vary_without_changing_split_seed() -> None:
 def test_safe_run_name_strips_unsafe_characters() -> None:
     assert safe_run_name(" M1 GPT-2 / English facts ") == "M1_GPT-2_English_facts"
     assert safe_run_name("///") == "training_run"
+
+
+def test_clm_tokenizer_path_prefers_manifest_source(tmp_path: Path) -> None:
+    checkpoint = tmp_path / "checkpoint"
+    tokenizer = tmp_path / "base-tokenizer"
+    assert tokenizer_path_from_manifest(
+        {"tokenizer_source_path_absolute": str(tokenizer)}, tmp_path, checkpoint
+    ) == tokenizer.resolve()
+    assert tokenizer_path_from_manifest({}, tmp_path, checkpoint) == checkpoint
 
 
 def test_estimate_optimizer_steps_uses_effective_batch_size() -> None:

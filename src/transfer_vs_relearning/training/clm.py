@@ -31,6 +31,16 @@ def resolve_path(repo_root: Path, value: str | Path) -> Path:
     return path if path.is_absolute() else repo_root / path
 
 
+def tokenizer_path_from_manifest(manifest: dict[str, Any], repo_root: Path, model_path: Path) -> Path:
+    absolute = manifest.get("tokenizer_source_path_absolute")
+    if absolute:
+        return Path(str(absolute)).resolve()
+    project_relative = manifest.get("tokenizer_source_path")
+    if project_relative:
+        return resolve_path(repo_root, str(project_relative)).resolve()
+    return model_path
+
+
 def estimate_optimizer_steps(
     train_blocks: int,
     per_device_train_batch_size: int,
@@ -232,8 +242,9 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
 
     model_manifest = _read_json(resolve_path(repo_root, model_config["base_model_manifest"]))
     model_path = Path(model_manifest["local_path_absolute"])
+    tokenizer_path = tokenizer_path_from_manifest(model_manifest, repo_root, model_path)
     local_files_only = bool(runtime_config.get("local_files_only", True))
-    tokenizer = AutoTokenizer.from_pretrained(str(model_path), local_files_only=local_files_only, use_fast=True)
+    tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path), local_files_only=local_files_only, use_fast=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     model_load_dtype = resolve_model_load_dtype(torch, training_config)

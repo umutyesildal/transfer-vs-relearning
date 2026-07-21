@@ -2,6 +2,11 @@ version: turkish_bridge_v1
 document: 109_TURKISH_BRIDGE_RETENTION_AND_SCALE_DECISION_PLAN.md
 scratch_root: /vol/tmp2/yesildau/turkish_bridge_v1
 corpus_config: configs/corpora/trwiki_turkish_bridge_v1.yaml
+frozen_corpus:
+  train_file: /vol/tmp2/yesildau/turkish_bridge_v1/corpus/trwiki_20260601_bridge_v1/splits/train_documents.jsonl
+  validation_file: /vol/tmp2/yesildau/turkish_bridge_v1/corpus/trwiki_20260601_bridge_v1/splits/validation_documents.jsonl
+  final_manifest: /vol/tmp2/yesildau/turkish_bridge_v1/corpus/trwiki_20260601_bridge_v1/manifests/corpus_manifest_final.json
+  final_manifest_sha256: 108c72375bb253742831da3fafb9e4b4b7b736974cb3cf6ef13f9b0f167502f7
 dataset_version: relation_v2_gate_v1
 selected_subject_count: 100
 fact_count: 500
@@ -10,9 +15,20 @@ models:
   - label: qwen
     model_id: Qwen/Qwen2.5-1.5B
     m1_endpoint: update_50
+    model_manifest: /vol/tmp2/yesildau/m1_qwen_checkpoint_pareto_v1/model_manifests/qwen_step50.json
+    hard_result: /vol/tmp2/yesildau/m1_qwen_checkpoint_pareto_v1/hard_suite/qwen_step50/hard_suite_per_fact.csv
   - label: smollm2
     model_id: HuggingFaceTB/SmolLM2-1.7B
     m1_endpoint: document_104_selected
+    source_model_manifest: artifacts/models/HuggingFaceTB__SmolLM2-1.7B/model_manifest.json
+    model_dir: /vol/tmp2/yesildau/m1_canonical_form_diversity_v1/training/seed42/20260719T064019Z_m1_canonical_form_diversity_seed42_453625c6/final_model
+    hard_result: /vol/tmp2/yesildau/m1_canonical_form_diversity_v1/evaluations/hard_suite/treatment_seed42/hard_suite_per_fact.csv
+contract:
+  version: v2
+  output_root: /vol/tmp2/yesildau/turkish_bridge_v1/contracts/v2
+  canonical_profiles: artifacts/datasets/relation_v2_gate_v1/data/canonical_subject_profiles_5000.csv
+  selected_subjects: artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/summary.json
+  validation_document_count: 256
 adaptation:
   block_size: 512
   per_device_train_batch_size: 2
@@ -27,6 +43,7 @@ adaptation:
   loss_mode: full_sequence
   seed: 42
   data_seed: 42
+  mapping_batch_rows: 1000
 evaluation:
   bootstrap_samples: 2000
   bootstrap_unit: subject_id
