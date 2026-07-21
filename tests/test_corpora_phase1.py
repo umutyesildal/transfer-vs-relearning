@@ -19,6 +19,7 @@ from transfer_vs_relearning.corpora.filtering import audit_document
 from transfer_vs_relearning.corpora.io import iter_documents, write_documents
 from transfer_vs_relearning.corpora.manifest import write_corpus_manifest
 from transfer_vs_relearning.corpora.normalize import normalize_document, normalize_text
+from transfer_vs_relearning.corpora.review import generate_contamination_review_sample
 from transfer_vs_relearning.corpora.state import stage_run, stage_state_path
 from transfer_vs_relearning.corpora.split import split_documents
 from transfer_vs_relearning.utils.io import write_csv, write_json
@@ -569,6 +570,10 @@ def test_stage_reuse_checks_input_output_and_force(tmp_path: Path) -> None:
         state["output_artifact_path"] = str(output_path)
     with stage_run(cfg, "resolve", input_path=input_path) as state:
         assert state["reused"] is True
+    with stage_run(cfg, "resolve", force=True, input_path=input_path) as state:
+        assert "reused" not in state
+        output_path.write_text("forced rerun", encoding="utf-8")
+        state["output_artifact_path"] = str(output_path)
     input_path.write_text("changed", encoding="utf-8")
     with pytest.raises(ValueError, match="input artifact changed"):
         with stage_run(cfg, "resolve", input_path=input_path):
@@ -584,6 +589,66 @@ def test_stage_reuse_checks_input_output_and_force(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="output artifacts"):
         with stage_run(cfg, "resolve", input_path=input_path):
             pass
+
+
+def test_contamination_review_sample_is_deterministic_and_bucketed(tmp_path: Path) -> None:
+    root = tmp_path / "corpus"
+    contamination = root / "contamination"
+    manifests = root / "manifests"
+    contamination.mkdir(parents=True)
+    manifests.mkdir(parents=True)
+    clean_rows = [
+        {"document_id": "clean-1", "title": "Temiz 1", "text": "tamamen temiz metin", "contamination_status": "clean"},
+        {"document_id": "clean-2", "title": "Temiz 2", "text": "başka temiz metin", "contamination_status": "clean"},
+        {"document_id": "flag-1", "title": "Bayrak 1", "text": "nesne adı içeren metin", "contamination_status": "flagged_only"},
+        {"document_id": "flag-2", "title": "Bayrak 2", "text": "başka nesne adı", "contamination_status": "flagged_only"},
+    ]
+    removed_rows = [
+        {"document": {"document_id": "removed-1", "title": "Kirli 1", "text": "sentetik kişi adı", "contamination_status": "contaminated"}, "removal_rule_ids": ["exact_full_synthetic_name"]},
+        {"document": {"document_id": "removed-2", "title": "Kirli 2", "text": "başka sentetik kişi", "contamination_status": "contaminated"}, "removal_rule_ids": ["exact_full_synthetic_name"]},
+    ]
+    match_rows = [
+        {"document_id": "removed-1", "matched_pattern_id": "p1", "match_channel": "exact_nfc_full_name", "rule_id": "exact_full_synthetic_name", "automatic_decision": "remove", "context": "sentetik kişi adı", "associated_subject_ids": ["S1"]},
+        {"document_id": "flag-1", "matched_pattern_id": "p2", "match_channel": "canonical_object", "rule_id": "object_only_flag", "automatic_decision": "flag_only", "context": "nesne adı", "associated_subject_ids": ["S1", "S2"]},
+    ]
+    (contamination / "clean_documents.jsonl").write_text("".join(json.dumps(row) + "\n" for row in clean_rows), encoding="utf-8")
+    (contamination / "removed_documents.jsonl").write_text("".join(json.dumps(row) + "\n" for row in removed_rows), encoding="utf-8")
+    (contamination / "matches.jsonl").write_text("".join(json.dumps(row) + "\n" for row in match_rows), encoding="utf-8")
+    write_json(manifests / "scan-contamination_state.json", {
+        "processing_git_commit": "fixture-commit",
+        "output_artifacts": {
+            "clean_documents": {"sha256": "clean-hash"},
+            "removed_documents": {"sha256": "removed-hash"},
+            "matches": {"sha256": "matches-hash"},
+        },
+    })
+
+    first = generate_contamination_review_sample(root, seed=42, sample_size=1)
+    second = generate_contamination_review_sample(root, seed=42, sample_size=1)
+
+    assert first == second
+    assert first["review_status"] == "pending_manual_review"
+    assert first["observed_bucket_counts"] == {"removed": 2, "flagged_only": 2, "clean": 2}
+    assert {bucket: len(rows) for bucket, rows in first["samples"].items()} == {
+        "removed": 1,
+        "flagged_only": 1,
+        "clean": 1,
+    }
+    assert first["source_artifact_sha256"] == {
+        "clean_documents": "clean-hash",
+        "removed_documents": "removed-hash",
+        "matches": "matches-hash",
+    }
+    for bucket, rows in first["samples"].items():
+        assert rows[0]["bucket"] == bucket
+        assert len(rows[0]["selection_sha256"]) == 64
+
+
+def test_contamination_review_sample_rejects_invalid_inputs(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="sample_size must be positive"):
+        generate_contamination_review_sample(tmp_path, sample_size=0)
+    with pytest.raises(ValueError, match="source artifact is missing"):
+        generate_contamination_review_sample(tmp_path, sample_size=1)
 
 
 def test_tiny_end_to_end_phase1_pipeline_excludes_contaminated_documents(tmp_path: Path, monkeypatch) -> None:
@@ -622,6 +687,9 @@ def test_manifest_schema_and_config_loading(tmp_path: Path) -> None:
     assert manifest["completion_status"] == "phase1_not_finalized"
     assert manifest["finalized"] is False
     assert manifest["extraction_tool_versions"] == {"mwxml": "0.3.8", "mwparserfromhell": "0.7.2"}
+    assert "manifests/corpus_manifest.json" in manifest["excluded_self_referential_artifacts"]
+    assert "manifests/report_state.json" in manifest["excluded_self_referential_artifacts"]
+    assert manifest["excluded_self_referential_stage_states"] == ["report"]
 
 
 def _write_config(tmp_path: Path, cfg: dict) -> Path:

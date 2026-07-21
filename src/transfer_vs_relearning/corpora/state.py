@@ -55,20 +55,16 @@ def ensure_compatible_or_force(config: dict[str, Any], stage: str, force: bool, 
     state = load_stage_state(config, stage)
     if not state or state.get("status") != "completed":
         return False
-    if state.get("config_hash") != config_hash(config):
-        if not force:
-            raise ValueError(f"Completed stage {stage} used a different config; pass --force or use a new corpus version")
+    if force:
         return False
+    if state.get("config_hash") != config_hash(config):
+        raise ValueError(f"Completed stage {stage} used a different config; pass --force or use a new corpus version")
     if input_path is not None:
         current_input = _artifact_entry(input_path)
         if state.get("input_artifact") != current_input:
-            if not force:
-                raise ValueError(f"Completed stage {stage} input artifact changed; pass --force to rerun")
-            return False
+            raise ValueError(f"Completed stage {stage} input artifact changed; pass --force to rerun")
     if not _outputs_match(state):
-        if not force:
-            raise ValueError(f"Completed stage {stage} output artifacts are missing or changed; pass --force to rerun")
-        return False
+        raise ValueError(f"Completed stage {stage} output artifacts are missing or changed; pass --force to rerun")
     return True
 
 

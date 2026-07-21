@@ -20,17 +20,24 @@ def git_commit() -> str | None:
 def write_corpus_manifest(config: dict[str, Any], status: str, warnings: list[str] | None = None) -> dict[str, Any]:
     dirs = stage_dirs(config)
     artifacts = {}
+    excluded_artifacts = {
+        dirs["manifests"] / "corpus_manifest.json",
+        dirs["manifests"] / "bridge_split_sha256.txt",
+        dirs["manifests"] / "bridge_split_candidate_sha256.txt",
+        dirs["manifests"] / "report_state.json",
+    }
     for name, directory in dirs.items():
         if not directory.exists():
             continue
         for path in sorted(directory.glob("*")):
-            if path.is_file():
+            if path.is_file() and path not in excluded_artifacts:
                 artifacts[str(path.relative_to(dirs["manifests"].parents[0]))] = {
                     "size_bytes": path.stat().st_size,
                     "sha256": sha256_file(path),
                 }
     dataset_manifest = Path(config["contamination"]["synthetic_dataset_dir"]) / "manifest.json"
     stage_states = _load_json_files(dirs["manifests"], "*_state.json")
+    stage_states.pop("report", None)
     reports = _load_json_files(dirs["reports"], "*_report.json")
     verify_manifest = _load_optional_json(dirs["manifests"] / "verify_manifest.json")
     payload = {
@@ -70,7 +77,9 @@ def write_corpus_manifest(config: dict[str, Any], status: str, warnings: list[st
         "artifact_hashes": artifacts,
         "completion_status": status,
         "warnings": warnings or [],
-        "finalized": False,
+        "excluded_self_referential_artifacts": sorted(str(path.relative_to(dirs["manifests"].parents[0])) for path in excluded_artifacts),
+        "excluded_self_referential_stage_states": ["report"],
+        "finalized": status == "finalized",
     }
     write_json(dirs["manifests"] / "corpus_manifest.json", payload)
     return payload
