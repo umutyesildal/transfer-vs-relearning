@@ -16,6 +16,7 @@ from transfer_vs_relearning.corpora.document import CorpusDocument
 from transfer_vs_relearning.corpora.dump import HTTP_USER_AGENT, DumpMetadata, _read_url, download_dump, load_official_dump_metadata, parse_checksum_line, sha1_file, status_is_complete
 from transfer_vs_relearning.corpora.extract import _iter_real_dump, extract_from_xml_text, parse_wikitext
 from transfer_vs_relearning.corpora.filtering import audit_document
+from transfer_vs_relearning.corpora.finalize import finalize_reviewed_corpus
 from transfer_vs_relearning.corpora.io import iter_documents, write_documents
 from transfer_vs_relearning.corpora.manifest import write_corpus_manifest
 from transfer_vs_relearning.corpora.normalize import normalize_document, normalize_text
@@ -658,6 +659,51 @@ def test_contamination_review_sample_rejects_invalid_inputs(tmp_path: Path) -> N
         generate_contamination_review_sample(tmp_path, sample_size=0)
     with pytest.raises(ValueError, match="source artifact is missing"):
         generate_contamination_review_sample(tmp_path, sample_size=1)
+
+
+def test_finalize_reviewed_corpus_preserves_candidate_and_refuses_overwrite(tmp_path: Path) -> None:
+    root = tmp_path / "corpus"
+    for directory in ("manifests", "reports", "splits"):
+        (root / directory).mkdir(parents=True)
+    train = root / "splits/train_documents.jsonl"
+    validation = root / "splits/validation_documents.jsonl"
+    train.write_text("train\n", encoding="utf-8")
+    validation.write_text("validation\n", encoding="utf-8")
+    candidate = {"completion_status": "phase1_not_finalized", "finalized": False, "artifact_hashes": {}}
+    write_json(root / "manifests/corpus_manifest.json", candidate)
+    sources = {"clean_documents": "clean", "removed_documents": "removed", "matches": "matches"}
+    write_json(root / "manifests/scan-contamination_state.json", {
+        "output_artifacts": {key: {"sha256": value} for key, value in sources.items()},
+    })
+    removed = [{
+        "document_id": f"removed-{index}",
+        "removal_rule_ids": ["exact_full_synthetic_name"],
+        "decisive_match_count": 1,
+        "matches": [{"automatic_decision": "remove", "rule_id": "exact_full_synthetic_name"}],
+    } for index in range(2)]
+    flagged = [{
+        "document_id": f"flag-{index}",
+        "decisive_match_count": 0,
+        "matches": [{"automatic_decision": "flag", "rule_id": "object_only_flag"}],
+    } for index in range(2)]
+    clean = [{"document_id": f"clean-{index}", "match_count": 0, "matches": []} for index in range(2)]
+    write_json(root / "reports/contamination_review_sample_seed42.json", {
+        "review_status": "pending_manual_review",
+        "seed": 42,
+        "sample_size_per_bucket": 2,
+        "source_artifact_sha256": sources,
+        "samples": {"removed": removed, "flagged_only": flagged, "clean": clean},
+    })
+
+    result = finalize_reviewed_corpus(root, seed=42, sample_size=2)
+
+    assert json.loads((root / "manifests/corpus_manifest.json").read_text()) == candidate
+    final = json.loads((root / "manifests/corpus_manifest_final.json").read_text())
+    assert final["completion_status"] == "finalized"
+    assert final["finalized"] is True
+    assert Path(result["final_hash_path"]).is_file()
+    with pytest.raises(ValueError, match="Refusing to overwrite"):
+        finalize_reviewed_corpus(root, seed=42, sample_size=2)
 
 
 def test_tiny_end_to_end_phase1_pipeline_excludes_contaminated_documents(tmp_path: Path, monkeypatch) -> None:
