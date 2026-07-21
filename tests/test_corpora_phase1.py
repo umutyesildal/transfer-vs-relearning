@@ -608,7 +608,12 @@ def test_contamination_review_sample_is_deterministic_and_bucketed(tmp_path: Pat
         {"document": {"document_id": "removed-2", "title": "Kirli 2", "text": "başka sentetik kişi", "contamination_status": "contaminated"}, "removal_rule_ids": ["exact_full_synthetic_name"]},
     ]
     match_rows = [
+        *[
+            {"document_id": "removed-1", "matched_pattern_id": f"flag-{index}", "match_channel": "canonical_object", "rule_id": "object_only_flag", "automatic_decision": "flag", "context": "genel nesne", "associated_subject_ids": ["S1"]}
+            for index in range(30)
+        ],
         {"document_id": "removed-1", "matched_pattern_id": "p1", "match_channel": "exact_nfc_full_name", "rule_id": "exact_full_synthetic_name", "automatic_decision": "remove", "context": "sentetik kişi adı", "associated_subject_ids": ["S1"]},
+        {"document_id": "removed-2", "matched_pattern_id": "p2", "match_channel": "exact_nfc_full_name", "rule_id": "exact_full_synthetic_name", "automatic_decision": "remove", "context": "başka sentetik kişi", "associated_subject_ids": ["S2"]},
         {"document_id": "flag-1", "matched_pattern_id": "p2", "match_channel": "canonical_object", "rule_id": "object_only_flag", "automatic_decision": "flag_only", "context": "nesne adı", "associated_subject_ids": ["S1", "S2"]},
     ]
     (contamination / "clean_documents.jsonl").write_text("".join(json.dumps(row) + "\n" for row in clean_rows), encoding="utf-8")
@@ -623,16 +628,16 @@ def test_contamination_review_sample_is_deterministic_and_bucketed(tmp_path: Pat
         },
     })
 
-    first = generate_contamination_review_sample(root, seed=42, sample_size=1)
-    second = generate_contamination_review_sample(root, seed=42, sample_size=1)
+    first = generate_contamination_review_sample(root, seed=42, sample_size=2)
+    second = generate_contamination_review_sample(root, seed=42, sample_size=2)
 
     assert first == second
     assert first["review_status"] == "pending_manual_review"
     assert first["observed_bucket_counts"] == {"removed": 2, "flagged_only": 2, "clean": 2}
     assert {bucket: len(rows) for bucket, rows in first["samples"].items()} == {
-        "removed": 1,
-        "flagged_only": 1,
-        "clean": 1,
+        "removed": 2,
+        "flagged_only": 2,
+        "clean": 2,
     }
     assert first["source_artifact_sha256"] == {
         "clean_documents": "clean-hash",
@@ -642,6 +647,10 @@ def test_contamination_review_sample_is_deterministic_and_bucketed(tmp_path: Pat
     for bucket, rows in first["samples"].items():
         assert rows[0]["bucket"] == bucket
         assert len(rows[0]["selection_sha256"]) == 64
+    removed_one = next(row for row in first["samples"]["removed"] if row["document_id"] == "removed-1")
+    assert removed_one["match_count"] == 31
+    assert removed_one["decisive_match_count"] == 1
+    assert removed_one["matches"][0]["automatic_decision"] == "remove"
 
 
 def test_contamination_review_sample_rejects_invalid_inputs(tmp_path: Path) -> None:

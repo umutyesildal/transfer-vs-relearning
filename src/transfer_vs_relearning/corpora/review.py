@@ -43,7 +43,7 @@ def generate_contamination_review_sample(corpus_root: Path, seed: int = 42, samp
         for entry in heaps[bucket]
     }
     match_details: dict[str, dict[str, Any]] = {
-        document_id: {"total": 0, "matches": []}
+        document_id: {"total": 0, "decisive_total": 0, "decisive_matches": [], "other_matches": []}
         for document_id in selected_ids
     }
     for match in _iter_jsonl(matches_path):
@@ -51,8 +51,17 @@ def generate_contamination_review_sample(corpus_root: Path, seed: int = 42, samp
         if details is None:
             continue
         details["total"] += 1
-        if len(details["matches"]) < 25:
-            details["matches"].append(_compact_match(match))
+        if match.get("automatic_decision") == "remove":
+            details["decisive_total"] += 1
+            target = details["decisive_matches"]
+        else:
+            target = details["other_matches"]
+        if len(target) < 25:
+            target.append(_compact_match(match))
+    for details in match_details.values():
+        decisive = details.pop("decisive_matches")
+        other = details.pop("other_matches")
+        details["matches"] = (decisive + other)[:25]
 
     samples = {}
     for bucket in REVIEW_BUCKETS:
@@ -76,7 +85,7 @@ def generate_contamination_review_sample(corpus_root: Path, seed: int = 42, samp
         "seed": seed,
         "sample_size_per_bucket": sample_size,
         "selection_policy": "lowest_sha256(seed|bucket|document_id), tie_break_document_id",
-        "match_detail_policy": "first_25_in_frozen_match_stream_with_total_count",
+        "match_detail_policy": "first_25_decisive_remove_matches_then_first_flag_matches_in_frozen_stream_with_total_counts",
         "source_scan_processing_git_commit": scan_state.get("processing_git_commit"),
         "source_artifact_sha256": source_hashes,
         "observed_bucket_counts": observed,
@@ -127,6 +136,7 @@ def _compact_sample(
         output["removal_rule_ids"] = row.get("removal_rule_ids") or []
     if match_details is not None:
         output["match_count"] = match_details["total"]
+        output["decisive_match_count"] = match_details["decisive_total"]
         output["matches"] = match_details["matches"]
     return output
 
