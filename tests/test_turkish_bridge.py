@@ -200,3 +200,23 @@ def test_bridge_training_wave_is_parallel_gated_and_scratch_only() -> None:
     assert 'training_sbatch+=(--exclude="${TRAINING_EXCLUDE_NODES}")' in submit
     assert "invalid_training_exclude_nodes" in submit
     assert 'find "${HOME_ROOT}" -xdev -type f -size +500M' in audit
+
+
+def test_qwen_recovery_selects_one_clean_gpu_from_two_allocated_a100s() -> None:
+    root = Path(__file__).resolve().parents[1]
+    preflight = (root / "slurm/preflight_turkish_bridge_qwen_recovery.slurm").read_text(encoding="utf-8")
+    training = (root / "slurm/train_turkish_bridge_qwen_recovery.slurm").read_text(encoding="utf-8")
+    submit = (root / "scripts/submit_turkish_bridge_qwen_recovery.sh").read_text(encoding="utf-8")
+    for source in (preflight, training):
+        assert "#SBATCH --output=/vol/tmp2/yesildau/turkish_bridge_v1/logs/" in source
+        assert 'SCRATCH_ROOT="/vol/tmp2/yesildau/turkish_bridge_v1"' in source
+    assert "#SBATCH --nodelist=gruenau10" in training
+    assert "#SBATCH --gres=gpu:a10080gb:2" in training
+    assert 'test "${allocated_count}" -eq 2' in training
+    assert 'export CUDA_VISIBLE_DEVICES="${clean_uuid}"' in training
+    assert "no_clean_allocated_gpu_before_training" in training
+    assert "QWEN_RESERVE_BYTES=52527160826" in preflight
+    assert 'test ! -e "${SCRATCH_ROOT}/training/qwen"' in preflight
+    assert 'test -d "${SCRATCH_ROOT}/training/smollm2"' in preflight
+    assert 'afterok:${preflight_id}' in submit
+    assert 'afterany:${training_id}' in submit
