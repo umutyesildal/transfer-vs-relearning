@@ -50,8 +50,12 @@ def create_local_model_manifest(
             "local_path": str(local_model_dir),
             "local_path_absolute": str(local_model_dir),
             "local_path_project_relative": _project_relative_or_absolute(local_model_dir),
-            "tokenizer_source_path": source_manifest.get("local_path_project_relative") or source_manifest.get("local_path"),
-            "tokenizer_source_path_absolute": source_manifest.get("local_path_absolute") or source_manifest.get("local_path"),
+            "tokenizer_source_path": source_manifest.get("tokenizer_source_path")
+            or source_manifest.get("local_path_project_relative")
+            or source_manifest.get("local_path"),
+            "tokenizer_source_path_absolute": source_manifest.get("tokenizer_source_path_absolute")
+            or source_manifest.get("local_path_absolute")
+            or source_manifest.get("local_path"),
             "download_timestamp": datetime.now(timezone.utc).isoformat(),
             "file_hashes": {path.name: sha256_file(path) for path in local_files},
         }

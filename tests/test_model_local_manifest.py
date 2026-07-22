@@ -48,3 +48,29 @@ def test_create_local_model_manifest_retargets_existing_source_manifest(tmp_path
     assert payload["training_run_dir"] == str((tmp_path / "training" / "demo_run").resolve())
     assert set(payload["file_hashes"]) == {"config.json", "model.safetensors"}
     assert payload["file_hashes"]["config.json"] != "abc"
+
+
+def test_create_local_model_manifest_preserves_explicit_tokenizer_fallback(tmp_path: Path) -> None:
+    source_manifest = tmp_path / "source_manifest.json"
+    local_model_dir = tmp_path / "checkpoint-50"
+    tokenizer_dir = tmp_path / "base-tokenizer"
+    local_model_dir.mkdir()
+    tokenizer_dir.mkdir()
+    (local_model_dir / "model.safetensors").write_bytes(b"weights")
+    source_manifest.write_text(json.dumps({
+        "model_id": "Qwen/Qwen2.5-1.5B-M1",
+        "local_path": str(local_model_dir),
+        "local_path_absolute": str(local_model_dir),
+        "tokenizer_source_path": "artifacts/models/Qwen/base",
+        "tokenizer_source_path_absolute": str(tokenizer_dir),
+    }), encoding="utf-8")
+
+    payload = create_local_model_manifest(
+        source_manifest_path=source_manifest,
+        local_model_dir=local_model_dir,
+        output_manifest_path=tmp_path / "derived.json",
+        model_id="qwen-low",
+    )
+
+    assert payload["tokenizer_source_path"] == "artifacts/models/Qwen/base"
+    assert payload["tokenizer_source_path_absolute"] == str(tokenizer_dir)

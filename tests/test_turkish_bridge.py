@@ -245,3 +245,26 @@ def test_bridge_evaluation_wave_freezes_four_states_and_uses_scratch_only() -> N
     assert 'STATES = ("m0", "m1", "low", "full")' in preparer
     assert '"primary_stratum": "model_eligible"' in preparer
     assert '"primary_stratum": "model_eligible"' in finalizer
+
+
+def test_qwen_bridge_recovery_is_append_only_and_reuses_frozen_m0() -> None:
+    root = Path(__file__).resolve().parents[1]
+    preflight = (root / "slurm/preflight_qwen_bridge_evaluation_recovery.slurm").read_text(encoding="utf-8")
+    evaluation = (root / "slurm/evaluate_qwen_bridge_recovery.slurm").read_text(encoding="utf-8")
+    audit = (root / "slurm/audit_qwen_bridge_evaluation_recovery.slurm").read_text(encoding="utf-8")
+    submit = (root / "scripts/submit_qwen_bridge_evaluation_recovery.sh").read_text(encoding="utf-8")
+    preparer = (root / "scripts/prepare_qwen_bridge_evaluation_recovery.py").read_text(encoding="utf-8")
+    for source in (preflight, evaluation, audit):
+        assert "#SBATCH --output=/vol/tmp2/yesildau/turkish_bridge_v1/logs/" in source
+    assert 'OUTPUT_ROOT="${SCRATCH_ROOT}/evaluation_v2_qwen"' in preflight
+    assert 'test ! -e "${OUTPUT_ROOT}"' in preflight
+    assert "expected_new_checkpoints=0" in preflight
+    assert "validated_prompt_candidate_boundaries" in preflight
+    assert "for state in m1 low full" in evaluation
+    assert "--m0-source-root" in evaluation
+    assert "unexpected_gpu_compute_processes_before_evaluation" in evaluation
+    assert 'afterok:${preflight_id}' in submit
+    assert 'afterany:${evaluation_id}' in submit
+    assert 'find "${HOME_ROOT}" -xdev -type f -size +500M' in audit
+    assert "M0_HASHES" in preparer
+    assert 'STATES = ("m1", "low", "full")' in preparer

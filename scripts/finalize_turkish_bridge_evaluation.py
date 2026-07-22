@@ -25,6 +25,7 @@ def main() -> None:
     parser.add_argument("--evaluation-root", type=Path, required=True)
     parser.add_argument("--contract-root", type=Path, required=True)
     parser.add_argument("--experiment-config", type=Path, required=True)
+    parser.add_argument("--m0-source-root", type=Path)
     args = parser.parse_args()
     root, contract = args.evaluation_root.resolve(), args.contract_root.resolve()
     output = root / "results" / args.model_label
@@ -35,8 +36,9 @@ def main() -> None:
     ppl_states: dict[str, dict[str, float]] = {}
     inputs: dict[str, Any] = {}
     for state in STATES:
-        bridge_path = output / state / "bridge/per_probe_results.csv"
-        ppl_path = output / state / "ppl/summary.json"
+        state_root = args.m0_source_root.resolve() if state == "m0" and args.m0_source_root else output / state
+        bridge_path = state_root / "bridge/per_probe_results.csv"
+        ppl_path = state_root / "ppl/summary.json"
         state_rows[state] = read_csv_rows(bridge_path)
         ppl = json.loads(ppl_path.read_text(encoding="utf-8"))
         if ppl.get("status") != "completed":
