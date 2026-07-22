@@ -220,3 +220,28 @@ def test_qwen_recovery_selects_one_clean_gpu_from_two_allocated_a100s() -> None:
     assert 'test -d "${SCRATCH_ROOT}/training/smollm2"' in preflight
     assert 'afterok:${preflight_id}' in submit
     assert 'afterany:${training_id}' in submit
+
+
+def test_bridge_evaluation_wave_freezes_four_states_and_uses_scratch_only() -> None:
+    root = Path(__file__).resolve().parents[1]
+    preflight = (root / "slurm/preflight_turkish_bridge_evaluation.slurm").read_text(encoding="utf-8")
+    evaluation = (root / "slurm/evaluate_turkish_bridge.slurm").read_text(encoding="utf-8")
+    audit = (root / "slurm/audit_turkish_bridge_evaluation.slurm").read_text(encoding="utf-8")
+    submit = (root / "scripts/submit_turkish_bridge_evaluation.sh").read_text(encoding="utf-8")
+    preparer = (root / "scripts/prepare_turkish_bridge_evaluation.py").read_text(encoding="utf-8")
+    finalizer = (root / "scripts/finalize_turkish_bridge_evaluation.py").read_text(encoding="utf-8")
+    for source in (preflight, evaluation, audit):
+        assert "#SBATCH --output=/vol/tmp2/yesildau/turkish_bridge_v1/logs/" in source
+    assert '#SBATCH --gres=gpu:rtx3090:1' in evaluation
+    assert "#SBATCH --array=0-1%2" in evaluation
+    assert "unexpected_gpu_compute_processes_before_evaluation" in evaluation
+    assert "for state in m0 m1 low full" in evaluation
+    assert "expected_new_checkpoints=0" in preflight
+    assert "expected_output_reserve_bytes" in preflight
+    assert 'test ! -e "${EVALUATION_ROOT}"' in preflight
+    assert 'afterok:${preflight_id}' in submit
+    assert 'afterany:${evaluation_id}' in submit
+    assert 'find "${HOME_ROOT}" -xdev -type f -size +500M' in audit
+    assert 'STATES = ("m0", "m1", "low", "full")' in preparer
+    assert '"primary_stratum": "model_eligible"' in preparer
+    assert '"primary_stratum": "model_eligible"' in finalizer

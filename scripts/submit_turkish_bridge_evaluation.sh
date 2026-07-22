@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="${1:-$(pwd)}"
+SCRATCH_ROOT="/vol/tmp2/yesildau/turkish_bridge_v1"
+EVALUATION_ROOT="${SCRATCH_ROOT}/evaluation_v1"
+cd "${REPO_ROOT}"
+
+test "$(sha256sum "${SCRATCH_ROOT}/contracts/v2/manifest.json" | awk '{print $1}')" = \
+  "f3248f07839f09665d571c22cf729c548e6c7b6a8a88f12fde2260903c739e5e"
+test ! -e "${EVALUATION_ROOT}"
+mkdir -p "${SCRATCH_ROOT}"/{logs,preflight}
+
+preflight_id=$(sbatch --parsable slurm/preflight_turkish_bridge_evaluation.slurm)
+preflight_manifest="${SCRATCH_ROOT}/preflight/evaluation_${preflight_id}.json"
+evaluation_id=$(sbatch --parsable --dependency="afterok:${preflight_id}" \
+  --export="ALL,PREFLIGHT_MANIFEST=${preflight_manifest}" \
+  slurm/evaluate_turkish_bridge.slurm)
+audit_id=$(sbatch --parsable --dependency="afterany:${evaluation_id}" \
+  slurm/audit_turkish_bridge_evaluation.slurm)
+
+printf 'preflight_id=%s\nevaluation_id=%s\naudit_id=%s\npreflight_manifest=%s\n' \
+  "${preflight_id}" "${evaluation_id}" "${audit_id}" "${preflight_manifest}"
+squeue -j "${preflight_id},${evaluation_id},${audit_id}" \
+  -o '%.18i %.12T %.10M %.24j %.20N %.30R'
