@@ -197,4 +197,6 @@ def test_bridge_training_wave_is_parallel_gated_and_scratch_only() -> None:
     assert "expected_family_reserve_bytes=110721074308" in preflight
     assert 'afterok:${preflight_id}' in submit
     assert 'afterany:${training_id}' in submit
+    assert 'training_sbatch+=(--exclude="${TRAINING_EXCLUDE_NODES}")' in submit
+    assert "invalid_training_exclude_nodes" in submit
     assert 'find "${HOME_ROOT}" -xdev -type f -size +500M' in audit
