@@ -178,3 +178,23 @@ def test_bridge_v2_launchers_are_scratch_only_and_append_only() -> None:
         assert 'test ! -e "${OUTPUT_ROOT}"' in source
     assert "expected_checkpoints=0" in preflight
     assert "prepare_turkish_bridge_contract_v2.py" in materialize
+
+
+def test_bridge_training_wave_is_parallel_gated_and_scratch_only() -> None:
+    root = Path(__file__).resolve().parents[1]
+    preflight = (root / "slurm/preflight_turkish_bridge_training.slurm").read_text(encoding="utf-8")
+    training = (root / "slurm/train_turkish_bridge.slurm").read_text(encoding="utf-8")
+    audit = (root / "slurm/audit_turkish_bridge_training.slurm").read_text(encoding="utf-8")
+    submit = (root / "scripts/submit_turkish_bridge_training.sh").read_text(encoding="utf-8")
+    for source in (preflight, training, audit):
+        assert "#SBATCH --output=/vol/tmp2/yesildau/turkish_bridge_v1/logs/" in source
+        assert 'SCRATCH_ROOT="/vol/tmp2/yesildau/turkish_bridge_v1"' in source
+    assert "#SBATCH --array=0-1%2" in training
+    assert "#SBATCH --gres=gpu:a10080gb:1" in training
+    assert "unexpected_gpu_compute_processes_before_training" in training
+    assert "nvidia-smi --query-compute-apps" in training
+    assert "expected_checkpoints_per_model=4" in preflight
+    assert "expected_family_reserve_bytes=110721074308" in preflight
+    assert 'afterok:${preflight_id}' in submit
+    assert 'afterany:${training_id}' in submit
+    assert 'find "${HOME_ROOT}" -xdev -type f -size +500M' in audit
