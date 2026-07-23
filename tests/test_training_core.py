@@ -67,6 +67,25 @@ def test_qwen_retention_configs_preserve_factual_budget() -> None:
     }
 
 
+def test_seed43_retention_replication_changes_only_seeds_and_output_identity() -> None:
+    seed42 = load_training_config(
+        Path("configs/training/m1_qwen_retention_replay_w0_5_seed42.yaml")
+    )
+    seed43 = load_training_config(
+        Path("configs/training/m1_qwen_retention_replay_w0_5_seed43.yaml")
+    )
+    assert seed42["dataset"] == seed43["dataset"]
+    assert seed42["model"] == seed43["model"]
+    assert seed42["retention"] == seed43["retention"]
+    allowed = {"run_name", "output_root", "seed", "data_seed"}
+    for key in set(seed42["training"]) | set(seed43["training"]):
+        if key not in allowed:
+            assert seed42["training"].get(key) == seed43["training"].get(key)
+    assert seed43["training"]["seed"] == 43
+    assert seed43["training"]["data_seed"] == 43
+    assert seed43["dataset"]["split_seed"] == 42
+
+
 def test_eos_ablation_masks_only_the_eos_label() -> None:
     input_ids = [10, 11, 12, 13]
     answer_mask = [False, False, True, True]

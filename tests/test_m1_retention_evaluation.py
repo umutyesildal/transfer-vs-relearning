@@ -85,3 +85,12 @@ def test_adjudication_preserves_short_diagnostic_but_accepts_lexical_answer(tmp_
     assert row["lexical_empty_generation_count"] == 0
     assert row["short_but_lexical_prompt_ids"] == ["qa_02"]
     assert row["all_corrected_gates_pass"]
+
+
+def test_seed43_launcher_uses_dedicated_scratch_and_single_replication_job() -> None:
+    launcher = (ROOT / "scripts/submit_m1_retention_seed43.sh").read_text(encoding="utf-8")
+    assert 'SCRATCH_ROOT="/vol/tmp2/yesildau/m1_retention_seed43_v1"' in launcher
+    assert "--array" not in launcher
+    training = (ROOT / "slurm/train_m1_retention_seed43.slurm").read_text(encoding="utf-8")
+    assert "#SBATCH --gres=gpu:a10080gb:1" in training
+    assert "m1_qwen_retention_replay_w0_5_seed43.yaml" in training
