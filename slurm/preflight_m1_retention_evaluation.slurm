@@ -81,7 +81,8 @@ payload = {
     "wave_manifest_sha256": sha(wave / "wave_manifest.json"),
     "home_kib": int(home_kib), "tmp2_available_kib": int(available_kib),
     "family_reserve_bytes": int(reserve), "array_throttle": 3,
-    "excluded_nodes": ["gruenau9", "gruenau10"],
+    "gpu_type": "rtx3090",
+    "excluded_nodes": ["guppi6", "guppi7"],
 }
 Path(output).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
 print(output)

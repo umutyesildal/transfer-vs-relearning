@@ -46,3 +46,11 @@ def test_resolver_reads_one_frozen_task(tmp_path: Path) -> None:
         writer.writerow({"array_index": 0, "condition": "control", "label": "control_step25"})
     assert module.resolve(registry, 0, "condition") == "control"
     assert module.resolve(registry, 0, "label") == "control_step25"
+
+
+def test_evaluation_uses_available_rtx3090_pool_and_avoids_busy_nodes() -> None:
+    launcher = (ROOT / "slurm/eval_m1_retention_checkpoints.slurm").read_text(encoding="utf-8")
+    assert "#SBATCH --gres=gpu:rtx3090:1" in launcher
+    assert "#SBATCH --exclude=guppi6,guppi7" in launcher
+    resume = (ROOT / "scripts/submit_prepared_m1_retention_evaluation.sh").read_text(encoding="utf-8")
+    assert '--array="0-21%3"' in resume
