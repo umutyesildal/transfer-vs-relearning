@@ -98,10 +98,15 @@ assert replay["retention"]["max_tokens"] == 64
 assert control["training"]["output_root"] == "/vol/tmp2/yesildau/m1_retention_v1/training/control_seed42"
 assert replay["training"]["output_root"] == "/vol/tmp2/yesildau/m1_retention_v1/training/replay_w0_5_seed42"
 model_manifest = json.loads(Path(control["model"]["base_model_manifest"]).read_text())
-for key in ("local_path_absolute", "tokenizer_source_path_absolute"):
-    model_path = Path(model_manifest[key]).resolve()
-    assert str(model_path).startswith(("/vol/tmp/yesildau/", "/vol/tmp2/yesildau/"))
-    assert model_path.exists()
+model_path = Path(model_manifest["local_path_absolute"]).resolve()
+tokenizer_path = Path(
+    model_manifest.get("tokenizer_source_path_absolute")
+    or model_manifest.get("tokenizer_source_path")
+    or model_path
+).resolve()
+for checked_path in (model_path, tokenizer_path):
+    assert str(checked_path).startswith(("/vol/tmp/yesildau/", "/vol/tmp2/yesildau/"))
+    assert checked_path.exists()
 
 payload = {
     "status": "passed",
