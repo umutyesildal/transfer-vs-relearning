@@ -132,6 +132,33 @@ def _answer_only_labels(
     return labels
 
 
+def combine_retention_losses(factual_loss: Any, anchor_loss: Any, coefficient: float) -> Any:
+    if coefficient <= 0:
+        raise ValueError("Retention coefficient must be positive")
+    return factual_loss + coefficient * anchor_loss
+
+
+def _padded_full_sequence(
+    input_ids: list[int],
+    attention_mask: list[int],
+    *,
+    eos_token_id: int,
+    pad_token_id: int,
+    block_size: int,
+) -> tuple[list[int], list[int], list[int]]:
+    ids = list(input_ids) + [eos_token_id]
+    mask = list(attention_mask) + [1]
+    if len(ids) > block_size:
+        raise ValueError("Full-sequence replay example exceeded configured block size")
+    labels = ids.copy()
+    pad_len = block_size - len(ids)
+    return (
+        ids + [pad_token_id] * pad_len,
+        mask + [0] * pad_len,
+        labels + [-100] * pad_len,
+    )
+
+
 def run_from_config(config_path: Path, repo_root: Path | None = None) -> Path:
     repo_root = (repo_root or Path.cwd()).resolve()
     config_path = config_path.resolve()
@@ -185,6 +212,22 @@ def _write_initial_manifest(
             "base_model_manifest_payload": _read_json(model_manifest),
         },
     }
+    retention = config.get("retention")
+    if retention:
+        if retention.get("mechanism") != "replay":
+            raise ValueError(f"Unsupported retention mechanism: {retention.get('mechanism')!r}")
+        anchor_train_file = resolve_path(repo_root, retention["anchor_train_file"])
+        anchor_validation_file = resolve_path(repo_root, retention["anchor_validation_file"])
+        payload["retention"] = {
+            "mechanism": "replay",
+            "coefficient": float(retention["coefficient"]),
+            "anchor_train_file": str(anchor_train_file),
+            "anchor_train_file_sha256": sha256_file(anchor_train_file),
+            "anchor_train_rows": count_lines(anchor_train_file),
+            "anchor_validation_file": str(anchor_validation_file),
+            "anchor_validation_file_sha256": sha256_file(anchor_validation_file),
+            "anchor_validation_rows": count_lines(anchor_validation_file),
+        }
     validation_file_value = dataset.get("validation_file")
     if validation_file_value:
         validation_file = resolve_path(repo_root, validation_file_value)
@@ -260,6 +303,17 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     validation_fraction = float(dataset_config.get("validation_fraction", 0.02))
     block_size = int(training_config.get("block_size", min(tokenizer.model_max_length, 512)))
     loss_mode = str(training_config.get("loss_mode", "full_sequence"))
+    retention_config = config.get("retention")
+    if retention_config:
+        if retention_config.get("mechanism") != "replay":
+            raise ValueError(f"Unsupported retention mechanism: {retention_config.get('mechanism')!r}")
+        if loss_mode != "answer_only":
+            raise ValueError("Replay retention currently requires answer-only factual loss")
+        retention_coefficient = float(retention_config["coefficient"])
+        if retention_coefficient <= 0:
+            raise ValueError("Replay retention coefficient must be positive")
+    else:
+        retention_coefficient = 0.0
 
     validation_file_value = dataset_config.get("validation_file")
     if validation_file_value:
@@ -272,6 +326,30 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     else:
         raw = load_dataset("json", data_files=str(train_file), split="train")
         raw_split = raw.train_test_split(test_size=validation_fraction, seed=split_seed, shuffle=True)
+
+    anchor_column = "__retention_anchor_text"
+    if retention_config:
+        anchor_train_file = resolve_path(repo_root, retention_config["anchor_train_file"])
+        anchor_validation_file = resolve_path(repo_root, retention_config["anchor_validation_file"])
+        anchor_text_field = str(retention_config.get("text_field", "text"))
+        anchor_split = load_dataset(
+            "json",
+            data_files={"train": str(anchor_train_file), "test": str(anchor_validation_file)},
+        )
+        for split_name in ("train", "test"):
+            if anchor_text_field not in anchor_split[split_name].column_names:
+                raise ValueError(
+                    f"Anchor text field {anchor_text_field!r} not found in {split_name} dataset"
+                )
+            if len(anchor_split[split_name]) != len(raw_split[split_name]):
+                raise ValueError(
+                    f"Replay {split_name} rows must align one-to-one with factual rows: "
+                    f"{len(anchor_split[split_name])} != {len(raw_split[split_name])}"
+                )
+            raw_split[split_name] = raw_split[split_name].add_column(
+                anchor_column,
+                [str(value) for value in anchor_split[split_name][anchor_text_field]],
+            )
 
     columns = raw_split["train"].column_names
     for split_name in ("train", "test"):
@@ -301,6 +379,9 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
             batch_input_ids: list[list[int]] = []
             batch_attention_mask: list[list[int]] = []
             batch_labels: list[list[int]] = []
+            batch_anchor_input_ids: list[list[int]] = []
+            batch_anchor_attention_mask: list[list[int]] = []
+            batch_anchor_labels: list[list[int]] = []
 
             for text, answer, input_ids, attention_mask, offsets in zip(
                 texts,
@@ -332,11 +413,46 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
                 batch_attention_mask.append(attention_mask + [0] * pad_len)
                 batch_labels.append(labels + [-100] * pad_len)
 
-            return {
+            if retention_config:
+                anchor_max_tokens = int(retention_config.get("max_tokens", block_size - 1))
+                if anchor_max_tokens <= 0 or anchor_max_tokens >= block_size:
+                    raise ValueError("Replay max_tokens must be positive and smaller than block_size")
+                anchor_tokenized = tokenizer(
+                    [str(value) for value in examples[anchor_column]],
+                    add_special_tokens=False,
+                    truncation=True,
+                    max_length=anchor_max_tokens,
+                )
+                for anchor_ids, anchor_mask in zip(
+                    anchor_tokenized["input_ids"],
+                    anchor_tokenized["attention_mask"],
+                    strict=True,
+                ):
+                    padded_ids, padded_mask, padded_labels = _padded_full_sequence(
+                        list(anchor_ids),
+                        list(anchor_mask),
+                        eos_token_id=eos_id,
+                        pad_token_id=tokenizer.pad_token_id,
+                        block_size=block_size,
+                    )
+                    batch_anchor_input_ids.append(padded_ids)
+                    batch_anchor_attention_mask.append(padded_mask)
+                    batch_anchor_labels.append(padded_labels)
+
+            result = {
                 "input_ids": batch_input_ids,
                 "attention_mask": batch_attention_mask,
                 "labels": batch_labels,
             }
+            if retention_config:
+                result.update(
+                    {
+                        "anchor_input_ids": batch_anchor_input_ids,
+                        "anchor_attention_mask": batch_anchor_attention_mask,
+                        "anchor_labels": batch_anchor_labels,
+                    }
+                )
+            return result
 
         lm_datasets = raw_split.map(
             tokenize_answer_only_batch,
@@ -415,6 +531,10 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     }
     if configured_max_steps is not None:
         args_kwargs["max_steps"] = int(configured_max_steps)
+    if retention_config:
+        # The replay tensors are consumed by ReplayTrainer.compute_loss rather than model.forward.
+        # Transformers would otherwise discard them as unused dataset columns.
+        args_kwargs["remove_unused_columns"] = False
     eval_arg = _training_args_eval_key(TrainingArguments)
     args_kwargs[eval_arg] = "steps"
     if "save_safetensors" in inspect.signature(TrainingArguments).parameters:
@@ -426,15 +546,71 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
         from transformers import DataCollatorForLanguageModeling
 
         collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
-    trainer = Trainer(
-        model=model,
-        args=training_args,
-        train_dataset=lm_datasets["train"],
-        eval_dataset=lm_datasets["test"],
-        data_collator=collator,
+    trainer_class = Trainer
+    if retention_config:
+        class ReplayTrainer(Trainer):
+            def __init__(self, *args: Any, replay_coefficient: float, **kwargs: Any) -> None:
+                super().__init__(*args, **kwargs)
+                self.replay_coefficient = replay_coefficient
+                self.replay_train_batches = 0
+                self.replay_fact_loss_sum = 0.0
+                self.replay_anchor_loss_sum = 0.0
+
+            def compute_loss(
+                self,
+                model: Any,
+                inputs: dict[str, Any],
+                return_outputs: bool = False,
+                **kwargs: Any,
+            ) -> Any:
+                anchor_inputs = {
+                    "input_ids": inputs.pop("anchor_input_ids"),
+                    "attention_mask": inputs.pop("anchor_attention_mask"),
+                    "labels": inputs.pop("anchor_labels"),
+                }
+                factual_outputs = model(**inputs)
+                anchor_outputs = model(**anchor_inputs)
+                factual_loss = factual_outputs.loss
+                anchor_loss = anchor_outputs.loss
+                loss = combine_retention_losses(
+                    factual_loss,
+                    anchor_loss,
+                    self.replay_coefficient,
+                )
+                if model.training:
+                    self.replay_train_batches += 1
+                    self.replay_fact_loss_sum += float(factual_loss.detach().float().cpu())
+                    self.replay_anchor_loss_sum += float(anchor_loss.detach().float().cpu())
+                return (loss, factual_outputs) if return_outputs else loss
+
+            def replay_metrics(self) -> dict[str, float | int]:
+                count = self.replay_train_batches
+                if count == 0:
+                    return {"train_batches": 0}
+                return {
+                    "train_batches": count,
+                    "mean_factual_loss": self.replay_fact_loss_sum / count,
+                    "mean_anchor_loss": self.replay_anchor_loss_sum / count,
+                    "coefficient": self.replay_coefficient,
+                }
+
+        trainer_class = ReplayTrainer
+
+    trainer_kwargs: dict[str, Any] = {
+        "model": model,
+        "args": training_args,
+        "train_dataset": lm_datasets["train"],
+        "eval_dataset": lm_datasets["test"],
+        "data_collator": collator,
+    }
+    if retention_config:
+        trainer_kwargs["replay_coefficient"] = retention_coefficient
+    trainer = trainer_class(
+        **trainer_kwargs,
     )
 
     train_output = trainer.train()
+    replay_metrics = trainer.replay_metrics() if retention_config else None
     final_model_dir = run_dir / "final_model"
     trainer.save_model(str(final_model_dir))
     tokenizer.save_pretrained(str(final_model_dir))
@@ -442,6 +618,8 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     eval_metrics = trainer.evaluate()
     write_json(run_dir / "train_metrics.json", train_metrics)
     write_json(run_dir / "eval_metrics.json", eval_metrics)
+    if replay_metrics is not None:
+        write_json(run_dir / "retention_loss_metrics.json", replay_metrics)
     checkpoints = sorted(str(path) for path in (run_dir / "checkpoints").glob("checkpoint-*") if path.is_dir())
     return {
         "run_dir": str(run_dir),
@@ -455,6 +633,7 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
         "warmup_steps": warmup_steps,
         "train_metrics": train_metrics,
         "eval_metrics": eval_metrics,
+        "retention_loss_metrics": replay_metrics,
         "software": {
             "torch": torch.__version__,
             "cuda": torch.version.cuda,

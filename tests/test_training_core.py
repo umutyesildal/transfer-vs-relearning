@@ -4,6 +4,8 @@ from pathlib import Path
 
 from transfer_vs_relearning.training.clm import (
     _answer_only_labels,
+    _padded_full_sequence,
+    combine_retention_losses,
     estimate_optimizer_steps,
     resolve_training_seeds,
     interval_from_fractions,
@@ -11,6 +13,58 @@ from transfer_vs_relearning.training.clm import (
     safe_run_name,
     tokenizer_path_from_manifest,
 )
+
+
+def test_replay_loss_is_added_without_replacing_factual_loss() -> None:
+    assert combine_retention_losses(2.0, 4.0, 0.5) == 4.0
+
+
+def test_replay_coefficient_must_be_positive() -> None:
+    try:
+        combine_retention_losses(2.0, 4.0, 0.0)
+    except ValueError as error:
+        assert "positive" in str(error)
+    else:
+        raise AssertionError("Expected a non-positive replay coefficient to fail")
+
+
+def test_replay_full_sequence_supervises_eos_but_not_padding() -> None:
+    ids, mask, labels = _padded_full_sequence(
+        [10, 11],
+        [1, 1],
+        eos_token_id=99,
+        pad_token_id=0,
+        block_size=5,
+    )
+    assert ids == [10, 11, 99, 0, 0]
+    assert mask == [1, 1, 1, 0, 0]
+    assert labels == [10, 11, 99, -100, -100]
+
+
+def test_qwen_retention_configs_preserve_factual_budget() -> None:
+    control = load_training_config(
+        Path("configs/training/m1_qwen_retention_control_seed42.yaml")
+    )
+    replay = load_training_config(
+        Path("configs/training/m1_qwen_retention_replay_w0_5_seed42.yaml")
+    )
+    assert control["dataset"] == replay["dataset"]
+    assert control["model"] == replay["model"]
+    for key in (
+        "block_size", "learning_rate", "num_train_epochs", "per_device_train_batch_size",
+        "gradient_accumulation_steps", "warmup_ratio", "weight_decay", "lr_scheduler_type",
+        "loss_mode", "supervise_eos", "seed", "data_seed",
+    ):
+        assert control["training"][key] == replay["training"][key]
+    assert estimate_optimizer_steps(3500, 10, 50, 36.0) == 252
+    assert replay["retention"] == {
+        "mechanism": "replay",
+        "coefficient": 0.5,
+        "max_tokens": 64,
+        "text_field": "text",
+        "anchor_train_file": "/vol/tmp2/yesildau/m1_retention_v1/anchor/train.jsonl",
+        "anchor_validation_file": "/vol/tmp2/yesildau/m1_retention_v1/anchor/validation.jsonl",
+    }
 
 
 def test_eos_ablation_masks_only_the_eos_label() -> None:
