@@ -54,3 +54,34 @@ def test_evaluation_uses_available_rtx3090_pool_and_avoids_busy_nodes() -> None:
     assert "#SBATCH --exclude=guppi6,guppi7" in launcher
     resume = (ROOT / "scripts/submit_prepared_m1_retention_evaluation.sh").read_text(encoding="utf-8")
     assert '--array="0-21%3"' in resume
+
+
+def test_adjudication_preserves_short_diagnostic_but_accepts_lexical_answer(tmp_path: Path) -> None:
+    module = _load("adjudicate_m1_retention_evaluation.py")
+    run_dir = tmp_path / "general_capability" / "replay_step50" / "run"
+    run_dir.mkdir(parents=True)
+    (run_dir / "summary_metrics.json").write_text(
+        json.dumps({"completion_status": "completed"}), encoding="utf-8"
+    )
+    generations = [
+        {
+            "prompt_id": "qa_02",
+            "continuation": " navigation",
+            "empty_or_near_empty": True,
+        }
+    ]
+    (run_dir / "generations.jsonl").write_text(
+        "\n".join(json.dumps(row) for row in generations) + "\n", encoding="utf-8"
+    )
+    original = {
+        "label": "replay_step50",
+        "condition": "replay_w0_5",
+        "checkpoint_step": 50,
+        "synthetic_subject_intrusion_count": 0,
+        **{key: True for key in module.GATE_KEYS},
+    }
+    row = module.adjudicate_rows(tmp_path, [original])[0]
+    assert row["legacy_near_empty_by_token_length_count"] == 1
+    assert row["lexical_empty_generation_count"] == 0
+    assert row["short_but_lexical_prompt_ids"] == ["qa_02"]
+    assert row["all_corrected_gates_pass"]

@@ -7,6 +7,7 @@ from transfer_vs_relearning.evaluation.general_capability import (
     classify_perplexity_ratio,
     distinct_ngram_ratio,
     generation_metrics,
+    has_lexical_content,
     longest_repeated_token_run,
     repeated_ngram_fraction,
     split_token_ids,
@@ -47,6 +48,24 @@ def test_generation_metrics_detect_subject_intrusion() -> None:
     assert metrics["longest_repeated_token_run"] == 2
 
 
+@pytest.mark.parametrize("text", ["", "   \n", "...?!", "—"])
+def test_lexical_content_rejects_empty_whitespace_and_punctuation(text: str) -> None:
+    assert not has_lexical_content(text)
+
+
+def test_generation_metrics_marks_eos_only_as_empty() -> None:
+    metrics = generation_metrics([151643], "", [])
+    assert metrics["near_empty_by_token_length"]
+    assert metrics["empty_generation"]
+
+
+def test_generation_metrics_keeps_valid_one_word_answer_plus_eos() -> None:
+    metrics = generation_metrics([10646, 151643], " navigation", [])
+    assert metrics["near_empty_by_token_length"]
+    assert metrics["empty_or_near_empty"]
+    assert not metrics["empty_generation"]
+
+
 def test_bootstrap_weighted_nll_interval_is_deterministic() -> None:
     rows = [
         {"nll_sum": 10.0, "token_count": 5},
@@ -71,4 +90,3 @@ def test_bootstrap_weighted_nll_interval_is_deterministic() -> None:
 )
 def test_classify_perplexity_ratio(ratio: float, expected: str) -> None:
     assert classify_perplexity_ratio(ratio) == expected
-

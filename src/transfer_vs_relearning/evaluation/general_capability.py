@@ -71,14 +71,24 @@ def longest_repeated_token_run(token_ids: list[int]) -> int:
     return longest
 
 
+def has_lexical_content(text: str) -> bool:
+    """Return whether decoded generation text contains a Unicode letter or number."""
+    return any(character.isalnum() for character in text)
+
+
 def generation_metrics(token_ids: list[int], text: str, synthetic_subjects: Iterable[str]) -> dict[str, Any]:
     normalized_text = text.casefold()
     intrusions = sorted(
         subject for subject in synthetic_subjects if subject and subject.casefold() in normalized_text
     )
+    near_empty_by_token_length = len(token_ids) <= 2
     return {
         "generated_token_count": len(token_ids),
-        "empty_or_near_empty": len(token_ids) <= 2,
+        # Preserve the historical length-only diagnostic for strict sensitivity reporting.
+        "empty_or_near_empty": near_empty_by_token_length,
+        "near_empty_by_token_length": near_empty_by_token_length,
+        # Hard empty-generation decisions use decoded lexical content, not token count.
+        "empty_generation": not has_lexical_content(text),
         "distinct_1": distinct_ngram_ratio(token_ids, 1),
         "distinct_2": distinct_ngram_ratio(token_ids, 2),
         "distinct_3": distinct_ngram_ratio(token_ids, 3),
@@ -417,6 +427,10 @@ def run_general_capability(config_path: Path) -> Path:
         "generation": {
             "prompt_count": len(generation_rows),
             "empty_or_near_empty_count": sum(bool(row["empty_or_near_empty"]) for row in generation_rows),
+            "near_empty_by_token_length_count": sum(
+                bool(row["near_empty_by_token_length"]) for row in generation_rows
+            ),
+            "empty_generation_count": sum(bool(row["empty_generation"]) for row in generation_rows),
             "ended_with_eos_count": sum(bool(row["ended_with_eos"]) for row in generation_rows),
             "synthetic_subject_intrusion_count": sum(
                 int(row["synthetic_subject_intrusion_count"]) for row in generation_rows
@@ -514,4 +528,3 @@ def compare_general_capability(
     }
     write_json(output_path, output)
     return output
-
