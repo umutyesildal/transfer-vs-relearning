@@ -29,5 +29,5 @@ module load anaconda/3-2024.06
 conda run --name xfer-relearn python scripts/prepare_m1_retention_anchor.py \
   --output-dir "${SCRATCH_ROOT}/anchor" \
   --model-manifest /vol/tmp2/yesildau/m1_cross_family_screen_v1/models/Qwen__Qwen2.5-1.5B/model_manifest.json \
-  --subject-registry artifacts/datasets/relation_v2_gate_v1/data/canonical_subject_profiles_5000.csv \
+  --factual-train-file /vol/tmp2/yesildau/m1_canonical_form_diversity_v1/datasets/train.jsonl \
   --subject-count 100 --train-rows 3500 --validation-rows 500 --max-tokens 64 --seed 42

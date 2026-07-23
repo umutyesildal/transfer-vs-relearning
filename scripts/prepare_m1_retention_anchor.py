@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-import csv
 import hashlib
 import json
 import random
@@ -30,17 +29,18 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _load_subjects(path: Path, count: int) -> tuple[list[str], list[str]]:
+def _load_surfaces(path: Path, count: int) -> tuple[list[str], list[str]]:
     subjects: list[str] = []
+    seen_subjects: set[str] = set()
     answers: set[str] = set()
-    with path.open(encoding="utf-8", newline="") as handle:
-        for row in csv.DictReader(handle):
-            if len(subjects) >= count:
-                break
-            subjects.append(str(row["subject"]))
-            for key, value in row.items():
-                if key.endswith("_en") and value:
-                    answers.add(str(value))
+    with path.open(encoding="utf-8") as handle:
+        for line in handle:
+            row = json.loads(line)
+            subject = str(row["subject"])
+            if subject not in seen_subjects:
+                seen_subjects.add(subject)
+                subjects.append(subject)
+            answers.add(str(row["answer"]))
     if len(subjects) != count:
         raise ValueError(f"Expected {count} subjects, found {len(subjects)}")
     return subjects, sorted(answers)
@@ -94,7 +94,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--model-manifest", type=Path, required=True)
-    parser.add_argument("--subject-registry", type=Path, required=True)
+    parser.add_argument("--factual-train-file", type=Path, required=True)
     parser.add_argument("--subject-count", type=int, default=100)
     parser.add_argument("--train-rows", type=int, default=3500)
     parser.add_argument("--validation-rows", type=int, default=500)
@@ -115,7 +115,7 @@ def main() -> None:
         or model_manifest["local_path_absolute"]
     )
     tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path), local_files_only=True, use_fast=True)
-    subjects, answers = _load_subjects(args.subject_registry, args.subject_count)
+    subjects, answers = _load_surfaces(args.factual_train_file, args.subject_count)
 
     source = load_dataset(DATASET_ID, DATASET_CONFIG, revision=DATASET_REVISION)
     selected: dict[str, list[dict[str, Any]]] = {}
@@ -176,8 +176,8 @@ def main() -> None:
             "seed": args.seed,
             "subject_count": args.subject_count,
             "max_tokens_before_eos": args.max_tokens,
-            "subject_registry": str(args.subject_registry.resolve()),
-            "subject_registry_sha256": _sha256(args.subject_registry),
+            "factual_train_file": str(args.factual_train_file.resolve()),
+            "factual_train_file_sha256": _sha256(args.factual_train_file),
             "zero_selected_subject_surface_occurrences": True,
         },
         "tokenizer": {
