@@ -94,3 +94,15 @@ def test_seed43_launcher_uses_dedicated_scratch_and_single_replication_job() -> 
     training = (ROOT / "slurm/train_m1_retention_seed43.slurm").read_text(encoding="utf-8")
     assert "#SBATCH --gres=gpu:a10080gb:1" in training
     assert "m1_qwen_retention_replay_w0_5_seed43.yaml" in training
+
+
+def test_seed43_evaluation_freezes_eleven_checkpoints_and_three_way_throttle() -> None:
+    module = _load("prepare_m1_retention_seed43_evaluation.py")
+    assert module.CHECKPOINTS == (25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 252)
+    launcher = (ROOT / "scripts/submit_m1_retention_seed43_evaluation.sh").read_text(encoding="utf-8")
+    assert '--array="0-10%3"' in launcher
+    evaluator = (ROOT / "slurm/eval_m1_retention_seed43_checkpoints.slurm").read_text(encoding="utf-8")
+    assert "#SBATCH --gres=gpu:rtx3090:1" in evaluator
+    summarizer = (ROOT / "scripts/summarize_m1_retention_seed43_evaluation.py").read_text(encoding="utf-8")
+    assert "legacy_strict_integrity_gate" in summarizer
+    assert "corrected_generic_integrity_gate" in summarizer
