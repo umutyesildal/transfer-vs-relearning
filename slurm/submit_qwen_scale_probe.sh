@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-ROOT=/vol/tmp2/yesildau/qwen_scale_probe_v2
+ROOT=/vol/tmp2/yesildau/qwen_scale_probe_v3
 pre=$(sbatch --parsable slurm/preflight_qwen_scale_probe.slurm)
 manifest="${ROOT}/preflight/family_${pre}.json"
 prep=$(sbatch --parsable --dependency="afterok:${pre}" --export="ALL,PREFLIGHT_MANIFEST=${manifest}" slurm/prepare_qwen_scale_probe.slurm)

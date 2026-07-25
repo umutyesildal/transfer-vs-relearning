@@ -1,9 +1,9 @@
 dataset:
   version: qwen_scale_probe_v1_500_subjects_2500_facts
-  dataset_dir: /vol/tmp2/yesildau/qwen_scale_probe_v2/datasets
-  dataset_manifest: /vol/tmp2/yesildau/qwen_scale_probe_v2/datasets/dataset_manifest.json
-  train_file: /vol/tmp2/yesildau/qwen_scale_probe_v2/datasets/train.jsonl
-  validation_file: /vol/tmp2/yesildau/qwen_scale_probe_v2/datasets/validation_replay_aligned.jsonl
+  dataset_dir: /vol/tmp2/yesildau/qwen_scale_probe_v3/datasets
+  dataset_manifest: /vol/tmp2/yesildau/qwen_scale_probe_v3/datasets/dataset_manifest.json
+  train_file: /vol/tmp2/yesildau/qwen_scale_probe_v3/datasets/train.jsonl
+  validation_file: /vol/tmp2/yesildau/qwen_scale_probe_v3/datasets/validation_replay_aligned.jsonl
   text_field: text
   answer_field: answer
   split_seed: 42
@@ -11,7 +11,7 @@ model:
   base_model_manifest: /vol/tmp2/yesildau/m1_cross_family_screen_v1/models/Qwen__Qwen2.5-1.5B/model_manifest.json
 training:
   run_name: qwen_scale_probe_replay_w0_5_seed42
-  output_root: /vol/tmp2/yesildau/qwen_scale_probe_v2/training/replay_w0_5_seed42
+  output_root: /vol/tmp2/yesildau/qwen_scale_probe_v3/training/replay_w0_5_seed42
   block_size: 128
   learning_rate: 5.0e-5
   num_train_epochs: 36.0
@@ -40,5 +40,5 @@ retention:
   coefficient: 0.5
   max_tokens: 64
   text_field: text
-  anchor_train_file: /vol/tmp2/yesildau/qwen_scale_probe_v2/anchor/train.jsonl
-  anchor_validation_file: /vol/tmp2/yesildau/qwen_scale_probe_v2/anchor/validation.jsonl
+  anchor_train_file: /vol/tmp2/yesildau/qwen_scale_probe_v3/anchor/train.jsonl
+  anchor_validation_file: /vol/tmp2/yesildau/qwen_scale_probe_v3/anchor/validation.jsonl

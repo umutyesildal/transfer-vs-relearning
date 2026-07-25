@@ -10,7 +10,7 @@
 set -euo pipefail
 HOME_ROOT=/vol/fob-vol6/mi25/yesildau
 REPO_ROOT="${SLURM_SUBMIT_DIR:-${HOME_ROOT}/transfer-vs-relearning}"
-ROOT=/vol/tmp2/yesildau/qwen_scale_probe_v2
+ROOT=/vol/tmp2/yesildau/qwen_scale_probe_v3
 RESERVE=$((300 * 1024 * 1024 * 1024))
 mkdir -p "${ROOT}"/{logs,preflight}
 test ! -e "${ROOT}/datasets"; test ! -e "${ROOT}/anchor"; test ! -e "${ROOT}/training"

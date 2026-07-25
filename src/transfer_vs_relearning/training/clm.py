@@ -479,8 +479,6 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
                     truncation=True,
                     max_length=anchor_max_tokens,
                 )
-            if contrastive_config:
-                result.update({"contrastive_input_ids": batch_candidate_ids, "contrastive_attention_mask": batch_candidate_masks, "contrastive_labels": batch_candidate_labels})
                 for anchor_ids, anchor_mask in zip(
                     anchor_tokenized["input_ids"],
                     anchor_tokenized["attention_mask"],
@@ -510,6 +508,8 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
                         "anchor_labels": batch_anchor_labels,
                     }
                 )
+            if contrastive_config:
+                result.update({"contrastive_input_ids": batch_candidate_ids, "contrastive_attention_mask": batch_candidate_masks, "contrastive_labels": batch_candidate_labels})
             return result
 
         lm_datasets = raw_split.map(
