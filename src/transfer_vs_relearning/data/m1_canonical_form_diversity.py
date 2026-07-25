@@ -17,9 +17,17 @@ FOUR_FORM_HASH = "54bf2968bcffecee8f0438b0ac489a6ab5fd0150dca2c459a4a1ad9efe5079
 EXACT_PREFIX_HASH = "1644288d0d62c51c56ceaae71b9eef7225b88326267281c8df8aeef9d7619c8e"
 
 
-def build_m1_canonical_form_diversity_dataset(repo_root: Path, *, output_dir: Path | None = None) -> Path:
+def build_m1_canonical_form_diversity_dataset(
+    repo_root: Path,
+    *,
+    output_dir: Path | None = None,
+    subject_count: int = 100,
+) -> Path:
     repo_root = repo_root.resolve()
-    source_dir = repo_root / "artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct"
+    if subject_count not in {100, 500}:
+        raise ValueError(f"Unsupported subject count: {subject_count}")
+    expected_facts = subject_count * len(RELATIONS)
+    source_dir = repo_root / "artifacts/datasets/relation_v2_gate_v1" / f"acquisition_{subject_count}_subjects_direct"
     output_dir = (output_dir or repo_root / f"artifacts/{VERSION}").resolve()
     source_rows = read_jsonl(source_dir / "train.jsonl")
     by_fact: dict[str, dict[str, dict[str, Any]]] = {}
@@ -27,7 +35,7 @@ def build_m1_canonical_form_diversity_dataset(repo_root: Path, *, output_dir: Pa
         template = str(row["template_id"])
         if template.endswith(("decl_01", "decl_02", "decl_03")):
             by_fact.setdefault(str(row["fact_id"]), {})[template.rsplit("_", 2)[-2] + "_" + template.rsplit("_", 1)[-1]] = row
-    if len(by_fact) != 500 or any(set(rows) != {"decl_01", "decl_02", "decl_03"} for rows in by_fact.values()):
+    if len(by_fact) != expected_facts or any(set(rows) != {"decl_01", "decl_02", "decl_03"} for rows in by_fact.values()):
         raise ValueError("Canonical declarative source rows are incomplete")
     train: list[dict[str, Any]] = []
     validation: list[dict[str, Any]] = []
@@ -50,8 +58,8 @@ def build_m1_canonical_form_diversity_dataset(repo_root: Path, *, output_dir: Pa
     _write_jsonl(validation_path, validation)
     counts = Counter(row["fact_id"] for row in train)
     c_forms = Counter(row.get("training_form_id", "declarative") for row in train)
-    expected = Counter({"declarative": 1500, "form_a": 1000, "form_b": 1000})
-    if len(train) != 3500 or len(validation) != 500 or set(counts.values()) != {7} or c_forms != expected:
+    expected = Counter({"declarative": expected_facts * 3, "form_a": expected_facts * 2, "form_b": expected_facts * 2})
+    if len(train) != expected_facts * 7 or len(validation) != expected_facts or set(counts.values()) != {7} or c_forms != expected:
         raise ValueError("Hybrid curriculum budget integrity failed")
-    write_json(output_dir / "dataset_manifest.json", {"version": VERSION, "status": "passed", "slots": list(SLOTS), "train_rows": len(train), "validation_rows": len(validation), "facts": len(counts), "training_representation_counts": dict(Counter(row["training_representation"] for row in train)), "training_form_counts": dict(c_forms), "train_sha256": sha256_file(train_path), "validation_sha256": sha256_file(validation_path), "four_form_registry_sha256": FOUR_FORM_HASH, "exact_prefix_sha256": EXACT_PREFIX_HASH})
+    write_json(output_dir / "dataset_manifest.json", {"version": VERSION, "status": "passed", "subjects": subject_count, "facts": expected_facts, "slots": list(SLOTS), "train_rows": len(train), "validation_rows": len(validation), "training_representation_counts": dict(Counter(row["training_representation"] for row in train)), "training_form_counts": dict(c_forms), "train_sha256": sha256_file(train_path), "validation_sha256": sha256_file(validation_path), "four_form_registry_sha256": FOUR_FORM_HASH, "exact_prefix_sha256": EXACT_PREFIX_HASH})
     return output_dir

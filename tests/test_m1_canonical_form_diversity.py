@@ -50,3 +50,18 @@ def test_hybrid_builder_preserves_canonical_slots_and_budget(tmp_path: Path) -> 
             assert {field: row[field] for field in ("template_id", "text", "answer")} == {
                 field: original[field] for field in ("template_id", "text", "answer")
             }
+
+
+def test_hybrid_builder_supports_nested_500_subject_scale(tmp_path: Path) -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    output = build_m1_canonical_form_diversity_dataset(repo_root, output_dir=tmp_path / "scale", subject_count=500)
+    manifest = json.loads((output / "dataset_manifest.json").read_text(encoding="utf-8"))
+    rows = read_jsonl(output / "train.jsonl")
+    assert manifest["subjects"] == 500
+    assert manifest["facts"] == 2500
+    assert len(rows) == 17500
+    assert Counter(row["training_representation"] for row in rows) == Counter({
+        "decl_01": 2500, "decl_02": 2500, "decl_03": 2500,
+        "form_a_qa": 2500, "form_a_direct": 2500,
+        "form_b_qa": 2500, "form_b_direct": 2500,
+    })

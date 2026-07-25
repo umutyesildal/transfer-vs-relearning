@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+import hashlib
 import json
 import math
 import re
@@ -10,6 +11,8 @@ from pathlib import Path
 from typing import Any
 
 from transfer_vs_relearning.utils.io import count_lines, sha256_file, sha256_text, write_json
+from transfer_vs_relearning.utils.io import read_csv_rows
+from transfer_vs_relearning.data.constants import RELATION_MAP
 
 
 def load_training_config(path: Path) -> dict[str, Any]:
@@ -136,6 +139,13 @@ def combine_retention_losses(factual_loss: Any, anchor_loss: Any, coefficient: f
     if coefficient <= 0:
         raise ValueError("Retention coefficient must be positive")
     return factual_loss + coefficient * anchor_loss
+
+
+def combine_contrastive_losses(factual_loss: Any, ranking_loss: Any, coefficient: float) -> Any:
+    """Keep canonical LM loss primary while adding the frozen binding objective."""
+    if coefficient <= 0:
+        raise ValueError("Contrastive coefficient must be positive")
+    return factual_loss + coefficient * ranking_loss
 
 
 def _padded_full_sequence(
@@ -304,6 +314,9 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     block_size = int(training_config.get("block_size", min(tokenizer.model_max_length, 512)))
     loss_mode = str(training_config.get("loss_mode", "full_sequence"))
     retention_config = config.get("retention")
+    contrastive_config = config.get("contrastive")
+    if retention_config and contrastive_config:
+        raise ValueError("Replay and contrastive objectives cannot be combined in one frozen run")
     if retention_config:
         if retention_config.get("mechanism") != "replay":
             raise ValueError(f"Unsupported retention mechanism: {retention_config.get('mechanism')!r}")
@@ -314,6 +327,21 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
             raise ValueError("Replay retention coefficient must be positive")
     else:
         retention_coefficient = 0.0
+    if contrastive_config:
+        if loss_mode != "answer_only":
+            raise ValueError("Contrastive binding requires answer-only factual loss")
+        contrastive_coefficient = float(contrastive_config["coefficient"])
+        negatives_per_example = int(contrastive_config["negatives_per_example"])
+        if contrastive_coefficient <= 0 or negatives_per_example <= 0:
+            raise ValueError("Contrastive coefficient and negative count must be positive")
+        profiles = read_csv_rows(resolve_path(repo_root, contrastive_config["canonical_profiles_file"]))
+        inventory = {relation: sorted({row[RELATION_MAP[relation][0]] for row in profiles}) for relation in RELATION_MAP}
+        profile_by_id = {row["subject_id"]: row for row in profiles}
+    else:
+        contrastive_coefficient = 0.0
+        negatives_per_example = 0
+        inventory = {}
+        profile_by_id = {}
 
     validation_file_value = dataset_config.get("validation_file")
     if validation_file_value:
@@ -382,6 +410,9 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
             batch_anchor_input_ids: list[list[int]] = []
             batch_anchor_attention_mask: list[list[int]] = []
             batch_anchor_labels: list[list[int]] = []
+            batch_candidate_ids: list[list[list[int]]] = []
+            batch_candidate_masks: list[list[list[int]]] = []
+            batch_candidate_labels: list[list[list[int]]] = []
 
             for text, answer, input_ids, attention_mask, offsets in zip(
                 texts,
@@ -412,6 +443,31 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
                 batch_input_ids.append(input_ids + [tokenizer.pad_token_id] * pad_len)
                 batch_attention_mask.append(attention_mask + [0] * pad_len)
                 batch_labels.append(labels + [-100] * pad_len)
+                if contrastive_config:
+                    relation = str(examples["relation"][len(batch_input_ids) - 1])
+                    subject_id = str(examples["subject_id"][len(batch_input_ids) - 1])
+                    exposure = str(examples.get("exposure_index", [0] * len(texts))[len(batch_input_ids) - 1])
+                    candidates = [value for value in inventory[relation] if value != answer]
+                    if len(candidates) < negatives_per_example:
+                        raise ValueError(f"Insufficient relation candidates for {relation}")
+                    start = int.from_bytes(hashlib.sha256(f"42:{relation}:{subject_id}:{exposure}".encode()).digest()[:8], "big") % len(candidates)
+                    negatives = [candidates[(start + offset) % len(candidates)] for offset in range(negatives_per_example)]
+                    if relation in {"born_in", "lives_in"}:
+                        paired = profile_by_id[subject_id]["residence_en" if relation == "born_in" else "birthplace_en"]
+                        if paired != answer and paired not in negatives:
+                            negatives[-1] = paired
+                    candidate_rows = []
+                    for candidate in [answer, *negatives]:
+                        candidate_text = text[:answer_start] + candidate
+                        encoded = tokenizer(candidate_text, add_special_tokens=False, truncation=True, max_length=block_size - 1, return_offsets_mapping=True)
+                        ids, mask, offsets2 = list(encoded["input_ids"]), list(encoded["attention_mask"]), list(encoded["offset_mapping"])
+                        start2, end2 = _answer_char_span(candidate_text, candidate)
+                        labels2 = _answer_only_labels(ids, _token_label_mask_from_offsets(offsets2, answer_start=start2, answer_end=end2), eos_id, supervise_eos=False)
+                        pad2 = block_size - (len(ids) + 1)
+                        candidate_rows.append((ids + [eos_id] + [tokenizer.pad_token_id] * pad2, mask + [1] + [0] * pad2, labels2 + [-100] * pad2))
+                    batch_candidate_ids.append([item[0] for item in candidate_rows])
+                    batch_candidate_masks.append([item[1] for item in candidate_rows])
+                    batch_candidate_labels.append([item[2] for item in candidate_rows])
 
             if retention_config:
                 anchor_max_tokens = int(retention_config.get("max_tokens", block_size - 1))
@@ -423,6 +479,8 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
                     truncation=True,
                     max_length=anchor_max_tokens,
                 )
+            if contrastive_config:
+                result.update({"contrastive_input_ids": batch_candidate_ids, "contrastive_attention_mask": batch_candidate_masks, "contrastive_labels": batch_candidate_labels})
                 for anchor_ids, anchor_mask in zip(
                     anchor_tokenized["input_ids"],
                     anchor_tokenized["attention_mask"],
@@ -531,7 +589,7 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     }
     if configured_max_steps is not None:
         args_kwargs["max_steps"] = int(configured_max_steps)
-    if retention_config:
+    if retention_config or contrastive_config:
         # The replay tensors are consumed by ReplayTrainer.compute_loss rather than model.forward.
         # Transformers would otherwise discard them as unused dataset columns.
         args_kwargs["remove_unused_columns"] = False
@@ -595,6 +653,27 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
                 }
 
         trainer_class = ReplayTrainer
+    elif contrastive_config:
+        class ContrastiveTrainer(Trainer):
+            def __init__(self, *args: Any, contrastive_coefficient: float, **kwargs: Any) -> None:
+                super().__init__(*args, **kwargs)
+                self.contrastive_coefficient = contrastive_coefficient
+            def compute_loss(self, model: Any, inputs: dict[str, Any], return_outputs: bool = False, **kwargs: Any) -> Any:
+                candidate_ids = inputs.pop("contrastive_input_ids")
+                candidate_mask = inputs.pop("contrastive_attention_mask")
+                candidate_labels = inputs.pop("contrastive_labels")
+                factual = model(**inputs)
+                batch, choices, length = candidate_ids.shape
+                outputs = model(input_ids=candidate_ids.reshape(batch * choices, length), attention_mask=candidate_mask.reshape(batch * choices, length))
+                logits = outputs.logits[:, :-1, :]
+                labels = candidate_labels.reshape(batch * choices, length)[:, 1:]
+                mask = labels.ne(-100)
+                token_logp = logits.log_softmax(-1).gather(-1, labels.masked_fill(~mask, 0).unsqueeze(-1)).squeeze(-1)
+                scores = (token_logp * mask).sum(-1) / mask.sum(-1).clamp_min(1)
+                ranking = torch.nn.functional.cross_entropy(scores.reshape(batch, choices), torch.zeros(batch, dtype=torch.long, device=scores.device))
+                loss = combine_contrastive_losses(factual.loss, ranking, self.contrastive_coefficient)
+                return (loss, factual) if return_outputs else loss
+        trainer_class = ContrastiveTrainer
 
     trainer_kwargs: dict[str, Any] = {
         "model": model,
@@ -605,6 +684,8 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     }
     if retention_config:
         trainer_kwargs["replay_coefficient"] = retention_coefficient
+    if contrastive_config:
+        trainer_kwargs["contrastive_coefficient"] = contrastive_coefficient
     trainer = trainer_class(
         **trainer_kwargs,
     )

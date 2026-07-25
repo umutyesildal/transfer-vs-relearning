@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from transfer_vs_relearning.training.clm import (
+    combine_contrastive_losses,
     _answer_only_labels,
     _padded_full_sequence,
     combine_retention_losses,
@@ -13,6 +14,16 @@ from transfer_vs_relearning.training.clm import (
     safe_run_name,
     tokenizer_path_from_manifest,
 )
+
+
+def test_contrastive_loss_is_added_without_replacing_factual_loss() -> None:
+    assert combine_contrastive_losses(2.0, 3.0, 0.1) == 2.3
+    try:
+        combine_contrastive_losses(2.0, 3.0, 0.0)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Expected non-positive contrastive coefficient to fail")
 
 
 def test_replay_loss_is_added_without_replacing_factual_loss() -> None:
