@@ -11,3 +11,4 @@ def test_qwen_scale_probe_builds_2500_fact_hybrid_and_four_form_registry(tmp_pat
     assert manifest["facts"] == 2500
     assert manifest["train_rows"] == 17500
     assert manifest["four_form_probes"] == 20000
+    assert manifest["monitoring_validation_rows"] == 2301

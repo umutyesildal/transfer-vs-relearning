@@ -6,13 +6,13 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
 #SBATCH --time=08:00:00
-#SBATCH --output=/vol/tmp2/yesildau/qwen_scale_probe_v1/logs/%x-%j.out
-#SBATCH --error=/vol/tmp2/yesildau/qwen_scale_probe_v1/logs/%x-%j.err
+#SBATCH --output=/vol/tmp2/yesildau/qwen_scale_probe_v2/logs/%x-%j.out
+#SBATCH --error=/vol/tmp2/yesildau/qwen_scale_probe_v2/logs/%x-%j.err
 set -euo pipefail
 : "${PREFLIGHT_MANIFEST:?PREFLIGHT_MANIFEST is required}"
 HOME_ROOT=/vol/fob-vol6/mi25/yesildau
 REPO_ROOT="${SLURM_SUBMIT_DIR:-${HOME_ROOT}/transfer-vs-relearning}"
-ROOT=/vol/tmp2/yesildau/qwen_scale_probe_v1
+ROOT=/vol/tmp2/yesildau/qwen_scale_probe_v2
 test -s "${PREFLIGHT_MANIFEST}"; test -s "${ROOT}/datasets/dataset_manifest.json"; test -s "${ROOT}/anchor/manifest.json"
 task_tmp="${ROOT}/tmp/training_${SLURM_JOB_ID}"
 mkdir -p "${ROOT}"/{cache/huggingface,cache/torch,logs} "${task_tmp}"
