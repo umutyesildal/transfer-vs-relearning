@@ -21,7 +21,8 @@ conda run --name xfer-relearn python scripts/m1_form_generalization_preflight.py
   --verify-manifest "${PREFLIGHT_MANIFEST}" \
   --repo-root "${REPO_ROOT}" \
   --source-config "${SOURCE_CONFIG}" \
-  --launcher slurm/train_smollm_contrastive_binding.slurm
+  --launcher slurm/train_smollm_contrastive_binding.slurm \
+  --max-age-minutes 240
 mkdir -p "${ROOT}"/{cache/huggingface,cache/torch,configs,logs,manifests,tmp}
 export HF_HOME="${ROOT}/cache/huggingface" TRANSFORMERS_CACHE="${ROOT}/cache/huggingface" XDG_CACHE_HOME="${ROOT}/cache" TORCH_HOME="${ROOT}/cache/torch" TMPDIR="${ROOT}/tmp" HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 conda run --name xfer-relearn python scripts/build_m1_canonical_form_diversity_dataset.py --repo-root "${REPO_ROOT}" --output-dir "${ROOT}/datasets" --subject-count 100
