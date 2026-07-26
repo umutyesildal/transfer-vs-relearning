@@ -335,7 +335,14 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
         if contrastive_coefficient <= 0 or negatives_per_example <= 0:
             raise ValueError("Contrastive coefficient and negative count must be positive")
         profiles = read_csv_rows(resolve_path(repo_root, contrastive_config["canonical_profiles_file"]))
-        inventory = {relation: sorted({row[RELATION_MAP[relation][0]] for row in profiles}) for relation in RELATION_MAP}
+        if not profiles:
+            raise ValueError("Contrastive binding requires at least one canonical profile")
+        available_columns = set(profiles[0])
+        inventory = {
+            relation: sorted({row[answer_column] for row in profiles})
+            for relation, (answer_column, _, _) in RELATION_MAP.items()
+            if answer_column in available_columns
+        }
         profile_by_id = {row["subject_id"]: row for row in profiles}
     else:
         contrastive_coefficient = 0.0
