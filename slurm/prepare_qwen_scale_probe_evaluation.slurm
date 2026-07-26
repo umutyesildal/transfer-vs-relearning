@@ -5,8 +5,8 @@
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=8G
 #SBATCH --time=00:30:00
-#SBATCH --output=/vol/tmp2/yesildau/qwen_scale_probe_v2/logs/%x-%j.out
-#SBATCH --error=/vol/tmp2/yesildau/qwen_scale_probe_v2/logs/%x-%j.err
+#SBATCH --output=/vol/tmp2/yesildau/qwen_scale_probe_v3/logs/%x-%j.out
+#SBATCH --error=/vol/tmp2/yesildau/qwen_scale_probe_v3/logs/%x-%j.err
 set -euo pipefail
 ROOT=/vol/tmp2/yesildau/qwen_scale_probe_v3
 cd "${SLURM_SUBMIT_DIR}"; module load anaconda/3-2024.06

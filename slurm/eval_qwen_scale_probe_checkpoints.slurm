@@ -6,15 +6,16 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
 #SBATCH --time=03:00:00
-#SBATCH --output=/vol/tmp2/yesildau/qwen_scale_probe_v2/logs/%x-%A_%a.out
-#SBATCH --error=/vol/tmp2/yesildau/qwen_scale_probe_v2/logs/%x-%A_%a.err
+#SBATCH --output=/vol/tmp2/yesildau/qwen_scale_probe_v3/logs/%x-%A_%a.out
+#SBATCH --error=/vol/tmp2/yesildau/qwen_scale_probe_v3/logs/%x-%A_%a.err
 set -euo pipefail
 : "${SLURM_ARRAY_TASK_ID:?}" 
 ROOT=/vol/tmp2/yesildau/qwen_scale_probe_v3
 REPO_ROOT="${SLURM_SUBMIT_DIR}"
 REGISTRY="${ROOT}/evaluation_v1/checkpoint_registry.csv"
-field(){ conda run --name xfer-relearn python scripts/resolve_m1_retention_evaluation.py --registry "${REGISTRY}" --task-index "${SLURM_ARRAY_TASK_ID}" --field "$1" | tr -d '\r' | tail -n 1; }
-cd "${REPO_ROOT}"; module load anaconda/3-2024.06
+cd "${REPO_ROOT}"
+module load anaconda/3-2024.06
+field(){ conda run --name xfer-relearn python scripts/resolve_m1_retention_evaluation.py --registry "${REGISTRY}" --task-index "${SLURM_ARRAY_TASK_ID}" --field "$1" | tr -d '\r'; }
 label=$(field label); model=$(field model_manifest); hard=$(field hard_output); exact=$(field exact_config); general=$(field general_config)
 tmp="${ROOT}/tmp/evaluation/${label}_${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
 mkdir -p "${ROOT}"/{cache/huggingface,cache/torch,logs} "${tmp}"
