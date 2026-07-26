@@ -8,7 +8,7 @@ dataset:
   answer_field: answer
   split_seed: 42
 model:
-  base_model_manifest: /vol/tmp2/yesildau/m1_cross_family_screen_v1/models/HuggingFaceTB__SmolLM2-1.7B/model_manifest.json
+  base_model_manifest: /vol/tmp/yesildau/transfer-vs-relearning/artifacts/models/HuggingFaceTB__SmolLM2-1.7B/model_manifest.json
 training:
   run_name: smollm_contrastive_binding_seed42
   output_root: /vol/tmp2/yesildau/smollm_contrastive_binding_v1/training/seed42
