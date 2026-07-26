@@ -2,7 +2,7 @@
 #SBATCH --job-name=qwen-scale-eval
 #SBATCH --account=yesildau
 #SBATCH --partition=gpu
-#SBATCH --gres=gpu:rtx3090:1
+#SBATCH --gres=gpu:a10080gb:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
 #SBATCH --time=03:00:00
