@@ -14,10 +14,16 @@ REPO_ROOT="${SLURM_SUBMIT_DIR:-$(pwd)}"
 ROOT=/vol/tmp2/yesildau/smollm_contrastive_binding_v1
 SOURCE_CONFIG="${REPO_ROOT}/configs/training/smollm_contrastive_binding_seed42.yaml"
 CONFIG="${ROOT}/configs/smoke_seed42.yaml"
-PREFLIGHT_MANIFEST="${PREFLIGHT_MANIFEST:-${ROOT}/preflight/manifest.json}"
 cd "${REPO_ROOT}"
 module load anaconda/3-2024.06
-conda run --name xfer-relearn python scripts/m1_form_generalization_preflight.py --verify-manifest "${PREFLIGHT_MANIFEST}" --repo-root "${REPO_ROOT}" --source-config "${SOURCE_CONFIG}" --launcher slurm/train_smollm_contrastive_binding.slurm --max-age-minutes 240
+conda run --name xfer-relearn python scripts/m1_form_generalization_preflight.py \
+  --repo-root "${REPO_ROOT}" \
+  --scratch-root "${ROOT}" \
+  --manifest "${ROOT}/preflight/manifest.json" \
+  --source-config "${SOURCE_CONFIG}" \
+  --launcher slurm/train_smollm_contrastive_binding.slurm \
+  --output-namespace "${ROOT}/training/seed42" \
+  --expected-commit "$(git rev-parse HEAD)"
 mkdir -p "${ROOT}"/{cache/huggingface,cache/torch,configs,logs,tmp}
 export HF_HOME="${ROOT}/cache/huggingface" TRANSFORMERS_CACHE="${ROOT}/cache/huggingface" XDG_CACHE_HOME="${ROOT}/cache" TORCH_HOME="${ROOT}/cache/torch" TMPDIR="${ROOT}/tmp" HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 conda run --name xfer-relearn python scripts/build_m1_canonical_form_diversity_dataset.py --repo-root "${REPO_ROOT}" --output-dir "${ROOT}/datasets" --subject-count 100
