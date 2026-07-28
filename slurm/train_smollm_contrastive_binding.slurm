@@ -5,7 +5,7 @@
 #SBATCH --gres=gpu:a10080gb:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
-#SBATCH --time=03:00:00
+#SBATCH --time=16:00:00
 #SBATCH --output=/vol/tmp2/yesildau/smollm_contrastive_binding_v1/logs/%x-%A.out
 #SBATCH --error=/vol/tmp2/yesildau/smollm_contrastive_binding_v1/logs/%x-%A.err
 set -euo pipefail
