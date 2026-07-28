@@ -17,12 +17,15 @@ def main() -> None:
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     parser.add_argument("--source-manifest", type=Path, required=True)
     parser.add_argument("--general-corpus", type=Path, required=True)
+    parser.add_argument("--training-relative", default="training/replay_w0_5_seed42")
+    parser.add_argument("--label-prefix", default="qwen_scale_step")
+    parser.add_argument("--resolved-revision-prefix", default="qwen-scale-probe-seed42-update")
     args = parser.parse_args()
     root, repo = args.root.resolve(), args.repo_root.resolve()
     wave = root / "evaluation_v1"
     if wave.exists():
         raise FileExistsError(wave)
-    run_roots = list((root / "training/replay_w0_5_seed42").glob("*/training_manifest.json"))
+    run_roots = list((root / args.training_relative).glob("*/training_manifest.json"))
     if len(run_roots) != 1:
         raise ValueError(f"Expected one training manifest, found {len(run_roots)}")
     run = run_roots[0].parent
@@ -31,10 +34,10 @@ def main() -> None:
         checkpoint = run / "checkpoints" / f"checkpoint-{step}"
         if not checkpoint.is_dir():
             raise FileNotFoundError(checkpoint)
-        label = f"qwen_scale_step{step}"
+        label = f"{args.label_prefix}{step}"
         model_manifest = wave / "model_manifests" / f"{label}.json"
         create_local_model_manifest(source_manifest_path=args.source_manifest, local_model_dir=checkpoint,
-            output_manifest_path=model_manifest, model_id=label, resolved_revision=f"qwen-scale-probe-seed42-update{step}",
+            output_manifest_path=model_manifest, model_id=label, resolved_revision=f"{args.resolved_revision_prefix}{step}",
             training_checkpoint=f"checkpoint-{step}", training_run_dir=run)
         exact = wave / "exact_configs" / f"{label}.json"
         general = wave / "general_configs" / f"{label}.json"
