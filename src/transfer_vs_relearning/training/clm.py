@@ -665,6 +665,9 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
             def __init__(self, *args: Any, contrastive_coefficient: float, **kwargs: Any) -> None:
                 super().__init__(*args, **kwargs)
                 self.contrastive_coefficient = contrastive_coefficient
+                self.contrastive_train_batches = 0
+                self.contrastive_factual_loss_sum = 0.0
+                self.contrastive_ranking_loss_sum = 0.0
             def compute_loss(self, model: Any, inputs: dict[str, Any], return_outputs: bool = False, **kwargs: Any) -> Any:
                 candidate_ids = inputs.pop("contrastive_input_ids")
                 candidate_mask = inputs.pop("contrastive_attention_mask")
@@ -679,7 +682,22 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
                 scores = (token_logp * mask).sum(-1) / mask.sum(-1).clamp_min(1)
                 ranking = torch.nn.functional.cross_entropy(scores.reshape(batch, choices), torch.zeros(batch, dtype=torch.long, device=scores.device))
                 loss = combine_contrastive_losses(factual.loss, ranking, self.contrastive_coefficient)
+                if model.training:
+                    self.contrastive_train_batches += 1
+                    self.contrastive_factual_loss_sum += float(factual.loss.detach().float().cpu())
+                    self.contrastive_ranking_loss_sum += float(ranking.detach().float().cpu())
                 return (loss, factual) if return_outputs else loss
+
+            def contrastive_metrics(self) -> dict[str, float | int]:
+                count = self.contrastive_train_batches
+                if count == 0:
+                    return {"train_batches": 0}
+                return {
+                    "train_batches": count,
+                    "mean_factual_lm_loss": self.contrastive_factual_loss_sum / count,
+                    "mean_ranking_loss": self.contrastive_ranking_loss_sum / count,
+                    "coefficient": self.contrastive_coefficient,
+                }
         trainer_class = ContrastiveTrainer
 
     trainer_kwargs: dict[str, Any] = {
@@ -699,6 +717,7 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
 
     train_output = trainer.train()
     replay_metrics = trainer.replay_metrics() if retention_config else None
+    contrastive_metrics = trainer.contrastive_metrics() if contrastive_config else None
     final_model_dir = run_dir / "final_model"
     trainer.save_model(str(final_model_dir))
     tokenizer.save_pretrained(str(final_model_dir))
@@ -708,6 +727,8 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     write_json(run_dir / "eval_metrics.json", eval_metrics)
     if replay_metrics is not None:
         write_json(run_dir / "retention_loss_metrics.json", replay_metrics)
+    if contrastive_metrics is not None:
+        write_json(run_dir / "contrastive_loss_metrics.json", contrastive_metrics)
     checkpoints = sorted(str(path) for path in (run_dir / "checkpoints").glob("checkpoint-*") if path.is_dir())
     return {
         "run_dir": str(run_dir),
