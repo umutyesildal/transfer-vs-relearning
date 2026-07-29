@@ -119,6 +119,9 @@ def test_smollm_prompt_consistency_contract_uses_only_training_forms_a_and_b() -
         "training_representations": ["form_a_qa", "form_a_direct", "form_b_qa", "form_b_direct"],
     }
     assert not any("form_c" in value or "form_d" in value for value in config["prompt_consistency"]["training_representations"])
+    preflight = Path("slurm/preflight_smollm_prompt_consistency.slurm").read_text(encoding="utf-8")
+    assert "smollm_prompt_consistency_v2" in preflight
+    assert "train_smollm_prompt_consistency.slurm" in preflight
 
 
 def test_seed43_retention_replication_changes_only_seeds_and_output_identity() -> None:
