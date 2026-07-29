@@ -1,0 +1,45 @@
+dataset:
+  version: m1_canonical_form_diversity_v1
+  dataset_dir: /vol/tmp2/yesildau/m1_canonical_form_diversity_v1/datasets
+  dataset_manifest: /vol/tmp2/yesildau/m1_canonical_form_diversity_v1/datasets/dataset_manifest.json
+  train_file: /vol/tmp2/yesildau/m1_canonical_form_diversity_v1/datasets/train.jsonl
+  validation_file: /vol/tmp2/yesildau/m1_canonical_form_diversity_v1/datasets/validation.jsonl
+  text_field: text
+  answer_field: answer
+  split_seed: 42
+model:
+  base_model_manifest: /vol/tmp/yesildau/transfer-vs-relearning/artifacts/models/HuggingFaceTB__SmolLM2-1.7B/model_manifest.json
+training:
+  run_name: smollm_prompt_consistency_seed42
+  output_root: /vol/tmp2/yesildau/smollm_prompt_consistency_v2/training/seed42
+  block_size: 128
+  learning_rate: 5.0e-5
+  num_train_epochs: 36.0
+  per_device_train_batch_size: 10
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 50
+  warmup_ratio: 0.02
+  weight_decay: 0.0
+  lr_scheduler_type: constant_with_warmup
+  loss_mode: answer_only
+  supervise_eos: false
+  bf16: true
+  fp16: false
+  gradient_checkpointing: true
+  max_grad_norm: 1.0
+  logging_steps: 5
+  checkpoint_fractions: [0.1, 0.25, 0.5, 0.75, 1.0]
+  save_total_limit: 12
+  seed: 42
+  data_seed: 42
+runtime:
+  local_files_only: true
+  world_size: 1
+contrastive:
+  coefficient: 0.10
+  negatives_per_example: 15
+  canonical_profiles_file: artifacts/datasets/relation_v2_gate_v1/data/canonical_subject_profiles_5000.csv
+prompt_consistency:
+  coefficient: 0.10
+  anchor_training_representation: form_a_qa
+  training_representations: [form_a_qa, form_a_direct, form_b_qa, form_b_direct]

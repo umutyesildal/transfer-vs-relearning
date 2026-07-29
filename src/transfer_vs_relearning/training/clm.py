@@ -148,6 +148,33 @@ def combine_contrastive_losses(factual_loss: Any, ranking_loss: Any, coefficient
     return factual_loss + coefficient * ranking_loss
 
 
+def prompt_distribution_consistency_loss(scores: Any) -> Any:
+    """KL agreement of same-fact, A/B-only candidate distributions."""
+    import torch.nn.functional as F
+
+    if scores.ndim != 3 or scores.shape[1] < 2:
+        raise ValueError("Prompt-consistency scores must be [groups, prompts, candidates]")
+    log_distributions = F.log_softmax(scores, dim=-1)
+    mean_distribution = log_distributions.exp().mean(dim=1, keepdim=True).detach()
+    return F.kl_div(
+        log_distributions,
+        mean_distribution.expand_as(log_distributions),
+        reduction="batchmean",
+    )
+
+
+def combine_binding_losses(
+    factual_loss: Any,
+    ranking_loss: Any,
+    ranking_coefficient: float,
+    consistency_loss: Any,
+    consistency_coefficient: float,
+) -> Any:
+    if ranking_coefficient <= 0 or consistency_coefficient <= 0:
+        raise ValueError("Binding coefficients must be positive")
+    return factual_loss + ranking_coefficient * ranking_loss + consistency_coefficient * consistency_loss
+
+
 def _padded_full_sequence(
     input_ids: list[int],
     attention_mask: list[int],
@@ -315,8 +342,11 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
     loss_mode = str(training_config.get("loss_mode", "full_sequence"))
     retention_config = config.get("retention")
     contrastive_config = config.get("contrastive")
+    consistency_config = config.get("prompt_consistency")
     if retention_config and contrastive_config:
         raise ValueError("Replay and contrastive objectives cannot be combined in one frozen run")
+    if consistency_config and not contrastive_config:
+        raise ValueError("Prompt consistency requires the contrastive binding objective")
     if retention_config:
         if retention_config.get("mechanism") != "replay":
             raise ValueError(f"Unsupported retention mechanism: {retention_config.get('mechanism')!r}")
@@ -344,11 +374,26 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
             if answer_column in available_columns
         }
         profile_by_id = {row["subject_id"]: row for row in profiles}
+        if consistency_config:
+            consistency_coefficient = float(consistency_config["coefficient"])
+            consistency_anchor = str(consistency_config["anchor_training_representation"])
+            consistency_slots = tuple(str(value) for value in consistency_config["training_representations"])
+            if consistency_coefficient <= 0 or len(consistency_slots) < 2:
+                raise ValueError("Prompt-consistency coefficient must be positive and require at least two prompts")
+            if consistency_anchor not in consistency_slots:
+                raise ValueError("Prompt-consistency anchor must be one of the grouped representations")
+        else:
+            consistency_coefficient = 0.0
+            consistency_anchor = ""
+            consistency_slots = ()
     else:
         contrastive_coefficient = 0.0
         negatives_per_example = 0
         inventory = {}
         profile_by_id = {}
+        consistency_coefficient = 0.0
+        consistency_anchor = ""
+        consistency_slots = ()
 
     validation_file_value = dataset_config.get("validation_file")
     if validation_file_value:
@@ -393,6 +438,24 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
         if raw_split[split_name].column_names != columns:
             raise ValueError("Training and validation datasets must have the same columns")
 
+    consistency_rows_by_fact: dict[str, dict[str, dict[str, Any]]] = {}
+    if consistency_config:
+        for row in raw_split["train"]:
+            representation = str(row.get("training_representation", ""))
+            if representation in consistency_slots:
+                fact_rows = consistency_rows_by_fact.setdefault(str(row["fact_id"]), {})
+                if representation in fact_rows:
+                    raise ValueError(f"Duplicate prompt-consistency row for {row['fact_id']} / {representation}")
+                fact_rows[representation] = dict(row)
+        incomplete = {
+            fact_id: sorted(set(consistency_slots) - set(rows))
+            for fact_id, rows in consistency_rows_by_fact.items()
+            if set(rows) != set(consistency_slots)
+        }
+        expected_facts = len({str(row["fact_id"]) for row in raw_split["train"]})
+        if len(consistency_rows_by_fact) != expected_facts or incomplete:
+            raise ValueError(f"Prompt-consistency groups are incomplete: {list(incomplete.items())[:3]}")
+
     if loss_mode == "answer_only":
         answer_field = str(dataset_config.get("answer_field", "answer"))
         supervise_eos = bool(training_config.get("supervise_eos", True))
@@ -420,6 +483,26 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
             batch_candidate_ids: list[list[list[int]]] = []
             batch_candidate_masks: list[list[list[int]]] = []
             batch_candidate_labels: list[list[list[int]]] = []
+            batch_consistency_ids: list[list[list[list[int]]]] = []
+            batch_consistency_masks: list[list[list[list[int]]]] = []
+            batch_consistency_labels: list[list[list[list[int]]]] = []
+            batch_consistency_active: list[bool] = []
+
+            def candidate_rows_for_text(
+                candidate_text_prefix: str,
+                candidate_answer: str,
+                candidate_values: list[str],
+            ) -> list[tuple[list[int], list[int], list[int]]]:
+                candidate_rows = []
+                for candidate in candidate_values:
+                    candidate_text = candidate_text_prefix[:_answer_char_span(candidate_text_prefix, candidate_answer)[0]] + candidate
+                    encoded = tokenizer(candidate_text, add_special_tokens=False, truncation=True, max_length=block_size - 1, return_offsets_mapping=True)
+                    ids, mask, offsets2 = list(encoded["input_ids"]), list(encoded["attention_mask"]), list(encoded["offset_mapping"])
+                    start2, end2 = _answer_char_span(candidate_text, candidate)
+                    labels2 = _answer_only_labels(ids, _token_label_mask_from_offsets(offsets2, answer_start=start2, answer_end=end2), eos_id, supervise_eos=False)
+                    pad2 = block_size - (len(ids) + 1)
+                    candidate_rows.append((ids + [eos_id] + [tokenizer.pad_token_id] * pad2, mask + [1] + [0] * pad2, labels2 + [-100] * pad2))
+                return candidate_rows
 
             for text, answer, input_ids, attention_mask, offsets in zip(
                 texts,
@@ -475,6 +558,35 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
                     batch_candidate_ids.append([item[0] for item in candidate_rows])
                     batch_candidate_masks.append([item[1] for item in candidate_rows])
                     batch_candidate_labels.append([item[2] for item in candidate_rows])
+                    if consistency_config:
+                        representation = str(examples.get("training_representation", [""] * len(texts))[len(batch_input_ids) - 1])
+                        fact_id = str(examples["fact_id"][len(batch_input_ids) - 1])
+                        is_anchor = representation == consistency_anchor
+                        batch_consistency_active.append(is_anchor)
+                        if is_anchor:
+                            group_rows = consistency_rows_by_fact[fact_id]
+                            group_relation = str(group_rows[consistency_slots[0]]["relation"])
+                            group_answer = str(group_rows[consistency_slots[0]]["answer"])
+                            if any(str(group_rows[slot]["relation"]) != group_relation or str(group_rows[slot]["answer"]) != group_answer for slot in consistency_slots):
+                                raise ValueError(f"Prompt-consistency group disagrees on fact {fact_id}")
+                            group_candidates = [value for value in inventory[group_relation] if value != group_answer]
+                            group_start = int.from_bytes(hashlib.sha256(f"42:consistency:{fact_id}:{group_relation}".encode()).digest()[:8], "big") % len(group_candidates)
+                            group_negatives = [group_candidates[(group_start + offset) % len(group_candidates)] for offset in range(negatives_per_example)]
+                            if group_relation in {"born_in", "lives_in"}:
+                                paired = profile_by_id[str(group_rows[consistency_slots[0]]["subject_id"])]["residence_en" if group_relation == "born_in" else "birthplace_en"]
+                                if paired != group_answer and paired not in group_negatives:
+                                    group_negatives[-1] = paired
+                            group_values = [group_answer, *group_negatives]
+                            grouped_candidates = [
+                                candidate_rows_for_text(str(group_rows[slot]["text"]), group_answer, group_values)
+                                for slot in consistency_slots
+                            ]
+                        else:
+                            blank = ([tokenizer.pad_token_id] * block_size, [0] * block_size, [-100] * block_size)
+                            grouped_candidates = [[blank for _ in range(negatives_per_example + 1)] for _ in consistency_slots]
+                        batch_consistency_ids.append([[item[0] for item in group] for group in grouped_candidates])
+                        batch_consistency_masks.append([[item[1] for item in group] for group in grouped_candidates])
+                        batch_consistency_labels.append([[item[2] for item in group] for group in grouped_candidates])
 
             if retention_config:
                 anchor_max_tokens = int(retention_config.get("max_tokens", block_size - 1))
@@ -517,6 +629,8 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
                 )
             if contrastive_config:
                 result.update({"contrastive_input_ids": batch_candidate_ids, "contrastive_attention_mask": batch_candidate_masks, "contrastive_labels": batch_candidate_labels})
+            if consistency_config:
+                result.update({"consistency_input_ids": batch_consistency_ids, "consistency_attention_mask": batch_consistency_masks, "consistency_labels": batch_consistency_labels, "consistency_active": batch_consistency_active})
             return result
 
         lm_datasets = raw_split.map(
@@ -662,16 +776,29 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
         trainer_class = ReplayTrainer
     elif contrastive_config:
         class ContrastiveTrainer(Trainer):
-            def __init__(self, *args: Any, contrastive_coefficient: float, **kwargs: Any) -> None:
+            def __init__(
+                self,
+                *args: Any,
+                contrastive_coefficient: float,
+                consistency_coefficient: float = 0.0,
+                **kwargs: Any,
+            ) -> None:
                 super().__init__(*args, **kwargs)
                 self.contrastive_coefficient = contrastive_coefficient
+                self.consistency_coefficient = consistency_coefficient
                 self.contrastive_train_batches = 0
                 self.contrastive_factual_loss_sum = 0.0
                 self.contrastive_ranking_loss_sum = 0.0
+                self.consistency_loss_sum = 0.0
+                self.consistency_group_count = 0
             def compute_loss(self, model: Any, inputs: dict[str, Any], return_outputs: bool = False, **kwargs: Any) -> Any:
                 candidate_ids = inputs.pop("contrastive_input_ids")
                 candidate_mask = inputs.pop("contrastive_attention_mask")
                 candidate_labels = inputs.pop("contrastive_labels")
+                consistency_ids = inputs.pop("consistency_input_ids", None)
+                consistency_mask = inputs.pop("consistency_attention_mask", None)
+                consistency_labels = inputs.pop("consistency_labels", None)
+                consistency_active = inputs.pop("consistency_active", None)
                 factual = model(**inputs)
                 batch, choices, length = candidate_ids.shape
                 outputs = model(input_ids=candidate_ids.reshape(batch * choices, length), attention_mask=candidate_mask.reshape(batch * choices, length))
@@ -681,11 +808,38 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
                 token_logp = logits.log_softmax(-1).gather(-1, labels.masked_fill(~mask, 0).unsqueeze(-1)).squeeze(-1)
                 scores = (token_logp * mask).sum(-1) / mask.sum(-1).clamp_min(1)
                 ranking = torch.nn.functional.cross_entropy(scores.reshape(batch, choices), torch.zeros(batch, dtype=torch.long, device=scores.device))
-                loss = combine_contrastive_losses(factual.loss, ranking, self.contrastive_coefficient)
+                if self.consistency_coefficient > 0:
+                    if consistency_ids is None or consistency_mask is None or consistency_labels is None or consistency_active is None:
+                        raise ValueError("Prompt-consistency tensors are missing")
+                    active = consistency_active.bool()
+                    active_ids = consistency_ids[active]
+                    active_mask = consistency_mask[active]
+                    active_labels = consistency_labels[active]
+                    groups, prompts, group_choices, group_length = active_ids.shape
+                    if groups == 0:
+                        consistency = scores.new_zeros(())
+                    else:
+                        group_outputs = model(
+                            input_ids=active_ids.reshape(groups * prompts * group_choices, group_length),
+                            attention_mask=active_mask.reshape(groups * prompts * group_choices, group_length),
+                        )
+                        group_logits = group_outputs.logits[:, :-1, :]
+                        group_labels = active_labels.reshape(groups * prompts * group_choices, group_length)[:, 1:]
+                        group_token_mask = group_labels.ne(-100)
+                        group_token_logp = group_logits.log_softmax(-1).gather(-1, group_labels.masked_fill(~group_token_mask, 0).unsqueeze(-1)).squeeze(-1)
+                        group_scores = ((group_token_logp * group_token_mask).sum(-1) / group_token_mask.sum(-1).clamp_min(1)).reshape(groups, prompts, group_choices)
+                        consistency = prompt_distribution_consistency_loss(group_scores)
+                    loss = combine_binding_losses(factual.loss, ranking, self.contrastive_coefficient, consistency, self.consistency_coefficient)
+                else:
+                    consistency = scores.new_zeros(())
+                    groups = 0
+                    loss = combine_contrastive_losses(factual.loss, ranking, self.contrastive_coefficient)
                 if model.training:
                     self.contrastive_train_batches += 1
                     self.contrastive_factual_loss_sum += float(factual.loss.detach().float().cpu())
                     self.contrastive_ranking_loss_sum += float(ranking.detach().float().cpu())
+                    self.consistency_loss_sum += float(consistency.detach().float().cpu())
+                    self.consistency_group_count += int(groups)
                 return (loss, factual) if return_outputs else loss
 
             def contrastive_metrics(self) -> dict[str, float | int]:
@@ -697,6 +851,9 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
                     "mean_factual_lm_loss": self.contrastive_factual_loss_sum / count,
                     "mean_ranking_loss": self.contrastive_ranking_loss_sum / count,
                     "coefficient": self.contrastive_coefficient,
+                    "mean_prompt_consistency_loss": self.consistency_loss_sum / count,
+                    "prompt_consistency_coefficient": self.consistency_coefficient,
+                    "prompt_consistency_groups": self.consistency_group_count,
                 }
         trainer_class = ContrastiveTrainer
 
@@ -711,6 +868,7 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
         trainer_kwargs["replay_coefficient"] = retention_coefficient
     if contrastive_config:
         trainer_kwargs["contrastive_coefficient"] = contrastive_coefficient
+        trainer_kwargs["consistency_coefficient"] = consistency_coefficient
     trainer = trainer_class(
         **trainer_kwargs,
     )

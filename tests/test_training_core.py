@@ -4,6 +4,8 @@ from pathlib import Path
 
 from transfer_vs_relearning.training.clm import (
     combine_contrastive_losses,
+    combine_binding_losses,
+    prompt_distribution_consistency_loss,
     _answer_only_labels,
     _padded_full_sequence,
     combine_retention_losses,
@@ -24,6 +26,35 @@ def test_contrastive_loss_is_added_without_replacing_factual_loss() -> None:
         pass
     else:
         raise AssertionError("Expected non-positive contrastive coefficient to fail")
+
+
+def test_prompt_consistency_is_zero_for_identical_candidate_distributions() -> None:
+    import pytest
+
+    torch = pytest.importorskip("torch")
+    scores = torch.tensor([[[2.0, 1.0, 0.0], [2.0, 1.0, 0.0]]])
+    assert torch.isclose(prompt_distribution_consistency_loss(scores), torch.tensor(0.0), atol=1e-6)
+
+
+def test_prompt_consistency_has_finite_gradient_and_preserves_lm_primary() -> None:
+    import pytest
+
+    torch = pytest.importorskip("torch")
+    scores = torch.tensor([[[2.0, 1.0], [0.0, 3.0]]], requires_grad=True)
+    consistency = prompt_distribution_consistency_loss(scores)
+    total = combine_binding_losses(torch.tensor(2.0), torch.tensor(3.0), 0.1, consistency, 0.1)
+    total.backward()
+    assert torch.isfinite(consistency)
+    assert torch.isfinite(scores.grad).all()
+    assert torch.isclose(total.detach(), torch.tensor(2.3) + 0.1 * consistency.detach())
+
+
+def test_prompt_consistency_rejects_incomplete_prompt_group() -> None:
+    import pytest
+
+    torch = pytest.importorskip("torch")
+    with pytest.raises(ValueError, match="Prompt-consistency scores"):
+        prompt_distribution_consistency_loss(torch.zeros(1, 1, 16))
 
 
 def test_replay_loss_is_added_without_replacing_factual_loss() -> None:
@@ -76,6 +107,18 @@ def test_qwen_retention_configs_preserve_factual_budget() -> None:
         "anchor_train_file": "/vol/tmp2/yesildau/m1_retention_v1/anchor/train.jsonl",
         "anchor_validation_file": "/vol/tmp2/yesildau/m1_retention_v1/anchor/validation.jsonl",
     }
+
+
+def test_smollm_prompt_consistency_contract_uses_only_training_forms_a_and_b() -> None:
+    config = load_training_config(Path("configs/training/smollm_prompt_consistency_seed42.yaml"))
+    assert estimate_optimizer_steps(3500, 10, 50, 36.0) == 252
+    assert config["contrastive"]["coefficient"] == 0.10
+    assert config["prompt_consistency"] == {
+        "coefficient": 0.10,
+        "anchor_training_representation": "form_a_qa",
+        "training_representations": ["form_a_qa", "form_a_direct", "form_b_qa", "form_b_direct"],
+    }
+    assert not any("form_c" in value or "form_d" in value for value in config["prompt_consistency"]["training_representations"])
 
 
 def test_seed43_retention_replication_changes_only_seeds_and_output_identity() -> None:
