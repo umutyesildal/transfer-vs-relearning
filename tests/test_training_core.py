@@ -122,6 +122,10 @@ def test_smollm_prompt_consistency_contract_uses_only_training_forms_a_and_b() -
     preflight = Path("slurm/preflight_smollm_prompt_consistency.slurm").read_text(encoding="utf-8")
     assert "smollm_prompt_consistency_v2" in preflight
     assert "train_smollm_prompt_consistency.slurm" in preflight
+    evaluation = Path("slurm/eval_smollm_prompt_consistency_array.slurm").read_text(encoding="utf-8")
+    assert "#SBATCH --array=0-11" in evaluation
+    assert "checkpoint-252 final_model" in evaluation
+    assert "evaluation_v1" in evaluation
 
 
 def test_seed43_retention_replication_changes_only_seeds_and_output_identity() -> None:

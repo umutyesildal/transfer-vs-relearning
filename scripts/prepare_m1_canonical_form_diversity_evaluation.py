@@ -21,6 +21,14 @@ def approved_scratch(path: Path) -> None:
         raise ValueError(f"Path must resolve under approved scratch: {path}")
 
 
+def training_manifest_for_model(model_dir: Path) -> Path:
+    for parent in (model_dir.parent, model_dir.parent.parent):
+        candidate = parent / "training_manifest.json"
+        if candidate.is_file():
+            return candidate
+    raise FileNotFoundError(f"Could not locate completed training_manifest.json for {model_dir}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Freeze final-model evaluation for Document 103 Treatment T.")
     parser.add_argument("--final-model", type=Path, required=True)
@@ -34,7 +42,7 @@ def main() -> None:
     output_root, final_model, general_corpus = args.output_root.resolve(), args.final_model.resolve(), args.general_corpus.resolve()
     approved_scratch(output_root)
     approved_scratch(final_model)
-    training_manifest = final_model.parent / "training_manifest.json"
+    training_manifest = training_manifest_for_model(final_model)
     if json.loads(training_manifest.read_text(encoding="utf-8")).get("status") != "complete":
         raise ValueError(f"Treatment training is not complete: {training_manifest}")
     if not general_corpus.is_file():
@@ -46,7 +54,7 @@ def main() -> None:
         source_manifest_path=args.source_manifest.resolve(), local_model_dir=final_model,
         output_manifest_path=model_manifest, model_id=label,
         resolved_revision=label,
-        training_checkpoint="final_model", training_run_dir=final_model.parent,
+        training_checkpoint=final_model.name, training_run_dir=training_manifest.parent,
     )
     exact_config = output_root / "exact_config.json"
     general_config = output_root / "general_config.json"
