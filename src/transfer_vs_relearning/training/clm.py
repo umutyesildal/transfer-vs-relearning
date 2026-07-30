@@ -196,24 +196,115 @@ def _padded_full_sequence(
     )
 
 
-def run_from_config(config_path: Path, repo_root: Path | None = None) -> Path:
+def run_from_config(
+    config_path: Path,
+    repo_root: Path | None = None,
+    *,
+    resume_run_dir: Path | None = None,
+) -> Path:
     repo_root = (repo_root or Path.cwd()).resolve()
     config_path = config_path.resolve()
     config = load_training_config(config_path)
     config_hash = sha256_text(json.dumps(config, ensure_ascii=False, sort_keys=True))
     training_config = config["training"]
     run_name = safe_run_name(str(training_config.get("run_name", config_path.stem)))
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     output_root = resolve_path(repo_root, training_config["output_root"])
-    run_dir = output_root / f"{timestamp}_{run_name}_{config_hash[:8]}"
-    if run_dir.exists():
-        raise FileExistsError(f"Training run directory already exists: {run_dir}")
-    run_dir.mkdir(parents=True)
+    resume_checkpoint: Path | None = None
+    if resume_run_dir is None:
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        run_dir = output_root / f"{timestamp}_{run_name}_{config_hash[:8]}"
+        if run_dir.exists():
+            raise FileExistsError(f"Training run directory already exists: {run_dir}")
+        run_dir.mkdir(parents=True)
+        _write_initial_manifest(config, config_path, config_hash, repo_root, run_dir)
+    else:
+        run_dir = resume_run_dir.resolve()
+        resume_checkpoint = validate_resume_run(
+            config=config,
+            config_hash=config_hash,
+            repo_root=repo_root,
+            output_root=output_root,
+            run_dir=run_dir,
+        )
+        manifest_path = run_dir / "training_manifest.json"
+        manifest = _read_json(manifest_path)
+        manifest.setdefault("resume_events", []).append(
+            {
+                "resumed_at": datetime.now(timezone.utc).isoformat(),
+                "checkpoint": str(resume_checkpoint),
+                "git_commit": _git_commit(repo_root),
+            }
+        )
+        write_json(manifest_path, manifest)
 
-    _write_initial_manifest(config, config_path, config_hash, repo_root, run_dir)
-    train_result = _run_hf_training(config, repo_root, run_dir)
+    train_result = _run_hf_training(
+        config,
+        repo_root,
+        run_dir,
+        resume_from_checkpoint=resume_checkpoint,
+    )
     _write_final_manifest(config, config_path, config_hash, repo_root, run_dir, train_result)
     return run_dir
+
+
+def validate_resume_run(
+    *,
+    config: dict[str, Any],
+    config_hash: str,
+    repo_root: Path,
+    output_root: Path,
+    run_dir: Path,
+) -> Path:
+    if not run_dir.is_dir() or run_dir.parent.resolve() != output_root.resolve():
+        raise ValueError("Resume run directory must be an existing direct child of the configured output root")
+    manifest_path = run_dir / "training_manifest.json"
+    if not manifest_path.is_file():
+        raise ValueError("Resume run is missing training_manifest.json")
+    manifest = _read_json(manifest_path)
+    if manifest.get("status") != "started":
+        raise ValueError(f"Only an incomplete started run may resume, found {manifest.get('status')!r}")
+    if manifest.get("config_sha256") != config_hash:
+        raise ValueError("Resume config hash does not match the original run")
+
+    dataset = config["dataset"]
+    model = config["model"]
+    current_inputs = {
+        "dataset.train_file_sha256": sha256_file(resolve_path(repo_root, dataset["train_file"])),
+        "dataset.dataset_manifest_sha256": sha256_file(resolve_path(repo_root, dataset["dataset_manifest"])),
+        "model.base_model_manifest_sha256": sha256_file(resolve_path(repo_root, model["base_model_manifest"])),
+    }
+    if dataset.get("validation_file"):
+        current_inputs["dataset.validation_file_sha256"] = sha256_file(
+            resolve_path(repo_root, dataset["validation_file"])
+        )
+    retention = config.get("retention")
+    if retention:
+        current_inputs["retention.anchor_train_file_sha256"] = sha256_file(
+            resolve_path(repo_root, retention["anchor_train_file"])
+        )
+        current_inputs["retention.anchor_validation_file_sha256"] = sha256_file(
+            resolve_path(repo_root, retention["anchor_validation_file"])
+        )
+    for dotted_key, observed in current_inputs.items():
+        section, key = dotted_key.split(".", 1)
+        expected = manifest.get(section, {}).get(key)
+        if expected != observed:
+            raise ValueError(f"Resume input hash mismatch for {dotted_key}: {observed} != {expected}")
+
+    candidates: list[tuple[int, Path]] = []
+    for path in (run_dir / "checkpoints").glob("checkpoint-*"):
+        if not path.is_dir():
+            continue
+        try:
+            step = int(path.name.rsplit("-", 1)[1])
+        except ValueError:
+            continue
+        required = ("trainer_state.json", "optimizer.pt", "scheduler.pt")
+        if all((path / name).is_file() for name in required):
+            candidates.append((step, path))
+    if not candidates:
+        raise ValueError("Resume run has no complete optimizer checkpoint")
+    return max(candidates)[1]
 
 
 def _write_initial_manifest(
@@ -298,7 +389,13 @@ def _write_final_manifest(
     write_json(manifest_path, payload)
 
 
-def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> dict[str, Any]:
+def _run_hf_training(
+    config: dict[str, Any],
+    repo_root: Path,
+    run_dir: Path,
+    *,
+    resume_from_checkpoint: Path | None = None,
+) -> dict[str, Any]:
     import datasets
     import torch
     import transformers
@@ -873,9 +970,25 @@ def _run_hf_training(config: dict[str, Any], repo_root: Path, run_dir: Path) -> 
         **trainer_kwargs,
     )
 
-    train_output = trainer.train()
+    train_output = trainer.train(
+        resume_from_checkpoint=str(resume_from_checkpoint) if resume_from_checkpoint else None
+    )
     replay_metrics = trainer.replay_metrics() if retention_config else None
     contrastive_metrics = trainer.contrastive_metrics() if contrastive_config else None
+    if replay_metrics is not None:
+        replay_metrics["measurement_scope"] = (
+            "post_resume_segment" if resume_from_checkpoint else "complete_run"
+        )
+        replay_metrics["resumed_from_checkpoint"] = (
+            str(resume_from_checkpoint) if resume_from_checkpoint else None
+        )
+    if contrastive_metrics is not None:
+        contrastive_metrics["measurement_scope"] = (
+            "post_resume_segment" if resume_from_checkpoint else "complete_run"
+        )
+        contrastive_metrics["resumed_from_checkpoint"] = (
+            str(resume_from_checkpoint) if resume_from_checkpoint else None
+        )
     final_model_dir = run_dir / "final_model"
     trainer.save_model(str(final_model_dir))
     tokenizer.save_pretrained(str(final_model_dir))

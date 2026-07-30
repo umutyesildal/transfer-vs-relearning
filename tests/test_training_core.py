@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 
 from transfer_vs_relearning.training.clm import (
@@ -15,6 +17,7 @@ from transfer_vs_relearning.training.clm import (
     load_training_config,
     safe_run_name,
     tokenizer_path_from_manifest,
+    validate_resume_run,
 )
 
 
@@ -206,6 +209,90 @@ def test_estimate_optimizer_steps_uses_effective_batch_size() -> None:
 def test_interval_from_fractions_uses_first_checkpoint_fraction() -> None:
     assert interval_from_fractions(188, [0.25, 0.5, 0.75, 1.0]) == 47
     assert interval_from_fractions(3, [0.25]) == 1
+
+
+def test_resume_requires_matching_inputs_and_selects_latest_complete_checkpoint(tmp_path: Path) -> None:
+    dataset = tmp_path / "train.jsonl"
+    validation = tmp_path / "validation.jsonl"
+    dataset_manifest = tmp_path / "dataset_manifest.json"
+    model_manifest = tmp_path / "model_manifest.json"
+    anchor_train = tmp_path / "anchor_train.jsonl"
+    anchor_validation = tmp_path / "anchor_validation.jsonl"
+    for path, value in (
+        (dataset, "train\n"),
+        (validation, "validation\n"),
+        (dataset_manifest, "dataset manifest\n"),
+        (model_manifest, "model manifest\n"),
+        (anchor_train, "anchor train\n"),
+        (anchor_validation, "anchor validation\n"),
+    ):
+        path.write_text(value, encoding="utf-8")
+
+    digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
+    output_root = tmp_path / "runs"
+    run_dir = output_root / "frozen-run"
+    checkpoints = run_dir / "checkpoints"
+    checkpoints.mkdir(parents=True)
+    config = {
+        "dataset": {
+            "train_file": str(dataset),
+            "validation_file": str(validation),
+            "dataset_manifest": str(dataset_manifest),
+        },
+        "model": {"base_model_manifest": str(model_manifest)},
+        "training": {"output_root": str(output_root)},
+        "runtime": {},
+        "retention": {
+            "anchor_train_file": str(anchor_train),
+            "anchor_validation_file": str(anchor_validation),
+        },
+    }
+    manifest = {
+        "status": "started",
+        "config_sha256": "frozen-config",
+        "dataset": {
+            "train_file_sha256": digest(dataset),
+            "validation_file_sha256": digest(validation),
+            "dataset_manifest_sha256": digest(dataset_manifest),
+        },
+        "model": {"base_model_manifest_sha256": digest(model_manifest)},
+        "retention": {
+            "anchor_train_file_sha256": digest(anchor_train),
+            "anchor_validation_file_sha256": digest(anchor_validation),
+        },
+    }
+    (run_dir / "training_manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    for step in (25, 50):
+        checkpoint = checkpoints / f"checkpoint-{step}"
+        checkpoint.mkdir()
+        for name in ("trainer_state.json", "optimizer.pt", "scheduler.pt"):
+            (checkpoint / name).write_text("complete", encoding="utf-8")
+    incomplete = checkpoints / "checkpoint-75"
+    incomplete.mkdir()
+    (incomplete / "trainer_state.json").write_text("partial", encoding="utf-8")
+
+    selected = validate_resume_run(
+        config=config,
+        config_hash="frozen-config",
+        repo_root=tmp_path,
+        output_root=output_root,
+        run_dir=run_dir,
+    )
+    assert selected == checkpoints / "checkpoint-50"
+
+    dataset.write_text("changed\n", encoding="utf-8")
+    try:
+        validate_resume_run(
+            config=config,
+            config_hash="frozen-config",
+            repo_root=tmp_path,
+            output_root=output_root,
+            run_dir=run_dir,
+        )
+    except ValueError as error:
+        assert "hash mismatch" in str(error)
+    else:
+        raise AssertionError("Changed resume input must be rejected")
 
 
 def test_acquisition_ladder_config_uses_explicit_validation_and_answer_only_loss() -> None:
