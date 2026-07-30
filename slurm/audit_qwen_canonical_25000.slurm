@@ -11,11 +11,13 @@ set -euo pipefail
 
 HOME_ROOT=/vol/fob-vol6/mi25/yesildau
 ROOT=/vol/tmp2/yesildau/qwen_canonical_25k_seed42_v1
+HOME_LIMIT_BYTES=30000000000
 home_kib=$(du -xsk "${HOME_ROOT}" | awk '{print $1}')
-test "${home_kib}" -le $((10 * 1024 * 1024))
+test $((home_kib * 1024)) -lt "${HOME_LIMIT_BYTES}"
 find "${HOME_ROOT}" -xdev -type f -size +500M -printf '%s %p\n' | sort -nr > \
-  "${ROOT}/preflight/home_large_after.txt"
-diff -u "${ROOT}/preflight/home_large_before.txt" "${ROOT}/preflight/home_large_after.txt"
+  "${ROOT}/preflight/training_home_large_after.txt"
+diff -u "${ROOT}/preflight/training_home_large_before.txt" \
+  "${ROOT}/preflight/training_home_large_after.txt"
 du -xsh "${HOME_ROOT}" "${ROOT}"
 df -h "${HOME_ROOT}" /vol/tmp /vol/tmp2
 df -i "${HOME_ROOT}" /vol/tmp /vol/tmp2

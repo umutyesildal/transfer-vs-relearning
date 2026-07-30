@@ -18,6 +18,7 @@ SMOKE_ROOT="${ROOT}/smoke"
 SOURCE_ANCHOR=/vol/tmp2/yesildau/qwen_scale_probe_v3/anchor
 RESERVE_BYTES=$((300 * 1024 * 1024 * 1024))
 MIN_FREE_BYTES=$((1024 * 1024 * 1024 * 1024))
+HOME_LIMIT_BYTES=30000000000
 
 mkdir -p "${ROOT}"/{logs,preflight}
 test ! -e "${PREPARED_ROOT}"
@@ -30,7 +31,7 @@ test -s "${SOURCE_ANCHOR}/validation.jsonl"
 home_kib=$(du -xsk "${HOME_ROOT}" | awk '{print $1}')
 avail_kib=$(df -Pk /vol/tmp2 | tail -n 1 | awk '{print $4}')
 avail_inodes=$(df -Pi /vol/tmp2 | tail -n 1 | awk '{print $4}')
-test "${home_kib}" -le $((10 * 1024 * 1024))
+test $((home_kib * 1024)) -lt "${HOME_LIMIT_BYTES}"
 test $((avail_kib * 1024)) -ge "${MIN_FREE_BYTES}"
 test "${avail_inodes}" -ge 100000
 

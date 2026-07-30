@@ -30,6 +30,15 @@ def test_training_preflight_requires_one_tib_and_frozen_smoke() -> None:
     assert "test ! -e \"${OUTPUT_ROOT}\"" in preflight
     assert "squeue -o" in preflight
     assert "sinfo -p gpu" in preflight
+    assert "HOME_LIMIT_BYTES=30000000000" in preflight
+    assert "training_home_large_before.txt" in preflight
+
+
+def test_post_run_audit_uses_approved_home_limit_and_training_time_baseline() -> None:
+    audit = Path("slurm/audit_qwen_canonical_25000.slurm").read_text(encoding="utf-8")
+    assert "HOME_LIMIT_BYTES=30000000000" in audit
+    assert "training_home_large_before.txt" in audit
+    assert "training_home_large_after.txt" in audit
 
 
 def test_smoke_does_not_create_canonical_output_before_gpu_guard_passes() -> None:

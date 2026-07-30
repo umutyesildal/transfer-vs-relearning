@@ -15,6 +15,7 @@ ROOT=/vol/tmp2/yesildau/qwen_canonical_25k_seed42_v1
 OUTPUT_ROOT="${ROOT}/training/replay_w0_5_seed42"
 CONFIG="${REPO_ROOT}/configs/training/qwen_canonical_25000_replay_w0_5_seed42.yaml"
 MIN_FREE_BYTES=$((1024 * 1024 * 1024 * 1024))
+HOME_LIMIT_BYTES=30000000000
 test -s "${ROOT}/prepared/dataset_manifest.json"
 test -s "${ROOT}/smoke/resume_rehearsal.json"
 test ! -e "${OUTPUT_ROOT}"
@@ -22,10 +23,12 @@ test ! -e "${OUTPUT_ROOT}"
 home_kib=$(du -xsk "${HOME_ROOT}" | awk '{print $1}')
 avail_kib=$(df -Pk /vol/tmp2 | tail -n 1 | awk '{print $4}')
 avail_inodes=$(df -Pi /vol/tmp2 | tail -n 1 | awk '{print $4}')
-test "${home_kib}" -le $((10 * 1024 * 1024))
+test $((home_kib * 1024)) -lt "${HOME_LIMIT_BYTES}"
 test $((avail_kib * 1024)) -ge "${MIN_FREE_BYTES}"
 test "${avail_inodes}" -ge 100000
 case "$(readlink -m "${OUTPUT_ROOT}")" in /vol/tmp2/yesildau/*) ;; *) exit 2 ;; esac
+find "${HOME_ROOT}" -xdev -type f -size +500M -printf '%s %p\n' | sort -nr > \
+  "${ROOT}/preflight/training_home_large_before.txt"
 
 module load anaconda/3-2024.06
 cd "${REPO_ROOT}"
@@ -65,8 +68,8 @@ git_commit=$(git rev-parse HEAD)
 created_at=$(date --iso-8601=seconds)
 dataset_sha=$(sha256sum "${ROOT}/prepared/dataset_manifest.json" | awk '{print $1}')
 config_sha=$(sha256sum "${CONFIG}" | awk '{print $1}')
-printf '{"status":"passed","created_at":"%s","git_commit":"%s","home_kib":%s,"tmp2_available_kib":%s,"tmp2_available_inodes":%s,"minimum_free_bytes":%s,"dataset_manifest_sha256":"%s","config_file_sha256":"%s","requested_a100_gpus":1,"exclusive":false,"scheduler_priority":"default","updates":252,"checkpoints":11,"retention_policy":"preserve_all_until_frozen_evaluation"}\n' \
-  "${created_at}" "${git_commit}" "${home_kib}" "${avail_kib}" "${avail_inodes}" "${MIN_FREE_BYTES}" "${dataset_sha}" "${config_sha}" > \
+printf '{"status":"passed","created_at":"%s","git_commit":"%s","home_kib":%s,"home_limit_bytes":%s,"tmp2_available_kib":%s,"tmp2_available_inodes":%s,"minimum_free_bytes":%s,"dataset_manifest_sha256":"%s","config_file_sha256":"%s","requested_a100_gpus":1,"exclusive":false,"scheduler_priority":"default","updates":252,"checkpoints":11,"retention_policy":"preserve_all_until_frozen_evaluation"}\n' \
+  "${created_at}" "${git_commit}" "${home_kib}" "${HOME_LIMIT_BYTES}" "${avail_kib}" "${avail_inodes}" "${MIN_FREE_BYTES}" "${dataset_sha}" "${config_sha}" > \
   "${ROOT}/preflight/training_${SLURM_JOB_ID}.json"
 
 du -xsh "${HOME_ROOT}" "${ROOT}"
