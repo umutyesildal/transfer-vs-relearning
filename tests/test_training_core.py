@@ -126,6 +126,8 @@ def test_smollm_prompt_consistency_contract_uses_only_training_forms_a_and_b() -
     assert "#SBATCH --array=0-11" in evaluation
     assert "checkpoint-252 final_model" in evaluation
     assert "evaluation_v1" in evaluation
+    assert '--manifest "${WORK_ROOT}/preflight/manifest.json"' in evaluation
+    assert "--output-namespace \"${OUTPUT_ROOT}\"" in evaluation
 
 
 def test_seed43_retention_replication_changes_only_seeds_and_output_identity() -> None:

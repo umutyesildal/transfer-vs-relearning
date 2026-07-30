@@ -28,10 +28,13 @@ OUTPUT_ROOT="${WORK_ROOT}/results"
 cd "${REPO_ROOT}"
 module load anaconda/3-2024.06
 conda run --name xfer-relearn python scripts/m1_form_generalization_preflight.py \
-  --verify-manifest "${ROOT}/preflight/manifest.json" \
   --repo-root "${REPO_ROOT}" \
+  --scratch-root "${WORK_ROOT}" \
+  --manifest "${WORK_ROOT}/preflight/manifest.json" \
   --source-config "${SOURCE_CONFIG}" \
-  --launcher slurm/eval_smollm_prompt_consistency_array.slurm
+  --launcher slurm/eval_smollm_prompt_consistency_array.slurm \
+  --output-namespace "${OUTPUT_ROOT}" \
+  --expected-commit "$(git rev-parse HEAD)"
 mkdir -p "${WORK_ROOT}"/{cache/huggingface,cache/torch,logs,tmp}
 export HF_HOME="${WORK_ROOT}/cache/huggingface" TRANSFORMERS_CACHE="${WORK_ROOT}/cache/huggingface" XDG_CACHE_HOME="${WORK_ROOT}/cache" TORCH_HOME="${WORK_ROOT}/cache/torch" TMPDIR="${WORK_ROOT}/tmp" HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 conda run --name xfer-relearn python scripts/prepare_m1_canonical_form_diversity_evaluation.py --label "${LABEL}" --final-model "${FINAL_MODEL}" --source-manifest artifacts/models/HuggingFaceTB__SmolLM2-1.7B/model_manifest.json --output-root "${OUTPUT_ROOT}" --general-corpus /vol/tmp2/yesildau/general_capability_v1/wikitext2_raw_test.jsonl --repo-root "${REPO_ROOT}"
