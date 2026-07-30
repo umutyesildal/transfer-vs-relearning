@@ -30,3 +30,11 @@ def test_training_preflight_requires_one_tib_and_frozen_smoke() -> None:
     assert "test ! -e \"${OUTPUT_ROOT}\"" in preflight
     assert "squeue -o" in preflight
     assert "sinfo -p gpu" in preflight
+
+
+def test_smoke_does_not_create_canonical_output_before_gpu_guard_passes() -> None:
+    launcher = Path("slurm/smoke_qwen_canonical_25000.slurm").read_text(encoding="utf-8")
+    guard_passed = launcher.index("printf 'gpu_preflight=clean")
+    canonical_absence_check = launcher.index('test ! -e "${SMOKE_ROOT}"')
+    canonical_creation = launcher.index('mkdir -p "${SMOKE_ROOT}"')
+    assert guard_passed < canonical_absence_check < canonical_creation

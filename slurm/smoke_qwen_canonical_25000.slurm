@@ -19,8 +19,20 @@ SOURCE_CONFIG="${REPO_ROOT}/configs/training/qwen_canonical_25000_replay_w0_5_se
 SMOKE_CONFIG="${SMOKE_ROOT}/config.json"
 test -s "${PREP_MANIFEST}"
 test -s "${ROOT}/prepared/dataset_manifest.json"
-test ! -e "${SMOKE_ROOT}"
 
+printf 'node=%s\ncuda_visible_devices=%s\nsmoke_config=%s\n' \
+  "${SLURMD_NODENAME:-unknown}" "${CUDA_VISIBLE_DEVICES:-unset}" "${SMOKE_CONFIG}"
+nvidia-smi --query-gpu=index,uuid,name,memory.total,memory.used --format=csv,noheader
+compute_processes=$(nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv,noheader,nounits | sed '/^[[:space:]]*$/d')
+if [[ -n "${compute_processes}" ]]; then
+  printf 'unexpected_gpu_compute_processes_before_smoke:\n%s\n' "${compute_processes}" >&2
+  exit 3
+fi
+printf 'gpu_preflight=clean\n'
+
+# A contaminated allocation must leave no canonical smoke directory behind. This keeps an
+# environment-only abort distinguishable from an attempted model load and permits a clean retry.
+test ! -e "${SMOKE_ROOT}"
 mkdir -p "${SMOKE_ROOT}" "${ROOT}"/{cache/huggingface,cache/torch,logs,tmp}
 task_tmp="${ROOT}/tmp/smoke_${SLURM_JOB_ID}"
 mkdir -p "${task_tmp}"
@@ -52,16 +64,6 @@ config["training"].update({
 })
 destination.write_text(json.dumps(config, indent=2, sort_keys=True) + "\n")
 PY
-
-printf 'node=%s\ncuda_visible_devices=%s\nsmoke_config=%s\n' \
-  "${SLURMD_NODENAME:-unknown}" "${CUDA_VISIBLE_DEVICES:-unset}" "${SMOKE_CONFIG}"
-nvidia-smi --query-gpu=index,uuid,name,memory.total,memory.used --format=csv,noheader
-compute_processes=$(nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv,noheader,nounits | sed '/^[[:space:]]*$/d')
-if [[ -n "${compute_processes}" ]]; then
-  printf 'unexpected_gpu_compute_processes_before_smoke:\n%s\n' "${compute_processes}" >&2
-  exit 3
-fi
-printf 'gpu_preflight=clean\n'
 
 conda run --name xfer-relearn python scripts/train_clm.py --config "${SMOKE_CONFIG}"
 run_dir=$(find "${SMOKE_ROOT}/training" -mindepth 1 -maxdepth 1 -type d | sort)
