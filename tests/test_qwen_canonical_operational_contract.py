@@ -16,6 +16,10 @@ def test_training_start_cutoff_is_inclusive_and_timezone_aware() -> None:
 def test_training_launcher_requests_one_nonexclusive_a100_and_sixty_hours() -> None:
     launcher = Path("slurm/train_qwen_canonical_25000.slurm").read_text(encoding="utf-8")
     assert "#SBATCH --gres=gpu:a10080gb:1" in launcher
+    assert "#SBATCH --cpus-per-task=8" in launcher
+    # The gpu partition caps memory at 8000 MB per requested CPU. Sixty-four GiB would
+    # silently raise MinCPUsNode to nine and prevent placement when exactly eight CPUs are free.
+    assert "#SBATCH --mem=60G" in launcher
     assert "#SBATCH --time=2-12:00:00" in launcher
     assert "#SBATCH --nice" not in launcher
     assert "--exclusive" not in launcher
@@ -43,6 +47,8 @@ def test_post_run_audit_uses_approved_home_limit_and_training_time_baseline() ->
 
 def test_smoke_does_not_create_canonical_output_before_gpu_guard_passes() -> None:
     launcher = Path("slurm/smoke_qwen_canonical_25000.slurm").read_text(encoding="utf-8")
+    assert "#SBATCH --cpus-per-task=8" in launcher
+    assert "#SBATCH --mem=60G" in launcher
     guard_passed = launcher.index("printf 'gpu_preflight=clean")
     canonical_absence_check = launcher.index('test ! -e "${SMOKE_ROOT}"')
     canonical_creation = launcher.index('mkdir -p "${SMOKE_ROOT}"')

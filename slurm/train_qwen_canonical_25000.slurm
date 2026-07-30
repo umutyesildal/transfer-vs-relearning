@@ -4,7 +4,7 @@
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:a10080gb:1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=64G
+#SBATCH --mem=60G
 #SBATCH --time=2-12:00:00
 #SBATCH --output=/vol/tmp2/yesildau/qwen_canonical_25k_seed42_v1/logs/%x-%j.out
 #SBATCH --error=/vol/tmp2/yesildau/qwen_canonical_25k_seed42_v1/logs/%x-%j.err
