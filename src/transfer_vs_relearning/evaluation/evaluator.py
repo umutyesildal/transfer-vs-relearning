@@ -71,7 +71,13 @@ def _resolve_path(path_value: str | Path, base: Path | None = None) -> Path:
 def _manifest_local_path(manifest: dict[str, Any], base: Path) -> Path:
     local_path = manifest.get("local_path_absolute") or manifest.get("local_path")
     if local_path is None:
-        raise KeyError("Model manifest is missing local_path/local_path_absolute")
+        selected_files = manifest.get("files", {})
+        model_file = selected_files.get("model.safetensors", {}).get("path")
+        if model_file:
+            return _resolve_path(model_file, base).parent
+        raise KeyError(
+            "Model manifest is missing local_path/local_path_absolute or files.model.safetensors.path"
+        )
     return _resolve_path(local_path, base)
 
 
@@ -80,15 +86,21 @@ def _resolve_tokenizer_path(manifest: dict[str, Any], manifest_path: Path) -> Pa
     if explicit:
         return _resolve_path(explicit, manifest_path.parent)
 
-    training_run_dir = manifest.get("training_run_dir")
-    if training_run_dir:
-        training_manifest_path = _resolve_path(training_run_dir, manifest_path.parent) / "training_manifest.json"
-        if training_manifest_path.exists():
-            training_manifest = json.loads(training_manifest_path.read_text(encoding="utf-8"))
-            base_manifest = training_manifest.get("model", {}).get("base_model_manifest_payload", {})
-            base_path = base_manifest.get("local_path_absolute") or base_manifest.get("local_path")
-            if base_path:
-                return _resolve_path(base_path, training_manifest_path.parent)
+    training_manifest_values = []
+    if manifest.get("training_run_dir"):
+        training_manifest_values.append(
+            _resolve_path(manifest["training_run_dir"], manifest_path.parent) / "training_manifest.json"
+        )
+    if manifest.get("training_manifest"):
+        training_manifest_values.append(_resolve_path(manifest["training_manifest"], manifest_path.parent))
+    for training_manifest_path in training_manifest_values:
+        if not training_manifest_path.exists():
+            continue
+        training_manifest = json.loads(training_manifest_path.read_text(encoding="utf-8"))
+        base_manifest = training_manifest.get("model", {}).get("base_model_manifest_payload", {})
+        base_path = base_manifest.get("local_path_absolute") or base_manifest.get("local_path")
+        if base_path:
+            return _resolve_path(base_path, training_manifest_path.parent)
 
     return _manifest_local_path(manifest, manifest_path.parent)
 

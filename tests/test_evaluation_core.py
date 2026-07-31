@@ -443,6 +443,12 @@ def test_manifest_local_path_prefers_absolute(tmp_path: Path) -> None:
     assert _manifest_local_path(manifest, tmp_path) == local_model_dir
 
 
+def test_manifest_local_path_supports_frozen_selected_artifact_format(tmp_path: Path) -> None:
+    checkpoint = (tmp_path / "checkpoint-75").resolve()
+    manifest = {"files": {"model.safetensors": {"path": str(checkpoint / "model.safetensors")}}}
+    assert _manifest_local_path(manifest, tmp_path) == checkpoint
+
+
 def test_resolve_tokenizer_path_prefers_explicit_manifest_field(tmp_path: Path) -> None:
     manifest_path = tmp_path / "manifest.json"
     tokenizer_dir = (tmp_path / "tokenizer").resolve()
@@ -470,6 +476,27 @@ def test_resolve_tokenizer_path_falls_back_to_training_manifest_base_model(tmp_p
         "training_run_dir": str(training_run_dir.resolve()),
     }
     assert _resolve_tokenizer_path(manifest, manifest_path) == base_model_dir
+
+
+def test_resolve_tokenizer_path_supports_selected_manifest_training_manifest(tmp_path: Path) -> None:
+    training_manifest_path = tmp_path / "training_manifest.json"
+    base_model_dir = (tmp_path / "artifacts" / "models" / "qwen-base").resolve()
+    write_json(
+        training_manifest_path,
+        {
+            "model": {
+                "base_model_manifest_payload": {
+                    "local_path_absolute": str(base_model_dir),
+                }
+            }
+        },
+    )
+    selected_manifest_path = tmp_path / "selected_artifact_manifest.json"
+    selected_manifest = {
+        "training_manifest": str(training_manifest_path),
+        "files": {"model.safetensors": {"path": str(tmp_path / "checkpoint" / "model.safetensors")}},
+    }
+    assert _resolve_tokenizer_path(selected_manifest, selected_manifest_path) == base_model_dir
 
 
 def test_resolve_tokenizer_path_falls_back_to_local_model_when_no_other_hint(tmp_path: Path) -> None:
