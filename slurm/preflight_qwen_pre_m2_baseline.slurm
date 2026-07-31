@@ -14,7 +14,7 @@ set -euo pipefail
 : "${EXPECTED_COMMIT:?EXPECTED_COMMIT must be passed at submission time}"
 HOME_ROOT="/vol/fob-vol6/mi25/yesildau"
 REPO_ROOT="${SLURM_SUBMIT_DIR:-${HOME_ROOT}/transfer-vs-relearning}"
-ROOT="/vol/tmp2/yesildau/qwen_pre_m2_baseline_v1"
+ROOT="${BASELINE_SCRATCH_ROOT:-/vol/tmp2/yesildau/qwen_pre_m2_baseline_v1}"
 CONTRACT_ROOT="/vol/tmp2/yesildau/qwen_pre_m2_contract_v1"
 PREFLIGHT_MANIFEST="${ROOT}/preflight/manifest.json"
 HOME_LIMIT_BYTES=30000000000

@@ -194,10 +194,11 @@ def test_qwen_baseline_wave_launchers_are_scratch_only_and_gated() -> None:
     submit = (root / "scripts/submit_qwen_pre_m2_baseline.sh").read_text(encoding="utf-8")
     smoke = (root / "slurm/smoke_qwen_pre_m2_baseline.slurm").read_text(encoding="utf-8")
     rtx3090_submit = (root / "scripts/submit_qwen_pre_m2_rtx3090_smoke.sh").read_text(encoding="utf-8")
+    rtx3090_baseline_submit = (root / "scripts/submit_qwen_pre_m2_baseline_rtx3090.sh").read_text(encoding="utf-8")
     assert "#SBATCH --partition=std" in preflight
     assert "#SBATCH --array=0-47%1" in evaluation
-    assert 'ROOT="/vol/tmp2/yesildau/qwen_pre_m2_baseline_v1"' in preflight
-    assert 'ROOT="/vol/tmp2/yesildau/qwen_pre_m2_baseline_v1"' in evaluation
+    assert 'BASELINE_SCRATCH_ROOT:-/vol/tmp2/yesildau/qwen_pre_m2_baseline_v1' in preflight
+    assert 'BASELINE_SCRATCH_ROOT:-/vol/tmp2/yesildau/qwen_pre_m2_baseline_v1' in evaluation
     assert "EXPECTED_JOBS=48" in preflight
     assert "EXPECTED_CHECKPOINTS=0" in preflight
     assert "test ! -e \"${ROOT}/results\"" in preflight
@@ -210,3 +211,7 @@ def test_qwen_baseline_wave_launchers_are_scratch_only_and_gated() -> None:
     assert "--gres=gpu:rtx3090:1" in rtx3090_submit
     assert "--exclude=guppi6,guppi7" in rtx3090_submit
     assert "--nodelist=guppi8" in rtx3090_submit
+    assert 'qwen_pre_m2_baseline_rtx3090_v1' in rtx3090_baseline_submit
+    assert "--gres=gpu:rtx3090:1" in rtx3090_baseline_submit
+    assert "--exclude=guppi5,guppi6,guppi7" in rtx3090_baseline_submit
+    assert "afterok:" in rtx3090_baseline_submit

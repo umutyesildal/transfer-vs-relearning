@@ -17,7 +17,7 @@ set -euo pipefail
 : "${PREFLIGHT_MANIFEST:?PREFLIGHT_MANIFEST is required}"
 HOME_ROOT="/vol/fob-vol6/mi25/yesildau"
 REPO_ROOT="${SLURM_SUBMIT_DIR:-${HOME_ROOT}/transfer-vs-relearning}"
-ROOT="/vol/tmp2/yesildau/qwen_pre_m2_baseline_v1"
+ROOT="${BASELINE_SCRATCH_ROOT:-/vol/tmp2/yesildau/qwen_pre_m2_baseline_v1}"
 CONTRACT_ROOT="/vol/tmp2/yesildau/qwen_pre_m2_contract_v1"
 REGISTRY="${CONTRACT_ROOT}/evaluation/slice_registry.json"
 DATASET_DIR="${REPO_ROOT}/artifacts/datasets/relation_v2_gate_v1"
