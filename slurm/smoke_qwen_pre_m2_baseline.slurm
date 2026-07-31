@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
 #SBATCH --time=00:30:00
-#SBATCH --array=0-1%2
+#SBATCH --array=0-1%1
 #SBATCH --output=/vol/tmp2/yesildau/qwen_pre_m2_baseline_smoke_v1/logs/%x-%A_%a.out
 #SBATCH --error=/vol/tmp2/yesildau/qwen_pre_m2_baseline_smoke_v1/logs/%x-%A_%a.err
 set -euo pipefail
