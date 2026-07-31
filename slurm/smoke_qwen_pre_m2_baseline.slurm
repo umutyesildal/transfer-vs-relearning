@@ -5,6 +5,7 @@
 #SBATCH --account=yesildau
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:a10080gb:1
+#SBATCH --exclude=gruenau10
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
 #SBATCH --time=00:30:00
@@ -17,7 +18,7 @@ set -euo pipefail
 : "${EXPECTED_COMMIT:?EXPECTED_COMMIT must be passed at submission time}"
 HOME_ROOT="/vol/fob-vol6/mi25/yesildau"
 REPO_ROOT="${SLURM_SUBMIT_DIR:-${HOME_ROOT}/transfer-vs-relearning}"
-SCRATCH_ROOT="/vol/tmp2/yesildau/qwen_pre_m2_baseline_smoke_v2"
+SCRATCH_ROOT="/vol/tmp2/yesildau/qwen_pre_m2_baseline_smoke_v3"
 CONTRACT_ROOT="/vol/tmp2/yesildau/qwen_pre_m2_contract_v1"
 SLICE="${CONTRACT_ROOT}/evaluation/slices/tr_to_tr_form_a_direct.csv"
 DATASET_DIR="${REPO_ROOT}/artifacts/datasets/relation_v2_gate_v1"
