@@ -13,6 +13,7 @@ sbatch_args=(
   --parsable
   --gres=gpu:rtx3090:1
   --exclude=guppi6,guppi7
+  --nodelist=guppi8
   --job-name=qwen-pre-m2-3090-smoke
   --output="$ROOT/logs/%x-%A_%a.out"
   --error="$ROOT/logs/%x-%A_%a.err"
@@ -25,4 +26,5 @@ printf 'expected_commit=%s\n' "$EXPECTED_COMMIT"
 printf 'scratch_root=%s\n' "$ROOT"
 printf 'gpu_type=rtx3090\n'
 printf 'excluded_nodes=guppi6,guppi7\n'
+printf 'nodelist=guppi8\n'
 squeue -j "$smoke_id" -o '%.18i %.12P %.32j %.8T %.10M %.10l %.20N %.30R'

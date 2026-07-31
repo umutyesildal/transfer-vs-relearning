@@ -209,3 +209,4 @@ def test_qwen_baseline_wave_launchers_are_scratch_only_and_gated() -> None:
     assert 'SMOKE_SCRATCH_ROOT:-/vol/tmp2/yesildau/qwen_pre_m2_baseline_smoke_v3' in smoke
     assert "--gres=gpu:rtx3090:1" in rtx3090_submit
     assert "--exclude=guppi6,guppi7" in rtx3090_submit
+    assert "--nodelist=guppi8" in rtx3090_submit
