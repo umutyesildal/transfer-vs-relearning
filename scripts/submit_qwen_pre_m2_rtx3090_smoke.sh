@@ -9,7 +9,16 @@ EXPECTED_COMMIT="$(git rev-parse HEAD)"
 mkdir -p "$ROOT/logs"
 test ! -e "$ROOT/results"
 
-smoke_id="$(sbatch --parsable +  --gres=gpu:rtx3090:1 +  --exclude=guppi6,guppi7 +  --job-name=qwen-pre-m2-3090-smoke +  --output="$ROOT/logs/%x-%A_%a.out" +  --error="$ROOT/logs/%x-%A_%a.err" +  --export="ALL,EXPECTED_COMMIT=$EXPECTED_COMMIT,SMOKE_SCRATCH_ROOT=$ROOT" +  slurm/smoke_qwen_pre_m2_baseline.slurm)"
+sbatch_args=(
+  --parsable
+  --gres=gpu:rtx3090:1
+  --exclude=guppi6,guppi7
+  --job-name=qwen-pre-m2-3090-smoke
+  --output="$ROOT/logs/%x-%A_%a.out"
+  --error="$ROOT/logs/%x-%A_%a.err"
+  --export="ALL,EXPECTED_COMMIT=$EXPECTED_COMMIT,SMOKE_SCRATCH_ROOT=$ROOT"
+)
+smoke_id="$(sbatch "${sbatch_args[@]}" slurm/smoke_qwen_pre_m2_baseline.slurm)"
 
 printf 'smoke_id=%s\n' "$smoke_id"
 printf 'expected_commit=%s\n' "$EXPECTED_COMMIT"
