@@ -14,6 +14,7 @@
 set -euo pipefail
 
 : "${SLURM_ARRAY_TASK_ID:?Slurm array index is required}"
+: "${EXPECTED_COMMIT:?EXPECTED_COMMIT must be passed at submission time}"
 HOME_ROOT="/vol/fob-vol6/mi25/yesildau"
 REPO_ROOT="${SLURM_SUBMIT_DIR:-${HOME_ROOT}/transfer-vs-relearning}"
 SCRATCH_ROOT="/vol/tmp2/yesildau/qwen_pre_m2_baseline_smoke_v1"
@@ -43,7 +44,7 @@ case "${SLURM_ARRAY_TASK_ID}" in
 esac
 
 cd "${REPO_ROOT}"
-test "$(git rev-parse HEAD)" = "68ff1b351da5fc091e719d2daa3e65b302375f45"
+test "$(git rev-parse HEAD)" = "${EXPECTED_COMMIT}"
 test -s "${CONTRACT_ROOT}/manifest.json"
 test -s "${CONTRACT_ROOT}/evaluation/slice_registry.json"
 test -s "${SLICE}"
