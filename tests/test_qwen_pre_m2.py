@@ -73,6 +73,10 @@ def test_bilingual_hard_registry_covers_every_direction_form_and_scaffold() -> N
     assert profession[("tr_to_tr", "form_a", "direct")]["expected_answer"] == "Meslek 1"
     assert profession[("tr_to_en", "form_d", "qa")]["rendered_prompt"].startswith("Soru:")
     assert profession[("en_to_en", "form_d", "qa")]["rendered_prompt"].startswith("Question:")
+    assert all(
+        str(row["expected_answer"]).casefold() not in str(row["question"]).casefold()
+        for row in probes
+    )
 
 
 def test_m3_registry_contains_only_branch_b_correct_bindings() -> None:
