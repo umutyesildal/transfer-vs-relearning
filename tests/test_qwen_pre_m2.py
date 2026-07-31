@@ -13,6 +13,7 @@ from transfer_vs_relearning.data.qwen_pre_m2 import (
     materialize_generic_blocks,
     validate_intermediate_population,
 )
+from scripts.summarize_qwen_pre_m2_baseline import _robust_rows
 
 
 def _profile(index: int, branch: str) -> dict[str, str]:
@@ -159,3 +160,24 @@ def test_contract_builder_materializes_24_balanced_evaluation_slices(tmp_path: P
     assert len(slices) == 24
     assert {row["probe_count"] for row in slices} == {2_500}
     assert len({row["slice_id"] for row in slices}) == 24
+
+
+def test_baseline_robust_summary_requires_all_eight_cells_per_direction() -> None:
+    rows = []
+    for direction in ("en_to_en", "tr_to_en", "tr_to_tr"):
+        for form_id in ("form_a", "form_b", "form_c", "form_d"):
+            for scaffold_id in ("direct", "qa"):
+                rows.append(
+                    {
+                        "direction": direction,
+                        "relation": "profession",
+                        "fact_id": "S00001_profession",
+                        "form_id": form_id,
+                        "scaffold_id": scaffold_id,
+                        "correct_rank_mean": 1,
+                    }
+                )
+    summary = _robust_rows(rows)
+    assert len(summary) == 6
+    assert {row["scope"] for row in summary} == {"direction_relation", "direction_global"}
+    assert {row["all_cell_top1"] for row in summary} == {1}
