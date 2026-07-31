@@ -528,9 +528,10 @@ def _run_hf_training(
                 [str(value) for value in anchor_split[split_name][anchor_text_field]],
             )
 
+    pretokenized = bool(dataset_config.get("pretokenized", False))
     columns = raw_split["train"].column_names
     for split_name in ("train", "test"):
-        if text_field not in raw_split[split_name].column_names:
+        if not pretokenized and text_field not in raw_split[split_name].column_names:
             raise ValueError(f"Text field {text_field!r} not found in {split_name} dataset")
         if raw_split[split_name].column_names != columns:
             raise ValueError("Training and validation datasets must have the same columns")
@@ -553,7 +554,51 @@ def _run_hf_training(
         if len(consistency_rows_by_fact) != expected_facts or incomplete:
             raise ValueError(f"Prompt-consistency groups are incomplete: {list(incomplete.items())[:3]}")
 
-    if loss_mode == "answer_only":
+    if pretokenized:
+        if loss_mode != "full_sequence":
+            raise ValueError("Pretokenized datasets currently require full_sequence loss")
+        if retention_config or contrastive_config or consistency_config:
+            raise ValueError("Pretokenized M2/M3 blocks cannot be combined with auxiliary objectives")
+
+        def validate_pretokenized_batch(
+            examples: dict[str, list[Any]],
+        ) -> dict[str, list[list[int]]]:
+            batch_input_ids: list[list[int]] = []
+            batch_attention_mask: list[list[int]] = []
+            batch_labels: list[list[int]] = []
+            for input_ids, attention_mask in zip(
+                examples["input_ids"], examples["attention_mask"], strict=True
+            ):
+                ids = [int(value) for value in input_ids]
+                mask = [int(value) for value in attention_mask]
+                if len(ids) != block_size or len(mask) != block_size:
+                    raise ValueError("Pretokenized input_ids and attention_mask must equal block_size")
+                if any(value != 1 for value in mask):
+                    raise ValueError("Frozen M2/M3 pretokenized blocks must supervise every token")
+                if any(value < 0 for value in ids):
+                    raise ValueError("Pretokenized input IDs must be non-negative")
+                batch_input_ids.append(ids)
+                batch_attention_mask.append(mask)
+                batch_labels.append(ids.copy())
+            return {
+                "input_ids": batch_input_ids,
+                "attention_mask": batch_attention_mask,
+                "labels": batch_labels,
+            }
+
+        for split_name in ("train", "test"):
+            required_columns = {"input_ids", "attention_mask"}
+            if not required_columns.issubset(raw_split[split_name].column_names):
+                raise ValueError(
+                    f"Pretokenized {split_name} split is missing {sorted(required_columns)}"
+                )
+        lm_datasets = raw_split.map(
+            validate_pretokenized_batch,
+            batched=True,
+            remove_columns=columns,
+            desc=f"Validating frozen {block_size}-token blocks",
+        )
+    elif loss_mode == "answer_only":
         answer_field = str(dataset_config.get("answer_field", "answer"))
         supervise_eos = bool(training_config.get("supervise_eos", True))
         for split_name in ("train", "test"):
