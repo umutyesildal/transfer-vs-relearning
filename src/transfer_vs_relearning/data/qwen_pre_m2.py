@@ -34,18 +34,18 @@ TURKISH_FORM_TEMPLATES: dict[str, dict[str, str]] = {
         "form_a": "{subject} hangi şehirde doğdu?",
         "form_b": "{subject} adlı kişinin doğum yeri olarak hangi şehir belirtilmiştir?",
         "form_c": "{subject} adlı kişinin doğduğu şehir hangisidir?",
-        "form_d": "{subject} nerede doğdu?",
+        "form_d": "{subject} hangi şehirde dünyaya geldi?",
     },
     "lives_in": {
         "form_a": "{subject} şu anda hangi şehirde ikamet ediyor?",
         "form_b": "{subject} adlı kişinin mevcut ikamet yeri olarak hangi şehir belirtilmiştir?",
         "form_c": "{subject} adlı kişinin şu an yaşadığı şehir hangisidir?",
-        "form_d": "{subject} nerede yaşıyor?",
+        "form_d": "{subject} hangi şehirde yaşıyor?",
     },
     "field_of_study": {
         "form_a": "{subject} hangi akademik alanda eğitim aldı?",
         "form_b": "{subject} adlı kişinin eğitim alanı olarak hangi disiplin belirtilmiştir?",
-        "form_c": "{subject} için kaydedilen çalışma alanı nedir?",
+        "form_c": "{subject} için kaydedilen eğitim alanı nedir?",
         "form_d": "{subject} ne okudu?",
     },
     "works_in_industry": {
