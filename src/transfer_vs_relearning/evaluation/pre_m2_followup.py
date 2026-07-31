@@ -181,6 +181,17 @@ def _as_bool(value: Any) -> bool:
     return str(value).strip().casefold() in {"1", "true", "yes"}
 
 
+def _probe_answer_language(probe: dict[str, Any]) -> str:
+    """Return the language used for candidate surfaces and expected-answer lookup."""
+    declared = str(probe.get("answer_language", "")).strip().casefold()
+    if declared in {"en", "tr"}:
+        return declared
+    direction = str(probe.get("direction", "")).strip().casefold()
+    if direction == "tr_to_tr":
+        return "tr"
+    return "en"
+
+
 def _summary_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     groups: dict[tuple[str, str, str], list[dict[str, Any]]] = defaultdict(list)
     for row in rows:
@@ -338,9 +349,12 @@ class PreM2FrozenEvaluator:
                 continue
             relation = probe["relation"]
             prompt = probe["rendered_prompt"]
-            correct = resolve_expected_answer(relation, "en", probe["expected_answer"], inventories)
+            answer_language = _probe_answer_language(probe)
+            correct = resolve_expected_answer(
+                relation, answer_language, probe["expected_answer"], inventories
+            )
             candidates = inventories[RELATION_TO_FAMILY[relation]]
-            surfaces = [candidate.object_en for candidate in candidates]
+            surfaces = [candidate.surface(answer_language) for candidate in candidates]
             candidate_scores: list[dict[str, Any]] = []
             for start in range(0, len(surfaces), self.candidate_batch_size):
                 batch_candidates = candidates[start : start + self.candidate_batch_size]
@@ -349,7 +363,7 @@ class PreM2FrozenEvaluator:
                 candidate_scores.extend(
                     {
                         "object_id": candidate.object_id,
-                        "surface": candidate.object_en,
+                        "surface": candidate.surface(answer_language),
                         **score,
                     }
                     for candidate, score in zip(batch_candidates, scores, strict=True)
@@ -359,7 +373,7 @@ class PreM2FrozenEvaluator:
                 row for row in ranking["ordered"] if row["object_id"] != correct.object_id
             )
             selected_candidates = [
-                ("gold", correct.object_id, correct.object_en, True),
+                ("gold", correct.object_id, correct.surface(answer_language), True),
                 ("best_incorrect", best_incorrect["object_id"], best_incorrect["surface"], False),
             ]
             confusable_relation = _confusable_relation(relation)
@@ -374,7 +388,12 @@ class PreM2FrozenEvaluator:
                     )
                     confusable_object_id = confusable.object_id
                     selected_candidates.append(
-                        ("same_subject_confusable", confusable.object_id, confusable.object_en, False)
+                        (
+                            "same_subject_confusable",
+                            confusable.object_id,
+                            confusable.surface(answer_language),
+                            False,
+                        )
                     )
 
             summaries: dict[str, dict[str, Any]] = {}

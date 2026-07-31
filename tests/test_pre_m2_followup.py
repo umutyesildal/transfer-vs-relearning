@@ -20,6 +20,7 @@ from transfer_vs_relearning.evaluation.pre_m2_followup import (
     _forced_choice_rows,
     _has_relation_columns,
     _intersection_rows,
+    _probe_answer_language,
     _summary_rows,
     conditional_token_records,
 )
@@ -218,6 +219,13 @@ def test_summary_parses_resumed_boolean_strings() -> None:
         }
     ]
     assert _summary_rows(rows)[0]["early_eos_preference_count"] == 0
+
+
+def test_frozen_evaluator_uses_probe_answer_language_for_bilingual_candidates() -> None:
+    assert _probe_answer_language({"answer_language": "tr", "direction": "tr_to_tr"}) == "tr"
+    assert _probe_answer_language({"answer_language": "en", "direction": "tr_to_en"}) == "en"
+    assert _probe_answer_language({"direction": "tr_to_tr"}) == "tr"
+    assert _probe_answer_language({"direction": "en_to_en"}) == "en"
 
 
 def test_wp3_confusable_relations_are_bidirectional() -> None:
