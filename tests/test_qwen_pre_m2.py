@@ -192,6 +192,8 @@ def test_qwen_baseline_wave_launchers_are_scratch_only_and_gated() -> None:
     preflight = (root / "slurm/preflight_qwen_pre_m2_baseline.slurm").read_text(encoding="utf-8")
     evaluation = (root / "slurm/eval_qwen_pre_m2_baseline_slice.slurm").read_text(encoding="utf-8")
     submit = (root / "scripts/submit_qwen_pre_m2_baseline.sh").read_text(encoding="utf-8")
+    smoke = (root / "slurm/smoke_qwen_pre_m2_baseline.slurm").read_text(encoding="utf-8")
+    rtx3090_submit = (root / "scripts/submit_qwen_pre_m2_rtx3090_smoke.sh").read_text(encoding="utf-8")
     assert "#SBATCH --partition=std" in preflight
     assert "#SBATCH --array=0-47%1" in evaluation
     assert 'ROOT="/vol/tmp2/yesildau/qwen_pre_m2_baseline_v1"' in preflight
@@ -204,3 +206,6 @@ def test_qwen_baseline_wave_launchers_are_scratch_only_and_gated() -> None:
     assert "unexpected_gpu_compute_processes_on_allocated_device" in evaluation
     assert "afterok:${preflight_id}" in submit
     assert "PREFLIGHT_MANIFEST" in submit
+    assert 'SMOKE_SCRATCH_ROOT:-/vol/tmp2/yesildau/qwen_pre_m2_baseline_smoke_v3' in smoke
+    assert "--gres=gpu:rtx3090:1" in rtx3090_submit
+    assert "--exclude=guppi6,guppi7" in rtx3090_submit
