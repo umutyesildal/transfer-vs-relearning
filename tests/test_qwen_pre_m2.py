@@ -200,6 +200,7 @@ def test_qwen_baseline_wave_launchers_are_scratch_only_and_gated() -> None:
     assert "EXPECTED_CHECKPOINTS=0" in preflight
     assert "test ! -e \"${ROOT}/results\"" in preflight
     assert 'test ! -e "${RESULT_ROOT}"' in evaluation
-    assert "unexpected_gpu_compute_processes_before_baseline" in evaluation
+    assert "allocated_gpu=\"${CUDA_VISIBLE_DEVICES:-${SLURM_JOB_GPUS:-}}\"" in evaluation
+    assert "unexpected_gpu_compute_processes_on_allocated_device" in evaluation
     assert "afterok:${preflight_id}" in submit
     assert "PREFLIGHT_MANIFEST" in submit

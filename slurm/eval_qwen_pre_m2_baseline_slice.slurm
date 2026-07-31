@@ -91,9 +91,12 @@ printf 'node=%s\nmodel_label=%s\nmodel_manifest=%s\nslice_id=%s\nprobe_registry=
   "${SLURMD_NODENAME:-unknown}" "${MODEL_LABEL}" "${MODEL_MANIFEST}" "${SLICE_ID}" \
   "${SLICE_PATH}" "${RESULT_ROOT}" "${ROOT}/cache" "${TASK_TMP}"
 nvidia-smi --query-gpu=index,uuid,name,memory.total,memory.used --format=csv,noheader
-compute_processes=$(nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv,noheader,nounits | sed '/^[[:space:]]*$/d')
+allocated_gpu="${CUDA_VISIBLE_DEVICES:-${SLURM_JOB_GPUS:-}}"
+test -n "${allocated_gpu}"
+printf 'allocated_gpu_selector=%s\n' "${allocated_gpu}"
+compute_processes=$(nvidia-smi --id="${allocated_gpu}" --query-compute-apps=pid,process_name,used_memory --format=csv,noheader,nounits | sed '/^[[:space:]]*$/d')
 if [[ -n "${compute_processes}" ]]; then
-  printf 'unexpected_gpu_compute_processes_before_baseline:\n%s\n' "${compute_processes}" >&2
+  printf 'unexpected_gpu_compute_processes_on_allocated_device:\n%s\n' "${compute_processes}" >&2
   exit 3
 fi
 printf 'gpu_preflight=clean\n'

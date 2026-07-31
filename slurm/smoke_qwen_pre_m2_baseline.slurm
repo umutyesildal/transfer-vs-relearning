@@ -5,7 +5,6 @@
 #SBATCH --account=yesildau
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:a10080gb:1
-#SBATCH --exclude=gruenau10
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
 #SBATCH --time=00:30:00
@@ -83,9 +82,12 @@ printf 'node=%s\nmodel_label=%s\nmodel_manifest=%s\nprobe_registry=%s\noutput_ro
   "${SLURMD_NODENAME:-unknown}" "${MODEL_LABEL}" "${MODEL_MANIFEST}" \
   "${SLICE}" "${RESULT_ROOT}" "${SCRATCH_ROOT}/cache" "${TASK_TMP}"
 nvidia-smi --query-gpu=index,uuid,name,memory.total,memory.used --format=csv,noheader
-compute_processes=$(nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv,noheader,nounits | sed '/^[[:space:]]*$/d')
+allocated_gpu="${CUDA_VISIBLE_DEVICES:-${SLURM_JOB_GPUS:-}}"
+test -n "${allocated_gpu}"
+printf 'allocated_gpu_selector=%s\n' "${allocated_gpu}"
+compute_processes=$(nvidia-smi --id="${allocated_gpu}" --query-compute-apps=pid,process_name,used_memory --format=csv,noheader,nounits | sed '/^[[:space:]]*$/d')
 if [[ -n "${compute_processes}" ]]; then
-  printf 'unexpected_gpu_compute_processes_before_smoke:\n%s\n' "${compute_processes}" >&2
+  printf 'unexpected_gpu_compute_processes_on_allocated_device:\n%s\n' "${compute_processes}" >&2
   exit 3
 fi
 printf 'gpu_preflight=clean\n'

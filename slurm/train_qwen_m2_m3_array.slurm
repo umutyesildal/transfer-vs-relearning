@@ -50,9 +50,12 @@ export HF_HOME="${ROOT}/cache/huggingface" TRANSFORMERS_CACHE="${ROOT}/cache/hug
 export XDG_CACHE_HOME="${ROOT}/cache" TORCH_HOME="${ROOT}/cache/torch" TMPDIR="${task_tmp}"
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 nvidia-smi --query-gpu=index,uuid,name,memory.total,memory.used --format=csv,noheader
-compute_processes=$(nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv,noheader,nounits | sed '/^[[:space:]]*$/d')
+allocated_gpu="${CUDA_VISIBLE_DEVICES:-${SLURM_JOB_GPUS:-}}"
+test -n "${allocated_gpu}"
+printf 'allocated_gpu_selector=%s\n' "${allocated_gpu}"
+compute_processes=$(nvidia-smi --id="${allocated_gpu}" --query-compute-apps=pid,process_name,used_memory --format=csv,noheader,nounits | sed '/^[[:space:]]*$/d')
 if [[ -n "${compute_processes}" ]]; then
-  printf 'unexpected_gpu_compute_processes_before_m2_m3:\n%s\n' "${compute_processes}" >&2
+  printf 'unexpected_gpu_compute_processes_on_allocated_device:\n%s\n' "${compute_processes}" >&2
   exit 3
 fi
 printf 'gpu_preflight=clean\nlabel=%s\nconfig=%s\noutput_root=%s\n' "${LABEL}" "${CONFIG}" "${OUTPUT_ROOT}"
