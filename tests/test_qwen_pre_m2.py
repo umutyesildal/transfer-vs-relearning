@@ -181,3 +181,21 @@ def test_baseline_robust_summary_requires_all_eight_cells_per_direction() -> Non
     assert len(summary) == 6
     assert {row["scope"] for row in summary} == {"direction_relation", "direction_global"}
     assert {row["all_cell_top1"] for row in summary} == {1}
+
+
+def test_qwen_baseline_wave_launchers_are_scratch_only_and_gated() -> None:
+    root = Path(__file__).resolve().parents[1]
+    preflight = (root / "slurm/preflight_qwen_pre_m2_baseline.slurm").read_text(encoding="utf-8")
+    evaluation = (root / "slurm/eval_qwen_pre_m2_baseline_slice.slurm").read_text(encoding="utf-8")
+    submit = (root / "scripts/submit_qwen_pre_m2_baseline.sh").read_text(encoding="utf-8")
+    assert "#SBATCH --partition=std" in preflight
+    assert "#SBATCH --array=0-47%1" in evaluation
+    assert 'ROOT="/vol/tmp2/yesildau/qwen_pre_m2_baseline_v1"' in preflight
+    assert 'ROOT="/vol/tmp2/yesildau/qwen_pre_m2_baseline_v1"' in evaluation
+    assert "EXPECTED_JOBS=48" in preflight
+    assert "EXPECTED_CHECKPOINTS=0" in preflight
+    assert "test ! -e \"${ROOT}/results\"" in preflight
+    assert 'test ! -e "${RESULT_ROOT}"' in evaluation
+    assert "unexpected_gpu_compute_processes_before_baseline" in evaluation
+    assert "afterok:${preflight_id}" in submit
+    assert "PREFLIGHT_MANIFEST" in submit
