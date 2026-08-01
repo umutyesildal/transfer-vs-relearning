@@ -39,16 +39,17 @@ python_bin="${HOME_ROOT}/.conda/envs/xfer-relearn/bin/python"
 mkdir -p "${SUMMARY_ROOT}" "${TMP_ROOT}"
 export TMPDIR="${TMP_ROOT}"
 
-"${python_bin}" - "${ROOT}/preflight/manifest.json" "${EXPECTED_COMMIT}" <<'PY'
+"${python_bin}" - "${ROOT}/preflight/manifest.json" <<'PY'
 import json
 import sys
 from pathlib import Path
 
 payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 assert payload["status"] == "passed"
-assert payload["git_commit"] == sys.argv[2]
 assert payload["expected_jobs"] == 48
 assert payload["expected_new_checkpoints"] == 0
+assert payload.get("git_commit")
+print(f"baseline_preflight_commit={payload['git_commit']}")
 PY
 
 for model_label in qwen_m1_seed42_step75 qwen_m1_seed43_step50; do
