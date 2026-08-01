@@ -80,7 +80,7 @@ export TMPDIR="${task_tmp}"
 export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 
-conda run --name xfer-relearn python - "${SOURCE_CONFIG}" "${SMOKE_CONFIG}" "${SMOKE_TRAIN_ROOT}" <<'PY'
+"${python_bin}" - "${SOURCE_CONFIG}" "${SMOKE_CONFIG}" "${SMOKE_TRAIN_ROOT}" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -102,6 +102,7 @@ config["training"].update(
 )
 destination.write_text(json.dumps(config, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 PY
+test -s "${SMOKE_CONFIG}"
 
 PYTHONPATH="${REPO_ROOT}/src" conda run --name xfer-relearn python scripts/train_clm.py --config "${SMOKE_CONFIG}"
 run_dir=$(find "${SMOKE_TRAIN_ROOT}" -mindepth 1 -maxdepth 1 -type d | sort)
@@ -109,7 +110,7 @@ test -n "${run_dir}"
 test "$(printf '%s\n' "${run_dir}" | wc -l)" -eq 1
 
 # Reopen the completed technical smoke manifest only to exercise the actual resume validator.
-conda run --name xfer-relearn python - "${run_dir}" <<'PY'
+"${python_bin}" - "${run_dir}" <<'PY'
 import json
 import math
 import sys
@@ -134,7 +135,7 @@ PY
 PYTHONPATH="${REPO_ROOT}/src" conda run --name xfer-relearn python scripts/train_clm.py \
   --config "${SMOKE_CONFIG}" --resume-run-dir "${run_dir}"
 
-conda run --name xfer-relearn python - "${run_dir}" "${SMOKE_ARM_ROOT}/smoke_report.json" <<'PY'
+"${python_bin}" - "${run_dir}" "${SMOKE_ARM_ROOT}/smoke_report.json" <<'PY'
 import json
 import sys
 from pathlib import Path
