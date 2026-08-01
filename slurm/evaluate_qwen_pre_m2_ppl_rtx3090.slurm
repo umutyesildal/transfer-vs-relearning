@@ -27,7 +27,6 @@ test "$(git rev-parse HEAD)" = "${EXPECTED_COMMIT}"
 test -s "${EN_CORPUS}"
 test -s "${TR_CORPUS}"
 test -d "${ROOT}/results"
-test ! -e "${OUTPUT_ROOT}"
 
 module load anaconda/3-2024.06
 python_bin="${HOME_ROOT}/.conda/envs/xfer-relearn/bin/python"
@@ -46,6 +45,8 @@ case "${SLURM_ARRAY_TASK_ID}" in
     ;;
 esac
 test -s "${MODEL_MANIFEST}"
+OUTPUT_DIR="${OUTPUT_ROOT}/${MODEL_LABEL}"
+test ! -e "${OUTPUT_DIR}"
 mkdir -p "${ROOT}"/cache/huggingface "${ROOT}"/cache/torch "${ROOT}/logs" "${TASK_TMP}"
 export HF_HOME="${ROOT}/cache/huggingface"
 export TRANSFORMERS_CACHE="${ROOT}/cache/huggingface"
@@ -56,7 +57,7 @@ export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 
 printf 'node=%s\nmodel_label=%s\nmodel_manifest=%s\noutput_root=%s\nenglish_corpus=%s\nturkish_corpus=%s\n' \
-  "${SLURMD_NODENAME:-unknown}" "${MODEL_LABEL}" "${MODEL_MANIFEST}" "${OUTPUT_ROOT}/${MODEL_LABEL}" \
+  "${SLURMD_NODENAME:-unknown}" "${MODEL_LABEL}" "${MODEL_MANIFEST}" "${OUTPUT_DIR}" \
   "${EN_CORPUS}" "${TR_CORPUS}"
 nvidia-smi --query-gpu=index,uuid,name,memory.total,memory.used --format=csv,noheader
 allocated_gpu="${CUDA_VISIBLE_DEVICES:-${SLURM_JOB_GPUS:-}}"
@@ -74,13 +75,13 @@ conda run --name xfer-relearn python scripts/evaluate_corpora_perplexity.py \
   --model-manifest "${MODEL_MANIFEST}" \
   --corpus "english=${EN_CORPUS}" \
   --corpus "turkish=${TR_CORPUS}" \
-  --output-dir "${OUTPUT_ROOT}/${MODEL_LABEL}" \
+  --output-dir "${OUTPUT_DIR}" \
   --block-size 512 \
   --batch-size 4 \
   --bootstrap-samples 2000 \
   --seed 42
 
-"${python_bin}" - "${OUTPUT_ROOT}/${MODEL_LABEL}/summary.json" <<'PY'
+"${python_bin}" - "${OUTPUT_DIR}/summary.json" <<'PY'
 import json
 from pathlib import Path
 import sys
@@ -89,4 +90,4 @@ payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 assert payload["status"] == "completed"
 assert set(payload["corpora"]) == {"english", "turkish"}
 PY
-printf 'status=ppl_complete model=%s output=%s\n' "${MODEL_LABEL}" "${OUTPUT_ROOT}/${MODEL_LABEL}"
+printf 'status=ppl_complete model=%s output=%s\n' "${MODEL_LABEL}" "${OUTPUT_DIR}"
