@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from transfer_vs_relearning.models.local_manifest import create_local_model_manifest
 from transfer_vs_relearning.utils.io import sha256_file, write_json
 
 
@@ -108,6 +109,65 @@ def _require_scratch(path: Path, *, allow_local: bool, label: str) -> None:
         raise ValueError(f"{label} must resolve under /vol/tmp or /vol/tmp2: {resolved}")
 
 
+def _resolve_training_model_manifest(
+    model: dict[str, Any],
+    *,
+    seed: int,
+    contract: dict[str, Any],
+    output_dir: Path,
+    allow_local: bool,
+) -> Path:
+    selected_manifest = Path(str(model["base_model_manifest"])).resolve()
+    source_manifest_value = model.get("source_model_manifest")
+    if not source_manifest_value:
+        if not selected_manifest.is_file():
+            raise FileNotFoundError(selected_manifest)
+        return selected_manifest
+
+    source_manifest = Path(str(source_manifest_value)).resolve()
+    if not source_manifest.is_file():
+        raise FileNotFoundError(source_manifest)
+    selected = _json(selected_manifest)
+    checkpoint_value = selected.get("checkpoint")
+    if not checkpoint_value:
+        raise ValueError(f"Selected artifact manifest has no checkpoint: {selected_manifest}")
+    checkpoint = Path(str(checkpoint_value)).resolve()
+    if not checkpoint.is_dir():
+        raise FileNotFoundError(f"Selected Qwen M1 checkpoint is missing: {checkpoint}")
+    for item in selected.get("files", {}).values():
+        path = Path(str(item["path"])).resolve()
+        if not path.is_file():
+            raise FileNotFoundError(f"Selected Qwen M1 file is missing: {path}")
+        declared = str(item.get("sha256", ""))
+        if declared and sha256_file(path) != declared:
+            raise ValueError(f"Selected Qwen M1 file hash mismatch: {path}")
+
+    tokenizer_value = contract.get("sources", {}).get("tokenizer")
+    if not tokenizer_value:
+        raise ValueError("Frozen M2/M3 contract must declare sources.tokenizer")
+    tokenizer = Path(str(tokenizer_value)).resolve()
+    _require_scratch(tokenizer, allow_local=allow_local, label="tokenizer")
+    if not (tokenizer / "tokenizer.json").is_file():
+        raise FileNotFoundError(f"Pinned tokenizer is incomplete: {tokenizer}")
+
+    step = selected.get("checkpoint_step", "unknown")
+    derived = output_dir / "model_manifests" / f"qwen_m1_seed{seed}_step{step}.json"
+    payload = create_local_model_manifest(
+        source_manifest_path=source_manifest,
+        local_model_dir=checkpoint,
+        output_manifest_path=derived,
+        model_id=f"qwen_m1_seed{seed}_selected",
+        resolved_revision=f"qwen-m1-seed{seed}-selected-step{step}",
+        training_checkpoint=f"checkpoint-{step}",
+    )
+    payload["tokenizer_source_path"] = str(tokenizer)
+    payload["tokenizer_source_path_absolute"] = str(tokenizer)
+    payload["source_selected_artifact_manifest"] = str(selected_manifest)
+    payload["source_selected_artifact_manifest_sha256"] = sha256_file(selected_manifest)
+    write_json(derived, payload)
+    return derived
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Materialize four matched Qwen M2/M3 training configs from a frozen CPU contract."
@@ -171,9 +231,13 @@ def main() -> None:
     entries: list[dict[str, Any]] = []
     for seed in (42, 43):
         model = by_seed[seed]
-        base_manifest = Path(str(model["base_model_manifest"])).resolve()
-        if not base_manifest.is_file():
-            raise FileNotFoundError(base_manifest)
+        base_manifest = _resolve_training_model_manifest(
+            model,
+            seed=seed,
+            contract=contract,
+            output_dir=output_dir,
+            allow_local=args.allow_local_paths,
+        )
         training_seed = int(model["training_seed"])
         data_seed = int(model["data_seed"])
         for arm in REQUIRED_ARMS:

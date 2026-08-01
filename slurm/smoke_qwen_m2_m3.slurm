@@ -9,7 +9,8 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
 #SBATCH --time=01:30:00
-#SBATCH --array=0-1%2
+#SBATCH --nodelist=gruenau9
+#SBATCH --array=0-1%1
 #SBATCH --output=/vol/tmp2/yesildau/qwen_m2_m3_v1/logs/%x-%A_%a.out
 #SBATCH --error=/vol/tmp2/yesildau/qwen_m2_m3_v1/logs/%x-%A_%a.err
 set -euo pipefail

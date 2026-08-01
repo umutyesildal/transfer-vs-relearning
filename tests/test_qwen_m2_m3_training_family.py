@@ -31,16 +31,47 @@ def test_prepare_and_validate_qwen_m2_m3_family_contract(tmp_path: Path) -> None
     block_manifest = block_root / "manifest.json"
     block_manifest.write_text(json.dumps({"artifacts": artifacts}), encoding="utf-8")
 
+    tokenizer_dir = tmp_path / "tokenizer"
+    tokenizer_dir.mkdir()
+    (tokenizer_dir / "tokenizer.json").write_text("{}\n", encoding="utf-8")
+    source_model_manifest = tmp_path / "source_model.json"
+    source_model_manifest.write_text(
+        json.dumps(
+            {
+                "model_id": "Qwen/Qwen2.5-1.5B",
+                "tokenizer_source_path_absolute": str(tokenizer_dir),
+            }
+        ),
+        encoding="utf-8",
+    )
+
     models = []
     for seed in (42, 43):
-        model_path = tmp_path / f"model_{seed}.json"
-        model_path.write_text(json.dumps({"seed": seed}), encoding="utf-8")
+        checkpoint = tmp_path / f"checkpoint_{seed}"
+        checkpoint.mkdir()
+        (checkpoint / "config.json").write_text("{}\n", encoding="utf-8")
+        (checkpoint / "model.safetensors").write_text("weights\n", encoding="utf-8")
+        selected_manifest = tmp_path / f"selected_{seed}.json"
+        selected_manifest.write_text(
+            json.dumps(
+                {
+                    "checkpoint": str(checkpoint),
+                    "checkpoint_step": 75 if seed == 42 else 50,
+                    "files": {
+                        name: {"path": str(checkpoint / name)}
+                        for name in ("config.json", "model.safetensors")
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
         models.append(
             {
                 "seed": seed,
                 "training_seed": seed + 100,
                 "data_seed": seed + 200,
-                "base_model_manifest": str(model_path),
+                "base_model_manifest": str(selected_manifest),
+                "source_model_manifest": str(source_model_manifest),
             }
         )
     contract = tmp_path / "contract.json"
@@ -50,6 +81,7 @@ def test_prepare_and_validate_qwen_m2_m3_family_contract(tmp_path: Path) -> None
                 "status": "frozen",
                 "block_manifest": str(block_manifest),
                 "training_output_root": str(tmp_path / "training"),
+                "sources": {"tokenizer": str(tokenizer_dir)},
                 "parameters": {
                     "block_size": 1,
                     "update_steps": 8,
@@ -89,6 +121,9 @@ def test_prepare_and_validate_qwen_m2_m3_family_contract(tmp_path: Path) -> None
     assert config["dataset"]["pretokenized"] is True
     assert config["training"]["loss_mode"] == "full_sequence"
     assert config["training"]["max_steps"] == 8
+    derived_manifest = Path(manifest["configs"][0]["base_model_manifest"])
+    assert derived_manifest.parent.name == "model_manifests"
+    assert json.loads(derived_manifest.read_text(encoding="utf-8"))["local_path_absolute"].endswith("checkpoint_42")
 
     validation = tmp_path / "validation.json"
     _run_script(
