@@ -108,6 +108,8 @@ def test_qwen_m2_m3_slurm_launchers_are_syntax_valid() -> None:
     for filename in (
         "slurm/preflight_qwen_m2_m3.slurm",
         "slurm/train_qwen_m2_m3_array.slurm",
+        "slurm/smoke_qwen_m2_m3.slurm",
         "scripts/submit_qwen_m2_m3.sh",
+        "scripts/submit_qwen_m2_m3_smoke.sh",
     ):
         subprocess.run(["bash", "-n", str(root / filename)], check=True)
