@@ -8,6 +8,9 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
 #SBATCH --time=08:00:00
+# gruenau10 currently has an unrelated compute process on one A100 device.
+# Keep the clean-GPU guard and exclude that node for future principal tasks.
+#SBATCH --exclude=gruenau10
 #SBATCH --array=0-3%2
 #SBATCH --output=/vol/tmp2/yesildau/qwen_m2_m3_v1/logs/%x-%A_%a.out
 #SBATCH --error=/vol/tmp2/yesildau/qwen_m2_m3_v1/logs/%x-%A_%a.err
