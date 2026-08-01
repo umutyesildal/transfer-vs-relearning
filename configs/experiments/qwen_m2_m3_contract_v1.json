@@ -1,0 +1,74 @@
+{
+  "status": "frozen",
+  "version": "qwen_m2_m3_contract_v1",
+  "decision_basis": "precommitted_after_complete_qwen_pre_m2_baseline_and_before_materialization",
+  "models": [
+    {
+      "seed": 42,
+      "training_seed": 42,
+      "data_seed": 42,
+      "base_model_manifest": "/vol/tmp2/yesildau/qwen_scale_selected_v1/seed42_step75/selected_artifact_manifest.json"
+    },
+    {
+      "seed": 43,
+      "training_seed": 43,
+      "data_seed": 43,
+      "base_model_manifest": "/vol/tmp2/yesildau/qwen_scale_selected_v1/seed43_step50/selected_artifact_manifest.json"
+    }
+  ],
+  "sources": {
+    "generic_train": "/vol/tmp2/yesildau/turkish_bridge_v1/corpus/trwiki_20260601_bridge_v1/splits/train_documents.jsonl",
+    "generic_validation": "/vol/tmp2/yesildau/turkish_bridge_v1/corpus/trwiki_20260601_bridge_v1/splits/validation_documents.jsonl",
+    "fact_registry": "/vol/tmp2/yesildau/qwen_pre_m2_contract_v1/adaptation/m3_branch_b_fact_registry.csv",
+    "tokenizer": "/vol/tmp2/yesildau/m1_cross_family_screen_v1/models/Qwen__Qwen2.5-1.5B/8faed761d45a263340a0528343f099c05c9a4323"
+  },
+  "block_manifest": "/vol/tmp2/yesildau/qwen_m2_m3_v1/blocks/manifest.json",
+  "training_output_root": "/vol/tmp2/yesildau/qwen_m2_m3_v1/runs",
+  "parameters": {
+    "block_size": 512,
+    "train_blocks": 2048,
+    "validation_blocks": 256,
+    "update_steps": 128,
+    "fact_cycles": 4,
+    "learning_rate": 0.00001,
+    "per_device_train_batch_size": 2,
+    "per_device_eval_batch_size": 2,
+    "gradient_accumulation_steps": 8,
+    "warmup_steps": 4,
+    "weight_decay": 0.0,
+    "lr_scheduler_type": "constant_with_warmup",
+    "save_steps": 32,
+    "eval_steps": 32,
+    "save_total_limit": 6,
+    "bf16": true,
+    "fp16": false,
+    "gradient_checkpointing": true,
+    "max_grad_norm": 1.0,
+    "logging_steps": 4
+  },
+  "checkpoint_schedule": [32, 64, 96, 128],
+  "primary_estimand": {
+    "metric": "tr_to_en_top1",
+    "contrast": "(M3_fact - M2_clean)_B - (M3_fact - M2_clean)_A",
+    "bootstrap_unit": "subject_id",
+    "bootstrap_samples": 2000,
+    "bootstrap_seed": 20260717
+  },
+  "secondary_outcomes": [
+    "m2_clean_minus_m1_by_branch",
+    "m3_fact_minus_m1_by_branch",
+    "m3_fact_minus_m2_clean_by_branch",
+    "tr_to_tr_top1_and_margin",
+    "en_to_en_top1_and_margin",
+    "english_generic_ppl",
+    "turkish_generic_ppl",
+    "relation_form_scaffold_and_robust_intersections"
+  ],
+  "interpretation_rules": {
+    "checkpoint_selection": "fixed_endpoint_128_for_all_arms; no_treatment_specific_selection",
+    "primary_success": "positive_branch_interaction_with_95_percent_ci_lower_bound_above_zero",
+    "retention_guardrail": "en_to_en_top1_drop_no_more_than_5_percentage_points_relative_to_m1",
+    "operational_validity": "all_four_arms_complete_with_matched_budget_and_passed_integrity"
+  },
+  "retention_policy": "retain_selected_model_only_weights_manifests_hashes_and_compact_evidence; keep_training_checkpoints_on_scratch_until_endpoint_evaluation_and_cleanup_audit"
+}
