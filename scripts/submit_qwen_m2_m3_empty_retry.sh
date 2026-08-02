@@ -5,7 +5,12 @@ set -euo pipefail
 
 ROOT=/vol/tmp2/yesildau/qwen_m2_m3_v1
 EVAL_ROOT="${ROOT}/evaluation_v1"
-RETRY_ROOT="${ROOT}/retry_v1"
+RETRY_TASK_IDS="${RETRY_TASK_IDS:-2 11 14 15}"
+RETRY_REQUIRED_STATE="${RETRY_REQUIRED_STATE:-m2_clean_seed42}"
+RETRY_RUN_NAME="${RETRY_RUN_NAME:-retry_v1}"
+read -r -a RETRY_TASK_ID_ARRAY <<< "${RETRY_TASK_IDS}"
+ARRAY_SPEC="$(IFS=,; printf '%s' "${RETRY_TASK_ID_ARRAY[*]}")"
+RETRY_ROOT="${ROOT}/${RETRY_RUN_NAME}"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 EXPECTED_COMMIT="$(git -C "${REPO_ROOT}" rev-parse HEAD)"
 cd "${REPO_ROOT}"
@@ -19,20 +24,24 @@ echo "--- queue before retry preflight ---"
 squeue -u yesildau -o '%.18i %.12P %.28j %.8T %.10M %.12R'
 
 preflight_id="$(sbatch --parsable \
-  --export="ALL,EXPECTED_COMMIT=${EXPECTED_COMMIT}" \
+  --output="${RETRY_ROOT}/logs/qwen-m2-m3-retry-pre-%j.out" \
+  --error="${RETRY_ROOT}/logs/qwen-m2-m3-retry-pre-%j.err" \
+  --export="ALL,EXPECTED_COMMIT=${EXPECTED_COMMIT},RETRY_TASK_IDS=${RETRY_TASK_IDS},RETRY_REQUIRED_STATE=${RETRY_REQUIRED_STATE},RETRY_RUN_NAME=${RETRY_RUN_NAME}" \
   slurm/preflight_qwen_m2_m3_empty_retry.slurm)"
 retry_id="$(sbatch --parsable \
   --dependency="afterok:${preflight_id}" \
   --job-name=qwen-m2-m3-retry \
-  --array=2,11,14,15%3 \
+  --array="${ARRAY_SPEC}%3" \
   --gres=gpu:rtx6000:1 \
   --nodelist=gruenau2 \
-  --export="ALL,EXPECTED_COMMIT=${EXPECTED_COMMIT},PREFLIGHT_MANIFEST=${RETRY_ROOT}/preflight/manifest.json,EVALUATION_MANIFEST=${EVAL_ROOT}/evaluation_manifest.json,RETRY_MANIFEST=${RETRY_ROOT}/retry_manifest.json,ALLOW_EXISTING_EMPTY_RESULT_ROOT=1" \
+  --export="ALL,EXPECTED_COMMIT=${EXPECTED_COMMIT},PREFLIGHT_MANIFEST=${RETRY_ROOT}/preflight/manifest.json,EVALUATION_MANIFEST=${EVAL_ROOT}/evaluation_manifest.json,RETRY_MANIFEST=${RETRY_ROOT}/retry_manifest.json,RETRY_TASK_IDS=${RETRY_TASK_IDS},RETRY_REQUIRED_STATE=${RETRY_REQUIRED_STATE},RETRY_RUN_NAME=${RETRY_RUN_NAME},ALLOW_EXISTING_EMPTY_RESULT_ROOT=1" \
   slurm/eval_qwen_m2_m3_slice.slurm)"
 
 echo "preflight_id=${preflight_id}"
 echo "retry_array_id=${retry_id}"
-echo "retry_task_ids=2,11,14,15"
+echo "retry_task_ids=${RETRY_TASK_IDS}"
+echo "retry_required_state=${RETRY_REQUIRED_STATE}"
+echo "retry_run_name=${RETRY_RUN_NAME}"
 echo "gpu_type=rtx6000"
 echo "node=gruenau2"
 echo "expected_runtime=20-60 minutes per batch; three cards maximum"

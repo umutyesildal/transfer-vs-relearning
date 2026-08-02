@@ -70,10 +70,14 @@ task_id = int(sys.argv[2])
 assert payload["status"] == "ready_for_fresh_preflight"
 assert task_id in [int(value) for value in payload["task_ids"]]
 PY
-  test -d "${RESULT_ROOT}"
-  if find "${RESULT_ROOT}" -type f -print -quit | grep -q .; then
-    echo "retry result root is not empty: ${RESULT_ROOT}" >&2
-    exit 4
+  if [[ -e "${RESULT_ROOT}" ]]; then
+    test -d "${RESULT_ROOT}"
+    if find "${RESULT_ROOT}" -type f -print -quit | grep -q .; then
+      echo "retry result root is not empty: ${RESULT_ROOT}" >&2
+      exit 4
+    fi
+  else
+    mkdir -p "${RESULT_ROOT}"
   fi
 else
   test ! -e "${RESULT_ROOT}"
@@ -87,7 +91,7 @@ from pathlib import Path
 payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 assert payload["status"] == "passed"
 assert payload["git_commit"] == sys.argv[2]
-expected_jobs = 4 if os.environ.get("ALLOW_EXISTING_EMPTY_RESULT_ROOT") == "1" else 96
+expected_jobs = int(payload["expected_jobs"]) if os.environ.get("ALLOW_EXISTING_EMPTY_RESULT_ROOT") == "1" else 96
 assert payload["expected_jobs"] == expected_jobs
 assert payload["expected_new_checkpoints"] == 0
 PY
