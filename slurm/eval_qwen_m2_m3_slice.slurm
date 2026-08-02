@@ -16,6 +16,7 @@ set -euo pipefail
 : "${EXPECTED_COMMIT:?EXPECTED_COMMIT is required}"
 : "${PREFLIGHT_MANIFEST:?PREFLIGHT_MANIFEST is required}"
 : "${EVALUATION_MANIFEST:?EVALUATION_MANIFEST is required}"
+ALLOW_EXISTING_EMPTY_RESULT_ROOT="${ALLOW_EXISTING_EMPTY_RESULT_ROOT:-0}"
 HOME_ROOT=/vol/fob-vol6/mi25/yesildau
 REPO_ROOT="${SLURM_SUBMIT_DIR:-${HOME_ROOT}/transfer-vs-relearning}"
 ROOT=/vol/tmp2/yesildau/qwen_m2_m3_v1
@@ -29,6 +30,7 @@ test -s "${PREFLIGHT_MANIFEST}"
 test -s "${EVALUATION_MANIFEST}"
 mapfile -t fields < <("${PYTHON_BIN}" - "${EVALUATION_MANIFEST}" "${CONTRACT_ROOT}" "${SLURM_ARRAY_TASK_ID}" <<'PY'
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -56,16 +58,37 @@ RESULT_ROOT="${RESULTS_ROOT}/${SLICE_ID}"
 test -s "${MODEL_MANIFEST}"
 test -s "${SLICE_PATH}"
 test "$(sha256sum "${SLICE_PATH}" | awk '{print $1}')" = "${SLICE_SHA256}"
-test ! -e "${RESULT_ROOT}"
+if [[ "${ALLOW_EXISTING_EMPTY_RESULT_ROOT}" == "1" ]]; then
+  : "${RETRY_MANIFEST:?RETRY_MANIFEST is required for an empty-result retry}"
+  "${PYTHON_BIN}" - "${RETRY_MANIFEST}" "${SLURM_ARRAY_TASK_ID}" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+task_id = int(sys.argv[2])
+assert payload["status"] == "ready_for_fresh_preflight"
+assert task_id in [int(value) for value in payload["task_ids"]]
+PY
+  test -d "${RESULT_ROOT}"
+  if find "${RESULT_ROOT}" -type f -print -quit | grep -q .; then
+    echo "retry result root is not empty: ${RESULT_ROOT}" >&2
+    exit 4
+  fi
+else
+  test ! -e "${RESULT_ROOT}"
+fi
 "${PYTHON_BIN}" - "${PREFLIGHT_MANIFEST}" "${EXPECTED_COMMIT}" <<'PY'
 import json
+import os
 import sys
 from pathlib import Path
 
 payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 assert payload["status"] == "passed"
 assert payload["git_commit"] == sys.argv[2]
-assert payload["expected_jobs"] == 96
+expected_jobs = 4 if os.environ.get("ALLOW_EXISTING_EMPTY_RESULT_ROOT") == "1" else 96
+assert payload["expected_jobs"] == expected_jobs
 assert payload["expected_new_checkpoints"] == 0
 PY
 
