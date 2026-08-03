@@ -142,7 +142,7 @@ def main() -> None:
     decline_rows = [
         row
         for row in paired_rows
-        if row["contrast"] in {"m2_minus_m1", "m3_minus_m2"}
+        if row["comparison"] in {"m2_minus_m1", "m3_minus_m2"}
         and (
             row["dimension"] in {"direction", "direction_relation", "direction_form", "direction_scaffold"}
             or row["key"] in {"tr_to_en", "tr_to_tr"}
@@ -153,17 +153,19 @@ def main() -> None:
     decline_candidates = [
         row
         for row in paired_rows
-        if row["contrast"] == "m2_minus_m1"
+        if row["comparison"] == "m2_minus_m1"
         and row["key"].startswith(("tr_to_en", "tr_to_tr"))
     ]
-    decline_candidates.sort(key=lambda row: float_value(row, "difference"))
+    decline_candidates.sort(key=lambda row: float_value(row, "difference_first_minus_second"))
     recovery_candidates = [
         row
         for row in paired_rows
-        if row["contrast"] == "m3_minus_m2"
+        if row["comparison"] == "m3_minus_m2"
         and row["key"].startswith(("tr_to_en", "tr_to_tr"))
     ]
-    recovery_candidates.sort(key=lambda row: float_value(row, "difference"), reverse=True)
+    recovery_candidates.sort(
+        key=lambda row: float_value(row, "difference_first_minus_second"), reverse=True
+    )
 
     report_lines = [
         "# Exploratory Qwen M2/M3 Mechanism Analysis",
@@ -194,7 +196,7 @@ def main() -> None:
     for row in decline_candidates[:20]:
         report_lines.append(
             f"| {row['seed']} | {row['dimension']} | {row['key']} | "
-            f"{100 * float_value(row, 'difference'):.2f} | "
+            f"{100 * float_value(row, 'difference_first_minus_second'):.2f} | "
             f"[{100 * float_value(row, 'bootstrap_ci_low'):.2f}, "
             f"{100 * float_value(row, 'bootstrap_ci_high'):.2f}] |"
         )
@@ -210,7 +212,7 @@ def main() -> None:
     for row in recovery_candidates[:20]:
         report_lines.append(
             f"| {row['seed']} | {row['dimension']} | {row['key']} | "
-            f"{100 * float_value(row, 'difference'):.2f} | "
+            f"{100 * float_value(row, 'difference_first_minus_second'):.2f} | "
             f"[{100 * float_value(row, 'bootstrap_ci_low'):.2f}, "
             f"{100 * float_value(row, 'bootstrap_ci_high'):.2f}] |"
         )
