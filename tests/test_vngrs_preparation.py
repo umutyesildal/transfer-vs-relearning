@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import io
 import json
+import urllib.error
 from pathlib import Path
 from time import perf_counter
 
@@ -45,7 +47,13 @@ from transfer_vs_relearning.corpora.vngrs.metadata import (
     validate_metadata_footer_output_paths,
     validate_sampling_schedule,
 )
-from transfer_vs_relearning.corpora.vngrs.metadata_executor import independent_writer_self_check
+from transfer_vs_relearning.corpora.vngrs import metadata_executor as metadata_executor_module
+from transfer_vs_relearning.corpora.vngrs.metadata_executor import (
+    AttemptResult,
+    BoundedClient,
+    ExecutionBlocked,
+    independent_writer_self_check,
+)
 from transfer_vs_relearning.corpora.vngrs.pipeline import (
     FailClosedLidAdapter,
     LidResult,
@@ -1574,6 +1582,270 @@ def test_metadata_footer_executor_independent_writer_preflight_is_explicit() -> 
             "independent_writer_parser_mismatch",
             "independent_writer_parser_failure",
         }
+
+
+class _FakeResponse:
+    def __init__(self, status: int, payload: bytes, *, headers: dict[str, str] | None = None, url: str) -> None:
+        self.status = status
+        self.code = status
+        self.headers = headers or {}
+        self._payload = payload
+        self._url = url
+
+    def __enter__(self) -> "_FakeResponse":
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        return None
+
+    def geturl(self) -> str:
+        return self._url
+
+    def read(self, limit: int = -1) -> bytes:
+        if limit >= 0:
+            return self._payload[:limit]
+        return self._payload
+
+
+class _FakeOpener:
+    def __init__(self, responses: list[object]) -> None:
+        self.responses = list(responses)
+
+    def open(self, request: object, timeout: int) -> object:
+        del request, timeout
+        if not self.responses:
+            raise AssertionError("fake opener exhausted")
+        response = self.responses.pop(0)
+        if isinstance(response, BaseException):
+            raise response
+        return response
+
+
+def _fake_response(status: int, payload: bytes = b"x", *, url: str = "https://example.test/route") -> _FakeResponse:
+    return _FakeResponse(status, payload, headers={"Content-Type": "application/octet-stream"}, url=url)
+
+
+def test_metadata_executor_accepts_24_retries_before_terminal_success() -> None:
+    responses = [_fake_response(429) for _ in range(24)] + [_fake_response(200, b"ok")]
+    client = BoundedClient(_FakeOpener(responses))  # type: ignore[arg-type]
+
+    result, payload = client.request_with_retries(
+        request_id="retry-boundary",
+        role="license_attribution",
+        path="README.md",
+        url="https://example.test/route",
+        method="GET",
+        range_header=None,
+        expected_status=200,
+        artifact_name="evidence/license/README.md",
+    )
+
+    assert result.status == 200
+    assert payload == b"ok"
+    assert client.attempt_count == 25
+    assert client.retry_count == 24
+    assert len(client.request_rows) == 25
+    assert len(client.artifact_payloads) == 25
+    assert client.total_response_bytes == 26
+
+
+def test_metadata_executor_rejects_the_25th_retry_before_retaining_artifact() -> None:
+    client = BoundedClient(_FakeOpener([_fake_response(429) for _ in range(25)]))  # type: ignore[arg-type]
+
+    with pytest.raises(ExecutionBlocked, match="24-retry") as caught:
+        client.request_with_retries(
+            request_id="retry-over-bound",
+            role="license_attribution",
+            path="README.md",
+            url="https://example.test/route",
+            method="GET",
+            range_header=None,
+            expected_status=200,
+            artifact_name="evidence/license/README.md",
+        )
+
+    assert caught.value.context["phase"] == "retry_bound"
+    assert caught.value.context["attempt_count"] == 25
+    assert caught.value.context["retry_count"] == 24
+    assert len(client.request_rows) == 24
+    assert len(client.artifact_payloads) == 24
+
+
+def test_metadata_executor_fails_before_retaining_cumulative_response_overflow() -> None:
+    client = BoundedClient(_FakeOpener([_fake_response(200, b"xx")]))  # type: ignore[arg-type]
+    client.total_response_bytes = metadata_executor_module.METADATA_FOOTER_MAX_TOTAL_RESPONSE_BYTES - 1
+
+    with pytest.raises(ExecutionBlocked, match="cumulative 64 MiB") as caught:
+        client.request_with_retries(
+            request_id="response-byte-overflow",
+            role="license_attribution",
+            path="README.md",
+            url="https://example.test/route",
+            method="GET",
+            range_header=None,
+            expected_status=200,
+            artifact_name="evidence/license/README.md",
+        )
+
+    assert caught.value.context["phase"] == "response_byte_bound"
+    assert not client.artifact_payloads
+    assert not client.request_rows
+
+
+def test_metadata_executor_checks_artifact_slot_before_retry_insert() -> None:
+    client = BoundedClient(_FakeOpener([_fake_response(429)]))  # type: ignore[arg-type]
+    response_artifact_capacity = metadata_executor_module.METADATA_FOOTER_MAX_OUTPUT_FILES - len(
+        metadata_executor_module.METADATA_FOOTER_OUTPUT_PATHS
+    )
+    client.artifact_payloads = {f"evidence/retry/seed-{index:03d}.bin": b"" for index in range(response_artifact_capacity)}
+
+    with pytest.raises(ExecutionBlocked, match="artifact/file/inode") as caught:
+        client.request_with_retries(
+            request_id="artifact-slot-overflow",
+            role="license_attribution",
+            path="README.md",
+            url="https://example.test/route",
+            method="GET",
+            range_header=None,
+            expected_status=200,
+            artifact_name="evidence/license/README.md",
+        )
+
+    assert caught.value.context["phase"] == "artifact_slot_bound"
+    assert len(client.artifact_payloads) == response_artifact_capacity
+
+
+def test_metadata_executor_preserves_3xx_failure_context() -> None:
+    url = "https://example.test/route"
+    redirect = urllib.error.HTTPError(
+        url,
+        302,
+        "redirect",
+        {"Location": "https://example.test/target"},
+        io.BytesIO(),
+    )
+    client = BoundedClient(_FakeOpener([redirect]))  # type: ignore[arg-type]
+
+    with pytest.raises(ExecutionBlocked, match="non-retryable HTTP status") as caught:
+        client.request_with_retries(
+            request_id="redirect-block",
+            role="license_attribution",
+            path="README.md",
+            url=url,
+            method="GET",
+            range_header=None,
+            expected_status=200,
+            artifact_name="evidence/license/README.md",
+        )
+
+    assert caught.value.context == {
+        "phase": "source_request",
+        "attempt_count": 1,
+        "retry_count": 0,
+        "total_response_bytes": 0,
+        "request_id": "redirect-block",
+        "http_status": 302,
+        "location": "https://example.test/target",
+        "final_url": url,
+    }
+
+
+def test_storage_preflight_blocks_timeout_and_home_limit(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    root = str(tmp_path / "new-root")
+
+    def fake_run(command: list[str], *, timeout: int = 30) -> dict[str, object]:
+        del timeout
+        if command[0] == "du":
+            return {"command": command, "returncode": 0, "stdout": "30G\t/vol/fob-vol6/mi25/yesildau\n", "stderr": "", "timed_out": False}
+        if command[0] == "readlink":
+            return {"command": command, "returncode": 0, "stdout": root + "\n", "stderr": "", "timed_out": True}
+        return {"command": command, "returncode": 0, "stdout": "ok\n", "stderr": "", "timed_out": False}
+
+    monkeypatch.setattr(metadata_executor_module, "_run_command", fake_run)
+    result = metadata_executor_module.storage_preflight(root)
+
+    assert not result["complete"]
+    assert "storage/preflight command timed out" in result["errors"]
+    assert "HU home usage is at or above the 30 GiB stop rule" in result["errors"]
+
+
+def test_storage_preflight_blocks_existing_root(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    root_path = tmp_path / "existing-root"
+    root_path.mkdir()
+    root = str(root_path)
+
+    def fake_run(command: list[str], *, timeout: int = 30) -> dict[str, object]:
+        del timeout
+        stdout = root + "\n" if command[0] == "readlink" else "1K\n"
+        return {"command": command, "returncode": 0, "stdout": stdout, "stderr": "", "timed_out": False}
+
+    monkeypatch.setattr(metadata_executor_module, "_run_command", fake_run)
+    result = metadata_executor_module.storage_preflight(root)
+
+    assert not result["complete"]
+    assert "new scratch root already exists" in result["errors"]
+
+
+def test_metadata_executor_writer_failure_precedes_source_requests(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    root = str(tmp_path / "new-root")
+    monkeypatch.setattr(metadata_executor_module, "storage_preflight", lambda root: {"root": root, "complete": True})
+    monkeypatch.setattr(
+        metadata_executor_module,
+        "independent_writer_self_check",
+        lambda: {"status": "BLOCKED", "reason": "independent_writer_parser_failure"},
+    )
+    monkeypatch.setattr(
+        metadata_executor_module,
+        "_execute_metadata_footer_wave_uncaught",
+        lambda **kwargs: pytest.fail("source stage must not run after writer failure"),
+    )
+
+    result = metadata_executor_module.execute_metadata_footer_wave(root=root)
+
+    assert result["status"] == "BLOCKED"
+    assert result["phase"] == "independent_writer_self_check"
+    assert result["source_requests_started"] == 0
+
+
+def test_metadata_executor_invokes_post_run_audit_on_pass(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    root = str(tmp_path / "new-root")
+    audit = {"root": root, "file_count": 0, "total_bytes": 0}
+    monkeypatch.setattr(metadata_executor_module, "storage_preflight", lambda root: {"root": root, "complete": True})
+    monkeypatch.setattr(metadata_executor_module, "independent_writer_self_check", lambda: {"status": "PASS"})
+    monkeypatch.setattr(metadata_executor_module, "_execute_metadata_footer_wave_uncaught", lambda **kwargs: {"status": "PASS"})
+    monkeypatch.setattr(metadata_executor_module, "post_run_storage_audit", lambda root: audit)
+
+    result = metadata_executor_module.execute_metadata_footer_wave(root=root)
+
+    assert result["post_run_storage_audit"] == audit
+
+
+def test_metadata_executor_invokes_post_run_audit_on_source_block(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    root = str(tmp_path / "new-root")
+    audit = {"root": root, "file_count": 0, "total_bytes": 0}
+    monkeypatch.setattr(metadata_executor_module, "storage_preflight", lambda root: {"root": root, "complete": True})
+    monkeypatch.setattr(metadata_executor_module, "independent_writer_self_check", lambda: {"status": "PASS"})
+    monkeypatch.setattr(
+        metadata_executor_module.BoundedClient,
+        "_attempt",
+        lambda self, **kwargs: AttemptResult(
+            status=302,
+            headers={"location": "https://example.test/target"},
+            payload=b"",
+            final_url=kwargs["url"],
+            redirect_chain=[],
+            error="http_302",
+        ),
+    )
+    monkeypatch.setattr(metadata_executor_module, "post_run_storage_audit", lambda root: audit)
+
+    result = metadata_executor_module.execute_metadata_footer_wave(root=root)
+
+    assert result["status"] == "BLOCKED"
+    assert result["phase"] == "source_request"
+    assert result["failure_context"]["http_status"] == 302
+    assert result["failure_context"]["location"] == "https://example.test/target"
+    assert result["post_run_storage_audit"] == audit
 
 
 def test_metadata_footer_validator_rejects_every_final_integrity_attack_class() -> None:

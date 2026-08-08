@@ -11,6 +11,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import socket
 import subprocess
 import sys
@@ -33,6 +34,7 @@ from .metadata import (
     METADATA_FOOTER_MAX_RETRIES,
     METADATA_FOOTER_MAX_SINGLE_RESPONSE_BYTES,
     METADATA_FOOTER_MAX_TOTAL_RESPONSE_BYTES,
+    METADATA_FOOTER_MAX_WALL_CLOCK_SECONDS,
     METADATA_FOOTER_OUTPUT_PATHS,
     METADATA_FOOTER_RANGE_HEADER,
     METADATA_FOOTER_ROUTE_KIND,
@@ -64,6 +66,10 @@ REQUEST_TIMEOUT_SECONDS = 60
 class ExecutionBlocked(RuntimeError):
     """A frozen 151an precondition, route, bound or integrity rule failed."""
 
+    def __init__(self, message: str, *, context: Mapping[str, Any] | None = None) -> None:
+        super().__init__(message)
+        self.context = dict(context or {})
+
 
 class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
     """Do not silently turn a direct immutable route into an unallowlisted CDN route."""
@@ -90,14 +96,85 @@ class BoundedClient:
     retry_count: int = 0
     request_rows: list[dict[str, Any]] = field(default_factory=list)
     artifact_payloads: dict[str, bytes] = field(default_factory=dict)
+    total_response_bytes: int = 0
 
-    def _check_bounds(self) -> None:
+    def _check_attempt_bound(self) -> None:
         if self.attempt_count >= METADATA_FOOTER_MAX_HTTP_ATTEMPTS:
-            raise ExecutionBlocked("the next HTTP attempt would exceed the 128-attempt bound")
+            raise ExecutionBlocked(
+                "the next HTTP attempt would exceed the 128-attempt bound",
+                context=self.bound_context(phase="attempt_bound"),
+            )
+        if time.monotonic() - self.start_monotonic > METADATA_FOOTER_MAX_WALL_CLOCK_SECONDS:
+            raise ExecutionBlocked(
+                f"the {METADATA_FOOTER_MAX_WALL_CLOCK_SECONDS}-second wall-clock bound was exceeded",
+                context=self.bound_context(phase="wall_clock_bound"),
+            )
+
+    def _check_retry_bound(self) -> None:
         if self.retry_count >= METADATA_FOOTER_MAX_RETRIES:
-            raise ExecutionBlocked("the next retry would exceed the 24-retry bound")
-        if time.monotonic() - self.start_monotonic > 7_200:
-            raise ExecutionBlocked("the 7,200-second wall-clock bound was exceeded")
+            raise ExecutionBlocked(
+                "the next retry would exceed the 24-retry bound",
+                context=self.bound_context(phase="retry_bound"),
+            )
+
+    def bound_context(self, *, phase: str, **extra: Any) -> dict[str, Any]:
+        context = {
+            "phase": phase,
+            "attempt_count": self.attempt_count,
+            "retry_count": self.retry_count,
+            "total_response_bytes": self.total_response_bytes,
+        }
+        context.update(extra)
+        return context
+
+    def _accept_response_bytes(self, count: int) -> None:
+        if count < 0 or self.total_response_bytes + count > METADATA_FOOTER_MAX_TOTAL_RESPONSE_BYTES:
+            raise ExecutionBlocked(
+                "the cumulative 64 MiB response-byte bound would be exceeded",
+                context=self.bound_context(
+                    phase="response_byte_bound",
+                    attempted_response_bytes=count,
+                    max_total_response_bytes=METADATA_FOOTER_MAX_TOTAL_RESPONSE_BYTES,
+                ),
+            )
+        self.total_response_bytes += count
+
+    def replace_artifact_payload(self, name: str, payload: bytes) -> None:
+        """Replace a raw response artifact with its canonical retained representation."""
+
+        self._check_artifact_slot(name)
+        previous = self.artifact_payloads.get(name, b"")
+        candidate_total = self.total_response_bytes - len(previous) + len(payload)
+        if candidate_total > METADATA_FOOTER_MAX_TOTAL_RESPONSE_BYTES:
+            raise ExecutionBlocked(
+                "the cumulative 64 MiB response-byte bound would be exceeded",
+                context=self.bound_context(
+                    phase="response_byte_bound",
+                    attempted_response_bytes=len(payload),
+                    max_total_response_bytes=METADATA_FOOTER_MAX_TOTAL_RESPONSE_BYTES,
+                ),
+            )
+        if candidate_total < 0:
+            raise ExecutionBlocked(
+                "canonical artifact accounting would become negative",
+                context=self.bound_context(phase="response_byte_accounting"),
+            )
+        self.total_response_bytes = candidate_total
+        self.artifact_payloads[name] = payload
+
+    def _check_artifact_slot(self, name: str) -> None:
+        if name in self.artifact_payloads:
+            return
+        projected = len(self.artifact_payloads) + 1 + len(METADATA_FOOTER_OUTPUT_PATHS)
+        if projected > METADATA_FOOTER_MAX_OUTPUT_FILES or projected > METADATA_FOOTER_MAX_NEW_INODES:
+            raise ExecutionBlocked(
+                "the response-artifact/file/inode bound would be exceeded",
+                context=self.bound_context(
+                    phase="artifact_slot_bound",
+                    artifact=name,
+                    projected_output_files=projected,
+                ),
+            )
 
     @staticmethod
     def _headers(response: Any) -> dict[str, str]:
@@ -111,7 +188,7 @@ class BoundedClient:
         return payload
 
     def _attempt(self, *, method: str, url: str, range_header: str | None) -> AttemptResult:
-        self._check_bounds()
+        self._check_attempt_bound()
         self.attempt_count += 1
         headers = {"User-Agent": "luna-151an-metadata-footer-executor/1"}
         if range_header is not None:
@@ -121,6 +198,7 @@ class BoundedClient:
             with self.opener.open(request, timeout=REQUEST_TIMEOUT_SECONDS) as response:
                 response_headers = self._headers(response)
                 payload = self._read_bounded(response)
+                self._accept_response_bytes(len(payload))
                 return AttemptResult(
                     status=int(response.status),
                     headers=response_headers,
@@ -128,6 +206,10 @@ class BoundedClient:
                     final_url=str(response.geturl()),
                     redirect_chain=[],
                 )
+        except ExecutionBlocked as exc:
+            if not exc.context:
+                exc.context = self.bound_context(phase="single_response_bound", method=method, url=url)
+            raise
         except urllib.error.HTTPError as exc:
             response_headers = {str(key).lower(): str(value) for key, value in exc.headers.items()}
             try:
@@ -135,7 +217,16 @@ class BoundedClient:
             except Exception:
                 payload = b""
             if len(payload) > METADATA_FOOTER_MAX_SINGLE_RESPONSE_BYTES:
-                raise ExecutionBlocked("retry response exceeded the 4 MiB bound") from exc
+                raise ExecutionBlocked(
+                    "retry response exceeded the 4 MiB bound",
+                    context=self.bound_context(
+                        phase="single_response_bound",
+                        method=method,
+                        url=url,
+                        http_status=int(exc.code),
+                    ),
+                ) from exc
+            self._accept_response_bytes(len(payload))
             return AttemptResult(
                 status=int(exc.code),
                 headers=response_headers,
@@ -173,18 +264,37 @@ class BoundedClient:
             no_response = result.status is None
             if result.status == expected_status:
                 if result.final_url != url or result.redirect_chain:
-                    raise ExecutionBlocked(f"{request_id}: redirect chain/final URL is outside the frozen route")
+                    raise ExecutionBlocked(
+                        f"{request_id}: redirect chain/final URL is outside the frozen route",
+                        context=self.bound_context(
+                            phase="route_integrity",
+                            request_id=request_id,
+                            http_status=result.status,
+                            final_url=result.final_url,
+                            redirect_chain=list(result.redirect_chain),
+                        ),
+                    )
                 payload = result.payload or b""
                 if role != "head_metadata_route" and len(payload) == 0:
-                    raise ExecutionBlocked(f"{request_id}: successful response has no payload")
+                    raise ExecutionBlocked(
+                        f"{request_id}: successful response has no payload",
+                        context=self.bound_context(phase="empty_success", request_id=request_id),
+                    )
                 response_artifact = artifact_name
                 response_payload = payload
                 if role == "head_metadata_route":
                     response_artifact = artifact_name
                 if response_artifact is None:
-                    raise ExecutionBlocked(f"{request_id}: successful response lacks an artifact name")
+                    raise ExecutionBlocked(
+                        f"{request_id}: successful response lacks an artifact name",
+                        context=self.bound_context(phase="artifact_binding", request_id=request_id),
+                    )
+                self._check_artifact_slot(response_artifact)
                 if response_artifact in self.artifact_payloads and self.artifact_payloads[response_artifact] != response_payload:
-                    raise ExecutionBlocked(f"{request_id}: response artifact was reused with different bytes")
+                    raise ExecutionBlocked(
+                        f"{request_id}: response artifact was reused with different bytes",
+                        context=self.bound_context(phase="artifact_binding", request_id=request_id),
+                    )
                 self.artifact_payloads[response_artifact] = response_payload
                 self._append_request_row(
                     request_id=request_id,
@@ -205,12 +315,15 @@ class BoundedClient:
                 )
                 return result, response_payload
             if retryable_http or no_response:
-                self._check_bounds()
                 retry_artifact = None
                 retry_payload = result.payload if result.payload is not None else None
                 if result.payload is not None:
+                    self._check_retry_bound()
                     retry_artifact = f"evidence/retry/{request_id}-{ordinal:02d}.bin"
+                    self._check_artifact_slot(retry_artifact)
                     self.artifact_payloads[retry_artifact] = result.payload
+                else:
+                    self._check_retry_bound()
                 self._append_request_row(
                     request_id=request_id,
                     role=role,
@@ -232,7 +345,14 @@ class BoundedClient:
                 ordinal += 1
                 continue
             raise ExecutionBlocked(
-                f"{request_id}: non-retryable HTTP status {result.status!r} or invalid response"
+                f"{request_id}: non-retryable HTTP status {result.status!r} or invalid response",
+                context=self.bound_context(
+                    phase="source_request",
+                    request_id=request_id,
+                    http_status=result.status,
+                    location=result.headers.get("location"),
+                    final_url=result.final_url,
+                ),
             )
 
     def _append_request_row(
@@ -324,9 +444,50 @@ def independent_writer_self_check() -> dict[str, Any]:
         return {"status": "BLOCKED", "reason": "independent_writer_parser_failure", "detail": repr(exc)}
 
 
-def _run_command(command: list[str]) -> dict[str, Any]:
-    result = subprocess.run(command, capture_output=True, text=True, check=False)
-    return {"command": command, "returncode": result.returncode, "stdout": result.stdout, "stderr": result.stderr}
+COMMAND_TIMEOUT_SECONDS = 30
+
+
+def _run_command(command: list[str], *, timeout: int = COMMAND_TIMEOUT_SECONDS) -> dict[str, Any]:
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=timeout,
+        )
+    except subprocess.TimeoutExpired as exc:
+        return {
+            "command": command,
+            "returncode": None,
+            "stdout": exc.stdout or "",
+            "stderr": exc.stderr or "",
+            "timed_out": True,
+        }
+    return {
+        "command": command,
+        "returncode": result.returncode,
+        "stdout": result.stdout,
+        "stderr": result.stderr,
+        "timed_out": False,
+    }
+
+
+def _parse_human_size(value: str) -> int | None:
+    match = re.match(r"^\s*([0-9]+(?:\.[0-9]+)?)\s*([KMGTPE]?)(?:i?B)?\s*$", value, re.IGNORECASE)
+    if not match:
+        return None
+    number = float(match.group(1))
+    unit = match.group(2).upper()
+    multiplier = 1024 ** " KMGTPE".index(unit) if unit else 1
+    return int(number * multiplier)
+
+
+def _du_bytes(du_result: Mapping[str, Any]) -> int | None:
+    first_line = str(du_result.get("stdout", "")).splitlines()
+    if not first_line:
+        return None
+    return _parse_human_size(first_line[0].split()[0])
 
 
 def storage_preflight(root: str = METADATA_FOOTER_SCRATCH_ROOT) -> dict[str, Any]:
@@ -340,15 +501,22 @@ def storage_preflight(root: str = METADATA_FOOTER_SCRATCH_ROOT) -> dict[str, Any
     ]
     root_exists = os.path.lexists(root)
     resolved = checks[-1]["stdout"].strip()
+    home_bytes = _du_bytes(checks[0])
     errors = [
         "new scratch root already exists" if root_exists else None,
         "resolved root does not equal frozen root" if resolved != root else None,
+        "storage/preflight command timed out" if any(check.get("timed_out") for check in checks) else None,
         "storage command failed" if any(check["returncode"] != 0 for check in checks) else None,
+        "HU home usage is at or above the 30 GiB stop rule"
+        if home_bytes is not None and home_bytes >= 30 * 1024**3
+        else None,
     ]
     return {
         "root": root,
         "root_exists_before_wave": root_exists,
         "resolved_root": resolved,
+        "home_usage_bytes": home_bytes,
+        "home_usage_stop_threshold_bytes": 30 * 1024**3,
         "checks": checks,
         "errors": [error for error in errors if error],
         "complete": not any(errors),
@@ -444,21 +612,13 @@ def _write_outputs(root: Path, package: Mapping[str, Any], payloads: Mapping[str
     (root / "metadata_footer_audit.json").write_bytes(audit_payload)
 
 
-def execute_metadata_footer_wave(*, root: str = METADATA_FOOTER_SCRATCH_ROOT) -> dict[str, Any]:
-    """Execute the frozen 151an wave once, returning a compact result for 151ao/151ap."""
-
-    preflight = storage_preflight(root)
-    if not preflight["complete"]:
-        return {"status": "BLOCKED", "phase": "preflight", "preflight": preflight, "source_requests_started": 0}
-    writer_check = independent_writer_self_check()
-    if writer_check.get("status") != "PASS":
-        return {
-            "status": "BLOCKED",
-            "phase": "independent_writer_self_check",
-            "preflight": preflight,
-            "independent_writer": writer_check,
-            "source_requests_started": 0,
-        }
+def _execute_metadata_footer_wave_uncaught(
+    *,
+    root: str,
+    preflight: Mapping[str, Any],
+    writer_check: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Run the source stage after preflight/self-check; the public wrapper records failures."""
 
     selection = build_selection_evidence()
     client = BoundedClient(urllib.request.build_opener(_NoRedirectHandler()))
@@ -503,7 +663,7 @@ def execute_metadata_footer_wave(*, root: str = METADATA_FOOTER_SCRATCH_ROOT) ->
                 "content_encoding": content_encoding,
             }
         )
-        client.artifact_payloads[f"evidence/head/{index:05d}.json"] = head_payload
+        client.replace_artifact_payload(f"evidence/head/{index:05d}.json", head_payload)
         client.request_rows[-1]["response_content_length"] = len(head_payload)
         client.request_rows[-1]["response_transferred_bytes"] = len(head_payload)
         client.request_rows[-1]["response_sha256"] = hashlib.sha256(head_payload).hexdigest()
@@ -696,6 +856,65 @@ def execute_metadata_footer_wave(*, root: str = METADATA_FOOTER_SCRATCH_ROOT) ->
         "source_requests_started": len(client.request_rows),
         "root": root,
     }
+
+
+def execute_metadata_footer_wave(*, root: str = METADATA_FOOTER_SCRATCH_ROOT) -> dict[str, Any]:
+    """Execute the frozen 151an wave once, returning a compact result for 151ao/151ap."""
+
+    preflight = storage_preflight(root)
+    if not preflight["complete"]:
+        return {
+            "status": "BLOCKED",
+            "phase": "preflight",
+            "preflight": preflight,
+            "source_requests_started": 0,
+        }
+    writer_check = independent_writer_self_check()
+    if writer_check.get("status") != "PASS":
+        return {
+            "status": "BLOCKED",
+            "phase": "independent_writer_self_check",
+            "preflight": preflight,
+            "independent_writer": dict(writer_check),
+            "source_requests_started": 0,
+        }
+    try:
+        result = _execute_metadata_footer_wave_uncaught(
+            root=root,
+            preflight=preflight,
+            writer_check=writer_check,
+        )
+    except ExecutionBlocked as exc:
+        audit = post_run_storage_audit(root)
+        context = dict(exc.context)
+        context.setdefault("phase", "execution")
+        return {
+            "status": "BLOCKED",
+            "phase": context["phase"],
+            "reason": str(exc),
+            "failure_context": context,
+            "preflight": preflight,
+            "independent_writer": dict(writer_check),
+            "post_run_storage_audit": audit,
+        }
+    except Exception as exc:  # fail closed and leave the exception in the compact terminal report
+        audit = post_run_storage_audit(root)
+        return {
+            "status": "BLOCKED",
+            "phase": "unexpected_executor_error",
+            "reason": repr(exc),
+            "failure_context": {
+                "phase": "unexpected_executor_error",
+                "attempt_count": None,
+                "retry_count": None,
+                "total_response_bytes": None,
+            },
+            "preflight": preflight,
+            "independent_writer": dict(writer_check),
+            "post_run_storage_audit": audit,
+        }
+    result["post_run_storage_audit"] = post_run_storage_audit(root)
+    return result
 
 
 def main(argv: list[str] | None = None) -> int:
