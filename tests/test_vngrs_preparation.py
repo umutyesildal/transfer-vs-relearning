@@ -1591,6 +1591,7 @@ class _FakeResponse:
         self.headers = headers or {}
         self._payload = payload
         self._url = url
+        self.read_limits: list[int] = []
 
     def __enter__(self) -> "_FakeResponse":
         return self
@@ -1602,6 +1603,7 @@ class _FakeResponse:
         return self._url
 
     def read(self, limit: int = -1) -> bytes:
+        self.read_limits.append(limit)
         if limit >= 0:
             return self._payload[:limit]
         return self._payload
@@ -1688,6 +1690,97 @@ def test_metadata_executor_fails_before_retaining_cumulative_response_overflow()
         )
 
     assert caught.value.context["phase"] == "response_byte_bound"
+    assert not client.artifact_payloads
+    assert not client.request_rows
+
+
+def test_metadata_executor_caps_unknown_normal_body_by_remaining_budget(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(metadata_executor_module, "METADATA_FOOTER_MAX_TOTAL_RESPONSE_BYTES", 10)
+    response = _fake_response(200, b"x" * 100)
+    client = BoundedClient(_FakeOpener([response]))  # type: ignore[arg-type]
+    client.total_response_bytes = 9
+
+    with pytest.raises(ExecutionBlocked) as caught:
+        client.request_with_retries(
+            request_id="normal-read-budget",
+            role="license_attribution",
+            path="README.md",
+            url="https://example.test/route",
+            method="GET",
+            range_header=None,
+            expected_status=200,
+            artifact_name="evidence/license/README.md",
+        )
+
+    assert response.read_limits == [2]
+    assert caught.value.context["phase"] == "response_byte_bound"
+    assert caught.value.context["read_limit"] == 2
+    assert not client.artifact_payloads
+    assert not client.request_rows
+
+
+def test_metadata_executor_rejects_declared_length_before_body_read(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(metadata_executor_module, "METADATA_FOOTER_MAX_TOTAL_RESPONSE_BYTES", 10)
+    response = _FakeResponse(
+        200,
+        b"x" * 100,
+        headers={"Content-Length": "2", "Content-Type": "application/octet-stream"},
+        url="https://example.test/route",
+    )
+    client = BoundedClient(_FakeOpener([response]))  # type: ignore[arg-type]
+    client.total_response_bytes = 9
+
+    with pytest.raises(ExecutionBlocked) as caught:
+        client.request_with_retries(
+            request_id="declared-length-read-budget",
+            role="license_attribution",
+            path="README.md",
+            url="https://example.test/route",
+            method="GET",
+            range_header=None,
+            expected_status=200,
+            artifact_name="evidence/license/README.md",
+        )
+
+    assert response.read_limits == []
+    assert caught.value.context["phase"] == "response_byte_bound"
+    assert not client.artifact_payloads
+    assert not client.request_rows
+
+
+class _RecordingBytesIO(io.BytesIO):
+    def __init__(self, payload: bytes) -> None:
+        super().__init__(payload)
+        self.read_limits: list[int] = []
+
+    def read(self, size: int = -1) -> bytes:
+        self.read_limits.append(size)
+        return super().read(size)
+
+
+def test_metadata_executor_caps_unknown_http_error_body_by_remaining_budget(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(metadata_executor_module, "METADATA_FOOTER_MAX_TOTAL_RESPONSE_BYTES", 10)
+    url = "https://example.test/route"
+    stream = _RecordingBytesIO(b"x" * 100)
+    retry = urllib.error.HTTPError(url, 429, "retry", {}, stream)
+    client = BoundedClient(_FakeOpener([retry]))  # type: ignore[arg-type]
+    client.total_response_bytes = 9
+
+    with pytest.raises(ExecutionBlocked) as caught:
+        client.request_with_retries(
+            request_id="http-error-read-budget",
+            role="license_attribution",
+            path="README.md",
+            url=url,
+            method="GET",
+            range_header=None,
+            expected_status=200,
+            artifact_name="evidence/license/README.md",
+        )
+
+    assert stream.read_limits == [2]
+    assert caught.value.context["phase"] == "response_byte_bound"
+    assert caught.value.context["read_limit"] == 2
     assert not client.artifact_payloads
     assert not client.request_rows
 
@@ -1784,6 +1877,27 @@ def test_storage_preflight_blocks_existing_root(monkeypatch: pytest.MonkeyPatch,
 
     assert not result["complete"]
     assert "new scratch root already exists" in result["errors"]
+
+
+@pytest.mark.parametrize("du_output", ["", "not-a-size\n"])
+def test_storage_preflight_blocks_unparseable_successful_du_output(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    du_output: str,
+) -> None:
+    root = str(tmp_path / "new-root")
+
+    def fake_run(command: list[str], *, timeout: int = 30) -> dict[str, object]:
+        del timeout
+        stdout = du_output if command[0] == "du" else root + "\n" if command[0] == "readlink" else "ok\n"
+        return {"command": command, "returncode": 0, "stdout": stdout, "stderr": "", "timed_out": False}
+
+    monkeypatch.setattr(metadata_executor_module, "_run_command", fake_run)
+    result = metadata_executor_module.storage_preflight(root)
+
+    assert result["home_usage_bytes"] is None
+    assert not result["complete"]
+    assert "HU home usage could not be parsed from successful du output" in result["errors"]
 
 
 def test_metadata_executor_writer_failure_precedes_source_requests(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

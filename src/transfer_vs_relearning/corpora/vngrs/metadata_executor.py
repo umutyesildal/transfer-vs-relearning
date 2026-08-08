@@ -180,12 +180,86 @@ class BoundedClient:
     def _headers(response: Any) -> dict[str, str]:
         return {str(key).lower(): str(value) for key, value in response.headers.items()}
 
-    @staticmethod
-    def _read_bounded(response: Any) -> bytes:
-        payload = response.read(METADATA_FOOTER_MAX_SINGLE_RESPONSE_BYTES + 1)
-        if len(payload) > METADATA_FOOTER_MAX_SINGLE_RESPONSE_BYTES:
-            raise ExecutionBlocked("single response exceeded the 4 MiB bound")
+    def _read_bounded(
+        self,
+        response: Any,
+        *,
+        headers: Mapping[str, str],
+        method: str,
+        url: str,
+    ) -> bytes:
+        """Read no more than the single-response and remaining cumulative budgets."""
+
+        if method.upper() == "HEAD":
+            return response.read(0)
+
+        remaining_total = METADATA_FOOTER_MAX_TOTAL_RESPONSE_BYTES - self.total_response_bytes
+        single_budget = min(METADATA_FOOTER_MAX_SINGLE_RESPONSE_BYTES, remaining_total)
+        declared_length = self._declared_response_length(headers)
+        if declared_length is not None:
+            if declared_length > METADATA_FOOTER_MAX_SINGLE_RESPONSE_BYTES:
+                raise ExecutionBlocked(
+                    "declared response length exceeded the 4 MiB bound",
+                    context=self.bound_context(
+                        phase="single_response_bound",
+                        method=method,
+                        url=url,
+                        declared_response_bytes=declared_length,
+                    ),
+                )
+            if declared_length > remaining_total:
+                raise ExecutionBlocked(
+                    "declared response length exceeded the remaining cumulative budget",
+                    context=self.bound_context(
+                        phase="response_byte_bound",
+                        method=method,
+                        url=url,
+                        declared_response_bytes=declared_length,
+                        remaining_response_bytes=remaining_total,
+                    ),
+                )
+            payload = response.read(declared_length)
+            if len(payload) != declared_length:
+                raise ExecutionBlocked(
+                    "response ended before its declared content length",
+                    context=self.bound_context(
+                        phase="response_length_integrity",
+                        method=method,
+                        url=url,
+                        declared_response_bytes=declared_length,
+                        received_response_bytes=len(payload),
+                    ),
+                )
+            return payload
+
+        # Unknown/chunked responses get only one byte beyond the smaller applicable budget.
+        # That byte detects overflow without consuming an entire single-response allowance.
+        payload = response.read(single_budget + 1)
+        if len(payload) > single_budget:
+            phase = "response_byte_bound" if remaining_total <= METADATA_FOOTER_MAX_SINGLE_RESPONSE_BYTES else "single_response_bound"
+            raise ExecutionBlocked(
+                "response exceeded the remaining cumulative 64 MiB budget"
+                if phase == "response_byte_bound"
+                else "response exceeded the 4 MiB single-response budget",
+                context=self.bound_context(
+                    phase=phase,
+                    method=method,
+                    url=url,
+                    remaining_response_bytes=remaining_total,
+                    read_limit=single_budget + 1,
+                    received_response_bytes=len(payload),
+                ),
+            )
         return payload
+
+    @staticmethod
+    def _declared_response_length(headers: Mapping[str, str]) -> int | None:
+        if headers.get("transfer-encoding", "").lower() == "chunked":
+            return None
+        raw = headers.get("content-length")
+        if raw is None or not re.fullmatch(r"[0-9]+", raw.strip()):
+            return None
+        return int(raw.strip())
 
     def _attempt(self, *, method: str, url: str, range_header: str | None) -> AttemptResult:
         self._check_attempt_bound()
@@ -197,7 +271,12 @@ class BoundedClient:
         try:
             with self.opener.open(request, timeout=REQUEST_TIMEOUT_SECONDS) as response:
                 response_headers = self._headers(response)
-                payload = self._read_bounded(response)
+                payload = self._read_bounded(
+                    response,
+                    headers=response_headers,
+                    method=method,
+                    url=url,
+                )
                 self._accept_response_bytes(len(payload))
                 return AttemptResult(
                     status=int(response.status),
@@ -213,14 +292,19 @@ class BoundedClient:
         except urllib.error.HTTPError as exc:
             response_headers = {str(key).lower(): str(value) for key, value in exc.headers.items()}
             try:
-                payload = exc.read(METADATA_FOOTER_MAX_SINGLE_RESPONSE_BYTES + 1)
-            except Exception:
-                payload = b""
-            if len(payload) > METADATA_FOOTER_MAX_SINGLE_RESPONSE_BYTES:
+                payload = self._read_bounded(
+                    exc,
+                    headers=response_headers,
+                    method=method,
+                    url=url,
+                )
+            except ExecutionBlocked:
+                raise
+            except Exception as exc:
                 raise ExecutionBlocked(
-                    "retry response exceeded the 4 MiB bound",
+                    "unable to read the bounded HTTPError response",
                     context=self.bound_context(
-                        phase="single_response_bound",
+                        phase="response_read_failure",
                         method=method,
                         url=url,
                         http_status=int(exc.code),
@@ -507,6 +591,9 @@ def storage_preflight(root: str = METADATA_FOOTER_SCRATCH_ROOT) -> dict[str, Any
         "resolved root does not equal frozen root" if resolved != root else None,
         "storage/preflight command timed out" if any(check.get("timed_out") for check in checks) else None,
         "storage command failed" if any(check["returncode"] != 0 for check in checks) else None,
+        "HU home usage could not be parsed from successful du output"
+        if checks[0]["returncode"] == 0 and home_bytes is None
+        else None,
         "HU home usage is at or above the 30 GiB stop rule"
         if home_bytes is not None and home_bytes >= 30 * 1024**3
         else None,
