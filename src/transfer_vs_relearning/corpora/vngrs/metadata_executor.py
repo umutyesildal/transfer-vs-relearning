@@ -935,6 +935,11 @@ def post_run_storage_audit(
     df_i = _run_command(["df", "-i", HOME_ROOT, *SCRATCH_ROOTS], timeout=COMMAND_TIMEOUT_SECONDS)
     resolved_root = _run_command(["readlink", "-f", root], timeout=COMMAND_TIMEOUT_SECONDS)
     exact_home_bytes = _parse_exact_du_bytes(exact_du)
+    try:
+        root_under_home = os.path.commonpath([os.path.abspath(root), HOME_ROOT]) == HOME_ROOT
+    except ValueError:
+        root_under_home = True
+    resolved_value = resolved_root.get("stdout", "").strip()
     errors = [
         "exact-byte home-usage audit timed out" if exact_du.get("timed_out") else None,
         "exact-byte home-usage audit failed" if exact_du.get("returncode") not in (0, None) else None,
@@ -943,6 +948,12 @@ def post_run_storage_audit(
         else None,
         "HU home usage is at or above the 30 GiB stop rule"
         if exact_home_bytes is not None and exact_home_bytes >= HOME_USAGE_LIMIT_BYTES
+        else None,
+        "HU home write prohibition violated"
+        if root_under_home
+        else None,
+        "resolved output root does not equal requested root"
+        if resolved_value and resolved_value != root
         else None,
         "storage audit command failed"
         if any(check["returncode"] != 0 for check in (df_h, df_i, resolved_root))
@@ -953,7 +964,49 @@ def post_run_storage_audit(
         else None,
     ]
     errors = [error for error in errors if error]
-    status = "PASS" if not errors else "INCOMPLETE"
+    # Post-run evidence has three intentionally different terminal states.  A timeout,
+    # parse failure, or missing reconciliation evidence means that the audit is incomplete;
+    # a definitive policy/command/reconciliation violation is blocked.  Do not collapse
+    # either case into a successful audit merely because the output root is small or absent.
+    incomplete = (
+        exact_du.get("timed_out")
+        or (
+            exact_du.get("returncode") == 0
+            and exact_home_bytes is None
+        )
+        or any(check.get("timed_out") for check in (df_h, df_i, resolved_root))
+        or large_file_audit.get("status") == "INCOMPLETE"
+        or reconciliation.get("status") == "INCOMPLETE"
+    )
+    definitive_failure = (
+        (
+            exact_du.get("returncode") not in (0, None)
+            and not exact_du.get("timed_out")
+        )
+        or (
+            exact_home_bytes is not None
+            and exact_home_bytes >= HOME_USAGE_LIMIT_BYTES
+        )
+        or any(
+            check.get("returncode") not in (0, None)
+            and not check.get("timed_out")
+            for check in (df_h, df_i, resolved_root)
+        )
+        or (
+            resolved_root.get("returncode") == 0
+            and resolved_value
+            and resolved_value != root
+        )
+        or root_under_home
+        or large_file_audit.get("status") == "BLOCKED"
+        or reconciliation.get("status") == "BLOCKED"
+    )
+    if definitive_failure:
+        status = "BLOCKED"
+    elif incomplete:
+        status = "INCOMPLETE"
+    else:
+        status = "PASS"
     return {
         "status": status,
         "errors": errors,
@@ -971,6 +1024,44 @@ def post_run_storage_audit(
         "large_home_file_reconciliation": reconciliation,
         "resolved_root": resolved_root,
     }
+
+
+def _post_run_audit_fail_closed(root: str, preflight: Mapping[str, Any]) -> dict[str, Any]:
+    """Return an explicit incomplete audit if the audit implementation itself fails."""
+
+    try:
+        return post_run_storage_audit(root, preflight=preflight)
+    except Exception as exc:  # preserve the failure as audit evidence, never as PASS
+        return {
+            "status": "INCOMPLETE",
+            "errors": ["post-run storage audit raised an exception"],
+            "root": root,
+            "audit_exception": repr(exc),
+        }
+
+
+def _bind_source_result_to_post_run_audit(
+    source_result: Mapping[str, Any],
+    audit: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Bind source-stage evidence to the mandatory post-run audit fail-closed."""
+
+    result = dict(source_result)
+    source_status = source_result.get("status")
+    audit_status = audit.get("status")
+    # Keep the unmodified source-stage payload so an audit failure cannot be mistaken for
+    # a source failure or erase evidence produced before the storage audit ran.
+    result["source_stage_result"] = dict(source_result)
+    result["source_stage_status"] = source_status
+    result["post_run_storage_audit"] = dict(audit)
+    if source_status == "PASS" and audit_status == "PASS":
+        result["status"] = "PASS"
+        return result
+    if source_status == "PASS":
+        result["status"] = "BLOCKED"
+        result["phase"] = "post_run_storage_audit"
+        result["reason"] = "post-run storage audit did not pass"
+    return result
 
 
 def _header_value(headers: Mapping[str, str], *names: str) -> str | None:
@@ -1318,7 +1409,7 @@ def execute_metadata_footer_wave(*, root: str = METADATA_FOOTER_SCRATCH_ROOT) ->
             writer_check=writer_check,
         )
     except ExecutionBlocked as exc:
-        audit = post_run_storage_audit(root, preflight=preflight)
+        audit = _post_run_audit_fail_closed(root, preflight)
         context = dict(exc.context)
         context.setdefault("phase", "execution")
         return {
@@ -1329,9 +1420,10 @@ def execute_metadata_footer_wave(*, root: str = METADATA_FOOTER_SCRATCH_ROOT) ->
             "preflight": preflight,
             "independent_writer": dict(writer_check),
             "post_run_storage_audit": audit,
+            "source_stage_status": "BLOCKED",
         }
     except Exception as exc:  # fail closed and leave the exception in the compact terminal report
-        audit = post_run_storage_audit(root, preflight=preflight)
+        audit = _post_run_audit_fail_closed(root, preflight)
         return {
             "status": "BLOCKED",
             "phase": "unexpected_executor_error",
@@ -1345,9 +1437,10 @@ def execute_metadata_footer_wave(*, root: str = METADATA_FOOTER_SCRATCH_ROOT) ->
             "preflight": preflight,
             "independent_writer": dict(writer_check),
             "post_run_storage_audit": audit,
+            "source_stage_status": "BLOCKED",
         }
-    result["post_run_storage_audit"] = post_run_storage_audit(root, preflight=preflight)
-    return result
+    audit = _post_run_audit_fail_closed(root, preflight)
+    return _bind_source_result_to_post_run_audit(result, audit)
 
 
 def main(argv: list[str] | None = None) -> int:

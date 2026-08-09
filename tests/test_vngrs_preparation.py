@@ -2156,6 +2156,136 @@ def test_storage_preflight_blocks_before_any_source_request(monkeypatch: pytest.
     assert result["source_requests_started"] == 0
 
 
+@pytest.mark.parametrize(
+    ("audit_status", "expected_status"),
+    [("PASS", "PASS"), ("INCOMPLETE", "BLOCKED"), ("BLOCKED", "BLOCKED")],
+)
+def test_source_pass_is_bound_to_post_run_audit_fail_closed(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    audit_status: str,
+    expected_status: str,
+) -> None:
+    root = str(tmp_path / "new-root")
+    source_result = {
+        "status": "PASS",
+        "phase": "completed",
+        "source_requests_started": 97,
+        "source_evidence": {"sha256": "a" * 64},
+    }
+    audit = {
+        "status": audit_status,
+        "errors": [] if audit_status == "PASS" else ["synthetic audit result"],
+        "root": root,
+    }
+    monkeypatch.setattr(metadata_executor_module, "storage_preflight", lambda root: {"root": root, "complete": True})
+    monkeypatch.setattr(metadata_executor_module, "independent_writer_self_check", lambda: {"status": "PASS"})
+    monkeypatch.setattr(metadata_executor_module, "_execute_metadata_footer_wave_uncaught", lambda **kwargs: source_result)
+    monkeypatch.setattr(metadata_executor_module, "post_run_storage_audit", lambda root, **kwargs: audit)
+
+    result = metadata_executor_module.execute_metadata_footer_wave(root=root)
+
+    assert result["status"] == expected_status
+    assert result["source_stage_status"] == "PASS"
+    assert result["post_run_storage_audit"] == audit
+    if audit_status == "PASS":
+        assert result["phase"] == "completed"
+    else:
+        assert result["phase"] == "post_run_storage_audit"
+
+
+def test_source_evidence_is_preserved_when_post_run_audit_blocks(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    root = str(tmp_path / "new-root")
+    source_result = {
+        "status": "PASS",
+        "phase": "completed",
+        "source_requests_started": 3,
+        "artifact_manifest_sha256": "b" * 64,
+    }
+    audit = {"status": "BLOCKED", "errors": ["large home file changed"], "root": root}
+    monkeypatch.setattr(metadata_executor_module, "storage_preflight", lambda root: {"root": root, "complete": True})
+    monkeypatch.setattr(metadata_executor_module, "independent_writer_self_check", lambda: {"status": "PASS"})
+    monkeypatch.setattr(metadata_executor_module, "_execute_metadata_footer_wave_uncaught", lambda **kwargs: source_result)
+    monkeypatch.setattr(metadata_executor_module, "post_run_storage_audit", lambda root, **kwargs: audit)
+
+    result = metadata_executor_module.execute_metadata_footer_wave(root=root)
+
+    assert result["status"] == "BLOCKED"
+    assert result["phase"] == "post_run_storage_audit"
+    assert result["source_stage_status"] == "PASS"
+    assert result["source_stage_result"] == source_result
+    assert result["artifact_manifest_sha256"] == source_result["artifact_manifest_sha256"]
+    assert result["post_run_storage_audit"] == audit
+
+
+def test_post_run_audit_blocks_new_large_home_file(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    root = str(tmp_path / "new-root")
+    large_path = f"{metadata_executor_module.HOME_ROOT}/new-large-file.bin"
+    preflight = {
+        "checks": {
+            "large_home_files": {
+                "status": "PASS",
+                "manifest": [],
+                "manifest_sha256": hashlib.sha256(b"[]").hexdigest(),
+            }
+        }
+    }
+
+    def fake_run(command: list[str], *, timeout: int = 30) -> dict[str, object]:
+        large = {
+            "returncode": 0,
+            "stdout": f"{metadata_executor_module.LARGE_HOME_FILE_LIMIT_BYTES + 1} {large_path}\n",
+            "stderr": "",
+            "timed_out": False,
+        }
+        return _fake_storage_command(command, root, large=large, timeout=timeout)
+
+    monkeypatch.setattr(metadata_executor_module, "_run_command", fake_run)
+    result = metadata_executor_module.post_run_storage_audit(root, preflight=preflight)
+
+    assert result["status"] == "BLOCKED"
+    assert result["large_home_files"]["status"] == "PASS"
+    assert result["large_home_file_reconciliation"]["status"] == "BLOCKED"
+    assert result["large_home_file_reconciliation"]["added"] == [large_path]
+
+
+@pytest.mark.parametrize(
+    "large_result",
+    [
+        {"timed_out": True, "returncode": None, "stdout": "", "stderr": ""},
+        {"returncode": 0, "stdout": "not-a-manifest\n", "stderr": "", "timed_out": False},
+    ],
+)
+def test_post_run_audit_records_large_file_evidence_as_incomplete(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, large_result: dict[str, object]
+) -> None:
+    root = str(tmp_path / "new-root")
+    preflight = {
+        "checks": {
+            "large_home_files": {
+                "status": "PASS",
+                "manifest": [],
+                "manifest_sha256": hashlib.sha256(b"[]").hexdigest(),
+            }
+        }
+    }
+
+    def fake_run(command: list[str], *, timeout: int = 30) -> dict[str, object]:
+        if command[0] == "find":
+            return {"command": command, **large_result}
+        return _fake_storage_command(command, root, timeout=timeout)
+
+    monkeypatch.setattr(metadata_executor_module, "_run_command", fake_run)
+    result = metadata_executor_module.post_run_storage_audit(root, preflight=preflight)
+
+    assert result["status"] == "INCOMPLETE"
+    assert result["large_home_files"]["status"] == "INCOMPLETE"
+
+
 def test_storage_preflight_blocks_existing_root(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     root_path = tmp_path / "existing-root"
     root_path.mkdir()
