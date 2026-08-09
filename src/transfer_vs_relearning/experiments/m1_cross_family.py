@@ -13,6 +13,7 @@ from transfer_vs_relearning.utils.io import sha256_file
 
 APPROVED_SCRATCH_PREFIXES = ("/vol/tmp/yesildau/", "/vol/tmp2/yesildau/")
 EXPECTED_LABELS = ("qwen", "stablelm", "gemma", "llama")
+PROVENANCE_SCREEN_LABELS = ("olmo", "pythia", "falcon")
 
 
 def approved_scratch(path: Path) -> Path:
@@ -31,30 +32,37 @@ def load_registry(path: Path) -> dict[str, Any]:
 
 
 def validate_registry(payload: dict[str, Any]) -> None:
-    if payload.get("version") != "m1_cross_family_screen_v1":
+    version = payload.get("version")
+    if version not in {"m1_cross_family_screen_v1", "m1_provenance_screen_v1"}:
         raise ValueError("Unexpected cross-family registry version")
     approved_scratch(Path(str(payload["scratch_root"])))
     approved_scratch(Path(str(payload["dataset_root"])))
     candidates = payload.get("candidates")
-    if not isinstance(candidates, list) or len(candidates) != 4:
-        raise ValueError("Registry requires exactly four candidate entries")
+    expected_labels = EXPECTED_LABELS if version == "m1_cross_family_screen_v1" else PROVENANCE_SCREEN_LABELS
+    expected_count = len(expected_labels)
+    if not isinstance(candidates, list) or len(candidates) != expected_count:
+        raise ValueError(f"Registry requires exactly {expected_count} candidate entries")
     labels = tuple(str(candidate["label"]) for candidate in candidates)
     indices = tuple(int(candidate["index"]) for candidate in candidates)
-    if labels != EXPECTED_LABELS or indices != tuple(range(4)):
-        raise ValueError(f"Candidate order must be {EXPECTED_LABELS} at indices 0..3")
+    if labels != expected_labels or indices != tuple(range(expected_count)):
+        raise ValueError(f"Candidate order must be {expected_labels} at indices 0..{expected_count - 1}")
     if any(not candidate.get("model_id") or not candidate.get("requested_revision") for candidate in candidates):
         raise ValueError("Every candidate needs a model ID and requested revision")
-    if not all(bool(candidate.get("required")) for candidate in candidates[:3]):
-        raise ValueError("Qwen, StableLM, and Gemma must remain required")
-    if bool(candidates[3].get("required")):
-        raise ValueError("Llama must remain conditional")
+    if version == "m1_cross_family_screen_v1":
+        if not all(bool(candidate.get("required")) for candidate in candidates[:3]):
+            raise ValueError("Qwen, StableLM, and Gemma must remain required")
+        if bool(candidates[3].get("required")):
+            raise ValueError("Llama must remain conditional")
+    elif not all(bool(candidate.get("required")) for candidate in candidates):
+        raise ValueError("All bounded provenance-screen candidates must be required")
     for candidate in candidates:
         overrides = candidate.get("training_overrides", {})
         if not isinstance(overrides, dict) or set(overrides) - {"model_load_dtype"}:
             raise ValueError(f"Unsupported training overrides for {candidate['label']}: {overrides}")
-    stable_overrides = candidates[1].get("training_overrides", {})
-    if stable_overrides not in ({}, {"model_load_dtype": "bfloat16"}):
-        raise ValueError("StableLM remediation may only load the model explicitly as bfloat16")
+    if version == "m1_cross_family_screen_v1":
+        stable_overrides = candidates[1].get("training_overrides", {})
+        if stable_overrides not in ({}, {"model_load_dtype": "bfloat16"}):
+            raise ValueError("StableLM remediation may only load the model explicitly as bfloat16")
     if int(payload.get("expected_train_rows", 0)) != 3500:
         raise ValueError("Cross-family training budget must remain 3,500 rows")
     if int(payload.get("expected_validation_rows", 0)) != 500:
@@ -126,7 +134,8 @@ def materialize_training_config(
     )
     payload["model"]["base_model_manifest"] = str(model_manifest)
     payload["training"].update(candidate.get("training_overrides", {}))
-    payload["training"]["run_name"] = f"m1_cross_family_{candidate['label']}_seed42"
+    run_prefix = "m1_provenance_screen" if registry["version"] == "m1_provenance_screen_v1" else "m1_cross_family"
+    payload["training"]["run_name"] = f"{run_prefix}_{candidate['label']}_seed42"
     payload["training"]["output_root"] = str(candidate_training_root(registry, candidate))
     steps = estimate_optimizer_steps(
         int(registry["expected_train_rows"]),
@@ -136,7 +145,9 @@ def materialize_training_config(
         int(payload["runtime"]["world_size"]),
     )
     if steps != int(registry["expected_optimizer_updates"]):
-        raise ValueError(f"Materialized config has {steps} updates instead of 252")
+        raise ValueError(
+            f"Materialized config has {steps} updates instead of {registry['expected_optimizer_updates']}"
+        )
     if payload["training"]["loss_mode"] != "answer_only" or bool(payload["training"]["supervise_eos"]):
         raise ValueError("Cross-family loss contract must remain answer-only and EOS-false")
     if scratch_root not in candidate_training_root(registry, candidate).parents:

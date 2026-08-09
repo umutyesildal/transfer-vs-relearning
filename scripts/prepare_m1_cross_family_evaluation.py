@@ -53,6 +53,7 @@ def main() -> None:
     registry = load_registry(registry_path)
     candidate = candidate_by_index(registry, args.candidate_index)
     label = str(candidate["label"])
+    run_prefix = "m1_provenance_screen" if registry["version"] == "m1_provenance_screen_v1" else "m1_cross_family"
     scratch_root = approved_scratch(Path(str(registry["scratch_root"])))
     output_root = approved_scratch(scratch_root / "evaluations" / label)
     if output_root.exists():
@@ -71,8 +72,8 @@ def main() -> None:
         source_manifest_path=base_manifest,
         local_model_dir=final_model,
         output_manifest_path=trained_manifest,
-        model_id=f"m1_cross_family_{label}_seed42",
-        resolved_revision=f"m1-cross-family-{label}-seed42-update252",
+        model_id=f"{run_prefix}_{label}_seed42",
+        resolved_revision=f"{run_prefix}-{label}-seed42-update252",
         training_checkpoint="final_model_update252",
         training_run_dir=final_model.parent,
     )
@@ -94,14 +95,14 @@ def main() -> None:
         "output": {"run_root": str(output_root / "exact_prefix")},
     })
     write_json(general_base_config, _general_config(
-        run_name=f"m1_cross_family_{label}_base_general_capability",
+        run_name=f"{run_prefix}_{label}_base_general_capability",
         output_root=output_root / "general_capability/base",
         model_manifest=base_manifest,
         corpus=corpus,
         repo_root=repo_root,
     ))
     write_json(general_trained_config, _general_config(
-        run_name=f"m1_cross_family_{label}_trained_general_capability",
+        run_name=f"{run_prefix}_{label}_trained_general_capability",
         output_root=output_root / "general_capability/trained",
         model_manifest=trained_manifest,
         corpus=corpus,

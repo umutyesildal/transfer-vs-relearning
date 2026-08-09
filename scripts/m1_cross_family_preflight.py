@@ -25,7 +25,10 @@ from transfer_vs_relearning.utils.io import sha256_file, write_json
 
 
 HOME_ROOT = Path("/vol/fob-vol6/mi25/yesildau")
-HOME_LIMIT_KIB = 10 * 1024 * 1024
+# Current project authority permits HU home usage below 30 GiB. The former
+# 10 GiB value belonged to an older operational state and is not applicable
+# to the bounded provenance screen.
+HOME_LIMIT_KIB = 30 * 1024 * 1024
 GIB = 1024**3
 
 
@@ -102,7 +105,7 @@ def run_preflight(args: argparse.Namespace) -> dict[str, Any]:
     checks: dict[str, Any] = {}
     started_at = _now()
     payload: dict[str, Any] = {
-        "version": "m1_cross_family_screen_v1_preflight",
+        "version": f"{registry['version']}_preflight",
         "stage": args.stage,
         "started_at": started_at.isoformat(),
         "status": "RUNNING",
@@ -181,7 +184,7 @@ def run_preflight(args: argparse.Namespace) -> dict[str, Any]:
             checks,
             resolved_paths,
         )
-        target_job_name = {"acquisition": "m1-xfam-acquire", "training": "m1-xfam-train", "evaluation": "m1-xfam-eval"}[args.stage]
+        target_job_name = args.target_job_name or {"acquisition": "m1-xfam-acquire", "training": "m1-xfam-train", "evaluation": "m1-xfam-eval"}[args.stage]
         queued = _run("squeue", "-u", args.user, "-h", "-o", "%i|%j|%E").splitlines()
         selected_for_overlap = set(indices) if args.allow_completed_subset_evaluation else None
         duplicates = _unexpected_target_jobs(
@@ -252,6 +255,7 @@ def main() -> None:
     parser.add_argument("--user", default="yesildau")
     parser.add_argument("--estimated-inodes", type=int, default=250000)
     parser.add_argument("--max-age-minutes", type=int, default=30)
+    parser.add_argument("--target-job-name", default=None)
     args = parser.parse_args()
     if args.verify_manifest:
         print(json.dumps(verify_preflight(args), indent=2, sort_keys=True))
