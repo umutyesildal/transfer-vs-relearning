@@ -697,6 +697,10 @@ def independent_writer_self_check() -> dict[str, Any]:
 
 
 COMMAND_TIMEOUT_SECONDS = 30
+EXACT_BYTE_DU_TIMEOUT_SECONDS = 120
+LARGE_HOME_FILE_AUDIT_TIMEOUT_SECONDS = 120
+HOME_USAGE_LIMIT_BYTES = 30 * 1024**3
+LARGE_HOME_FILE_LIMIT_BYTES = 500 * 1024**2
 
 
 def _run_command(command: list[str], *, timeout: int = COMMAND_TIMEOUT_SECONDS) -> dict[str, Any]:
@@ -742,43 +746,177 @@ def _du_bytes(du_result: Mapping[str, Any]) -> int | None:
     return _parse_human_size(first_line[0].split()[0])
 
 
+def _parse_exact_du_bytes(du_result: Mapping[str, Any]) -> int | None:
+    """Parse exactly one GNU byte-form ``du`` result, never a stale human-size value."""
+
+    if du_result.get("returncode") != 0 or du_result.get("timed_out"):
+        return None
+    lines = [line.strip() for line in str(du_result.get("stdout", "")).splitlines() if line.strip()]
+    if len(lines) != 1:
+        return None
+    fields = lines[0].split(maxsplit=1)
+    if len(fields) != 2 or not re.fullmatch(r"[0-9]+", fields[0]) or fields[1] != HOME_ROOT:
+        return None
+    return int(fields[0])
+
+
+def _parse_large_home_file_manifest(result: Mapping[str, Any]) -> list[dict[str, Any]] | None:
+    """Parse the bounded regular-file inventory into deterministic path/byte rows."""
+
+    if result.get("returncode") != 0 or result.get("timed_out"):
+        return None
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for line in str(result.get("stdout", "")).splitlines():
+        if not line:
+            continue
+        fields = line.split(" ", maxsplit=1)
+        if len(fields) != 2 or not re.fullmatch(r"[0-9]+", fields[0]):
+            return None
+        path = fields[1]
+        try:
+            under_home = os.path.commonpath([os.path.abspath(path), HOME_ROOT]) == HOME_ROOT
+        except ValueError:
+            under_home = False
+        if not under_home or path in seen:
+            return None
+        size = int(fields[0])
+        if size <= LARGE_HOME_FILE_LIMIT_BYTES:
+            return None
+        seen.add(path)
+        rows.append({"path": path, "bytes": size})
+    return sorted(rows, key=lambda row: (row["path"], row["bytes"]))
+
+
+def _large_home_file_audit() -> dict[str, Any]:
+    """Run and parse the bounded >500 MiB HU-home regular-file manifest."""
+
+    command_result = _run_command(
+        ["find", HOME_ROOT, "-xdev", "-type", "f", "-size", "+500M", "-printf", "%s %p\\n"],
+        timeout=LARGE_HOME_FILE_AUDIT_TIMEOUT_SECONDS,
+    )
+    manifest = _parse_large_home_file_manifest(command_result)
+    if command_result.get("timed_out"):
+        status = "INCOMPLETE"
+        reason = "large_home_file_audit_timeout"
+    elif command_result.get("returncode") != 0:
+        status = "BLOCKED"
+        reason = "large_home_file_audit_command_failed"
+    elif manifest is None:
+        status = "INCOMPLETE"
+        reason = "large_home_file_audit_parse_failure"
+    else:
+        status = "PASS"
+        reason = None
+    result: dict[str, Any] = {
+        "status": status,
+        "reason": reason,
+        "threshold_bytes": LARGE_HOME_FILE_LIMIT_BYTES,
+        "command_result": dict(command_result),
+    }
+    if manifest is not None:
+        manifest_payload = canonical_json_bytes(manifest)
+        result.update(
+            {
+                "manifest": manifest,
+                "file_count": len(manifest),
+                "manifest_sha256": hashlib.sha256(manifest_payload).hexdigest(),
+            }
+        )
+    return result
+
+
+def _reconcile_large_home_file_manifests(
+    before: Mapping[str, Any] | None,
+    after: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Compare pre/post large-file manifests without treating missing evidence as clean."""
+
+    if before is None:
+        return {"status": "INCOMPLETE", "reason": "pre_manifest_not_available"}
+    if before.get("status") != "PASS" or after.get("status") != "PASS":
+        return {"status": "INCOMPLETE", "reason": "pre_or_post_manifest_incomplete"}
+    before_rows = {row["path"]: row["bytes"] for row in before.get("manifest", [])}
+    after_rows = {row["path"]: row["bytes"] for row in after.get("manifest", [])}
+    added = sorted(path for path in after_rows if path not in before_rows)
+    removed = sorted(path for path in before_rows if path not in after_rows)
+    changed = sorted(path for path in after_rows if path in before_rows and after_rows[path] != before_rows[path])
+    status = "PASS" if not added and not removed and not changed else "BLOCKED"
+    return {
+        "status": status,
+        "added": added,
+        "removed": removed,
+        "changed": changed,
+        "before_manifest_sha256": before.get("manifest_sha256"),
+        "after_manifest_sha256": after.get("manifest_sha256"),
+    }
+
+
 def storage_preflight(root: str = METADATA_FOOTER_SCRATCH_ROOT) -> dict[str, Any]:
     """Run the mandatory local/HU storage, inode and resolved-path preflight."""
 
-    checks = [
-        _run_command(["du", "-xsh", HOME_ROOT]),
-        _run_command(["df", "-h", HOME_ROOT, *SCRATCH_ROOTS]),
-        _run_command(["df", "-i", HOME_ROOT, *SCRATCH_ROOTS]),
-        _run_command(["readlink", "-f", root]),
-    ]
+    human_du = _run_command(["du", "-xsh", HOME_ROOT], timeout=COMMAND_TIMEOUT_SECONDS)
+    exact_du = _run_command(["du", "-x", "-B1", "-s", HOME_ROOT], timeout=EXACT_BYTE_DU_TIMEOUT_SECONDS)
+    df_h = _run_command(["df", "-h", HOME_ROOT, *SCRATCH_ROOTS], timeout=COMMAND_TIMEOUT_SECONDS)
+    df_i = _run_command(["df", "-i", HOME_ROOT, *SCRATCH_ROOTS], timeout=COMMAND_TIMEOUT_SECONDS)
+    resolved_root_check = _run_command(["readlink", "-f", root], timeout=COMMAND_TIMEOUT_SECONDS)
+    large_file_audit = _large_home_file_audit()
+    checks = {
+        "human_du": human_du,
+        "exact_byte_du": exact_du,
+        "df_h": df_h,
+        "df_i": df_i,
+        "resolved_root": resolved_root_check,
+        "large_home_files": large_file_audit,
+    }
     root_exists = os.path.lexists(root)
-    resolved = checks[-1]["stdout"].strip()
-    home_bytes = _du_bytes(checks[0])
+    resolved = resolved_root_check["stdout"].strip()
+    home_bytes = _parse_exact_du_bytes(exact_du)
+    root_under_home = os.path.commonpath([os.path.abspath(root), HOME_ROOT]) == HOME_ROOT
+    exact_du_failed = exact_du.get("timed_out") or exact_du.get("returncode") != 0
     errors = [
         "new scratch root already exists" if root_exists else None,
         "resolved root does not equal frozen root" if resolved != root else None,
-        "storage/preflight command timed out" if any(check.get("timed_out") for check in checks) else None,
-        "storage command failed" if any(check["returncode"] != 0 for check in checks) else None,
-        "HU home usage could not be parsed from successful du output"
-        if checks[0]["returncode"] == 0 and home_bytes is None
+        "HU home write prohibition violated" if root_under_home else None,
+        "storage/preflight command timed out"
+        if any(check.get("timed_out") for name, check in checks.items() if name not in {"human_du", "large_home_files"})
         else None,
+        "exact-byte home-usage du timed out" if exact_du.get("timed_out") else None,
+        "exact-byte home-usage du failed" if exact_du.get("returncode") not in (0, None) else None,
+        "exact-byte home-usage du output could not be parsed" if not exact_du_failed and home_bytes is None else None,
         "HU home usage is at or above the 30 GiB stop rule"
-        if home_bytes is not None and home_bytes >= 30 * 1024**3
+        if home_bytes is not None and home_bytes >= HOME_USAGE_LIMIT_BYTES
         else None,
+        "storage command failed"
+        if any(check["returncode"] != 0 for name, check in checks.items() if name not in {"human_du", "large_home_files"})
+        else None,
+        "large-home file audit is incomplete or blocked" if large_file_audit["status"] != "PASS" else None,
     ]
     return {
         "root": root,
         "root_exists_before_wave": root_exists,
         "resolved_root": resolved,
         "home_usage_bytes": home_bytes,
-        "home_usage_stop_threshold_bytes": 30 * 1024**3,
+        "home_usage_source": "du -x -B1 -s",
+        "home_usage_stop_threshold_bytes": HOME_USAGE_LIMIT_BYTES,
+        "home_write_prohibition": {
+            "home_root": HOME_ROOT,
+            "write_allowed": False,
+            "root_under_home": root_under_home,
+        },
+        "human_du_timeout_seconds": COMMAND_TIMEOUT_SECONDS,
+        "exact_byte_du_timeout_seconds": EXACT_BYTE_DU_TIMEOUT_SECONDS,
         "checks": checks,
         "errors": [error for error in errors if error],
         "complete": not any(errors),
     }
 
 
-def post_run_storage_audit(root: str = METADATA_FOOTER_SCRATCH_ROOT) -> dict[str, Any]:
+def post_run_storage_audit(
+    root: str = METADATA_FOOTER_SCRATCH_ROOT,
+    *,
+    preflight: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     """Run the mandatory post-run storage audit without deleting or migrating anything."""
 
     inventory: list[dict[str, Any]] = []
@@ -786,18 +924,52 @@ def post_run_storage_audit(root: str = METADATA_FOOTER_SCRATCH_ROOT) -> dict[str
         for path in sorted(Path(root).rglob("*")):
             if path.is_file():
                 inventory.append({"path": str(path), "bytes": path.stat().st_size})
+    exact_du = _run_command(["du", "-x", "-B1", "-s", HOME_ROOT], timeout=EXACT_BYTE_DU_TIMEOUT_SECONDS)
+    human_du = _run_command(["du", "-xsh", HOME_ROOT], timeout=COMMAND_TIMEOUT_SECONDS)
+    large_file_audit = _large_home_file_audit()
+    reconciliation = _reconcile_large_home_file_manifests(
+        (preflight or {}).get("checks", {}).get("large_home_files") if preflight else None,
+        large_file_audit,
+    )
+    df_h = _run_command(["df", "-h", HOME_ROOT, *SCRATCH_ROOTS], timeout=COMMAND_TIMEOUT_SECONDS)
+    df_i = _run_command(["df", "-i", HOME_ROOT, *SCRATCH_ROOTS], timeout=COMMAND_TIMEOUT_SECONDS)
+    resolved_root = _run_command(["readlink", "-f", root], timeout=COMMAND_TIMEOUT_SECONDS)
+    exact_home_bytes = _parse_exact_du_bytes(exact_du)
+    errors = [
+        "exact-byte home-usage audit timed out" if exact_du.get("timed_out") else None,
+        "exact-byte home-usage audit failed" if exact_du.get("returncode") not in (0, None) else None,
+        "exact-byte home-usage audit output could not be parsed"
+        if not exact_du.get("timed_out") and exact_du.get("returncode") == 0 and exact_home_bytes is None
+        else None,
+        "HU home usage is at or above the 30 GiB stop rule"
+        if exact_home_bytes is not None and exact_home_bytes >= HOME_USAGE_LIMIT_BYTES
+        else None,
+        "storage audit command failed"
+        if any(check["returncode"] != 0 for check in (df_h, df_i, resolved_root))
+        else None,
+        "large-home file audit is incomplete or blocked" if large_file_audit["status"] != "PASS" else None,
+        "large-home pre/post manifest reconciliation is incomplete or blocked"
+        if reconciliation["status"] != "PASS"
+        else None,
+    ]
+    errors = [error for error in errors if error]
+    status = "PASS" if not errors else "INCOMPLETE"
     return {
+        "status": status,
+        "errors": errors,
         "root": root,
         "files": inventory,
         "file_count": len(inventory),
         "total_bytes": sum(item["bytes"] for item in inventory),
-        "du": _run_command(["du", "-xsh", HOME_ROOT]),
-        "df_h": _run_command(["df", "-h", HOME_ROOT, *SCRATCH_ROOTS]),
-        "df_i": _run_command(["df", "-i", HOME_ROOT, *SCRATCH_ROOTS]),
-        "large_home_files": _run_command(
-            ["find", HOME_ROOT, "-xdev", "-type", "f", "-size", "+500M", "-printf", "%s %p\\n"]
-        ),
-        "resolved_root": _run_command(["readlink", "-f", root]),
+        "home_usage_bytes": exact_home_bytes,
+        "home_usage_source": "du -x -B1 -s",
+        "du": human_du,
+        "exact_byte_du": exact_du,
+        "df_h": df_h,
+        "df_i": df_i,
+        "large_home_files": large_file_audit,
+        "large_home_file_reconciliation": reconciliation,
+        "resolved_root": resolved_root,
     }
 
 
@@ -1146,7 +1318,7 @@ def execute_metadata_footer_wave(*, root: str = METADATA_FOOTER_SCRATCH_ROOT) ->
             writer_check=writer_check,
         )
     except ExecutionBlocked as exc:
-        audit = post_run_storage_audit(root)
+        audit = post_run_storage_audit(root, preflight=preflight)
         context = dict(exc.context)
         context.setdefault("phase", "execution")
         return {
@@ -1159,7 +1331,7 @@ def execute_metadata_footer_wave(*, root: str = METADATA_FOOTER_SCRATCH_ROOT) ->
             "post_run_storage_audit": audit,
         }
     except Exception as exc:  # fail closed and leave the exception in the compact terminal report
-        audit = post_run_storage_audit(root)
+        audit = post_run_storage_audit(root, preflight=preflight)
         return {
             "status": "BLOCKED",
             "phase": "unexpected_executor_error",
@@ -1174,7 +1346,7 @@ def execute_metadata_footer_wave(*, root: str = METADATA_FOOTER_SCRATCH_ROOT) ->
             "independent_writer": dict(writer_check),
             "post_run_storage_audit": audit,
         }
-    result["post_run_storage_audit"] = post_run_storage_audit(root)
+    result["post_run_storage_audit"] = post_run_storage_audit(root, preflight=preflight)
     return result
 
 

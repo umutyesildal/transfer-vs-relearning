@@ -1983,23 +1983,177 @@ def test_metadata_executor_preserves_http_error_status_when_response_read_fails(
     assert caught.value.context["response_read_exception"] == "RuntimeError"
 
 
-def test_storage_preflight_blocks_timeout_and_home_limit(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def _fake_storage_command(
+    command: list[str],
+    root: str,
+    *,
+    human: dict[str, object] | None = None,
+    exact: dict[str, object] | None = None,
+    df_h: dict[str, object] | None = None,
+    df_i: dict[str, object] | None = None,
+    resolved: str | None = None,
+    large: dict[str, object] | None = None,
+    timeout: int = 30,
+) -> dict[str, object]:
+    del timeout
+    base = {"command": command, "returncode": 0, "stdout": "ok\n", "stderr": "", "timed_out": False}
+    if command[0] == "du" and command[1] == "-xsh":
+        return {**base, **(human or {"stdout": "14G\t/vol/fob-vol6/mi25/yesildau\n"})}
+    if command[0] == "du" and command[1:4] == ["-x", "-B1", "-s"]:
+        return {**base, **(exact or {"stdout": "14687617024\t/vol/fob-vol6/mi25/yesildau\n"})}
+    if command[0] == "df" and command[1] == "-h":
+        return {**base, **(df_h or {})}
+    if command[0] == "df" and command[1] == "-i":
+        return {**base, **(df_i or {})}
+    if command[0] == "readlink":
+        return {**base, "stdout": (resolved if resolved is not None else root) + "\n"}
+    if command[0] == "find":
+        return {**base, **(large or {"stdout": ""})}
+    return base
+
+
+def test_storage_preflight_allows_human_du_timeout_when_exact_byte_passes_below_limit(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    root = str(tmp_path / "new-root")
+    calls: list[tuple[list[str], int]] = []
+
+    def fake_run(command: list[str], *, timeout: int = 30) -> dict[str, object]:
+        calls.append((command, timeout))
+        human = {"timed_out": True, "stdout": "", "stderr": "", "returncode": None}
+        exact = {"stdout": "14687617024\t/vol/fob-vol6/mi25/yesildau\n"}
+        return _fake_storage_command(command, root, human=human, exact=exact, timeout=timeout)
+
+    monkeypatch.setattr(metadata_executor_module, "_run_command", fake_run)
+    result = metadata_executor_module.storage_preflight(root)
+
+    assert result["complete"]
+    assert result["home_usage_bytes"] == 14687617024
+    assert result["checks"]["human_du"]["timed_out"]
+    assert (result["checks"]["exact_byte_du"]["command"][1:4]) == ["-x", "-B1", "-s"]
+    assert any(command[1] == "-xsh" and timeout == 30 for command, timeout in calls)
+    assert any(command[1:4] == ["-x", "-B1", "-s"] and timeout == 120 for command, timeout in calls)
+
+
+def test_storage_preflight_blocks_exact_byte_du_timeout(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     root = str(tmp_path / "new-root")
 
     def fake_run(command: list[str], *, timeout: int = 30) -> dict[str, object]:
-        del timeout
-        if command[0] == "du":
-            return {"command": command, "returncode": 0, "stdout": "30G\t/vol/fob-vol6/mi25/yesildau\n", "stderr": "", "timed_out": False}
-        if command[0] == "readlink":
-            return {"command": command, "returncode": 0, "stdout": root + "\n", "stderr": "", "timed_out": True}
-        return {"command": command, "returncode": 0, "stdout": "ok\n", "stderr": "", "timed_out": False}
+        exact = {"timed_out": True, "returncode": None, "stdout": "", "stderr": ""}
+        return _fake_storage_command(command, root, exact=exact, timeout=timeout)
 
     monkeypatch.setattr(metadata_executor_module, "_run_command", fake_run)
     result = metadata_executor_module.storage_preflight(root)
 
     assert not result["complete"]
-    assert "storage/preflight command timed out" in result["errors"]
+    assert result["home_usage_bytes"] is None
+    assert "exact-byte home-usage du timed out" in result["errors"]
+
+
+def test_storage_preflight_blocks_exact_byte_du_parse_failure(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    root = str(tmp_path / "new-root")
+
+    def fake_run(command: list[str], *, timeout: int = 30) -> dict[str, object]:
+        exact = {"stdout": "not-an-exact-byte-value\n"}
+        return _fake_storage_command(command, root, exact=exact, timeout=timeout)
+
+    monkeypatch.setattr(metadata_executor_module, "_run_command", fake_run)
+    result = metadata_executor_module.storage_preflight(root)
+
+    assert not result["complete"]
+    assert result["home_usage_bytes"] is None
+    assert "exact-byte home-usage du output could not be parsed" in result["errors"]
+
+
+def test_storage_preflight_blocks_exact_byte_du_at_home_limit(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    root = str(tmp_path / "new-root")
+
+    def fake_run(command: list[str], *, timeout: int = 30) -> dict[str, object]:
+        exact = {"stdout": f"{30 * 1024**3}\t/vol/fob-vol6/mi25/yesildau\n"}
+        return _fake_storage_command(command, root, exact=exact, timeout=timeout)
+
+    monkeypatch.setattr(metadata_executor_module, "_run_command", fake_run)
+    result = metadata_executor_module.storage_preflight(root)
+
+    assert not result["complete"]
+    assert result["home_usage_bytes"] == 30 * 1024**3
     assert "HU home usage is at or above the 30 GiB stop rule" in result["errors"]
+
+
+@pytest.mark.parametrize(
+    "failure_kwargs, expected_error",
+    [
+        ({"df_h": {"returncode": 1}}, "storage command failed"),
+        ({"df_i": {"returncode": 1}}, "storage command failed"),
+        ({"resolved": "/vol/tmp2/yesildau/another-root"}, "resolved root does not equal frozen root"),
+    ],
+)
+def test_storage_preflight_blocks_capacity_inode_or_path_failure(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    failure_kwargs: dict[str, object],
+    expected_error: str,
+) -> None:
+    root = str(tmp_path / "new-root")
+
+    def fake_run(command: list[str], *, timeout: int = 30) -> dict[str, object]:
+        return _fake_storage_command(command, root, timeout=timeout, **failure_kwargs)
+
+    monkeypatch.setattr(metadata_executor_module, "_run_command", fake_run)
+    result = metadata_executor_module.storage_preflight(root)
+
+    assert not result["complete"]
+    assert expected_error in result["errors"]
+
+
+@pytest.mark.parametrize(
+    "large_result, expected_status",
+    [
+        ({"timed_out": True, "returncode": None, "stdout": "", "stderr": ""}, "INCOMPLETE"),
+        ({"returncode": 1, "stdout": "", "stderr": "permission denied\n"}, "BLOCKED"),
+        ({"returncode": 0, "stdout": "not-a-manifest\n"}, "INCOMPLETE"),
+    ],
+)
+def test_large_home_file_audit_fails_closed_on_timeout_failure_or_parse(
+    monkeypatch: pytest.MonkeyPatch,
+    large_result: dict[str, object],
+    expected_status: str,
+) -> None:
+    def fake_run(command: list[str], *, timeout: int = 30) -> dict[str, object]:
+        del timeout
+        if command[0] == "find":
+            return {"command": command, "stderr": "", **large_result}
+        return {"command": command, "returncode": 0, "stdout": "", "stderr": "", "timed_out": False}
+
+    monkeypatch.setattr(metadata_executor_module, "_run_command", fake_run)
+    result = metadata_executor_module._large_home_file_audit()
+
+    assert result["status"] == expected_status
+
+
+def test_large_home_file_manifest_reconciliation_fails_closed_without_both_manifests() -> None:
+    result = metadata_executor_module._reconcile_large_home_file_manifests(None, {"status": "PASS", "manifest": []})
+    assert result["status"] == "INCOMPLETE"
+
+
+def test_storage_preflight_blocks_before_any_source_request(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    root = str(tmp_path / "new-root")
+    monkeypatch.setattr(
+        metadata_executor_module,
+        "storage_preflight",
+        lambda root: {"root": root, "complete": False, "errors": ["exact-byte timeout"]},
+    )
+    monkeypatch.setattr(
+        metadata_executor_module,
+        "_execute_metadata_footer_wave_uncaught",
+        lambda **kwargs: pytest.fail("source stage must not run after preflight failure"),
+    )
+
+    result = metadata_executor_module.execute_metadata_footer_wave(root=root)
+
+    assert result["status"] == "BLOCKED"
+    assert result["phase"] == "preflight"
+    assert result["source_requests_started"] == 0
 
 
 def test_storage_preflight_blocks_existing_root(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -2008,36 +2162,13 @@ def test_storage_preflight_blocks_existing_root(monkeypatch: pytest.MonkeyPatch,
     root = str(root_path)
 
     def fake_run(command: list[str], *, timeout: int = 30) -> dict[str, object]:
-        del timeout
-        stdout = root + "\n" if command[0] == "readlink" else "1K\n"
-        return {"command": command, "returncode": 0, "stdout": stdout, "stderr": "", "timed_out": False}
+        return _fake_storage_command(command, root, timeout=timeout)
 
     monkeypatch.setattr(metadata_executor_module, "_run_command", fake_run)
     result = metadata_executor_module.storage_preflight(root)
 
     assert not result["complete"]
     assert "new scratch root already exists" in result["errors"]
-
-
-@pytest.mark.parametrize("du_output", ["", "not-a-size\n"])
-def test_storage_preflight_blocks_unparseable_successful_du_output(
-    monkeypatch: pytest.MonkeyPatch,
-    tmp_path: Path,
-    du_output: str,
-) -> None:
-    root = str(tmp_path / "new-root")
-
-    def fake_run(command: list[str], *, timeout: int = 30) -> dict[str, object]:
-        del timeout
-        stdout = du_output if command[0] == "du" else root + "\n" if command[0] == "readlink" else "ok\n"
-        return {"command": command, "returncode": 0, "stdout": stdout, "stderr": "", "timed_out": False}
-
-    monkeypatch.setattr(metadata_executor_module, "_run_command", fake_run)
-    result = metadata_executor_module.storage_preflight(root)
-
-    assert result["home_usage_bytes"] is None
-    assert not result["complete"]
-    assert "HU home usage could not be parsed from successful du output" in result["errors"]
 
 
 def test_metadata_executor_writer_failure_precedes_source_requests(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -2067,7 +2198,7 @@ def test_metadata_executor_invokes_post_run_audit_on_pass(monkeypatch: pytest.Mo
     monkeypatch.setattr(metadata_executor_module, "storage_preflight", lambda root: {"root": root, "complete": True})
     monkeypatch.setattr(metadata_executor_module, "independent_writer_self_check", lambda: {"status": "PASS"})
     monkeypatch.setattr(metadata_executor_module, "_execute_metadata_footer_wave_uncaught", lambda **kwargs: {"status": "PASS"})
-    monkeypatch.setattr(metadata_executor_module, "post_run_storage_audit", lambda root: audit)
+    monkeypatch.setattr(metadata_executor_module, "post_run_storage_audit", lambda root, **kwargs: audit)
 
     result = metadata_executor_module.execute_metadata_footer_wave(root=root)
 
@@ -2091,7 +2222,7 @@ def test_metadata_executor_invokes_post_run_audit_on_source_block(monkeypatch: p
             error="http_302",
         ),
     )
-    monkeypatch.setattr(metadata_executor_module, "post_run_storage_audit", lambda root: audit)
+    monkeypatch.setattr(metadata_executor_module, "post_run_storage_audit", lambda root, **kwargs: audit)
 
     result = metadata_executor_module.execute_metadata_footer_wave(root=root)
 
