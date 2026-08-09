@@ -73,6 +73,43 @@ METADATA_FOOTER_RETRYABLE_ERROR_CODES = frozenset(
     {"http_429", "http_503", "transport_timeout", "transport_connection_error"}
 )
 METADATA_FOOTER_RETRY_FAILURE_CLASSES = frozenset({"http_retryable", "transport_no_response"})
+_HF_REDIRECT_METADATA_FIELDS = frozenset(
+    {"location_sha256", "scheme", "host", "path_sha256", "url_length", "query_keys"}
+)
+_HF_REDIRECT_ALLOWED_HOST_SUFFIXES = ("xethub.hf.co", "cdn.hf.co")
+_HF_REDIRECT_MAX_URL_LENGTH = 8_192
+
+
+def _valid_redirect_chain(value: Any) -> bool:
+    """Validate the secret-safe, at-most-one-hop redirect representation."""
+
+    if not isinstance(value, list) or len(value) > 1:
+        return False
+    if not value:
+        return True
+    entry = value[0]
+    if not isinstance(entry, Mapping) or set(entry) != _HF_REDIRECT_METADATA_FIELDS:
+        return False
+    host = entry.get("host")
+    if (
+        entry.get("scheme") != "https"
+        or not isinstance(host, str)
+        or not any(host == suffix or host.endswith("." + suffix) for suffix in _HF_REDIRECT_ALLOWED_HOST_SUFFIXES)
+        or not isinstance(entry.get("url_length"), int)
+        or not 0 < entry["url_length"] <= _HF_REDIRECT_MAX_URL_LENGTH
+    ):
+        return False
+    if not all(
+        isinstance(entry.get(field), str) and re.fullmatch(r"[0-9a-f]{64}", entry[field])
+        for field in ("location_sha256", "path_sha256")
+    ):
+        return False
+    query_keys = entry.get("query_keys")
+    return (
+        isinstance(query_keys, list)
+        and all(isinstance(key, str) for key in query_keys)
+        and query_keys == sorted(query_keys)
+    )
 
 
 class _CompactProtocolError(ValueError):
@@ -946,7 +983,7 @@ def validate_metadata_footer_feasibility(
             errors.append(f"route row {index}: footer range template is not frozen")
         if row.get("status") != "verified":
             errors.append(f"route row {index}: route is not verified")
-        if row.get("final_url") != row.get("request_url") or row.get("redirect_chain") != []:
+        if row.get("final_url") != row.get("request_url") or not _valid_redirect_chain(row.get("redirect_chain")):
             errors.append(f"route row {index}: final URL/redirect chain is not bound")
         if row.get("http_status") != 200:
             errors.append(f"route row {index}: HEAD status is not 200")
@@ -1034,6 +1071,8 @@ def validate_metadata_footer_feasibility(
             errors.append(f"request row {index}: metadata/footer outcome is invalid")
         if not isinstance(response_present, bool):
             errors.append(f"request row {index}: response_present must be boolean")
+        if not _valid_redirect_chain(row.get("redirect_chain")):
+            errors.append(f"request row {index}: redirect chain is not a bounded secret-safe representation")
         if outcome == "metadata_success":
             if failure_class != "none" or retryable_error is not None or response_present is not True:
                 errors.append(f"request row {index}: successful attempt has retry/failure semantics")
@@ -1061,12 +1100,14 @@ def validate_metadata_footer_feasibility(
             expected_error = f"http_{row.get('http_status')}"
             if retryable_error != expected_error or response_present is not True:
                 errors.append(f"request row {index}: retryable HTTP error/response semantics are invalid")
-            if row.get("final_url") != row.get("request_url") or row.get("redirect_chain") != []:
+            if row.get("final_url") != row.get("request_url") or not _valid_redirect_chain(row.get("redirect_chain")):
                 errors.append(f"request row {index}: retryable HTTP route binding is invalid")
         elif failure_class == "transport_no_response":
             if retryable_error not in {"transport_timeout", "transport_connection_error"}:
                 errors.append(f"request row {index}: no-response transport error is invalid")
-            if row.get("http_status") is not None or row.get("final_url") is not None or row.get("redirect_chain") != []:
+            if row.get("http_status") is not None or (
+                row.get("final_url") not in {None, row.get("request_url")}
+            ) or not _valid_redirect_chain(row.get("redirect_chain")):
                 errors.append(f"request row {index}: no-response transport fields are invalid")
             if response_present is not False:
                 errors.append(f"request row {index}: no-response transport attempt has a response")
@@ -1308,7 +1349,14 @@ def validate_metadata_footer_feasibility(
                         expected_header = {
                             "request_url": parquet_resolve_url(path),
                             "final_url": parquet_resolve_url(path),
-                            "redirect_chain": [],
+                            "redirect_chain": next(
+                                (
+                                    route.get("redirect_chain")
+                                    for route in route_rows
+                                    if isinstance(route, Mapping) and route.get("path") == path
+                                ),
+                                [],
+                            ),
                             "http_status": 200,
                             "content_length": shard.get("object_size_bytes"),
                             "etag": shard.get("etag"),
@@ -1435,6 +1483,20 @@ def validate_metadata_footer_feasibility(
             errors.append("metadata/footer audit artifact bytes are not reconciled")
         if audit.get("request_count") != len(request_rows) or audit.get("retry_count") != retries:
             errors.append("metadata/footer audit request/retry totals are not reconciled")
+        redirect_hops = sum(
+            len(row.get("redirect_chain", []))
+            for row in request_rows
+            if isinstance(row, Mapping) and isinstance(row.get("redirect_chain"), list)
+        )
+        http_hops = len(request_rows) + redirect_hops
+        if audit.get("logical_request_attempt_count") != len(request_rows):
+            errors.append("metadata/footer audit logical request count is not reconciled")
+        if audit.get("redirect_hop_count") != redirect_hops or audit.get("http_hop_count") != http_hops:
+            errors.append("metadata/footer audit HTTP-hop totals are not reconciled")
+        if audit.get("max_logical_request_attempts") != 121 or audit.get("max_http_hops") != 242:
+            errors.append("metadata/footer audit redirect bounds are not frozen")
+        if http_hops > 242 or len(request_rows) > 121:
+            errors.append("metadata/footer audit exceeds the frozen logical-request/HTTP-hop bounds")
         if audit.get("total_response_bytes") != total_response_bytes or audit.get("max_response_bytes") != max_response_bytes:
             errors.append("metadata/footer audit response byte totals are not reconciled")
         if audit.get("output_file_count") != len(artifact_rows) + len(METADATA_FOOTER_OUTPUT_PATHS):

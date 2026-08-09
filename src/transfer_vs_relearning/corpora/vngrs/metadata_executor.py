@@ -22,13 +22,13 @@ import urllib.request
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable, Mapping
+from urllib.parse import parse_qsl, urlsplit
 
 from .metadata import (
     FROZEN_SELECTED_SHARD_PATHS,
     METADATA_FOOTER_ARTIFACT_KINDS,
     METADATA_FOOTER_CONTRACT_SHA256,
     METADATA_FOOTER_FOOTER_RANGE_TEMPLATE,
-    METADATA_FOOTER_MAX_HTTP_ATTEMPTS,
     METADATA_FOOTER_MAX_NEW_INODES,
     METADATA_FOOTER_MAX_OUTPUT_FILES,
     METADATA_FOOTER_MAX_RETRIES,
@@ -61,6 +61,14 @@ from .metadata import (
 HOME_ROOT = "/vol/fob-vol6/mi25/yesildau"
 SCRATCH_ROOTS = ("/vol/tmp", "/vol/tmp2")
 REQUEST_TIMEOUT_SECONDS = 60
+METADATA_FOOTER_MAX_LOGICAL_ATTEMPTS = 121
+METADATA_FOOTER_MAX_HTTP_HOPS = 242
+HF_REDIRECT_STATUS = 302
+HF_REDIRECT_MAX_URL_LENGTH = 8_192
+HF_REDIRECT_ALLOWED_HOST_SUFFIXES = ("xethub.hf.co", "cdn.hf.co")
+HF_REDIRECT_METADATA_FIELDS = frozenset(
+    {"location_sha256", "scheme", "host", "path_sha256", "url_length", "query_keys"}
+)
 
 
 class ExecutionBlocked(RuntimeError):
@@ -72,7 +80,7 @@ class ExecutionBlocked(RuntimeError):
 
 
 class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
-    """Do not silently turn a direct immutable route into an unallowlisted CDN route."""
+    """Disable urllib's automatic redirects; the bounded client validates one hop itself."""
 
     def redirect_request(self, request, file, code, message, headers, newurl):  # type: ignore[no-untyped-def]
         return None
@@ -84,8 +92,11 @@ class AttemptResult:
     headers: dict[str, str]
     payload: bytes | None
     final_url: str | None
-    redirect_chain: list[str]
+    redirect_chain: list[dict[str, Any]]
     error: str | None = None
+    # The raw terminal URL is retained only in memory. ``final_url`` is the canonical
+    # requested URL used in ledgers and artifacts so signed query values never persist.
+    terminal_url: str | None = field(default=None, repr=False)
 
 
 @dataclass
@@ -97,17 +108,26 @@ class BoundedClient:
     request_rows: list[dict[str, Any]] = field(default_factory=list)
     artifact_payloads: dict[str, bytes] = field(default_factory=dict)
     total_response_bytes: int = 0
+    http_hop_count: int = 0
+    redirect_hop_count: int = 0
 
     def _check_attempt_bound(self) -> None:
-        if self.attempt_count >= METADATA_FOOTER_MAX_HTTP_ATTEMPTS:
+        if self.attempt_count >= METADATA_FOOTER_MAX_LOGICAL_ATTEMPTS:
             raise ExecutionBlocked(
-                "the next HTTP attempt would exceed the 128-attempt bound",
+                "the next logical request attempt would exceed the 121-attempt bound",
                 context=self.bound_context(phase="attempt_bound"),
             )
         if time.monotonic() - self.start_monotonic > METADATA_FOOTER_MAX_WALL_CLOCK_SECONDS:
             raise ExecutionBlocked(
                 f"the {METADATA_FOOTER_MAX_WALL_CLOCK_SECONDS}-second wall-clock bound was exceeded",
                 context=self.bound_context(phase="wall_clock_bound"),
+            )
+
+    def _check_http_hop_bound(self) -> None:
+        if self.http_hop_count >= METADATA_FOOTER_MAX_HTTP_HOPS:
+            raise ExecutionBlocked(
+                "the next HTTP hop would exceed the 242-hop bound",
+                context=self.bound_context(phase="http_hop_bound"),
             )
 
     def _check_retry_bound(self) -> None:
@@ -122,6 +142,8 @@ class BoundedClient:
             "phase": phase,
             "attempt_count": self.attempt_count,
             "retry_count": self.retry_count,
+            "http_hop_count": self.http_hop_count,
+            "redirect_hop_count": self.redirect_hop_count,
             "total_response_bytes": self.total_response_bytes,
         }
         context.update(extra)
@@ -179,6 +201,100 @@ class BoundedClient:
     @staticmethod
     def _headers(response: Any) -> dict[str, str]:
         return {str(key).lower(): str(value) for key, value in response.headers.items()}
+
+    @staticmethod
+    def _redact_location(location: str | None) -> dict[str, Any]:
+        """Return non-secret Location evidence without retaining its value."""
+
+        raw = location or ""
+        return {
+            "location_sha256": hashlib.sha256(raw.encode("utf-8")).hexdigest(),
+            "location_length": len(raw),
+        }
+
+    @staticmethod
+    def _safe_redirect_metadata(metadata: Any) -> bool:
+        if not isinstance(metadata, Mapping) or set(metadata) != HF_REDIRECT_METADATA_FIELDS:
+            return False
+        if metadata.get("scheme") != "https" or not isinstance(metadata.get("host"), str):
+            return False
+        host = str(metadata["host"]).lower()
+        if not any(host == suffix or host.endswith("." + suffix) for suffix in HF_REDIRECT_ALLOWED_HOST_SUFFIXES):
+            return False
+        if not isinstance(metadata.get("url_length"), int) or not 0 < metadata["url_length"] <= HF_REDIRECT_MAX_URL_LENGTH:
+            return False
+        if not all(
+            isinstance(metadata.get(field), str) and re.fullmatch(r"[0-9a-f]{64}", metadata[field])
+            for field in ("location_sha256", "path_sha256")
+        ):
+            return False
+        query_keys = metadata.get("query_keys")
+        return (
+            isinstance(query_keys, list)
+            and all(isinstance(key, str) for key in query_keys)
+            and query_keys == sorted(query_keys)
+        )
+
+    @classmethod
+    def _validate_redirect_target(cls, location: str | None) -> tuple[str, dict[str, Any]]:
+        if not isinstance(location, str) or not location:
+            raise ExecutionBlocked(
+                "HTTP 302 lacked an absolute Location header",
+                context={"phase": "redirect_integrity", "location_present": False},
+            )
+        summary = cls._redact_location(location)
+        if len(location) > HF_REDIRECT_MAX_URL_LENGTH:
+            raise ExecutionBlocked(
+                "HTTP 302 Location exceeded the frozen URL-length bound",
+                context={"phase": "redirect_integrity", **summary},
+            )
+        try:
+            parsed = urlsplit(location)
+            port = parsed.port
+        except ValueError as exc:
+            raise ExecutionBlocked(
+                "HTTP 302 Location contained an invalid port",
+                context={"phase": "redirect_integrity", **summary},
+            ) from exc
+        host = parsed.hostname.lower() if parsed.hostname else None
+        if (
+            parsed.scheme != "https"
+            or not parsed.netloc
+            or parsed.username is not None
+            or parsed.password is not None
+            or parsed.fragment
+            or port is not None
+            or not parsed.path.startswith("/")
+            or host is None
+            or not any(host == suffix or host.endswith("." + suffix) for suffix in HF_REDIRECT_ALLOWED_HOST_SUFFIXES)
+        ):
+            raise ExecutionBlocked(
+                "HTTP 302 Location failed the official Hugging Face CDN allowlist",
+                context={"phase": "redirect_integrity", **summary},
+            )
+        query_keys = sorted(key for key, _ in parse_qsl(parsed.query, keep_blank_values=True))
+        metadata = {
+            "location_sha256": summary["location_sha256"],
+            "scheme": parsed.scheme,
+            "host": host,
+            "path_sha256": hashlib.sha256(parsed.path.encode("utf-8")).hexdigest(),
+            "url_length": len(location),
+            "query_keys": query_keys,
+        }
+        return location, metadata
+
+    @staticmethod
+    def _request_headers(*, range_header: str | None, cross_host: bool = False) -> dict[str, str]:
+        headers = {"User-Agent": "luna-151an-metadata-footer-executor/1"}
+        if range_header is not None:
+            headers["Range"] = range_header
+        if cross_host:
+            headers = {
+                key: value
+                for key, value in headers.items()
+                if key.lower() not in {"authorization", "cookie"}
+            }
+        return headers
 
     def _read_bounded(
         self,
@@ -264,70 +380,117 @@ class BoundedClient:
     def _attempt(self, *, method: str, url: str, range_header: str | None) -> AttemptResult:
         self._check_attempt_bound()
         self.attempt_count += 1
-        headers = {"User-Agent": "luna-151an-metadata-footer-executor/1"}
-        if range_header is not None:
-            headers["Range"] = range_header
-        request = urllib.request.Request(url, headers=headers, method=method)
-        try:
-            with self.opener.open(request, timeout=REQUEST_TIMEOUT_SECONDS) as response:
-                response_headers = self._headers(response)
+        redirect_chain: list[dict[str, Any]] = []
+        current_url = url
+        for hop_index in range(2):
+            self._check_http_hop_bound()
+            self.http_hop_count += 1
+            request = urllib.request.Request(
+                current_url,
+                headers=self._request_headers(range_header=range_header, cross_host=hop_index > 0),
+                method=method,
+            )
+            try:
+                response = self.opener.open(request, timeout=REQUEST_TIMEOUT_SECONDS)
+            except urllib.error.HTTPError as http_error:
+                response_headers = self._headers(http_error)
+                status = int(http_error.code)
+                if status == HF_REDIRECT_STATUS:
+                    if hop_index == 1:
+                        raise ExecutionBlocked(
+                            "a second HTTP 302 redirect exceeded the one-hop bound",
+                            context=self.bound_context(phase="redirect_hop_bound", http_status=status),
+                        )
+                    target, metadata = self._validate_redirect_target(response_headers.get("location"))
+                    redirect_chain.append(metadata)
+                    self.redirect_hop_count += 1
+                    current_url = target
+                    http_error.close()
+                    continue
+                try:
+                    payload = self._read_bounded(
+                        http_error,
+                        headers=response_headers,
+                        method=method,
+                        url=url,
+                    )
+                except ExecutionBlocked:
+                    raise
+                except Exception as read_error:
+                    raise ExecutionBlocked(
+                        "unable to read the bounded HTTPError response",
+                        context=self.bound_context(
+                            phase="response_read_failure",
+                            method=method,
+                            url=url,
+                            http_status=status,
+                            response_read_exception=type(read_error).__name__,
+                        ),
+                    ) from read_error
+                finally:
+                    http_error.close()
+                self._accept_response_bytes(len(payload))
+                return AttemptResult(
+                    status=status,
+                    headers=response_headers,
+                    payload=payload,
+                    final_url=url,
+                    redirect_chain=redirect_chain,
+                    terminal_url=current_url,
+                    error=f"http_{status}",
+                )
+            except (urllib.error.URLError, TimeoutError, socket.timeout, ConnectionError, OSError) as transport_error:
+                return AttemptResult(
+                    status=None,
+                    headers={},
+                    payload=None,
+                    final_url=url if redirect_chain else None,
+                    redirect_chain=redirect_chain,
+                    terminal_url=current_url if redirect_chain else None,
+                    error=("transport_timeout" if isinstance(transport_error, (TimeoutError, socket.timeout)) else "transport_connection_error"),
+                )
+
+            response_headers = self._headers(response)
+            status_value = getattr(response, "status", None)
+            status = int(status_value if status_value is not None else response.getcode())
+            if status == HF_REDIRECT_STATUS:
+                if hop_index == 1:
+                    if hasattr(response, "close"):
+                        response.close()
+                    raise ExecutionBlocked(
+                        "a second HTTP 302 redirect exceeded the one-hop bound",
+                        context=self.bound_context(phase="redirect_hop_bound", http_status=status),
+                    )
+                target, metadata = self._validate_redirect_target(response_headers.get("location"))
+                redirect_chain.append(metadata)
+                self.redirect_hop_count += 1
+                current_url = target
+                if hasattr(response, "close"):
+                    response.close()
+                continue
+            try:
                 payload = self._read_bounded(
                     response,
                     headers=response_headers,
                     method=method,
                     url=url,
                 )
-                self._accept_response_bytes(len(payload))
-                return AttemptResult(
-                    status=int(response.status),
-                    headers=response_headers,
-                    payload=payload,
-                    final_url=str(response.geturl()),
-                    redirect_chain=[],
-                )
-        except ExecutionBlocked as exc:
-            if not exc.context:
-                exc.context = self.bound_context(phase="single_response_bound", method=method, url=url)
-            raise
-        except urllib.error.HTTPError as exc:
-            response_headers = {str(key).lower(): str(value) for key, value in exc.headers.items()}
-            try:
-                payload = self._read_bounded(
-                    exc,
-                    headers=response_headers,
-                    method=method,
-                    url=url,
-                )
-            except ExecutionBlocked:
+            except ExecutionBlocked as blocked:
+                if not blocked.context:
+                    blocked.context = self.bound_context(phase="single_response_bound", method=method, url=url)
                 raise
-            except Exception as exc:
-                raise ExecutionBlocked(
-                    "unable to read the bounded HTTPError response",
-                    context=self.bound_context(
-                        phase="response_read_failure",
-                        method=method,
-                        url=url,
-                        http_status=int(exc.code),
-                    ),
-                ) from exc
             self._accept_response_bytes(len(payload))
+            if hasattr(response, "close"):
+                response.close()
             return AttemptResult(
-                status=int(exc.code),
+                status=status,
                 headers=response_headers,
                 payload=payload,
                 final_url=url,
-                redirect_chain=[],
-                error=f"http_{exc.code}",
+                redirect_chain=redirect_chain,
+                terminal_url=current_url,
             )
-        except (urllib.error.URLError, TimeoutError, socket.timeout, ConnectionError, OSError) as exc:
-            return AttemptResult(
-                status=None,
-                headers={},
-                payload=None,
-                final_url=None,
-                redirect_chain=[],
-                error=("transport_timeout" if isinstance(exc, (TimeoutError, socket.timeout)) else "transport_connection_error"),
-            )
+        raise ExecutionBlocked("redirect loop exceeded the one-hop bound", context=self.bound_context(phase="redirect_hop_bound"))
 
     def request_with_retries(
         self,
@@ -347,7 +510,9 @@ class BoundedClient:
             retryable_http = result.status in {429, 503}
             no_response = result.status is None
             if result.status == expected_status:
-                if result.final_url != url or result.redirect_chain:
+                if result.final_url != url or len(result.redirect_chain) > 1 or any(
+                    not self._safe_redirect_metadata(item) for item in result.redirect_chain
+                ):
                     raise ExecutionBlocked(
                         f"{request_id}: redirect chain/final URL is outside the frozen route",
                         context=self.bound_context(
@@ -434,8 +599,11 @@ class BoundedClient:
                     phase="source_request",
                     request_id=request_id,
                     http_status=result.status,
-                    location=result.headers.get("location"),
+                    **self._redact_location(result.headers.get("location"))
+                    if result.headers.get("location") is not None
+                    else {"location_present": False},
                     final_url=result.final_url,
+                    redirect_chain=list(result.redirect_chain),
                 ),
             )
 
@@ -833,8 +1001,8 @@ def _execute_metadata_footer_wave_uncaught(
                 "range_header": METADATA_FOOTER_TRAILER_RANGE_HEADER,
                 "footer_range_header_template": METADATA_FOOTER_FOOTER_RANGE_TEMPLATE,
                 "status": "verified",
-                "final_url": url,
-                "redirect_chain": [],
+                "final_url": head_result.final_url,
+                "redirect_chain": list(head_result.redirect_chain),
                 "http_status": head_result.status,
                 "content_length": object_size,
                 "etag": etag,
@@ -889,6 +1057,12 @@ def _execute_metadata_footer_wave_uncaught(
         "artifact_total_bytes": sum(row["bytes"] for row in artifact_rows),
         "request_count": len(client.request_rows),
         "retry_count": client.retry_count,
+        "logical_request_attempt_count": len(client.request_rows),
+        "http_hop_count": client.http_hop_count,
+        "redirect_hop_count": client.redirect_hop_count,
+        "max_logical_request_attempts": METADATA_FOOTER_MAX_LOGICAL_ATTEMPTS,
+        "max_http_hops": METADATA_FOOTER_MAX_HTTP_HOPS,
+        "redirect_hop_retry_separation": True,
         "total_response_bytes": sum(row["response_transferred_bytes"] for row in client.request_rows),
         "max_response_bytes": max(row["response_transferred_bytes"] for row in client.request_rows),
         "output_file_count": len(artifact_rows) + len(METADATA_FOOTER_OUTPUT_PATHS),

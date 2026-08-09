@@ -77,6 +77,40 @@ MAX_TOTAL_RESPONSE_BYTES = 64 * 1024 * 1024
 MAX_SINGLE_RESPONSE_BYTES = 4 * 1024 * 1024
 SUCCESSFUL_REQUEST_OUTCOMES = frozenset({"success", "row_success", "metadata_success"})
 FAILED_REQUEST_OUTCOMES = frozenset({"failed", "http_error", "blocked"})
+_REDIRECT_METADATA_FIELDS = frozenset(
+    {"location_sha256", "scheme", "host", "path_sha256", "url_length", "query_keys"}
+)
+_REDIRECT_ALLOWED_HOST_SUFFIXES = ("xethub.hf.co", "cdn.hf.co")
+
+
+def _valid_redirect_chain(value: Any) -> bool:
+    if not isinstance(value, list) or len(value) > 1:
+        return False
+    if not value:
+        return True
+    entry = value[0]
+    if not isinstance(entry, Mapping) or set(entry) != _REDIRECT_METADATA_FIELDS:
+        return False
+    host = entry.get("host")
+    if (
+        entry.get("scheme") != "https"
+        or not isinstance(host, str)
+        or not any(host == suffix or host.endswith("." + suffix) for suffix in _REDIRECT_ALLOWED_HOST_SUFFIXES)
+        or not isinstance(entry.get("url_length"), int)
+        or not 0 < entry["url_length"] <= 8_192
+    ):
+        return False
+    if not all(
+        isinstance(entry.get(field), str) and SHA256_RE.fullmatch(entry[field])
+        for field in ("location_sha256", "path_sha256")
+    ):
+        return False
+    query_keys = entry.get("query_keys")
+    return (
+        isinstance(query_keys, list)
+        and all(isinstance(key, str) for key in query_keys)
+        and query_keys == sorted(query_keys)
+    )
 
 
 class ManifestValidationError(ValueError):
@@ -235,8 +269,8 @@ def validate_request_ledger(rows: Iterable[Mapping[str, Any]], *, raise_on_error
             errors.append(f"row {index}: response_evidence_artifact must be a safe named artifact")
         if not isinstance(row.get("row_range_or_metadata_target"), str) or not row["row_range_or_metadata_target"]:
             errors.append(f"row {index}: row_range_or_metadata_target missing")
-        if not isinstance(row.get("redirect_chain"), list) or any(not isinstance(item, str) for item in row["redirect_chain"]):
-            errors.append(f"row {index}: redirect_chain must be list of strings")
+        if not _valid_redirect_chain(row.get("redirect_chain")):
+            errors.append(f"row {index}: redirect_chain must be an empty list or one secret-safe CDN-hop mapping")
         if not _sha256(row.get("response_sha256")):
             errors.append(f"row {index}: response_sha256 is not a lowercase SHA-256")
         outcome = row.get("request_outcome")

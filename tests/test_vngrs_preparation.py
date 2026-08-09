@@ -1245,6 +1245,12 @@ def _valid_metadata_footer_package() -> tuple[dict[str, object], dict[str, bytes
         "artifact_total_bytes": sum(row["bytes"] for row in artifact_rows),
         "request_count": len(request_rows),
         "retry_count": 0,
+        "logical_request_attempt_count": len(request_rows),
+        "http_hop_count": len(request_rows),
+        "redirect_hop_count": 0,
+        "max_logical_request_attempts": 121,
+        "max_http_hops": 242,
+        "redirect_hop_retry_separation": True,
         "total_response_bytes": sum(row["response_transferred_bytes"] for row in request_rows),
         "max_response_bytes": max(row["response_transferred_bytes"] for row in request_rows),
         "output_file_count": len(artifact_rows) + len(METADATA_FOOTER_OUTPUT_PATHS),
@@ -1357,6 +1363,12 @@ def _append_retry_attempts(
             "artifact_total_bytes": sum(row["bytes"] for row in artifact_rows),
             "request_count": len(request_rows),
             "retry_count": count,
+            "logical_request_attempt_count": len(request_rows),
+            "http_hop_count": len(request_rows),
+            "redirect_hop_count": 0,
+            "max_logical_request_attempts": 121,
+            "max_http_hops": 242,
+            "redirect_hop_retry_separation": True,
             "total_response_bytes": sum(row["response_transferred_bytes"] for row in request_rows),
             "max_response_bytes": max(row["response_transferred_bytes"] for row in request_rows),
             "output_file_count": len(artifact_rows) + len(METADATA_FOOTER_OUTPUT_PATHS),
@@ -1623,6 +1635,16 @@ class _FakeOpener:
         return response
 
 
+class _RecordingOpener(_FakeOpener):
+    def __init__(self, responses: list[object]) -> None:
+        super().__init__(responses)
+        self.requests: list[object] = []
+
+    def open(self, request: object, timeout: int) -> object:
+        self.requests.append(request)
+        return super().open(request, timeout)
+
+
 def _fake_response(status: int, payload: bytes = b"x", *, url: str = "https://example.test/route") -> _FakeResponse:
     return _FakeResponse(status, payload, headers={"Content-Type": "application/octet-stream"}, url=url)
 
@@ -1819,7 +1841,7 @@ def test_metadata_executor_preserves_3xx_failure_context() -> None:
     )
     client = BoundedClient(_FakeOpener([redirect]))  # type: ignore[arg-type]
 
-    with pytest.raises(ExecutionBlocked, match="non-retryable HTTP status") as caught:
+    with pytest.raises(ExecutionBlocked, match="official Hugging Face CDN allowlist") as caught:
         client.request_with_retries(
             request_id="redirect-block",
             role="license_attribution",
@@ -1831,16 +1853,134 @@ def test_metadata_executor_preserves_3xx_failure_context() -> None:
             artifact_name="evidence/license/README.md",
         )
 
-    assert caught.value.context == {
-        "phase": "source_request",
-        "attempt_count": 1,
-        "retry_count": 0,
-        "total_response_bytes": 0,
-        "request_id": "redirect-block",
-        "http_status": 302,
-        "location": "https://example.test/target",
-        "final_url": url,
-    }
+    assert caught.value.context["phase"] == "redirect_integrity"
+    assert caught.value.context["location_sha256"] == hashlib.sha256(
+        b"https://example.test/target"
+    ).hexdigest()
+    assert "location" not in caught.value.context
+
+
+@pytest.mark.parametrize("target_host", ["cas-server.xethub.hf.co", "us.aws.cdn.hf.co"])
+def test_metadata_executor_follows_one_secret_safe_cdn_hop_preserving_method_and_range(target_host: str) -> None:
+    source_url = "https://huggingface.co/datasets/example/repo/resolve/abc/file.parquet"
+    target_url = (
+        f"https://{target_host}/xet/file.parquet"
+        "?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Signature=super-secret"
+    )
+    redirect = urllib.error.HTTPError(
+        source_url,
+        302,
+        "redirect",
+        {"Location": target_url},
+        io.BytesIO(),
+    )
+    opener = _RecordingOpener([redirect, _fake_response(206, b"ok", url=target_url)])
+    client = BoundedClient(opener)  # type: ignore[arg-type]
+
+    result, payload = client.request_with_retries(
+        request_id="redirect-one-hop",
+        role="footer_bytes",
+        path="train-00004-of-00284.parquet",
+        url=source_url,
+        method="GET",
+        range_header="bytes=10-",
+        expected_status=206,
+        artifact_name="evidence/footer/00000.bin",
+    )
+
+    assert payload == b"ok"
+    assert result.final_url == source_url
+    assert result.terminal_url == target_url
+    assert client.attempt_count == 1
+    assert client.http_hop_count == 2
+    assert client.redirect_hop_count == 1
+    assert len(client.request_rows) == 1
+    row = client.request_rows[0]
+    assert row["final_url"] == source_url
+    assert len(row["redirect_chain"]) == 1
+    assert "super-secret" not in json.dumps(row, sort_keys=True)
+    assert opener.requests[1].get_header("Range") == "bytes=10-"
+    assert opener.requests[1].get_header("Authorization") is None
+    assert opener.requests[1].get_header("Cookie") is None
+
+
+@pytest.mark.parametrize(
+    "location",
+    [
+        "/relative-target",
+        "http://cdn.hf.co/object",
+        "https://user:password@cdn.hf.co/object",
+        "https://cdn.hf.co/object#fragment",
+        "https://cdn.hf.co:443/object",
+        "https://evilcdn.hf.co/object",
+    ],
+)
+def test_metadata_executor_rejects_unsafe_cdn_redirect_targets(location: str) -> None:
+    source_url = "https://huggingface.co/datasets/example/repo/resolve/abc/file.parquet"
+    redirect = urllib.error.HTTPError(
+        source_url,
+        302,
+        "redirect",
+        {"Location": location},
+        io.BytesIO(),
+    )
+    client = BoundedClient(_FakeOpener([redirect]))  # type: ignore[arg-type]
+
+    with pytest.raises(ExecutionBlocked, match="official Hugging Face CDN allowlist|absolute Location|redirect"):
+        client._attempt(method="GET", url=source_url, range_header="bytes=10-")
+
+
+def test_metadata_executor_rejects_a_second_cdn_redirect() -> None:
+    source_url = "https://huggingface.co/datasets/example/repo/resolve/abc/file.parquet"
+    first = urllib.error.HTTPError(
+        source_url,
+        302,
+        "redirect",
+        {"Location": "https://cdn.hf.co/first?signature=one"},
+        io.BytesIO(),
+    )
+    second = urllib.error.HTTPError(
+        "https://cdn.hf.co/first?signature=one",
+        302,
+        "redirect",
+        {"Location": "https://xethub.hf.co/second?signature=two"},
+        io.BytesIO(),
+    )
+    client = BoundedClient(_FakeOpener([first, second]))  # type: ignore[arg-type]
+
+    with pytest.raises(ExecutionBlocked, match="second HTTP 302"):
+        client._attempt(method="GET", url=source_url, range_header=None)
+
+    assert client.http_hop_count == 2
+    assert client.redirect_hop_count == 1
+
+
+class _RaisingBytesIO(io.BytesIO):
+    def read(self, size: int = -1) -> bytes:
+        del size
+        raise RuntimeError("synthetic response read failure")
+
+
+def test_metadata_executor_preserves_http_error_status_when_response_read_fails() -> None:
+    url = "https://example.test/route"
+    error = urllib.error.HTTPError(url, 503, "unavailable", {}, _RaisingBytesIO())
+    client = BoundedClient(_FakeOpener([error]))  # type: ignore[arg-type]
+
+    with pytest.raises(ExecutionBlocked, match="unable to read the bounded HTTPError response") as caught:
+        client.request_with_retries(
+            request_id="http-error-read-failure",
+            role="license_attribution",
+            path="README.md",
+            url=url,
+            method="GET",
+            range_header=None,
+            expected_status=200,
+            artifact_name="evidence/license/README.md",
+        )
+
+    assert caught.value.context["phase"] == "response_read_failure"
+    assert caught.value.context["http_status"] == 503
+    assert caught.value.context["response_read_exception"] == "RuntimeError"
 
 
 def test_storage_preflight_blocks_timeout_and_home_limit(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -1958,7 +2098,10 @@ def test_metadata_executor_invokes_post_run_audit_on_source_block(monkeypatch: p
     assert result["status"] == "BLOCKED"
     assert result["phase"] == "source_request"
     assert result["failure_context"]["http_status"] == 302
-    assert result["failure_context"]["location"] == "https://example.test/target"
+    assert result["failure_context"]["location_sha256"] == hashlib.sha256(
+        b"https://example.test/target"
+    ).hexdigest()
+    assert "location" not in result["failure_context"]
     assert result["post_run_storage_audit"] == audit
 
 
