@@ -53,7 +53,12 @@ def main() -> None:
     registry = load_registry(registry_path)
     candidate = candidate_by_index(registry, args.candidate_index)
     label = str(candidate["label"])
-    run_prefix = "m1_provenance_screen" if registry["version"] == "m1_provenance_screen_v1" else "m1_cross_family"
+    if registry["version"] == "m1_provenance_screen_retry_v2":
+        run_prefix = "m1_provenance_screen_retry_v2"
+    elif registry["version"] == "m1_provenance_screen_v1":
+        run_prefix = "m1_provenance_screen"
+    else:
+        run_prefix = "m1_cross_family"
     scratch_root = approved_scratch(Path(str(registry["scratch_root"])))
     output_root = approved_scratch(scratch_root / "evaluations" / label)
     if output_root.exists():
