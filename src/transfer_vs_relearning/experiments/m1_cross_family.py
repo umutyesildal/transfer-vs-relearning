@@ -33,7 +33,11 @@ def load_registry(path: Path) -> dict[str, Any]:
 
 def validate_registry(payload: dict[str, Any]) -> None:
     version = payload.get("version")
-    if version not in {"m1_cross_family_screen_v1", "m1_provenance_screen_v1"}:
+    if version not in {
+        "m1_cross_family_screen_v1",
+        "m1_provenance_screen_v1",
+        "m1_provenance_screen_retry_v2",
+    }:
         raise ValueError("Unexpected cross-family registry version")
     approved_scratch(Path(str(payload["scratch_root"])))
     approved_scratch(Path(str(payload["dataset_root"])))
@@ -55,6 +59,8 @@ def validate_registry(payload: dict[str, Any]) -> None:
             raise ValueError("Llama must remain conditional")
     elif not all(bool(candidate.get("required")) for candidate in candidates):
         raise ValueError("All bounded provenance-screen candidates must be required")
+    if version == "m1_provenance_screen_retry_v2" and not bool(payload.get("require_native_tokenizer")):
+        raise ValueError("Retry-v2 must require native tokenizer assets")
     for candidate in candidates:
         overrides = candidate.get("training_overrides", {})
         if not isinstance(overrides, dict) or set(overrides) - {"model_load_dtype"}:
@@ -134,7 +140,12 @@ def materialize_training_config(
     )
     payload["model"]["base_model_manifest"] = str(model_manifest)
     payload["training"].update(candidate.get("training_overrides", {}))
-    run_prefix = "m1_provenance_screen" if registry["version"] == "m1_provenance_screen_v1" else "m1_cross_family"
+    if registry["version"] == "m1_provenance_screen_retry_v2":
+        run_prefix = "m1_provenance_screen_retry_v2"
+    elif registry["version"] == "m1_provenance_screen_v1":
+        run_prefix = "m1_provenance_screen"
+    else:
+        run_prefix = "m1_cross_family"
     payload["training"]["run_name"] = f"{run_prefix}_{candidate['label']}_seed42"
     payload["training"]["output_root"] = str(candidate_training_root(registry, candidate))
     steps = estimate_optimizer_steps(

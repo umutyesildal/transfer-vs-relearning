@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import gc
 import json
+import re
 import shutil
 from collections import defaultdict
 from pathlib import Path
@@ -21,14 +22,26 @@ from transfer_vs_relearning.training.clm import (
 from transfer_vs_relearning.utils.io import read_jsonl, sha256_file, write_json
 
 
+_PYTORCH_SHARDED_WEIGHT_RE = re.compile(r"^pytorch_model-\d+-of-\d+\.bin$")
+
+
+def _is_declared_weight_file(name: str) -> bool:
+    """Return whether a manifest path names a supported base-model weight file."""
+
+    basename = Path(name).name
+    return basename.endswith(".safetensors") or basename == "pytorch_model.bin" or bool(
+        _PYTORCH_SHARDED_WEIGHT_RE.fullmatch(basename)
+    )
+
+
 def _verify_base_weights(model_path: Path, manifest: dict[str, Any]) -> dict[str, str]:
     declared = {
         name: digest
         for name, digest in manifest.get("file_hashes", {}).items()
-        if name.endswith(".safetensors")
+        if _is_declared_weight_file(name)
     }
     if not declared:
-        raise ValueError("Base manifest contains no safetensors hashes")
+        raise ValueError("Base manifest contains no safetensors or pytorch_model.bin hashes")
     for relative, expected in declared.items():
         path = model_path / relative
         if not path.is_file() or sha256_file(path) != expected:

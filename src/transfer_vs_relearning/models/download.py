@@ -11,7 +11,29 @@ def safe_model_dir_name(model_id: str) -> str:
     return model_id.replace("/", "__")
 
 
-def download_model_snapshot(model_id: str, revision: str | None, artifact_root: Path, local_files_only: bool = False) -> dict[str, Any]:
+def _validate_native_tokenizer_assets(tokenizer: Any, snapshot_path: Path) -> list[str]:
+    """Require the tokenizer's declared native vocabulary files in the snapshot."""
+
+    declared = getattr(tokenizer, "vocab_files_names", {}) or {}
+    names = sorted({str(name) for name in declared.values() if name})
+    missing = [name for name in names if not (snapshot_path / name).is_file()]
+    if missing:
+        raise ValueError(
+            "Native tokenizer assets are incomplete; missing declared files: "
+            + ", ".join(missing)
+        )
+    if not names:
+        raise ValueError("Tokenizer did not declare native vocabulary files")
+    return names
+
+
+def download_model_snapshot(
+    model_id: str,
+    revision: str | None,
+    artifact_root: Path,
+    local_files_only: bool = False,
+    require_native_tokenizer: bool = False,
+) -> dict[str, Any]:
     from accelerate import init_empty_weights
     from huggingface_hub import HfApi, snapshot_download
     import huggingface_hub
@@ -41,6 +63,11 @@ def download_model_snapshot(model_id: str, revision: str | None, artifact_root: 
         local_files_only=local_files_only,
     )
     tokenizer = AutoTokenizer.from_pretrained(snapshot_path, local_files_only=True)
+    tokenizer_files = (
+        _validate_native_tokenizer_assets(tokenizer, Path(snapshot_path))
+        if require_native_tokenizer
+        else []
+    )
     config = AutoConfig.from_pretrained(snapshot_path, local_files_only=True)
     with init_empty_weights():
         model = AutoModelForCausalLM.from_config(config)
@@ -62,6 +89,8 @@ def download_model_snapshot(model_id: str, revision: str | None, artifact_root: 
         "transformers_version": transformers.__version__,
         "huggingface_hub_version": huggingface_hub.__version__,
         "tokenizer_class": tokenizer.__class__.__name__,
+        "tokenizer_native_assets_required": require_native_tokenizer,
+        "tokenizer_native_assets": tokenizer_files,
         "model_class": "AutoModelForCausalLM",
         "parameter_count": parameter_count,
         "resolution_manifest": str(model_root / "model_resolution.json"),

@@ -44,6 +44,7 @@ def main() -> None:
             model_id=str(candidate["model_id"]),
             revision=str(candidate["requested_revision"]),
             artifact_root=artifact_root,
+            require_native_tokenizer=bool(registry.get("require_native_tokenizer", False)),
         )
         record = {
             **base_record,
