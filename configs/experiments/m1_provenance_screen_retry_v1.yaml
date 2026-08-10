@@ -1,0 +1,61 @@
+# Technical retry registry for the bounded M1 provenance screen.
+# Scientific conditions remain identical to Document 152; only the scratch root
+# is fresh so the failed first submission and its acquisition evidence remain
+# immutable and separately inspectable.
+version: m1_provenance_screen_v1
+contract_document: documentation/152_BOUNDED_M1_PROVENANCE_SCREEN_EXECUTION_CONTRACT_TR.md
+status: technical_retry_same_conditions
+retry_of_scratch_root: /vol/tmp2/yesildau/m1_provenance_screen_v1
+scratch_root: /vol/tmp2/yesildau/m1_provenance_screen_retry_v1
+dataset_version: m1_canonical_form_diversity_v1
+dataset_root: /vol/tmp2/yesildau/m1_canonical_form_diversity_v1/datasets
+training_template: configs/training/m1_provenance_screen_seed42_template.yaml
+expected_train_rows: 3500
+expected_validation_rows: 500
+expected_optimizer_updates: 252
+expected_checkpoints_per_candidate: 11
+estimated_shared_overhead_gib: 100
+candidates:
+  - index: 0
+    label: olmo
+    model_id: allenai/OLMo-2-0425-1B
+    requested_revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+    required: true
+    estimated_checkpoint_gib: 18
+    estimated_download_gib: 5
+  - index: 1
+    label: pythia
+    model_id: EleutherAI/pythia-1.4b
+    requested_revision: 0da31d8fb309463877ed8c40e54a8f911dced3ec
+    required: true
+    estimated_checkpoint_gib: 18
+    estimated_download_gib: 5
+  - index: 2
+    label: falcon
+    model_id: tiiuae/falcon-rw-1b
+    requested_revision: e4b9872bb803165eb22f0a867d4e6a64d34fce19
+    required: true
+    estimated_checkpoint_gib: 18
+    estimated_download_gib: 5
+reference:
+  label: smollm2_document_104
+  model_id: HuggingFaceTB/SmolLM2-1.7B
+  result_document: documentation/104_M1_CANONICAL_FORM_DIVERSITY_REMEDIATION_RESULT.md
+  retrain: false
+gates:
+  exact_prefix_min: 0.90
+  trained_cell_min: 0.80
+  heldout_cell_min: 0.80
+  robust_intersection_min: 0.70
+  generic_ppl_ratio_max: 1.25
+  generic_ppl_ratio_preferred: 1.10
+selection:
+  endpoint: update-252-only
+  automatic_promotion: false
+  seed_43: forbidden_without_new_contract
+  m2_m3: forbidden_without_new_contract
+retention: >-
+  Preserve the update-252 model-only endpoint, native tokenizer/config, source revision,
+  training manifest, compact evaluation summaries, and SHA-256 records on scratch. Duplicate
+  checkpoints, optimizer/trainer state, reproducible caches, and verbose logs remain cleanup
+  candidates only after evidence verification and separate retention review.
