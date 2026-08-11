@@ -30,8 +30,8 @@ def main() -> None:
 
     registry_path = args.registry.resolve()
     registry = load_registry(registry_path)
-    if registry["version"] != "m1_provenance_screen_v3":
-        raise ValueError("The v3 family assembler only accepts m1_provenance_screen_v3")
+    if registry["version"] not in {"m1_provenance_screen_v3", "m1_provenance_screen_v3_pythia_repair_v1"}:
+        raise ValueError("The v3 family assembler only accepts a v3 provenance-screen registry")
     scratch_root = approved_scratch(Path(str(registry["scratch_root"])))
     candidates: list[dict[str, Any]] = []
     for candidate in registry["candidates"]:
@@ -82,7 +82,7 @@ def main() -> None:
         )
 
     payload = {
-        "version": "m1_provenance_screen_v3_terminal_assembly",
+        "version": f"{registry['version']}_terminal_assembly",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "registry": str(registry_path),
         "registry_sha256": sha256_file(registry_path),

@@ -4,6 +4,8 @@ import hashlib
 import json
 from pathlib import Path
 
+import pytest
+
 from transfer_vs_relearning.training.clm import (
     combine_contrastive_losses,
     combine_binding_losses,
@@ -189,6 +191,25 @@ def test_clm_tokenizer_path_prefers_manifest_source(tmp_path: Path) -> None:
         {"tokenizer_source_path_absolute": str(tokenizer)}, tmp_path, checkpoint
     ) == tokenizer.resolve()
     assert tokenizer_path_from_manifest({}, tmp_path, checkpoint) == checkpoint
+
+
+def test_clm_tokenizer_path_verifies_frozen_file_inventory(tmp_path: Path) -> None:
+    import hashlib
+
+    tokenizer = tmp_path / "base-tokenizer"
+    tokenizer.mkdir()
+    payload = b"tokenizer"
+    (tokenizer / "tokenizer.json").write_bytes(payload)
+    manifest = {
+        "tokenizer_source_path_absolute": str(tokenizer),
+        "tokenizer_source_file_hashes": {
+            "tokenizer.json": hashlib.sha256(payload).hexdigest(),
+        },
+    }
+    assert tokenizer_path_from_manifest(manifest, tmp_path, tmp_path / "checkpoint") == tokenizer.resolve()
+    (tokenizer / "tokenizer.json").write_bytes(b"changed")
+    with pytest.raises(ValueError, match="hash mismatch"):
+        tokenizer_path_from_manifest(manifest, tmp_path, tmp_path / "checkpoint")
 
 
 def test_estimate_optimizer_steps_uses_effective_batch_size() -> None:

@@ -19,13 +19,14 @@ def main() -> None:
     parser.add_argument("--candidate-index", type=int, required=True)
     parser.add_argument(
         "--field",
-        choices=("label", "model_id", "requested_revision", "required", "model_root", "model_manifest", "training_root"),
+        choices=("registry_version", "label", "model_id", "requested_revision", "required", "model_root", "model_manifest", "training_root"),
         required=True,
     )
     args = parser.parse_args()
     registry = load_registry(args.registry.resolve())
     candidate = candidate_by_index(registry, args.candidate_index)
     values = {
+        "registry_version": registry["version"],
         "label": candidate["label"],
         "model_id": candidate["model_id"],
         "requested_revision": candidate["requested_revision"],

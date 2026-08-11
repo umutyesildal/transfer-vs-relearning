@@ -6,6 +6,7 @@ import pytest
 
 from transfer_vs_relearning.models.download import (
     _validate_native_tokenizer_assets,
+    validate_exact_download_bytes,
     validate_model_native_tokenizer_roundtrip,
 )
 
@@ -94,4 +95,53 @@ def test_model_native_roundtrip_requires_fast_offsets(tmp_path: Path) -> None:
             tokenizer,
             tmp_path / "saved",
             lambda _: tokenizer,
+        )
+
+
+def test_model_native_roundtrip_rejects_empty_probe_ids(tmp_path: Path) -> None:
+    class EmptyTokenizer(_RoundTripTokenizer):
+        def __call__(self, text: str, **_: object) -> dict[str, object]:
+            return {"input_ids": [], "attention_mask": [], "offset_mapping": []}
+
+    with pytest.raises(ValueError, match="empty IDs"):
+        validate_model_native_tokenizer_roundtrip(
+            EmptyTokenizer(),
+            tmp_path / "saved",
+            lambda _: EmptyTokenizer(),
+        )
+
+
+def test_model_native_roundtrip_rejects_two_token_vocabulary(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="vocabulary is not meaningful"):
+        validate_model_native_tokenizer_roundtrip(
+            _RoundTripTokenizer(vocabulary_length=2),
+            tmp_path / "saved",
+            lambda _: _RoundTripTokenizer(vocabulary_length=2),
+        )
+
+
+def test_exact_download_bytes_fail_closed_on_hash_or_size() -> None:
+    import hashlib
+
+    payload = b"official tokenizer bytes"
+    digest = hashlib.sha256(payload).hexdigest()
+    validate_exact_download_bytes(
+        payload,
+        expected_bytes=len(payload),
+        expected_sha256=digest,
+        max_bytes=len(payload),
+    )
+    with pytest.raises(ValueError, match="byte count mismatch"):
+        validate_exact_download_bytes(
+            payload,
+            expected_bytes=len(payload) + 1,
+            expected_sha256=digest,
+            max_bytes=len(payload) + 1,
+        )
+    with pytest.raises(ValueError, match="SHA-256 mismatch"):
+        validate_exact_download_bytes(
+            payload,
+            expected_bytes=len(payload),
+            expected_sha256="0" * 64,
+            max_bytes=len(payload),
         )

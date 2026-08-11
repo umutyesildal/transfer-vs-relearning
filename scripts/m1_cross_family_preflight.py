@@ -57,7 +57,7 @@ def _check(condition: bool, label: str, checks: dict[str, Any], detail: Any) -> 
 def home_usage_evidence(registry: dict[str, Any]) -> dict[str, Any]:
     """Return the applicable home-usage evidence without repeating v3's recursive scan."""
 
-    if registry["version"] == "m1_provenance_screen_v3":
+    if registry["version"] in {"m1_provenance_screen_v3", "m1_provenance_screen_v3_pythia_repair_v1"}:
         policy = dict(registry["home_storage_policy"])
         reference_bytes = int(policy["reference_bytes"])
         limit_bytes = int(policy["limit_bytes"])
@@ -229,7 +229,7 @@ def run_preflight(args: argparse.Namespace) -> dict[str, Any]:
             checks,
             resolved_paths,
         )
-        if registry["version"] == "m1_provenance_screen_v3":
+        if registry["version"] in {"m1_provenance_screen_v3", "m1_provenance_screen_v3_pythia_repair_v1"}:
             scratch_environment = resolved_paths["scratch_environment"]
             _check(
                 all(

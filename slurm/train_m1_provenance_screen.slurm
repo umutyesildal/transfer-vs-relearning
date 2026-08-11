@@ -15,6 +15,7 @@ SCRATCH_ROOT="${M1_PROVENANCE_SCREEN_ROOT:-/vol/tmp2/yesildau/m1_provenance_scre
 REGISTRY="${M1_PROVENANCE_REGISTRY:-${REPO_ROOT}/configs/experiments/m1_provenance_screen_v1.yaml}"
 TEMPLATE="${M1_PROVENANCE_TEMPLATE:-${REPO_ROOT}/configs/training/m1_provenance_screen_seed42_template.yaml}"
 DATASET_ROOT="/vol/tmp2/yesildau/m1_canonical_form_diversity_v1/datasets"
+PROBE_REGISTRY="/vol/tmp2/yesildau/m1_form_generalization_v1/datasets/evaluations/four_form_probe_registry.csv"
 PREFLIGHT_MANIFEST="${PREFLIGHT_MANIFEST:-${SCRATCH_ROOT}/preflight/training.json}"
 cd "${REPO_ROOT}"
 module load anaconda/3-2024.06
@@ -37,6 +38,6 @@ task_tmp="${SCRATCH_ROOT}/tmp/training/${label}_${SLURM_ARRAY_JOB_ID}_${SLURM_AR
 mkdir -p "${SCRATCH_ROOT}"/{cache/huggingface,cache/torch,configs/training,logs,manifests/tokenization,manifests/smoke} "${task_tmp}"
 export TMPDIR="${task_tmp}" HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 run_python scripts/prepare_m1_cross_family_config.py --registry "${REGISTRY}" --candidate-index "${SLURM_ARRAY_TASK_ID}" --template "${TEMPLATE}" --dataset-root "${DATASET_ROOT}" --output "${config}"
-run_python scripts/audit_m1_cross_family_tokenization.py --config "${config}" --output "${SCRATCH_ROOT}/manifests/tokenization/${label}.json" --repo-root "${REPO_ROOT}"
+run_python scripts/audit_m1_cross_family_tokenization.py --config "${config}" --output "${SCRATCH_ROOT}/manifests/tokenization/${label}.json" --repo-root "${REPO_ROOT}" --probe-registry "${PROBE_REGISTRY}"
 run_python scripts/smoke_m1_cross_family_candidate.py --config "${config}" --output "${SCRATCH_ROOT}/manifests/smoke/${label}.json" --checkpoint-dir "${task_tmp}/checkpoint_smoke_${label}" --repo-root "${REPO_ROOT}"
 run_python scripts/train_clm.py --config "${config}"

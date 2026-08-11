@@ -84,7 +84,18 @@ def _manifest_local_path(manifest: dict[str, Any], base: Path) -> Path:
 def _resolve_tokenizer_path(manifest: dict[str, Any], manifest_path: Path) -> Path:
     explicit = manifest.get("tokenizer_source_path_absolute") or manifest.get("tokenizer_source_path")
     if explicit:
-        return _resolve_path(explicit, manifest_path.parent)
+        tokenizer_path = _resolve_path(explicit, manifest_path.parent)
+        expected_hashes = manifest.get("tokenizer_source_file_hashes")
+        if expected_hashes is not None:
+            observed_files = sorted(path for path in tokenizer_path.rglob("*") if path.is_file())
+            observed_relative = {str(path.relative_to(tokenizer_path)) for path in observed_files}
+            if observed_relative != set(expected_hashes):
+                raise ValueError("Tokenizer source file inventory differs from its frozen manifest")
+            for path in observed_files:
+                relative = str(path.relative_to(tokenizer_path))
+                if sha256_file(path) != expected_hashes[relative]:
+                    raise ValueError(f"Tokenizer source hash mismatch: {relative}")
+        return tokenizer_path
 
     training_manifest_values = []
     if manifest.get("training_run_dir"):

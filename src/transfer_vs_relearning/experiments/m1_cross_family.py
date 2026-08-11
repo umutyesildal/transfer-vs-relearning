@@ -38,12 +38,18 @@ def validate_registry(payload: dict[str, Any]) -> None:
         "m1_provenance_screen_v1",
         "m1_provenance_screen_retry_v2",
         "m1_provenance_screen_v3",
+        "m1_provenance_screen_v3_pythia_repair_v1",
     }:
         raise ValueError("Unexpected cross-family registry version")
     approved_scratch(Path(str(payload["scratch_root"])))
     approved_scratch(Path(str(payload["dataset_root"])))
     candidates = payload.get("candidates")
-    expected_labels = EXPECTED_LABELS if version == "m1_cross_family_screen_v1" else PROVENANCE_SCREEN_LABELS
+    if version == "m1_cross_family_screen_v1":
+        expected_labels = EXPECTED_LABELS
+    elif version == "m1_provenance_screen_v3_pythia_repair_v1":
+        expected_labels = ("pythia",)
+    else:
+        expected_labels = PROVENANCE_SCREEN_LABELS
     expected_count = len(expected_labels)
     if not isinstance(candidates, list) or len(candidates) != expected_count:
         raise ValueError(f"Registry requires exactly {expected_count} candidate entries")
@@ -62,7 +68,7 @@ def validate_registry(payload: dict[str, Any]) -> None:
         raise ValueError("All bounded provenance-screen candidates must be required")
     if version == "m1_provenance_screen_retry_v2" and not bool(payload.get("require_native_tokenizer")):
         raise ValueError("Retry-v2 must require native tokenizer assets")
-    if version == "m1_provenance_screen_v3":
+    if version in {"m1_provenance_screen_v3", "m1_provenance_screen_v3_pythia_repair_v1"}:
         if payload.get("storage_correction_sha256") != "1b55a03484682e065c9eaec106f8803b9ffdecba9301e3a0261df9e6ecd154fa":
             raise ValueError("Provenance v3 must bind the frozen Document 152b storage correction")
         if payload.get("tokenizer_validation_mode") != "model_native_roundtrip":
@@ -82,6 +88,14 @@ def validate_registry(payload: dict[str, Any]) -> None:
         limit_bytes = int(storage.get("limit_bytes", -1))
         if not 0 <= reference_bytes < limit_bytes:
             raise ValueError("Frozen HU-home reference must be non-negative and below its limit")
+    if version == "m1_provenance_screen_v3_pythia_repair_v1":
+        source = payload.get("official_tokenizer_source", {})
+        if source.get("repository") != "EleutherAI/pythia":
+            raise ValueError("Pythia repair must use the official EleutherAI/pythia tokenizer source")
+        if not re_full_sha256(str(source.get("sha256", ""))):
+            raise ValueError("Pythia repair tokenizer source needs an exact SHA-256")
+        if int(source.get("bytes", 0)) <= 0 or int(source.get("max_download_bytes", 0)) < int(source.get("bytes", 0)):
+            raise ValueError("Pythia repair tokenizer byte bounds are invalid")
     for candidate in candidates:
         overrides = candidate.get("training_overrides", {})
         if not isinstance(overrides, dict) or set(overrides) - {"model_load_dtype"}:
@@ -163,7 +177,9 @@ def materialize_training_config(
     )
     payload["model"]["base_model_manifest"] = str(model_manifest)
     payload["training"].update(candidate.get("training_overrides", {}))
-    if registry["version"] == "m1_provenance_screen_v3":
+    if registry["version"] == "m1_provenance_screen_v3_pythia_repair_v1":
+        run_prefix = "m1_provenance_screen_v3_pythia_repair_v1"
+    elif registry["version"] == "m1_provenance_screen_v3":
         run_prefix = "m1_provenance_screen_v3"
     elif registry["version"] == "m1_provenance_screen_retry_v2":
         run_prefix = "m1_provenance_screen_retry_v2"
@@ -189,6 +205,10 @@ def materialize_training_config(
     if scratch_root not in candidate_training_root(registry, candidate).parents:
         raise ValueError("Candidate training root escaped the family scratch root")
     return payload
+
+
+def re_full_sha256(value: str) -> bool:
+    return len(value) == 64 and all(character in "0123456789abcdef" for character in value)
 
 
 def find_completed_final_model(training_root: Path) -> Path:

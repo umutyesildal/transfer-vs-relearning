@@ -22,7 +22,7 @@ from transfer_vs_relearning.utils.io import sha256_file, write_json
 RELATIONS = ("profession", "born_in", "lives_in", "field_of_study", "works_in_industry")
 
 
-def _general_config(*, run_name: str, output_root: Path, model_manifest: Path, corpus: Path, repo_root: Path) -> dict[str, object]:
+def _general_config(*, run_name: str, output_root: Path, model_manifest: Path, corpus: Path, repo_root: Path, bf16: bool = True) -> dict[str, object]:
     return {
         "run_name": run_name,
         "output_root": str(output_root),
@@ -35,7 +35,7 @@ def _general_config(*, run_name: str, output_root: Path, model_manifest: Path, c
         },
         "scoring": {"block_size": 512, "batch_size": 4, "candidate_batch_size": 16, "bootstrap_samples": 2000},
         "generation": {"max_new_tokens": 64},
-        "runtime": {"device": "cuda", "bf16": True, "seed": 42},
+        "runtime": {"device": "cuda", "bf16": bf16, "seed": 42},
     }
 
 
@@ -53,7 +53,7 @@ def main() -> None:
     registry = load_registry(registry_path)
     candidate = candidate_by_index(registry, args.candidate_index)
     label = str(candidate["label"])
-    if registry["version"] == "m1_provenance_screen_v3":
+    if registry["version"] in {"m1_provenance_screen_v3", "m1_provenance_screen_v3_pythia_repair_v1"}:
         run_prefix = "m1_provenance_screen_v3"
     elif registry["version"] == "m1_provenance_screen_retry_v2":
         run_prefix = "m1_provenance_screen_retry_v2"
@@ -62,6 +62,7 @@ def main() -> None:
     else:
         run_prefix = "m1_cross_family"
     scratch_root = approved_scratch(Path(str(registry["scratch_root"])))
+    evaluation_bf16 = registry["version"] != "m1_provenance_screen_v3_pythia_repair_v1"
     output_root = approved_scratch(scratch_root / "evaluations" / label)
     if output_root.exists():
         raise FileExistsError(f"Evaluation namespace already exists: {output_root}")
@@ -98,7 +99,7 @@ def main() -> None:
         "relations": list(RELATIONS),
         "prompt": {"format": "direct", "template": "{question}", "answer_separator": " "},
         "scoring": {"primary": "mean_logprob", "secondary": "total_logprob", "tie_breaker": "canonical_object_id"},
-        "runtime": {"bf16": True, "device": "cuda", "candidate_batch_size": 64, "checkpoint_interval": 25, "seed": 42},
+        "runtime": {"bf16": evaluation_bf16, "device": "cuda", "candidate_batch_size": 64, "checkpoint_interval": 25, "seed": 42},
     }
     write_json(exact_base_config, {
         **exact_common,
@@ -116,6 +117,7 @@ def main() -> None:
         model_manifest=base_manifest,
         corpus=corpus,
         repo_root=repo_root,
+        bf16=evaluation_bf16,
     ))
     write_json(general_trained_config, _general_config(
         run_name=f"{run_prefix}_{label}_trained_general_capability",
@@ -123,6 +125,7 @@ def main() -> None:
         model_manifest=trained_manifest,
         corpus=corpus,
         repo_root=repo_root,
+        bf16=evaluation_bf16,
     ))
     weight_hashes = model_weight_hashes(final_model)
     write_json(output_root / "evaluation_manifest.json", {

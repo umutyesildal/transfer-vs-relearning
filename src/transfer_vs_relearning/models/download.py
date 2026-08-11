@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
@@ -9,6 +10,22 @@ from transfer_vs_relearning.utils.io import sha256_file, write_json
 
 def safe_model_dir_name(model_id: str) -> str:
     return model_id.replace("/", "__")
+
+
+def validate_exact_download_bytes(
+    payload: bytes,
+    *,
+    expected_bytes: int,
+    expected_sha256: str,
+    max_bytes: int,
+) -> None:
+    if len(payload) != expected_bytes:
+        raise ValueError(f"Downloaded byte count mismatch: {len(payload)} != {expected_bytes}")
+    if len(payload) > max_bytes:
+        raise ValueError("Download exceeded the frozen byte ceiling")
+    observed = hashlib.sha256(payload).hexdigest()
+    if observed != expected_sha256:
+        raise ValueError(f"Downloaded SHA-256 mismatch: {observed} != {expected_sha256}")
 
 
 def _validate_native_tokenizer_assets(tokenizer: Any, snapshot_path: Path) -> list[str]:
@@ -36,6 +53,11 @@ _TOKENIZER_ROUNDTRIP_PROBES = (
 
 
 def _tokenizer_signature(tokenizer: Any) -> dict[str, Any]:
+    vocabulary_length = int(len(tokenizer))
+    if vocabulary_length <= 2:
+        raise ValueError(
+            f"Tokenizer vocabulary is not meaningful: {vocabulary_length} entries"
+        )
     encoded_rows: list[dict[str, Any]] = []
     for text in _TOKENIZER_ROUNDTRIP_PROBES:
         encoded = tokenizer(
@@ -45,23 +67,32 @@ def _tokenizer_signature(tokenizer: Any) -> dict[str, Any]:
             return_offsets_mapping=True,
         )
         input_ids = [int(value) for value in encoded["input_ids"]]
+        attention_mask = [int(value) for value in encoded["attention_mask"]]
+        offset_mapping = [[int(start), int(end)] for start, end in encoded["offset_mapping"]]
+        decoded = tokenizer.decode(
+            input_ids,
+            skip_special_tokens=False,
+            clean_up_tokenization_spaces=False,
+        )
+        if not input_ids:
+            raise ValueError(f"Tokenizer returned empty IDs for non-empty probe: {text!r}")
+        if len(attention_mask) != len(input_ids) or len(offset_mapping) != len(input_ids):
+            raise ValueError("Tokenizer probe IDs, attention mask, and offsets have different lengths")
+        if not decoded:
+            raise ValueError(f"Tokenizer decoded a non-empty probe to empty text: {text!r}")
         encoded_rows.append(
             {
                 "text": text,
                 "input_ids": input_ids,
-                "attention_mask": [int(value) for value in encoded["attention_mask"]],
-                "offset_mapping": [[int(start), int(end)] for start, end in encoded["offset_mapping"]],
-                "decoded": tokenizer.decode(
-                    input_ids,
-                    skip_special_tokens=False,
-                    clean_up_tokenization_spaces=False,
-                ),
+                "attention_mask": attention_mask,
+                "offset_mapping": offset_mapping,
+                "decoded": decoded,
             }
         )
     return {
         "tokenizer_class": tokenizer.__class__.__name__,
         "is_fast": bool(getattr(tokenizer, "is_fast", False)),
-        "vocabulary_length": int(len(tokenizer)),
+        "vocabulary_length": vocabulary_length,
         "special_token_ids": {
             name: getattr(tokenizer, f"{name}_token_id", None)
             for name in ("bos", "eos", "pad", "unk")

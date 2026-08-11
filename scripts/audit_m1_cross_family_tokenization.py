@@ -14,8 +14,9 @@ from transfer_vs_relearning.training.clm import (
     _token_label_mask_from_offsets,
     load_training_config,
     resolve_path,
+    tokenizer_path_from_manifest,
 )
-from transfer_vs_relearning.utils.io import read_jsonl, sha256_file, write_json
+from transfer_vs_relearning.utils.io import read_csv_rows, read_jsonl, sha256_file, write_json
 
 
 def _stats(values: list[int]) -> dict[str, float | int]:
@@ -35,6 +36,7 @@ def main() -> None:
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
+    parser.add_argument("--probe-registry", type=Path)
     args = parser.parse_args()
 
     from transformers import AutoTokenizer
@@ -46,8 +48,9 @@ def main() -> None:
     model_manifest_path = resolve_path(repo_root, config["model"]["base_model_manifest"]).resolve()
     model_manifest = json.loads(model_manifest_path.read_text(encoding="utf-8"))
     model_path = Path(model_manifest["local_path_absolute"])
+    tokenizer_path = tokenizer_path_from_manifest(model_manifest, repo_root, model_path)
     tokenizer = AutoTokenizer.from_pretrained(
-        str(model_path),
+        str(tokenizer_path),
         local_files_only=True,
         use_fast=True,
         trust_remote_code=bool(model_manifest.get("allow_pinned_remote_code", False)),
@@ -105,6 +108,8 @@ def main() -> None:
             answer_start, answer_end = _answer_char_span(text, answer)
             keep = _token_label_mask_from_offsets(offsets, answer_start=answer_start, answer_end=answer_end)
             answer_count = sum(keep)
+            if answer_count <= 0:
+                raise ValueError(f"Tokenized row has zero supervised tokens: {row.get('fact_id')}")
             total_with_eos = len(ids) + 1
             if total_with_eos > block_size:
                 raise ValueError(f"Tokenized row exceeds block size: {row.get('fact_id')} {total_with_eos}>{block_size}")
@@ -135,6 +140,41 @@ def main() -> None:
     ))
     report["train_answer_tokens_per_epoch_naive_answer_only"] = train_answer_tokens
     report["train_answer_tokens_over_36_epochs_naive_answer_only"] = train_answer_tokens * 36
+    if args.probe_registry is not None:
+        probe_registry = args.probe_registry.resolve()
+        probes = read_csv_rows(probe_registry)
+        if len(probes) != 4000:
+            raise ValueError(f"Hard-probe registry must contain exactly 4,000 rows, found {len(probes)}")
+        lengths: list[int] = []
+        supervised: list[int] = []
+        for probe in probes:
+            prompt = str(probe["rendered_prompt"])
+            answer = str(probe["expected_answer"])
+            text = f"{prompt} {answer}"
+            encoded = tokenizer(text, add_special_tokens=False, return_offsets_mapping=True)
+            ids = list(encoded["input_ids"])
+            answer_start, answer_end = _answer_char_span(text, answer)
+            keep = _token_label_mask_from_offsets(
+                list(encoded["offset_mapping"]),
+                answer_start=answer_start,
+                answer_end=answer_end,
+            )
+            if sum(keep) <= 0:
+                raise ValueError(f"Hard probe has zero supervised tokens: {probe.get('probe_id')}")
+            length = len(ids) + 1
+            if length > block_size:
+                raise ValueError(f"Hard probe exceeds block size: {probe.get('probe_id')} {length}>{block_size}")
+            lengths.append(length)
+            supervised.append(sum(keep))
+        report["hard_probe_registry"] = {
+            "path": str(probe_registry),
+            "sha256": sha256_file(probe_registry),
+            "rows": len(probes),
+            "total_tokens_with_eos": _stats(lengths),
+            "answer_tokens": _stats(supervised),
+            "truncated_rows": 0,
+            "zero_supervised_rows": sum(value == 0 for value in supervised),
+        }
     report["note"] = "Offset-aligned supervised-token counts in split statistics are authoritative; naive answer-only counts are an additional segmentation diagnostic. EOS is not supervised."
     report["status"] = "passed"
     write_json(args.output.resolve(), report)

@@ -456,6 +456,26 @@ def test_resolve_tokenizer_path_prefers_explicit_manifest_field(tmp_path: Path) 
     assert _resolve_tokenizer_path(manifest, manifest_path) == tokenizer_dir
 
 
+def test_resolve_tokenizer_path_verifies_frozen_file_inventory(tmp_path: Path) -> None:
+    import hashlib
+
+    manifest_path = tmp_path / "manifest.json"
+    tokenizer_dir = tmp_path / "tokenizer"
+    tokenizer_dir.mkdir()
+    payload = b"tokenizer"
+    (tokenizer_dir / "tokenizer.json").write_bytes(payload)
+    manifest = {
+        "tokenizer_source_path_absolute": str(tokenizer_dir),
+        "tokenizer_source_file_hashes": {
+            "tokenizer.json": hashlib.sha256(payload).hexdigest(),
+        },
+    }
+    assert _resolve_tokenizer_path(manifest, manifest_path) == tokenizer_dir.resolve()
+    (tokenizer_dir / "unexpected.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(ValueError, match="inventory differs"):
+        _resolve_tokenizer_path(manifest, manifest_path)
+
+
 def test_resolve_tokenizer_path_falls_back_to_training_manifest_base_model(tmp_path: Path) -> None:
     training_run_dir = tmp_path / "runs" / "training" / "demo"
     training_run_dir.mkdir(parents=True)

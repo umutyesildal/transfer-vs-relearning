@@ -37,11 +37,27 @@ def resolve_path(repo_root: Path, value: str | Path) -> Path:
 def tokenizer_path_from_manifest(manifest: dict[str, Any], repo_root: Path, model_path: Path) -> Path:
     absolute = manifest.get("tokenizer_source_path_absolute")
     if absolute:
-        return Path(str(absolute)).resolve()
-    project_relative = manifest.get("tokenizer_source_path")
-    if project_relative:
-        return resolve_path(repo_root, str(project_relative)).resolve()
-    return model_path
+        tokenizer_path = Path(str(absolute)).resolve()
+    else:
+        project_relative = manifest.get("tokenizer_source_path")
+        tokenizer_path = (
+            resolve_path(repo_root, str(project_relative)).resolve()
+            if project_relative
+            else model_path
+        )
+    expected_hashes = manifest.get("tokenizer_source_file_hashes")
+    if expected_hashes is not None:
+        observed_files = sorted(
+            path for path in tokenizer_path.rglob("*") if path.is_file()
+        )
+        observed_relative = {str(path.relative_to(tokenizer_path)) for path in observed_files}
+        if observed_relative != set(expected_hashes):
+            raise ValueError("Tokenizer source file inventory differs from its frozen manifest")
+        for path in observed_files:
+            relative = str(path.relative_to(tokenizer_path))
+            if sha256_file(path) != expected_hashes[relative]:
+                raise ValueError(f"Tokenizer source hash mismatch: {relative}")
+    return tokenizer_path
 
 
 def estimate_optimizer_steps(

@@ -55,6 +55,42 @@ def test_provenance_v3_registry_is_model_native_and_endpoint_only() -> None:
     assert storage["home_write_allowed"] is False
 
 
+def test_pythia_repair_registry_freezes_official_tokenizer_and_fresh_root() -> None:
+    registry = load_registry(
+        _repo_root() / "configs/experiments/m1_provenance_screen_v3_pythia_repair_v1.yaml"
+    )
+    assert registry["scratch_root"].endswith("m1_provenance_screen_v3_pythia_repair_v1")
+    assert [candidate["label"] for candidate in registry["candidates"]] == ["pythia"]
+    assert registry["candidates"][0]["requested_revision"] == "0da31d8fb309463877ed8c40e54a8f911dced3ec"
+    source = registry["official_tokenizer_source"]
+    assert source["repository"] == "EleutherAI/pythia"
+    assert source["commit"] == "1e2365516a3284f18a68c13dbd4ca19fcae59a4b"
+    assert source["bytes"] == 2_467_981
+    assert source["sha256"] == "56ac4821e129d2c520fdaba60abd920fa852ada51b45c0dd52bbb6bd8c985ade"
+    assert source["expected_vocabulary_length"] == 50_277
+    assert estimated_family_gib(registry) == 46
+    storage = home_usage_evidence(registry)
+    assert storage["recursive_du_executed_for_this_stage"] is False
+
+
+def test_pythia_v100_template_changes_only_mixed_precision() -> None:
+    config_root = _repo_root() / "configs/training"
+    frozen = yaml.safe_load((config_root / "m1_provenance_screen_v3_seed42_template.yaml").read_text(encoding="utf-8"))
+    pythia = yaml.safe_load(
+        (config_root / "m1_provenance_screen_v3_pythia_v100_fp16_seed42.yaml").read_text(encoding="utf-8")
+    )
+    frozen_training = dict(frozen["training"])
+    pythia_training = dict(pythia["training"])
+    assert frozen_training.pop("bf16") is True
+    assert pythia_training.pop("bf16") is False
+    assert frozen_training.pop("fp16") is False
+    assert pythia_training.pop("fp16") is True
+    assert pythia_training == frozen_training
+    assert pythia["dataset"] == frozen["dataset"]
+    assert pythia["model"] == frozen["model"]
+    assert pythia["runtime"] == frozen["runtime"]
+
+
 def test_olmo_3090_retry_changes_only_batch_decomposition() -> None:
     config_root = _repo_root() / "configs/training"
     frozen = yaml.safe_load((config_root / "m1_provenance_screen_v3_seed42_template.yaml").read_text(encoding="utf-8"))
