@@ -67,6 +67,7 @@ def test_olmo_relocation_fallback_preserves_effective_batch_and_bounds_eval_batc
     training = template["training"]
     assert training["per_device_train_batch_size"] == 2
     assert training["gradient_accumulation_steps"] == 250
+    assert training["optimizer_foreach"] is False
     assert training["per_device_train_batch_size"] * training["gradient_accumulation_steps"] == 500
     evaluate = (repo_root() / "slurm/eval_m1_dose_pareto_olmo_rtx3090.slurm").read_text(encoding="utf-8")
     assert "--candidate-batch-size 32" in evaluate

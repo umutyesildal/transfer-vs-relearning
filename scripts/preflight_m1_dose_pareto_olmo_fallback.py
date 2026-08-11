@@ -26,6 +26,7 @@ def main() -> None:
     parser.add_argument("--oom-log", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--expected-commit", required=True)
+    parser.add_argument("--pending-job", action="append", required=True)
     args = parser.parse_args()
     repo = args.repo_root.resolve()
     registry_path = args.registry.resolve()
@@ -46,7 +47,7 @@ def main() -> None:
     if (root / "training" / "olmo").exists() or (root / "evaluations" / "olmo").exists():
         raise FileExistsError("OLMo scientific namespace is not absent")
     jobs = {}
-    for job_id in ("453387", "453388"):
+    for job_id in args.pending_job:
         state = run("squeue", "-h", "-j", job_id, "-o", "%T")
         if state != "PENDING":
             raise ValueError(f"Expected PENDING stale job {job_id}, got {state!r}")
