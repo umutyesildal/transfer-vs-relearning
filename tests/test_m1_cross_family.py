@@ -108,6 +108,14 @@ def test_olmo_v100_retry_changes_only_mixed_precision() -> None:
     assert v100["runtime"] == frozen["runtime"]
 
 
+def test_provenance_launchers_allow_isolated_scratch_python() -> None:
+    for relative in ("slurm/train_m1_provenance_screen.slurm", "slurm/eval_m1_provenance_screen.slurm"):
+        launcher = (_repo_root() / relative).read_text(encoding="utf-8")
+        assert 'M1_PROVENANCE_PYTHON' in launcher
+        assert 'test -x "${M1_PROVENANCE_PYTHON}"' in launcher
+        assert 'run_python' in launcher
+
+
 def test_materialized_config_preserves_frozen_budget(tmp_path: Path, monkeypatch) -> None:
     registry = load_registry(_repo_root() / "configs/experiments/m1_cross_family_screen_v1.yaml")
     registry["scratch_root"] = str(tmp_path / "m1_cross_family_screen_v1")
