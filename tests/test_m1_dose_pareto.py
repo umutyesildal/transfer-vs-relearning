@@ -36,6 +36,8 @@ def test_registry_and_templates_freeze_document_159() -> None:
         assert training["learning_rate"] == 5e-5
         assert training["num_train_epochs"] == 36.0
         assert training["per_device_train_batch_size"] * training["gradient_accumulation_steps"] == 500
+        if item["label"] in {"falcon", "pythia"}:
+            assert training["model_load_dtype"] == "bfloat16"
 
 
 def test_launchers_bind_gpu_classes_and_no_cleanup() -> None:
@@ -50,6 +52,9 @@ def test_launchers_bind_gpu_classes_and_no_cleanup() -> None:
     sources = "\n".join(path.read_text(encoding="utf-8") for path in (repo_root() / "slurm").glob("*m1_dose_pareto*.slurm"))
     assert "rm " not in sources
     assert "--force" not in sources
+    for label in ("olmo", "falcon"):
+        launcher = (repo_root() / f"slurm/train_m1_dose_pareto_{label}_{'v100' if label == 'olmo' else 'rtx3090'}.slurm").read_text(encoding="utf-8")
+        assert "M1_V4_PREFLIGHT" in launcher
 
 
 def test_final_gate_reproduces_eight_prompt_intersection(tmp_path: Path) -> None:

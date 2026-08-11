@@ -23,6 +23,7 @@ training:
   lr_scheduler_type: constant_with_warmup
   loss_mode: answer_only
   supervise_eos: false
+  model_load_dtype: bfloat16
   bf16: true
   fp16: false
   gradient_checkpointing: true

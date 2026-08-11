@@ -46,6 +46,11 @@ def main() -> None:
             raise ValueError("Registry changed after shared preflight")
         if not args.label:
             raise ValueError("Verification requires --label")
+        item = candidate(registry, args.label)
+        template = (repo_root / item["training_template"]).resolve()
+        template_evidence = payload.get("checks", {}).get(f"candidate:{args.label}", {})
+        if template_evidence.get("template_sha256") != sha256_file(template):
+            raise ValueError(f"{args.label} template changed after shared/retry preflight")
         if (root / "training" / args.label).exists():
             raise FileExistsError(f"Training namespace already exists for {args.label}")
         print(output)

@@ -12,7 +12,7 @@
 set -euo pipefail
 REPO_ROOT="${SLURM_SUBMIT_DIR:-$(pwd)}"; ROOT=/vol/tmp2/yesildau/m1_provenance_screen_v4_dose_pareto_v1
 REGISTRY="${REPO_ROOT}/configs/experiments/m1_provenance_screen_v4_dose_pareto_v1.yaml"; TEMPLATE="${REPO_ROOT}/configs/training/m1_provenance_screen_v4_falcon_rtx3090_bf16_seed42.yaml"
-PYTHON=/vol/tmp2/yesildau/m1_provenance_screen_v3/compat_envs/torch260_cu124_v1/bin/python; PREFLIGHT="${ROOT}/preflight/shared.json"
+PYTHON=/vol/tmp2/yesildau/m1_provenance_screen_v3/compat_envs/torch260_cu124_v1/bin/python; PREFLIGHT="${M1_V4_PREFLIGHT:-${ROOT}/preflight/shared.json}"
 cd "${REPO_ROOT}"; task_tmp="${ROOT}/tmp/training/falcon_${SLURM_JOB_ID}"
 mkdir -p "${task_tmp}" "${ROOT}/configs/training" "${ROOT}/manifests/runtime" "${ROOT}/manifests/tokenization" "${ROOT}/manifests/smoke"
 export HF_HOME="${ROOT}/cache/huggingface" TRANSFORMERS_CACHE="${ROOT}/cache/huggingface" HF_DATASETS_CACHE="${ROOT}/cache/huggingface_datasets" XDG_CACHE_HOME="${ROOT}/cache" TORCH_HOME="${ROOT}/cache/torch" TRITON_CACHE_DIR="${ROOT}/cache/triton" CUDA_CACHE_PATH="${ROOT}/cache/cuda" MPLCONFIGDIR="${ROOT}/cache/matplotlib" NUMBA_CACHE_DIR="${ROOT}/cache/numba" WANDB_DIR="${ROOT}/cache/wandb" WANDB_MODE=disabled TMPDIR="${task_tmp}" PYTHONDONTWRITEBYTECODE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1

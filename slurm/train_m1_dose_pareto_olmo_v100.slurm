@@ -14,7 +14,7 @@ ROOT=/vol/tmp2/yesildau/m1_provenance_screen_v4_dose_pareto_v1
 REGISTRY="${REPO_ROOT}/configs/experiments/m1_provenance_screen_v4_dose_pareto_v1.yaml"
 TEMPLATE="${REPO_ROOT}/configs/training/m1_provenance_screen_v4_olmo_v100_fp16_seed42.yaml"
 PYTHON=/vol/tmp2/yesildau/m1_provenance_screen_v3/compat_envs/torch260_cu124_v1/bin/python
-PREFLIGHT="${ROOT}/preflight/shared.json"
+PREFLIGHT="${M1_V4_PREFLIGHT:-${ROOT}/preflight/shared.json}"
 cd "${REPO_ROOT}"
 task_tmp="${ROOT}/tmp/training/olmo_${SLURM_JOB_ID}"
 mkdir -p "${task_tmp}" "${ROOT}/configs/training" "${ROOT}/manifests/runtime" "${ROOT}/manifests/tokenization" "${ROOT}/manifests/smoke"
