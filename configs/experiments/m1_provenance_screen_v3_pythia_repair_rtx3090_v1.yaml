@@ -1,0 +1,71 @@
+version: m1_provenance_screen_v3_pythia_repair_v1
+contract_document: documentation/156b_PYTHIA_V100_QUEUE_TO_RTX3090_RELOCATION_CONTRACT_TR.md
+contract_sha256: 6306737f6fc22916cf616e20e62e7ab15bc879df3ba2ca3e064d8db2a5a3b85e
+storage_correction_document: documentation/152b_M1_PROVENANCE_SCREEN_V3_FROZEN_HOME_REFERENCE_AND_NO_WRITE_PREFLIGHT_CORRECTION_TR.md
+storage_correction_sha256: 1b55a03484682e065c9eaec106f8803b9ffdecba9301e3a0261df9e6ecd154fa
+status: frozen_rtx3090_operational_relocation_unauthorized
+scratch_root: /vol/tmp2/yesildau/m1_provenance_screen_v3_pythia_repair_retry_v1
+preserved_pythia_model_root: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/EleutherAI__pythia-1.4b
+preserved_pythia_model_manifest: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/EleutherAI__pythia-1.4b/model_manifest.json
+dataset_version: m1_canonical_form_diversity_v1
+dataset_root: /vol/tmp2/yesildau/m1_canonical_form_diversity_v1/datasets
+training_template: configs/training/m1_provenance_screen_v3_pythia_v100_fp16_seed42.yaml
+tokenizer_validation_mode: model_native_roundtrip
+require_native_tokenizer: false
+expected_train_rows: 3500
+expected_validation_rows: 500
+expected_optimizer_updates: 252
+expected_checkpoints_per_candidate: 1
+estimated_shared_overhead_gib: 15
+official_tokenizer_source:
+  repository: EleutherAI/pythia
+  commit: 1e2365516a3284f18a68c13dbd4ca19fcae59a4b
+  path: utils/20B_tokenizer.json
+  url: https://raw.githubusercontent.com/EleutherAI/pythia/1e2365516a3284f18a68c13dbd4ca19fcae59a4b/utils/20B_tokenizer.json
+  bytes: 2467981
+  sha256: 56ac4821e129d2c520fdaba60abd920fa852ada51b45c0dd52bbb6bd8c985ade
+  max_download_bytes: 3145728
+  expected_vocabulary_length: 50277
+home_storage_policy:
+  mode: frozen_exact_reference_and_no_home_write
+  home_root: /vol/fob-vol6/mi25/yesildau
+  limit_bytes: 32212254720
+  reference_command: du -x -B1 -s /vol/fob-vol6/mi25/yesildau
+  reference_started_at: "2026-08-11T07:30:52+02:00"
+  reference_finished_at: "2026-08-11T07:32:29+02:00"
+  reference_bytes: 14689423360
+  reference_elapsed_seconds: 96.99
+  recursive_du_per_stage: false
+  home_write_allowed: false
+candidates:
+  - index: 0
+    label: pythia
+    model_id: EleutherAI/pythia-1.4b
+    requested_revision: 0da31d8fb309463877ed8c40e54a8f911dced3ec
+    required: true
+    allow_pinned_remote_code: false
+    estimated_checkpoint_gib: 30
+    estimated_download_gib: 1
+runtime:
+  python: /vol/tmp2/yesildau/m1_provenance_screen_v3/compat_envs/torch260_cu124_v1/bin/python
+  torch: 2.6.0+cu124
+  expected_gpu: NVIDIA GeForce RTX 3090
+  expected_compute_capability: "8.6"
+  expected_compiled_arch: sm_86
+gates:
+  exact_prefix_min: 0.90
+  trained_cell_min: 0.80
+  heldout_cell_min: 0.80
+  robust_intersection_min: 0.70
+  generic_ppl_ratio_max: 1.25
+  generic_ppl_ratio_preferred: 1.10
+selection:
+  endpoint: update-252-only
+  automatic_promotion: false
+  seed_43: forbidden_without_new_contract
+  m2_m3: forbidden_without_new_contract
+retention: >-
+  Preserve the official-tokenizer source evidence, composite model manifest, one update-252
+  resumable checkpoint through evaluation, the verified model-only endpoint, compact base/endpoint
+  evaluation summaries and SHA-256 records on the fresh retry scratch root. No cleanup or deletion
+  is authorized.

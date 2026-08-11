@@ -88,6 +88,30 @@ def test_pythia_retry_registry_uses_new_root_and_same_frozen_source() -> None:
     assert "pad_token=None" in repair_source
 
 
+def test_pythia_rtx3090_relocation_changes_only_runtime_identity() -> None:
+    original = yaml.safe_load(
+        (_repo_root() / "configs/experiments/m1_provenance_screen_v3_pythia_repair_retry_v1.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    relocation = yaml.safe_load(
+        (_repo_root() / "configs/experiments/m1_provenance_screen_v3_pythia_repair_rtx3090_v1.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    ignored = {"contract_document", "contract_sha256", "status", "runtime"}
+    assert {key: value for key, value in relocation.items() if key not in ignored} == {
+        key: value for key, value in original.items() if key not in ignored
+    }
+    assert relocation["runtime"] == {
+        "python": "/vol/tmp2/yesildau/m1_provenance_screen_v3/compat_envs/torch260_cu124_v1/bin/python",
+        "torch": "2.6.0+cu124",
+        "expected_gpu": "NVIDIA GeForce RTX 3090",
+        "expected_compute_capability": "8.6",
+        "expected_compiled_arch": "sm_86",
+    }
+
+
 def test_pythia_v100_template_changes_only_mixed_precision() -> None:
     config_root = _repo_root() / "configs/training"
     frozen = yaml.safe_load((config_root / "m1_provenance_screen_v3_seed42_template.yaml").read_text(encoding="utf-8"))
