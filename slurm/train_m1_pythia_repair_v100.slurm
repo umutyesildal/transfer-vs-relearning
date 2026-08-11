@@ -15,7 +15,7 @@ REGISTRY="${M1_PYTHIA_REPAIR_REGISTRY:-${REPO_ROOT}/configs/experiments/m1_prove
 TEMPLATE="${REPO_ROOT}/configs/training/m1_provenance_screen_v3_pythia_v100_fp16_seed42.yaml"
 DATASET_ROOT="/vol/tmp2/yesildau/m1_canonical_form_diversity_v1/datasets"
 PROBE_REGISTRY="/vol/tmp2/yesildau/m1_form_generalization_v1/datasets/evaluations/four_form_probe_registry.csv"
-PREFLIGHT_MANIFEST="${SCRATCH_ROOT}/preflight/training.json"
+PREFLIGHT_MANIFEST="${M1_PYTHIA_PREFLIGHT_MANIFEST:-${SCRATCH_ROOT}/preflight/training.json}"
 PYTHON="/vol/tmp2/yesildau/m1_provenance_screen_v3/compat_envs/torch260_cu124_v1/bin/python"
 cd "${REPO_ROOT}"
 module load anaconda/3-2024.06

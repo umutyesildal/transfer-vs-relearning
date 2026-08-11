@@ -110,6 +110,13 @@ def test_pythia_rtx3090_relocation_changes_only_runtime_identity() -> None:
         "expected_compute_capability": "8.6",
         "expected_compiled_arch": "sm_86",
     }
+    for launcher_name, stage in (
+        ("train_m1_pythia_repair_v100.slurm", "training"),
+        ("eval_m1_pythia_repair_v100.slurm", "evaluation"),
+    ):
+        launcher = (_repo_root() / "slurm" / launcher_name).read_text(encoding="utf-8")
+        assert "M1_PYTHIA_PREFLIGHT_MANIFEST" in launcher
+        assert f"preflight/{stage}.json" in launcher
 
 
 def test_pythia_v100_template_changes_only_mixed_precision() -> None:
