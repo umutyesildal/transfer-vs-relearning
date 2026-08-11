@@ -148,11 +148,13 @@ def main() -> None:
         "attention_mask": torch.tensor(batch_attention_mask, device=device),
         "labels": torch.tensor(batch_labels, device=device),
     }
-    optimizer = torch.optim.AdamW(
-        model.parameters(),
-        lr=float(training["learning_rate"]),
-        weight_decay=float(training.get("weight_decay", 0.0)),
-    )
+    optimizer_kwargs: dict[str, Any] = {
+        "lr": float(training["learning_rate"]),
+        "weight_decay": float(training.get("weight_decay", 0.0)),
+    }
+    if "optimizer_foreach" in training:
+        optimizer_kwargs["foreach"] = bool(training["optimizer_foreach"])
+    optimizer = torch.optim.AdamW(model.parameters(), **optimizer_kwargs)
     gradient_accumulation_steps = int(training.get("gradient_accumulation_steps", 1))
     smoke_loss = 0.0
     gradient_norm = None
@@ -212,6 +214,7 @@ def main() -> None:
         "supervised_tokens_by_representation": dict(sorted(supervised_by_representation.items())),
         "batch_size": batch_size,
         "gradient_accumulation_steps": gradient_accumulation_steps,
+        "optimizer_foreach": training.get("optimizer_foreach", "framework_default"),
         "optimizer_steps": args.optimizer_steps,
         "model_load_dtype": str(training.get("model_load_dtype", "native_config")),
         "allow_pinned_remote_code": trust_remote_code,

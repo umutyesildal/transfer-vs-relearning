@@ -1015,6 +1015,22 @@ def _run_hf_training(
         "eval_dataset": lm_datasets["test"],
         "data_collator": collator,
     }
+    optimizer_foreach = training_config.get("optimizer_foreach")
+    if optimizer_foreach is not None:
+        if retention_config or contrastive_config:
+            raise ValueError("optimizer_foreach override is only supported for plain CLM training")
+        optimizer = torch.optim.AdamW(
+            model.parameters(),
+            lr=float(training_config["learning_rate"]),
+            betas=(
+                float(training_config.get("adam_beta1", 0.9)),
+                float(training_config.get("adam_beta2", 0.999)),
+            ),
+            eps=float(training_config.get("adam_epsilon", 1e-8)),
+            weight_decay=float(training_config.get("weight_decay", 0.0)),
+            foreach=bool(optimizer_foreach),
+        )
+        trainer_kwargs["optimizers"] = (optimizer, None)
     if retention_config:
         trainer_kwargs["replay_coefficient"] = retention_coefficient
     if contrastive_config:
@@ -1065,6 +1081,7 @@ def _run_hf_training(
         "save_steps": save_steps,
         "eval_steps": eval_steps,
         "warmup_steps": warmup_steps,
+        "optimizer_foreach": training_config.get("optimizer_foreach", "framework_default"),
         "train_metrics": train_metrics,
         "eval_metrics": eval_metrics,
         "retention_loss_metrics": replay_metrics,

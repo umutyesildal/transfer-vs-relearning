@@ -74,6 +74,22 @@ def test_olmo_3090_retry_changes_only_batch_decomposition() -> None:
     assert 5 * 100 == 10 * 50 == 500
 
 
+def test_olmo_3090_foreach_retry_changes_only_optimizer_kernel() -> None:
+    config_root = _repo_root() / "configs/training"
+    batch_retry = yaml.safe_load(
+        (config_root / "m1_provenance_screen_v3_olmo_3090_retry_seed42.yaml").read_text(encoding="utf-8")
+    )
+    foreach_retry = yaml.safe_load(
+        (config_root / "m1_provenance_screen_v3_olmo_3090_retry_foreach_false_seed42.yaml").read_text(encoding="utf-8")
+    )
+    foreach_training = dict(foreach_retry["training"])
+    assert foreach_training.pop("optimizer_foreach") is False
+    assert foreach_training == batch_retry["training"]
+    assert foreach_retry["dataset"] == batch_retry["dataset"]
+    assert foreach_retry["model"] == batch_retry["model"]
+    assert foreach_retry["runtime"] == batch_retry["runtime"]
+
+
 def test_materialized_config_preserves_frozen_budget(tmp_path: Path, monkeypatch) -> None:
     registry = load_registry(_repo_root() / "configs/experiments/m1_cross_family_screen_v1.yaml")
     registry["scratch_root"] = str(tmp_path / "m1_cross_family_screen_v1")
