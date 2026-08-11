@@ -162,6 +162,15 @@ def run_preflight(args: argparse.Namespace) -> dict[str, Any]:
         _check(registry_path.is_file(), "registry_exists", checks, str(registry_path))
         _check(template.is_file(), "training_template_exists", checks, str(template))
         _check(launcher.is_file(), "launcher_exists", checks, str(launcher))
+        declared_template = Path(str(registry["training_template"]))
+        if not declared_template.is_absolute():
+            declared_template = repo_root / declared_template
+        _check(
+            template == declared_template.resolve(),
+            "registry_training_template_binding",
+            checks,
+            {"submitted": str(template), "declared": str(declared_template.resolve())},
+        )
         _check(
             not (args.allow_subset_retry and args.allow_completed_subset_evaluation),
             "subset_mode_is_unambiguous",

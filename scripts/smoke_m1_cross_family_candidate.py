@@ -58,6 +58,7 @@ def main() -> None:
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     parser.add_argument("--batch-size", type=int)
     parser.add_argument("--optimizer-steps", type=int, default=1)
+    parser.add_argument("--preserve-checkpoint", action="store_true")
     args = parser.parse_args()
 
     import torch
@@ -188,6 +189,26 @@ def main() -> None:
     gradient_tensors = sum(1 for parameter in model.parameters() if parameter.grad is not None)
     if gradient_tensors == 0:
         raise ValueError("Smoke backward pass produced no gradients")
+    parameter_dtypes = sorted({str(parameter.dtype) for parameter in model.parameters() if parameter.requires_grad})
+    gradient_dtypes = sorted({str(parameter.grad.dtype) for parameter in model.parameters() if parameter.grad is not None})
+    optimizer_state_dtypes: defaultdict[str, set[str]] = defaultdict(set)
+    for state in optimizer.state.values():
+        for key, value in state.items():
+            if torch.is_tensor(value):
+                optimizer_state_dtypes[str(key)].add(str(value.dtype))
+    frozen_model_dtype = str(training.get("model_load_dtype", ""))
+    if use_bf16:
+        if frozen_model_dtype != "bfloat16":
+            raise ValueError("BF16 smoke requires explicit bfloat16 model_load_dtype")
+        if parameter_dtypes != ["torch.bfloat16"] or gradient_dtypes != ["torch.bfloat16"]:
+            raise ValueError(
+                f"BF16 parameter/gradient dtype gate failed: parameters={parameter_dtypes}, gradients={gradient_dtypes}"
+            )
+        for state_key in ("exp_avg", "exp_avg_sq"):
+            if optimizer_state_dtypes.get(state_key) != {"torch.bfloat16"}:
+                raise ValueError(
+                    f"BF16 AdamW state dtype gate failed for {state_key}: {sorted(optimizer_state_dtypes.get(state_key, set()))}"
+                )
     peak_allocated_bytes = torch.cuda.max_memory_allocated()
 
     checkpoint_dir = approved_scratch(args.checkpoint_dir.resolve())
@@ -234,6 +255,11 @@ def main() -> None:
         "loss": smoke_loss,
         "gradient_norm": float(gradient_norm.detach().cpu()) if gradient_norm is not None else None,
         "gradient_tensors": gradient_tensors,
+        "parameter_dtypes": parameter_dtypes,
+        "gradient_dtypes": gradient_dtypes,
+        "optimizer_state_dtypes": {
+            key: sorted(values) for key, values in sorted(optimizer_state_dtypes.items())
+        },
         "gpu": torch.cuda.get_device_name(0),
         "peak_allocated_bytes": peak_allocated_bytes,
         "checkpoint_files": len(checkpoint_files),
@@ -241,10 +267,12 @@ def main() -> None:
         "checkpoint_weight_hashes": checkpoint_hashes,
         "reload_class": reload_class,
         "reload_parameters": reload_parameters,
-        "checkpoint_cleanup": "completed_after_successful_reload",
     }
-    # The checkpoint is a reproducible smoke artifact, never a selected scientific model.
-    shutil.rmtree(checkpoint_dir)
+    # Historical waves removed this reproducible smoke artifact after reload. New bounded waves
+    # can preserve it when their explicit no-deletion contract requires that evidence.
+    if not args.preserve_checkpoint:
+        shutil.rmtree(checkpoint_dir)
+    report["checkpoint_cleanup"] = "preserved_after_successful_reload" if args.preserve_checkpoint else "completed_after_successful_reload"
     write_json(args.output.resolve(), report)
     print(json.dumps(report, indent=2, sort_keys=True))
 

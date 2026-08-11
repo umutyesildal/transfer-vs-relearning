@@ -119,6 +119,67 @@ def test_pythia_rtx3090_relocation_changes_only_runtime_identity() -> None:
         assert f"preflight/{stage}.json" in launcher
 
 
+def test_pythia_rtx3090_bf16_repair_preserves_scientific_recipe() -> None:
+    config_root = _repo_root() / "configs/training"
+    fp16 = yaml.safe_load(
+        (config_root / "m1_provenance_screen_v3_pythia_v100_fp16_seed42.yaml").read_text(encoding="utf-8")
+    )
+    bf16 = yaml.safe_load(
+        (config_root / "m1_provenance_screen_v3_pythia_rtx3090_bf16_seed42.yaml").read_text(encoding="utf-8")
+    )
+    assert fp16["dataset"] == bf16["dataset"]
+    assert fp16["model"] == bf16["model"]
+    assert fp16["runtime"] == bf16["runtime"]
+    precision = {"bf16", "fp16"}
+    assert {key: value for key, value in fp16["training"].items() if key not in precision} == {
+        key: value for key, value in bf16["training"].items() if key not in precision
+    }
+    assert (fp16["training"]["bf16"], fp16["training"]["fp16"]) == (False, True)
+    assert (bf16["training"]["bf16"], bf16["training"]["fp16"]) == (True, False)
+
+    registry = yaml.safe_load(
+        (
+            _repo_root()
+            / "configs/experiments/m1_provenance_screen_v3_pythia_repair_rtx3090_bf16_v1.yaml"
+        ).read_text(encoding="utf-8")
+    )
+    assert registry["candidates"][0]["training_overrides"] == {"model_load_dtype": "bfloat16"}
+    assert registry["runtime"]["expected_amp_dtype"] == "bfloat16"
+    assert registry["runtime"]["min_free_memory_bytes"] == 20 * 1024**3
+    validator = (_repo_root() / "scripts/validate_m1_pythia_v100_runtime.py").read_text(encoding="utf-8")
+    assert 'expected.get("expected_amp_dtype", "float16")' in validator
+    assert "torch.cuda.is_bf16_supported()" in validator
+    assert "torch.cuda.mem_get_info(0)" in validator
+    for launcher_name in ("train_m1_pythia_repair_v100.slurm", "eval_m1_pythia_repair_v100.slurm"):
+        launcher = (_repo_root() / "slurm" / launcher_name).read_text(encoding="utf-8")
+        assert "M1_PYTHIA_REPAIR_TEMPLATE" in launcher
+
+    train_launcher = (
+        _repo_root() / "slurm/train_m1_pythia_repair_rtx3090_bf16.slurm"
+    ).read_text(encoding="utf-8")
+    eval_launcher = (
+        _repo_root() / "slurm/eval_m1_pythia_repair_rtx3090_bf16.slurm"
+    ).read_text(encoding="utf-8")
+    for launcher in (train_launcher, eval_launcher):
+        assert "#SBATCH --gres=gpu:rtx3090:1" in launcher
+        assert "#SBATCH --exclude=guppi6" in launcher
+        assert "m1_provenance_screen_v3_pythia_repair_retry_v1/logs" in launcher
+        assert "m1_provenance_screen_v3_pythia_repair_rtx3090_bf16_v1.yaml" in launcher
+        assert "m1_provenance_screen_v3_pythia_rtx3090_bf16_seed42.yaml" in launcher
+        assert "M1_PYTHIA_REPAIR_ROOT" not in launcher
+        assert "M1_PYTHIA_REPAIR_REGISTRY" not in launcher
+        assert "M1_PYTHIA_REPAIR_TEMPLATE" not in launcher
+    assert "training_rtx3090_bf16.json" in train_launcher
+    assert "evaluation_rtx3090_bf16.json" in eval_launcher
+    assert "--preserve-checkpoint" in train_launcher
+
+    preflight = (_repo_root() / "scripts/m1_cross_family_preflight.py").read_text(encoding="utf-8")
+    assert "registry_training_template_binding" in preflight
+    smoke = (_repo_root() / "scripts/smoke_m1_cross_family_candidate.py").read_text(encoding="utf-8")
+    assert "optimizer_state_dtypes" in smoke
+    assert "BF16 AdamW state dtype gate failed" in smoke
+
+
 def test_pythia_v100_template_changes_only_mixed_precision() -> None:
     config_root = _repo_root() / "configs/training"
     frozen = yaml.safe_load((config_root / "m1_provenance_screen_v3_seed42_template.yaml").read_text(encoding="utf-8"))
