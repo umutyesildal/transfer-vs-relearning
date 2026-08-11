@@ -13,7 +13,7 @@ set -euo pipefail
 REPO_ROOT="${SLURM_SUBMIT_DIR:-$(pwd)}"
 SCRATCH_ROOT="${M1_PROVENANCE_SCREEN_ROOT:-/vol/tmp2/yesildau/m1_provenance_screen_v1}"
 REGISTRY="${M1_PROVENANCE_REGISTRY:-${REPO_ROOT}/configs/experiments/m1_provenance_screen_v1.yaml}"
-TEMPLATE="${REPO_ROOT}/configs/training/m1_provenance_screen_seed42_template.yaml"
+TEMPLATE="${M1_PROVENANCE_TEMPLATE:-${REPO_ROOT}/configs/training/m1_provenance_screen_seed42_template.yaml}"
 PREFLIGHT_MANIFEST="${PREFLIGHT_MANIFEST:-${SCRATCH_ROOT}/preflight/acquisition.json}"
 cd "${REPO_ROOT}"
 module load anaconda/3-2024.06

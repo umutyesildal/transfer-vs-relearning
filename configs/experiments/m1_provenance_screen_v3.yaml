@@ -1,0 +1,67 @@
+version: m1_provenance_screen_v3
+contract_document: documentation/152a_M1_PROVENANCE_SCREEN_MODEL_NATIVE_REPAIR_AND_EXECUTION_PLAN_TR.md
+contract_sha256: 411b32bedebc8f710b0d533ba7d17884d854bafe892496068ef20517d90a950a
+status: frozen_exact_user_authorized_execution
+scratch_root: /vol/tmp2/yesildau/m1_provenance_screen_v3
+preserve_roots:
+  - /vol/tmp2/yesildau/m1_provenance_screen_v1
+  - /vol/tmp2/yesildau/m1_provenance_screen_retry_v1
+  - /vol/tmp2/yesildau/m1_provenance_screen_retry_v2
+dataset_version: m1_canonical_form_diversity_v1
+dataset_root: /vol/tmp2/yesildau/m1_canonical_form_diversity_v1/datasets
+training_template: configs/training/m1_provenance_screen_v3_seed42_template.yaml
+tokenizer_validation_mode: model_native_roundtrip
+require_native_tokenizer: false
+expected_train_rows: 3500
+expected_validation_rows: 500
+expected_optimizer_updates: 252
+expected_checkpoints_per_candidate: 1
+estimated_shared_overhead_gib: 45
+candidates:
+  - index: 0
+    label: olmo
+    model_id: allenai/OLMo-2-0425-1B
+    requested_revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+    required: true
+    allow_pinned_remote_code: false
+    estimated_checkpoint_gib: 25
+    estimated_download_gib: 8
+  - index: 1
+    label: pythia
+    model_id: EleutherAI/pythia-1.4b
+    requested_revision: 0da31d8fb309463877ed8c40e54a8f911dced3ec
+    required: true
+    allow_pinned_remote_code: false
+    estimated_checkpoint_gib: 30
+    estimated_download_gib: 8
+  - index: 2
+    label: falcon
+    model_id: tiiuae/falcon-rw-1b
+    requested_revision: e4b9872bb803165eb22f0a867d4e6a64d34fce19
+    required: true
+    allow_pinned_remote_code: false
+    estimated_checkpoint_gib: 25
+    estimated_download_gib: 8
+reference:
+  label: historical_same_population_context
+  result_documents:
+    - documentation/104_M1_CANONICAL_FORM_DIVERSITY_REMEDIATION_RESULT.md
+    - documentation/106_M1_CROSS_FAMILY_MODEL_SCREENING_RESULT.md
+  retrain: false
+gates:
+  exact_prefix_min: 0.90
+  trained_cell_min: 0.80
+  heldout_cell_min: 0.80
+  robust_intersection_min: 0.70
+  generic_ppl_ratio_max: 1.25
+  generic_ppl_ratio_preferred: 1.10
+selection:
+  endpoint: update-252-only
+  automatic_promotion: false
+  seed_43: forbidden_without_new_contract
+  m2_m3: forbidden_without_new_contract
+retention: >-
+  Preserve one update-252 resumable checkpoint through base/endpoint evaluation, then retain the
+  verified update-252 model-only endpoint, model-native tokenizer/config, source revision,
+  training manifest, compact evaluation summaries and SHA-256 records on scratch. No cleanup or
+  deletion is authorized by this execution.

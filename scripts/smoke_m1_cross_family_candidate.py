@@ -71,8 +71,14 @@ def main() -> None:
     model_manifest = json.loads(model_manifest_path.read_text(encoding="utf-8"))
     model_path = Path(model_manifest["local_path_absolute"])
     declared_weight_hashes = _verify_base_weights(model_path, model_manifest)
+    trust_remote_code = bool(model_manifest.get("allow_pinned_remote_code", False))
 
-    tokenizer = AutoTokenizer.from_pretrained(str(model_path), local_files_only=True, use_fast=True)
+    tokenizer = AutoTokenizer.from_pretrained(
+        str(model_path),
+        local_files_only=True,
+        use_fast=True,
+        trust_remote_code=trust_remote_code,
+    )
     if not tokenizer.is_fast or tokenizer.eos_token_id is None:
         raise ValueError("Candidate requires a fast tokenizer with EOS for answer-only masking")
     if tokenizer.pad_token is None:
@@ -126,7 +132,11 @@ def main() -> None:
 
     device = torch.device("cuda")
     model_load_dtype = resolve_model_load_dtype(torch, training)
-    model_kwargs: dict[str, Any] = {"local_files_only": True, "low_cpu_mem_usage": True}
+    model_kwargs: dict[str, Any] = {
+        "local_files_only": True,
+        "low_cpu_mem_usage": True,
+        "trust_remote_code": trust_remote_code,
+    }
     if model_load_dtype is not None:
         model_kwargs["torch_dtype"] = model_load_dtype
     model = AutoModelForCausalLM.from_pretrained(str(model_path), **model_kwargs)
@@ -178,7 +188,13 @@ def main() -> None:
     del output, inputs, optimizer, model
     gc.collect()
     torch.cuda.empty_cache()
-    reloaded = AutoModelForCausalLM.from_pretrained(str(checkpoint_dir), local_files_only=True, low_cpu_mem_usage=True, torch_dtype="auto")
+    reloaded = AutoModelForCausalLM.from_pretrained(
+        str(checkpoint_dir),
+        local_files_only=True,
+        low_cpu_mem_usage=True,
+        torch_dtype="auto",
+        trust_remote_code=trust_remote_code,
+    )
     reload_class = reloaded.__class__.__name__
     reload_parameters = sum(parameter.numel() for parameter in reloaded.parameters())
     del reloaded
@@ -198,6 +214,7 @@ def main() -> None:
         "gradient_accumulation_steps": gradient_accumulation_steps,
         "optimizer_steps": args.optimizer_steps,
         "model_load_dtype": str(training.get("model_load_dtype", "native_config")),
+        "allow_pinned_remote_code": trust_remote_code,
         "loss": smoke_loss,
         "gradient_norm": float(gradient_norm.detach().cpu()) if gradient_norm is not None else None,
         "gradient_tensors": gradient_tensors,

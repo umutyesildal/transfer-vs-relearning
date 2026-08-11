@@ -37,6 +37,7 @@ def validate_registry(payload: dict[str, Any]) -> None:
         "m1_cross_family_screen_v1",
         "m1_provenance_screen_v1",
         "m1_provenance_screen_retry_v2",
+        "m1_provenance_screen_v3",
     }:
         raise ValueError("Unexpected cross-family registry version")
     approved_scratch(Path(str(payload["scratch_root"])))
@@ -61,10 +62,19 @@ def validate_registry(payload: dict[str, Any]) -> None:
         raise ValueError("All bounded provenance-screen candidates must be required")
     if version == "m1_provenance_screen_retry_v2" and not bool(payload.get("require_native_tokenizer")):
         raise ValueError("Retry-v2 must require native tokenizer assets")
+    if version == "m1_provenance_screen_v3":
+        if payload.get("tokenizer_validation_mode") != "model_native_roundtrip":
+            raise ValueError("Provenance v3 must use model-native tokenizer round-trip validation")
+        if bool(payload.get("require_native_tokenizer")):
+            raise ValueError("Provenance v3 must not require universal tokenizer filenames")
+        if int(payload.get("expected_checkpoints_per_candidate", 0)) != 1:
+            raise ValueError("Provenance v3 must retain exactly one endpoint checkpoint per candidate")
     for candidate in candidates:
         overrides = candidate.get("training_overrides", {})
         if not isinstance(overrides, dict) or set(overrides) - {"model_load_dtype"}:
             raise ValueError(f"Unsupported training overrides for {candidate['label']}: {overrides}")
+        if not isinstance(candidate.get("allow_pinned_remote_code", False), bool):
+            raise ValueError(f"Pinned remote-code policy must be boolean for {candidate['label']}")
     if version == "m1_cross_family_screen_v1":
         stable_overrides = candidates[1].get("training_overrides", {})
         if stable_overrides not in ({}, {"model_load_dtype": "bfloat16"}):
@@ -140,7 +150,9 @@ def materialize_training_config(
     )
     payload["model"]["base_model_manifest"] = str(model_manifest)
     payload["training"].update(candidate.get("training_overrides", {}))
-    if registry["version"] == "m1_provenance_screen_retry_v2":
+    if registry["version"] == "m1_provenance_screen_v3":
+        run_prefix = "m1_provenance_screen_v3"
+    elif registry["version"] == "m1_provenance_screen_retry_v2":
         run_prefix = "m1_provenance_screen_retry_v2"
     elif registry["version"] == "m1_provenance_screen_v1":
         run_prefix = "m1_provenance_screen"

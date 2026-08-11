@@ -53,7 +53,9 @@ def main() -> None:
     registry = load_registry(registry_path)
     candidate = candidate_by_index(registry, args.candidate_index)
     label = str(candidate["label"])
-    if registry["version"] == "m1_provenance_screen_retry_v2":
+    if registry["version"] == "m1_provenance_screen_v3":
+        run_prefix = "m1_provenance_screen_v3"
+    elif registry["version"] == "m1_provenance_screen_retry_v2":
         run_prefix = "m1_provenance_screen_retry_v2"
     elif registry["version"] == "m1_provenance_screen_v1":
         run_prefix = "m1_provenance_screen"
@@ -83,21 +85,30 @@ def main() -> None:
         training_run_dir=final_model.parent,
     )
 
-    exact_config = output_root / "configs/exact_trained.json"
+    exact_base_config = output_root / "configs/exact_base.json"
+    exact_trained_config = output_root / "configs/exact_trained.json"
     general_base_config = output_root / "configs/general_base.json"
     general_trained_config = output_root / "configs/general_trained.json"
-    write_json(exact_config, {
+    exact_common = {
         "dataset_version": "relation_v2_gate_v1_100_subjects_500_facts_direct",
         "dataset_dir": str(repo_root / "artifacts/datasets/relation_v2_gate_v1"),
         "pilot_subject_file": str(repo_root / "artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/summary.json"),
         "probe_files": {"en": str(repo_root / "artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/exact_prefix_probes_en.csv")},
-        "model_manifest": str(trained_manifest),
         "languages": ["en"],
         "relations": list(RELATIONS),
         "prompt": {"format": "direct", "template": "{question}", "answer_separator": " "},
         "scoring": {"primary": "mean_logprob", "secondary": "total_logprob", "tie_breaker": "canonical_object_id"},
         "runtime": {"bf16": True, "device": "cuda", "candidate_batch_size": 64, "checkpoint_interval": 25, "seed": 42},
-        "output": {"run_root": str(output_root / "exact_prefix")},
+    }
+    write_json(exact_base_config, {
+        **exact_common,
+        "model_manifest": str(base_manifest),
+        "output": {"run_root": str(output_root / "exact_prefix/base")},
+    })
+    write_json(exact_trained_config, {
+        **exact_common,
+        "model_manifest": str(trained_manifest),
+        "output": {"run_root": str(output_root / "exact_prefix/trained")},
     })
     write_json(general_base_config, _general_config(
         run_name=f"{run_prefix}_{label}_base_general_capability",
@@ -133,8 +144,10 @@ def main() -> None:
         "probe_registry_sha256": sha256_file(probe_registry),
         "general_corpus": str(corpus),
         "general_corpus_sha256": sha256_file(corpus),
-        "hard_output": str(output_root / "hard_suite"),
-        "exact_config": str(exact_config),
+        "hard_base_output": str(output_root / "hard_suite/base"),
+        "hard_trained_output": str(output_root / "hard_suite/trained"),
+        "exact_base_config": str(exact_base_config),
+        "exact_trained_config": str(exact_trained_config),
         "general_base_config": str(general_base_config),
         "general_trained_config": str(general_trained_config),
     })

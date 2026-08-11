@@ -157,7 +157,13 @@ def _load_model(config: dict[str, Any]) -> tuple[Any, Any, str, dict[str, Any], 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     model_path = _manifest_local_path(manifest, manifest_path.parent)
     tokenizer_path = _resolve_tokenizer_path(manifest, manifest_path)
-    tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path), local_files_only=True, use_fast=True)
+    trust_remote_code = bool(manifest.get("allow_pinned_remote_code", False))
+    tokenizer = AutoTokenizer.from_pretrained(
+        str(tokenizer_path),
+        local_files_only=True,
+        use_fast=True,
+        trust_remote_code=trust_remote_code,
+    )
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     use_bf16 = (
@@ -170,6 +176,7 @@ def _load_model(config: dict[str, Any]) -> tuple[Any, Any, str, dict[str, Any], 
         str(model_path),
         local_files_only=True,
         torch_dtype=dtype,
+        trust_remote_code=trust_remote_code,
     )
     requested_device = config.get("runtime", {}).get("device", "cuda")
     device = "cuda" if requested_device == "cuda" and torch.cuda.is_available() else "cpu"

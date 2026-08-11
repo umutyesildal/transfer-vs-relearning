@@ -45,6 +45,8 @@ def main() -> None:
             revision=str(candidate["requested_revision"]),
             artifact_root=artifact_root,
             require_native_tokenizer=bool(registry.get("require_native_tokenizer", False)),
+            tokenizer_validation_mode=registry.get("tokenizer_validation_mode"),
+            allow_pinned_remote_code=bool(candidate.get("allow_pinned_remote_code", False)),
         )
         record = {
             **base_record,
@@ -53,6 +55,9 @@ def main() -> None:
             "model_manifest": str(artifact_root / str(candidate["model_id"]).replace("/", "__") / "model_manifest.json"),
             "parameter_count": manifest["parameter_count"],
             "tokenizer_class": manifest["tokenizer_class"],
+            "tokenizer_validation_mode": manifest.get("tokenizer_validation_mode"),
+            "tokenizer_length": manifest.get("tokenizer_length"),
+            "model_input_embedding_rows": manifest.get("model_input_embedding_rows"),
         }
         write_json(access_record, record)
         print(json.dumps(record, indent=2, sort_keys=True))

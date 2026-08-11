@@ -179,11 +179,22 @@ class CausalCandidateEvaluator:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         local_path = str(_manifest_local_path(manifest, manifest_path.parent))
         tokenizer_path = str(_resolve_tokenizer_path(manifest, manifest_path))
-        tokenizer = AutoTokenizer.from_pretrained(tokenizer_path, local_files_only=True, use_fast=True)
+        trust_remote_code = bool(manifest.get("allow_pinned_remote_code", False))
+        tokenizer = AutoTokenizer.from_pretrained(
+            tokenizer_path,
+            local_files_only=True,
+            use_fast=True,
+            trust_remote_code=trust_remote_code,
+        )
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
         dtype = torch.bfloat16 if self.config["runtime"].get("bf16") and torch.cuda.is_available() and torch.cuda.is_bf16_supported() else None
-        model = AutoModelForCausalLM.from_pretrained(local_path, local_files_only=True, torch_dtype=dtype)
+        model = AutoModelForCausalLM.from_pretrained(
+            local_path,
+            local_files_only=True,
+            torch_dtype=dtype,
+            trust_remote_code=trust_remote_code,
+        )
         device = "cuda" if self.config["runtime"].get("device") == "cuda" and torch.cuda.is_available() else "cpu"
         model.to(device)
         model.eval()

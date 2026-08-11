@@ -14,12 +14,15 @@ set -euo pipefail
 REPO_ROOT="${SLURM_SUBMIT_DIR:-$(pwd)}"
 SCRATCH_ROOT="${M1_PROVENANCE_SCREEN_ROOT:-/vol/tmp2/yesildau/m1_provenance_screen_v1}"
 REGISTRY="${M1_PROVENANCE_REGISTRY:-${REPO_ROOT}/configs/experiments/m1_provenance_screen_v1.yaml}"
-TEMPLATE="${REPO_ROOT}/configs/training/m1_provenance_screen_seed42_template.yaml"
-MANIFEST="${SCRATCH_ROOT}/preflight/${PREFLIGHT_STAGE}.json"
+TEMPLATE="${M1_PROVENANCE_TEMPLATE:-${REPO_ROOT}/configs/training/m1_provenance_screen_seed42_template.yaml}"
+MANIFEST="${PREFLIGHT_MANIFEST_PATH:-${SCRATCH_ROOT}/preflight/${PREFLIGHT_STAGE}.json}"
 indices_value="${CANDIDATE_INDICES:-0:1:2}"
 IFS=':' read -r -a indices <<< "${indices_value}"
 candidate_args=()
 for index in "${indices[@]}"; do candidate_args+=(--candidate-index "${index}"); done
+mode_args=()
+if [[ "${ALLOW_SUBSET_RETRY:-0}" == "1" ]]; then mode_args+=(--allow-subset-retry); fi
+if [[ "${ALLOW_COMPLETED_SUBSET_EVALUATION:-0}" == "1" ]]; then mode_args+=(--allow-completed-subset-evaluation); fi
 cd "${REPO_ROOT}"
 module load anaconda/3-2024.06
 conda run --name xfer-relearn python scripts/m1_cross_family_preflight.py \
@@ -31,4 +34,5 @@ conda run --name xfer-relearn python scripts/m1_cross_family_preflight.py \
   --target-job-name "${TARGET_JOB_NAME}" \
   --manifest "${MANIFEST}" \
   --expected-commit "$(git rev-parse HEAD)" \
+  "${mode_args[@]}" \
   "${candidate_args[@]}"

@@ -421,11 +421,20 @@ def _run_hf_training(
     model_path = Path(model_manifest["local_path_absolute"])
     tokenizer_path = tokenizer_path_from_manifest(model_manifest, repo_root, model_path)
     local_files_only = bool(runtime_config.get("local_files_only", True))
-    tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path), local_files_only=local_files_only, use_fast=True)
+    trust_remote_code = bool(model_manifest.get("allow_pinned_remote_code", False))
+    tokenizer = AutoTokenizer.from_pretrained(
+        str(tokenizer_path),
+        local_files_only=local_files_only,
+        use_fast=True,
+        trust_remote_code=trust_remote_code,
+    )
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     model_load_dtype = resolve_model_load_dtype(torch, training_config)
-    model_kwargs: dict[str, Any] = {"local_files_only": local_files_only}
+    model_kwargs: dict[str, Any] = {
+        "local_files_only": local_files_only,
+        "trust_remote_code": trust_remote_code,
+    }
     if model_load_dtype is not None:
         model_kwargs["torch_dtype"] = model_load_dtype
     model = AutoModelForCausalLM.from_pretrained(str(model_path), **model_kwargs)

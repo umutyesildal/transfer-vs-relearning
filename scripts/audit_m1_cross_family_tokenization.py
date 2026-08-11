@@ -46,7 +46,12 @@ def main() -> None:
     model_manifest_path = resolve_path(repo_root, config["model"]["base_model_manifest"]).resolve()
     model_manifest = json.loads(model_manifest_path.read_text(encoding="utf-8"))
     model_path = Path(model_manifest["local_path_absolute"])
-    tokenizer = AutoTokenizer.from_pretrained(str(model_path), local_files_only=True, use_fast=True)
+    tokenizer = AutoTokenizer.from_pretrained(
+        str(model_path),
+        local_files_only=True,
+        use_fast=True,
+        trust_remote_code=bool(model_manifest.get("allow_pinned_remote_code", False)),
+    )
     if not tokenizer.is_fast:
         raise ValueError("Answer-only offset audit requires a fast tokenizer")
     if tokenizer.eos_token_id is None:

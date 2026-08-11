@@ -35,6 +35,19 @@ def test_provenance_registry_freezes_three_required_candidates() -> None:
     assert estimated_family_gib(registry) == 709
 
 
+def test_provenance_v3_registry_is_model_native_and_endpoint_only() -> None:
+    registry = load_registry(_repo_root() / "configs/experiments/m1_provenance_screen_v3.yaml")
+    assert registry["tokenizer_validation_mode"] == "model_native_roundtrip"
+    assert registry["require_native_tokenizer"] is False
+    assert registry["expected_checkpoints_per_candidate"] == 1
+    assert estimated_family_gib(registry) == 149
+    template = yaml.safe_load(
+        (_repo_root() / "configs/training/m1_provenance_screen_v3_seed42_template.yaml").read_text(encoding="utf-8")
+    )
+    assert template["training"]["checkpoint_fractions"] == [1.0]
+    assert template["training"]["gradient_accumulation_steps"] * template["training"]["per_device_train_batch_size"] == 500
+
+
 def test_materialized_config_preserves_frozen_budget(tmp_path: Path, monkeypatch) -> None:
     registry = load_registry(_repo_root() / "configs/experiments/m1_cross_family_screen_v1.yaml")
     registry["scratch_root"] = str(tmp_path / "m1_cross_family_screen_v1")
