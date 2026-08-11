@@ -1,7 +1,9 @@
 version: m1_provenance_screen_v4_dose_pareto_v1
 contract_document: documentation/159_THREE_MODEL_M1_DOSE_PARETO_REMEDIATION_CONTRACT_TR.md
 contract_sha256: 909c60ff8ace454dc53eb941f0e18c43e991f8377a2bf750e9ba7f9fdc285f2c
-status: frozen_authorized_unexecuted
+operational_amendment_document: documentation/159a_OLMO_V100_QUEUE_TO_RTX3090_MEMORY_SAFE_RELOCATION_CONTRACT_TR.md
+operational_amendment_sha256: e13c2a08c482e027ab04c364306b6b62ec73897d9caca7b111a188796235b0cb
+status: frozen_authorized_in_progress
 scratch_root: /vol/tmp2/yesildau/m1_provenance_screen_v4_dose_pareto_v1
 dataset_root: /vol/tmp2/yesildau/m1_canonical_form_diversity_v1/datasets
 dataset_files:
@@ -44,19 +46,20 @@ candidates:
     requested_revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
     base_model_manifest: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
     base_model_manifest_sha256: 8702b80d5b7e4c996c8ce2ff5fe771ada08ab0080bde1926c0b1f53c607303dc
-    training_template: configs/training/m1_provenance_screen_v4_olmo_v100_fp16_seed42.yaml
+    training_template: configs/training/m1_provenance_screen_v4_olmo_rtx3090_fp16_seed42.yaml
     base_general_summary: /vol/tmp2/yesildau/m1_provenance_screen_v3/evaluations/olmo/general_capability/base/20260811T095332Z_m1_provenance_screen_v3_olmo_base_general_capability/summary_metrics.json
     base_general_summary_sha256: dfb557ce04e20b1b047c370482f20c95268b7dcb6272c8d5f5d2e0f4b62b1e20
     runtime:
       python: /vol/tmp2/yesildau/m1_provenance_screen_v3/compat_envs/torch260_cu124_v1/bin/python
       torch: 2.6.0+cu124
-      expected_gpu_substring: V100
-      expected_compute_capability: "7.0"
-      expected_compiled_arch: sm_70
+      expected_gpu_substring: RTX 3090
+      expected_compute_capability: "8.6"
+      expected_compiled_arch: sm_86
       expected_amp_dtype: float16
-      min_free_memory_bytes: 32000000000
-      training_gres: gpu:v10032gb:1
-      evaluation_gres: gpu:v10032gb:1
+      min_free_memory_bytes: 21474836480
+      training_gres: gpu:rtx3090:1
+      evaluation_gres: gpu:rtx3090:1
+      evaluation_candidate_batch_size: 32
   - index: 1
     label: falcon
     model_id: tiiuae/falcon-rw-1b

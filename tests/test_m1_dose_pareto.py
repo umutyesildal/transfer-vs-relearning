@@ -9,6 +9,7 @@ import yaml
 from transfer_vs_relearning.experiments.m1_dose_pareto import (
     CHECKPOINT_STEPS,
     CONTRACT_SHA256,
+    AMENDMENT_SHA256,
     LABELS,
     VERSION,
     final_gate,
@@ -24,6 +25,7 @@ def test_registry_and_templates_freeze_document_159() -> None:
     registry = load_registry(repo_root() / "configs/experiments/m1_provenance_screen_v4_dose_pareto_v1.yaml")
     assert registry["version"] == VERSION
     assert registry["contract_sha256"] == CONTRACT_SHA256
+    assert registry["operational_amendment_sha256"] == AMENDMENT_SHA256
     assert tuple(registry["checkpoint_steps"]) == CHECKPOINT_STEPS
     assert tuple(item["label"] for item in registry["candidates"]) == LABELS
     assert registry["gates"]["generic_ppl_ratio_max"] == 1.25
@@ -41,8 +43,9 @@ def test_registry_and_templates_freeze_document_159() -> None:
 
 
 def test_launchers_bind_gpu_classes_and_no_cleanup() -> None:
-    olmo = (repo_root() / "slurm/train_m1_dose_pareto_olmo_v100.slurm").read_text(encoding="utf-8")
-    assert "#SBATCH --gres=gpu:v10032gb:1" in olmo
+    olmo = (repo_root() / "slurm/train_m1_dose_pareto_olmo_rtx3090.slurm").read_text(encoding="utf-8")
+    assert "#SBATCH --gres=gpu:rtx3090:1" in olmo
+    assert "#SBATCH --exclude=guppi6" in olmo
     for label in ("falcon", "pythia"):
         train = (repo_root() / f"slurm/train_m1_dose_pareto_{label}_rtx3090.slurm").read_text(encoding="utf-8")
         evaluate = (repo_root() / f"slurm/eval_m1_dose_pareto_{label}_rtx3090.slurm").read_text(encoding="utf-8")
@@ -53,8 +56,20 @@ def test_launchers_bind_gpu_classes_and_no_cleanup() -> None:
     assert "rm " not in sources
     assert "--force" not in sources
     for label in ("olmo", "falcon"):
-        launcher = (repo_root() / f"slurm/train_m1_dose_pareto_{label}_{'v100' if label == 'olmo' else 'rtx3090'}.slurm").read_text(encoding="utf-8")
+        launcher = (repo_root() / f"slurm/train_m1_dose_pareto_{label}_rtx3090.slurm").read_text(encoding="utf-8")
         assert "M1_V4_PREFLIGHT" in launcher
+
+
+def test_olmo_relocation_preserves_effective_batch_and_bounds_eval_batches() -> None:
+    template = yaml.safe_load(
+        (repo_root() / "configs/training/m1_provenance_screen_v4_olmo_rtx3090_fp16_seed42.yaml").read_text(encoding="utf-8")
+    )
+    training = template["training"]
+    assert training["per_device_train_batch_size"] == 4
+    assert training["gradient_accumulation_steps"] == 125
+    assert training["per_device_train_batch_size"] * training["gradient_accumulation_steps"] == 500
+    evaluate = (repo_root() / "slurm/eval_m1_dose_pareto_olmo_rtx3090.slurm").read_text(encoding="utf-8")
+    assert "--candidate-batch-size 32" in evaluate
 
 
 def test_final_gate_reproduces_eight_prompt_intersection(tmp_path: Path) -> None:
