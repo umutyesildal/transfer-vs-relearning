@@ -14,6 +14,7 @@ from transfer_vs_relearning.utils.io import sha256_file, write_json
 VERSION = "m1_provenance_screen_v4_dose_pareto_v1"
 CONTRACT_SHA256 = "909c60ff8ace454dc53eb941f0e18c43e991f8377a2bf750e9ba7f9fdc285f2c"
 AMENDMENT_SHA256 = "e13c2a08c482e027ab04c364306b6b62ec73897d9caca7b111a188796235b0cb"
+PRECISION_REPAIR_SHA256 = "6bbd299645ca36463b3fd3fdb9f90288e8ec3f4f6ba2312bd4ce704ccd225984"
 CHECKPOINT_STEPS = (42, 84, 126, 168, 210, 252)
 LABELS = ("olmo", "falcon", "pythia")
 SCRATCH_PREFIX = "/vol/tmp2/yesildau/"
@@ -30,6 +31,8 @@ def load_registry(path: Path) -> dict[str, Any]:
         raise ValueError("Registry is not bound to the frozen Document 159 hash")
     if payload.get("operational_amendment_sha256") != AMENDMENT_SHA256:
         raise ValueError("Registry is not bound to the frozen Document 159a hash")
+    if payload.get("precision_repair_sha256") != PRECISION_REPAIR_SHA256:
+        raise ValueError("Registry is not bound to the frozen Document 159b hash")
     if Path(str(payload["scratch_root"])).as_posix() != f"{SCRATCH_PREFIX}{VERSION}":
         raise ValueError("Unexpected fresh scratch root")
     if tuple(int(step) for step in payload.get("checkpoint_steps", [])) != CHECKPOINT_STEPS:

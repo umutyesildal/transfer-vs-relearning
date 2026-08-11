@@ -3,6 +3,8 @@ contract_document: documentation/159_THREE_MODEL_M1_DOSE_PARETO_REMEDIATION_CONT
 contract_sha256: 909c60ff8ace454dc53eb941f0e18c43e991f8377a2bf750e9ba7f9fdc285f2c
 operational_amendment_document: documentation/159a_OLMO_V100_QUEUE_TO_RTX3090_MEMORY_SAFE_RELOCATION_CONTRACT_TR.md
 operational_amendment_sha256: e13c2a08c482e027ab04c364306b6b62ec73897d9caca7b111a188796235b0cb
+precision_repair_document: documentation/159b_OLMO_RTX3090_EXPLICIT_BF16_PARAMETER_STATE_REPAIR_CONTRACT_TR.md
+precision_repair_sha256: 6bbd299645ca36463b3fd3fdb9f90288e8ec3f4f6ba2312bd4ce704ccd225984
 status: frozen_authorized_in_progress
 scratch_root: /vol/tmp2/yesildau/m1_provenance_screen_v4_dose_pareto_v1
 dataset_root: /vol/tmp2/yesildau/m1_canonical_form_diversity_v1/datasets
@@ -46,9 +48,9 @@ candidates:
     requested_revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
     base_model_manifest: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
     base_model_manifest_sha256: 8702b80d5b7e4c996c8ce2ff5fe771ada08ab0080bde1926c0b1f53c607303dc
-    training_template: configs/training/m1_provenance_screen_v4_olmo_rtx3090_fp16_fallback_seed42.yaml
+    training_template: configs/training/m1_provenance_screen_v4_olmo_rtx3090_bf16_seed42.yaml
     primary_training_template: configs/training/m1_provenance_screen_v4_olmo_rtx3090_fp16_seed42.yaml
-    relocation_memory_mode: precommitted_fallback_microbatch2_accumulation250_after_primary_smoke_oom
+    relocation_memory_mode: document_159b_explicit_bf16_parameter_optimizer_state_microbatch5_accumulation100
     base_general_summary: /vol/tmp2/yesildau/m1_provenance_screen_v3/evaluations/olmo/general_capability/base/20260811T095332Z_m1_provenance_screen_v3_olmo_base_general_capability/summary_metrics.json
     base_general_summary_sha256: dfb557ce04e20b1b047c370482f20c95268b7dcb6272c8d5f5d2e0f4b62b1e20
     runtime:
@@ -57,7 +59,7 @@ candidates:
       expected_gpu_substring: RTX 3090
       expected_compute_capability: "8.6"
       expected_compiled_arch: sm_86
-      expected_amp_dtype: float16
+      expected_amp_dtype: bfloat16
       min_free_memory_bytes: 21474836480
       training_gres: gpu:rtx3090:1
       evaluation_gres: gpu:rtx3090:1

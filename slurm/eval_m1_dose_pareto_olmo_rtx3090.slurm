@@ -13,7 +13,7 @@
 set -euo pipefail
 steps=(42 84 126 168 210 252); step="${steps[${SLURM_ARRAY_TASK_ID:?}]}"
 REPO_ROOT="${SLURM_SUBMIT_DIR:-$(pwd)}"; ROOT=/vol/tmp2/yesildau/m1_provenance_screen_v4_dose_pareto_v1
-REGISTRY="${REPO_ROOT}/configs/experiments/m1_provenance_screen_v4_dose_pareto_v1.yaml"; TEMPLATE="${REPO_ROOT}/configs/training/m1_provenance_screen_v4_olmo_rtx3090_fp16_fallback_seed42.yaml"
+REGISTRY="${REPO_ROOT}/configs/experiments/m1_provenance_screen_v4_dose_pareto_v1.yaml"; TEMPLATE="${REPO_ROOT}/configs/training/m1_provenance_screen_v4_olmo_rtx3090_bf16_seed42.yaml"
 PYTHON=/vol/tmp2/yesildau/m1_provenance_screen_v3/compat_envs/torch260_cu124_v1/bin/python
 cd "${REPO_ROOT}"; task_tmp="${ROOT}/tmp/evaluation/olmo_${step}_${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
 mkdir -p "${task_tmp}" "${ROOT}/manifests/runtime"

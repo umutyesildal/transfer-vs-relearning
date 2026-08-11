@@ -27,6 +27,7 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--expected-commit", required=True)
     parser.add_argument("--pending-job", action="append", required=True)
+    parser.add_argument("--scope", required=True)
     args = parser.parse_args()
     repo = args.repo_root.resolve()
     registry_path = args.registry.resolve()
@@ -71,7 +72,7 @@ def main() -> None:
         registry_sha256=sha256_file(registry_path),
         predecessor_preflight=str(previous),
         predecessor_preflight_sha256=args.previous_sha256,
-        relocation_scope="document_159a_precommitted_fallback_microbatch2_accumulation250",
+        relocation_scope=args.scope,
         primary_smoke_oom_log=str(oom_log),
         primary_smoke_oom_log_sha256=sha256_file(oom_log),
         protected_pending_jobs=jobs,
