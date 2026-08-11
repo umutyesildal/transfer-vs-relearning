@@ -110,6 +110,7 @@ def main() -> None:
         bos_token=END_OF_TEXT,
         eos_token=END_OF_TEXT,
         unk_token=END_OF_TEXT,
+        pad_token=None,
     )
     if tokenizer.pad_token_id is not None:
         raise ValueError("Official Pythia tokenizer unexpectedly defines a PAD token")

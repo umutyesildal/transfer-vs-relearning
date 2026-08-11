@@ -10,8 +10,8 @@
 #SBATCH --error=/vol/tmp2/yesildau/m1_provenance_screen_v3_pythia_repair_v1/logs/%x-%j.err
 set -euo pipefail
 REPO_ROOT="${SLURM_SUBMIT_DIR:-$(pwd)}"
-SCRATCH_ROOT="/vol/tmp2/yesildau/m1_provenance_screen_v3_pythia_repair_v1"
-REGISTRY="${REPO_ROOT}/configs/experiments/m1_provenance_screen_v3_pythia_repair_v1.yaml"
+SCRATCH_ROOT="${M1_PYTHIA_REPAIR_ROOT:-/vol/tmp2/yesildau/m1_provenance_screen_v3_pythia_repair_v1}"
+REGISTRY="${M1_PYTHIA_REPAIR_REGISTRY:-${REPO_ROOT}/configs/experiments/m1_provenance_screen_v3_pythia_repair_v1.yaml}"
 TEMPLATE="${REPO_ROOT}/configs/training/m1_provenance_screen_v3_pythia_v100_fp16_seed42.yaml"
 DATASET_ROOT="/vol/tmp2/yesildau/m1_canonical_form_diversity_v1/datasets"
 PROBE_REGISTRY="/vol/tmp2/yesildau/m1_form_generalization_v1/datasets/evaluations/four_form_probe_registry.csv"

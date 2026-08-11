@@ -73,6 +73,21 @@ def test_pythia_repair_registry_freezes_official_tokenizer_and_fresh_root() -> N
     assert storage["recursive_du_executed_for_this_stage"] is False
 
 
+def test_pythia_retry_registry_uses_new_root_and_same_frozen_source() -> None:
+    initial = load_registry(
+        _repo_root() / "configs/experiments/m1_provenance_screen_v3_pythia_repair_v1.yaml"
+    )
+    retry = load_registry(
+        _repo_root() / "configs/experiments/m1_provenance_screen_v3_pythia_repair_retry_v1.yaml"
+    )
+    assert retry["scratch_root"].endswith("m1_provenance_screen_v3_pythia_repair_retry_v1")
+    assert retry["scratch_root"] != initial["scratch_root"]
+    assert retry["official_tokenizer_source"] == initial["official_tokenizer_source"]
+    assert retry["candidates"] == initial["candidates"]
+    repair_source = (_repo_root() / "scripts/repair_pythia_official_tokenizer.py").read_text(encoding="utf-8")
+    assert "pad_token=None" in repair_source
+
+
 def test_pythia_v100_template_changes_only_mixed_precision() -> None:
     config_root = _repo_root() / "configs/training"
     frozen = yaml.safe_load((config_root / "m1_provenance_screen_v3_seed42_template.yaml").read_text(encoding="utf-8"))
