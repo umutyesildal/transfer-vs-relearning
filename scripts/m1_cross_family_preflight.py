@@ -30,6 +30,14 @@ HOME_ROOT = Path("/vol/fob-vol6/mi25/yesildau")
 # to the bounded provenance screen.
 HOME_LIMIT_KIB = 30 * 1024 * 1024
 GIB = 1024**3
+REQUIRED_SCRATCH_ENV_VARS = (
+    "HF_HOME",
+    "TRANSFORMERS_CACHE",
+    "HF_DATASETS_CACHE",
+    "XDG_CACHE_HOME",
+    "TORCH_HOME",
+    "TMPDIR",
+)
 
 
 def _now() -> datetime:
@@ -44,6 +52,38 @@ def _check(condition: bool, label: str, checks: dict[str, Any], detail: Any) -> 
     checks[label] = {"status": "PASS" if condition else "FAIL", "detail": detail}
     if not condition:
         raise ValueError(f"Preflight failed: {label}: {detail}")
+
+
+def home_usage_evidence(registry: dict[str, Any]) -> dict[str, Any]:
+    """Return the applicable home-usage evidence without repeating v3's recursive scan."""
+
+    if registry["version"] == "m1_provenance_screen_v3":
+        policy = dict(registry["home_storage_policy"])
+        reference_bytes = int(policy["reference_bytes"])
+        limit_bytes = int(policy["limit_bytes"])
+        return {
+            "mode": policy["mode"],
+            "home_root": policy["home_root"],
+            "reference_command": policy["reference_command"],
+            "reference_started_at": policy["reference_started_at"],
+            "reference_finished_at": policy["reference_finished_at"],
+            "reference_elapsed_seconds": float(policy["reference_elapsed_seconds"]),
+            "reference_bytes": reference_bytes,
+            "limit_bytes": limit_bytes,
+            "below_limit": reference_bytes < limit_bytes,
+            "recursive_du_executed_for_this_stage": False,
+            "home_write_allowed": bool(policy["home_write_allowed"]),
+        }
+    home_kib = int(_run("du", "-xsk", str(HOME_ROOT)).split()[0])
+    return {
+        "mode": "legacy_live_recursive_du",
+        "home_root": str(HOME_ROOT),
+        "reference_bytes": home_kib * 1024,
+        "limit_bytes": HOME_LIMIT_KIB * 1024,
+        "below_limit": home_kib <= HOME_LIMIT_KIB,
+        "recursive_du_executed_for_this_stage": True,
+        "home_write_allowed": False,
+    }
 
 
 def _unexpected_target_jobs(
@@ -158,8 +198,9 @@ def run_preflight(args: argparse.Namespace) -> dict[str, Any]:
         _check(all(str(path).startswith(("/vol/tmp/yesildau/", "/vol/tmp2/yesildau/")) for path in outputs), "output_namespaces_are_scratch", checks, [str(path) for path in outputs])
         _check(not any(path.exists() for path in outputs), "output_namespaces_absent", checks, [str(path) for path in outputs])
 
-        home_kib = int(_run("du", "-xsk", str(HOME_ROOT)).split()[0])
-        _check(home_kib <= HOME_LIMIT_KIB, "home_usage", checks, {"kib": home_kib, "limit_kib": HOME_LIMIT_KIB})
+        home_evidence = home_usage_evidence(registry)
+        _check(bool(home_evidence["below_limit"]), "home_usage_reference_below_limit", checks, home_evidence)
+        _check(not bool(home_evidence["home_write_allowed"]), "home_write_prohibited", checks, home_evidence)
         payload["df_h"] = _run("df", "-h", str(HOME_ROOT), "/vol/tmp", "/vol/tmp2")
         payload["df_i"] = _run("df", "-i", str(HOME_ROOT), "/vol/tmp", "/vol/tmp2")
 
@@ -177,6 +218,10 @@ def run_preflight(args: argparse.Namespace) -> dict[str, Any]:
             "family_root": str(scratch_root),
             "outputs": [str(path) for path in outputs],
             "model_manifests": [str(candidate_model_manifest(registry, candidate)) for candidate in candidates],
+            "scratch_environment": {
+                name: str(Path(os.environ.get(name, "")).resolve()) if os.environ.get(name) else None
+                for name in REQUIRED_SCRATCH_ENV_VARS
+            },
         }
         _check(
             all(str(value).startswith(("/vol/tmp/yesildau/", "/vol/tmp2/yesildau/")) for value in (resolved_paths["runs"], resolved_paths["artifacts"], resolved_paths["family_root"])),
@@ -184,6 +229,17 @@ def run_preflight(args: argparse.Namespace) -> dict[str, Any]:
             checks,
             resolved_paths,
         )
+        if registry["version"] == "m1_provenance_screen_v3":
+            scratch_environment = resolved_paths["scratch_environment"]
+            _check(
+                all(
+                    value is not None and str(value).startswith(("/vol/tmp/yesildau/", "/vol/tmp2/yesildau/"))
+                    for value in scratch_environment.values()
+                ),
+                "cache_and_tmp_environment_is_scratch",
+                checks,
+                scratch_environment,
+            )
         target_job_name = args.target_job_name or {"acquisition": "m1-xfam-acquire", "training": "m1-xfam-train", "evaluation": "m1-xfam-eval"}[args.stage]
         queued = _run("squeue", "-u", args.user, "-h", "-o", "%i|%j|%E").splitlines()
         selected_for_overlap = set(indices) if args.allow_completed_subset_evaluation else None
@@ -208,6 +264,7 @@ def run_preflight(args: argparse.Namespace) -> dict[str, Any]:
                 "estimated_family_gib": estimated_gib,
                 "estimated_inodes": args.estimated_inodes,
                 "retention": registry["retention"],
+                "home_usage_evidence": home_evidence,
                 "status": "PASS",
             }
         )

@@ -6,7 +6,7 @@ from pathlib import Path
 import yaml
 
 import transfer_vs_relearning.experiments.m1_cross_family as cross_family
-from scripts.m1_cross_family_preflight import _unexpected_target_jobs
+from scripts.m1_cross_family_preflight import _unexpected_target_jobs, home_usage_evidence
 from transfer_vs_relearning.experiments.m1_cross_family import (
     candidate_by_index,
     combined_weight_sha256,
@@ -37,6 +37,7 @@ def test_provenance_registry_freezes_three_required_candidates() -> None:
 
 def test_provenance_v3_registry_is_model_native_and_endpoint_only() -> None:
     registry = load_registry(_repo_root() / "configs/experiments/m1_provenance_screen_v3.yaml")
+    assert registry["storage_correction_sha256"] == "1b55a03484682e065c9eaec106f8803b9ffdecba9301e3a0261df9e6ecd154fa"
     assert registry["tokenizer_validation_mode"] == "model_native_roundtrip"
     assert registry["require_native_tokenizer"] is False
     assert registry["expected_checkpoints_per_candidate"] == 1
@@ -46,6 +47,12 @@ def test_provenance_v3_registry_is_model_native_and_endpoint_only() -> None:
     )
     assert template["training"]["checkpoint_fractions"] == [1.0]
     assert template["training"]["gradient_accumulation_steps"] * template["training"]["per_device_train_batch_size"] == 500
+    storage = home_usage_evidence(registry)
+    assert storage["reference_bytes"] == 14_689_423_360
+    assert storage["limit_bytes"] == 30 * 1024**3
+    assert storage["below_limit"] is True
+    assert storage["recursive_du_executed_for_this_stage"] is False
+    assert storage["home_write_allowed"] is False
 
 
 def test_materialized_config_preserves_frozen_budget(tmp_path: Path, monkeypatch) -> None:

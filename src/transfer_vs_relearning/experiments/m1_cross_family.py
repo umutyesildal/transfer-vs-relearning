@@ -63,12 +63,25 @@ def validate_registry(payload: dict[str, Any]) -> None:
     if version == "m1_provenance_screen_retry_v2" and not bool(payload.get("require_native_tokenizer")):
         raise ValueError("Retry-v2 must require native tokenizer assets")
     if version == "m1_provenance_screen_v3":
+        if payload.get("storage_correction_sha256") != "1b55a03484682e065c9eaec106f8803b9ffdecba9301e3a0261df9e6ecd154fa":
+            raise ValueError("Provenance v3 must bind the frozen Document 152b storage correction")
         if payload.get("tokenizer_validation_mode") != "model_native_roundtrip":
             raise ValueError("Provenance v3 must use model-native tokenizer round-trip validation")
         if bool(payload.get("require_native_tokenizer")):
             raise ValueError("Provenance v3 must not require universal tokenizer filenames")
         if int(payload.get("expected_checkpoints_per_candidate", 0)) != 1:
             raise ValueError("Provenance v3 must retain exactly one endpoint checkpoint per candidate")
+        storage = payload.get("home_storage_policy", {})
+        if storage.get("mode") != "frozen_exact_reference_and_no_home_write":
+            raise ValueError("Provenance v3 must use the frozen-reference no-home-write policy")
+        if bool(storage.get("recursive_du_per_stage", True)):
+            raise ValueError("Provenance v3 must not repeat recursive home du per stage")
+        if bool(storage.get("home_write_allowed", True)):
+            raise ValueError("Provenance v3 must prohibit HU-home writes")
+        reference_bytes = int(storage.get("reference_bytes", -1))
+        limit_bytes = int(storage.get("limit_bytes", -1))
+        if not 0 <= reference_bytes < limit_bytes:
+            raise ValueError("Frozen HU-home reference must be non-negative and below its limit")
     for candidate in candidates:
         overrides = candidate.get("training_overrides", {})
         if not isinstance(overrides, dict) or set(overrides) - {"model_load_dtype"}:
