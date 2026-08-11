@@ -55,6 +55,25 @@ def test_provenance_v3_registry_is_model_native_and_endpoint_only() -> None:
     assert storage["home_write_allowed"] is False
 
 
+def test_olmo_3090_retry_changes_only_batch_decomposition() -> None:
+    config_root = _repo_root() / "configs/training"
+    frozen = yaml.safe_load((config_root / "m1_provenance_screen_v3_seed42_template.yaml").read_text(encoding="utf-8"))
+    retry = yaml.safe_load(
+        (config_root / "m1_provenance_screen_v3_olmo_3090_retry_seed42.yaml").read_text(encoding="utf-8")
+    )
+    frozen_training = dict(frozen["training"])
+    retry_training = dict(retry["training"])
+    assert frozen_training.pop("per_device_train_batch_size") == 10
+    assert retry_training.pop("per_device_train_batch_size") == 5
+    assert frozen_training.pop("gradient_accumulation_steps") == 50
+    assert retry_training.pop("gradient_accumulation_steps") == 100
+    assert retry_training == frozen_training
+    assert retry["dataset"] == frozen["dataset"]
+    assert retry["model"] == frozen["model"]
+    assert retry["runtime"] == frozen["runtime"]
+    assert 5 * 100 == 10 * 50 == 500
+
+
 def test_materialized_config_preserves_frozen_budget(tmp_path: Path, monkeypatch) -> None:
     registry = load_registry(_repo_root() / "configs/experiments/m1_cross_family_screen_v1.yaml")
     registry["scratch_root"] = str(tmp_path / "m1_cross_family_screen_v1")
