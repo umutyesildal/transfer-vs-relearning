@@ -46,7 +46,9 @@ candidates:
     requested_revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
     base_model_manifest: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
     base_model_manifest_sha256: 8702b80d5b7e4c996c8ce2ff5fe771ada08ab0080bde1926c0b1f53c607303dc
-    training_template: configs/training/m1_provenance_screen_v4_olmo_rtx3090_fp16_seed42.yaml
+    training_template: configs/training/m1_provenance_screen_v4_olmo_rtx3090_fp16_fallback_seed42.yaml
+    primary_training_template: configs/training/m1_provenance_screen_v4_olmo_rtx3090_fp16_seed42.yaml
+    relocation_memory_mode: precommitted_fallback_microbatch2_accumulation250_after_primary_smoke_oom
     base_general_summary: /vol/tmp2/yesildau/m1_provenance_screen_v3/evaluations/olmo/general_capability/base/20260811T095332Z_m1_provenance_screen_v3_olmo_base_general_capability/summary_metrics.json
     base_general_summary_sha256: dfb557ce04e20b1b047c370482f20c95268b7dcb6272c8d5f5d2e0f4b62b1e20
     runtime:
