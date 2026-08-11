@@ -90,6 +90,24 @@ def test_olmo_3090_foreach_retry_changes_only_optimizer_kernel() -> None:
     assert foreach_retry["runtime"] == batch_retry["runtime"]
 
 
+def test_olmo_v100_retry_changes_only_mixed_precision() -> None:
+    config_root = _repo_root() / "configs/training"
+    frozen = yaml.safe_load((config_root / "m1_provenance_screen_v3_seed42_template.yaml").read_text(encoding="utf-8"))
+    v100 = yaml.safe_load(
+        (config_root / "m1_provenance_screen_v3_olmo_v100_fp16_seed42.yaml").read_text(encoding="utf-8")
+    )
+    frozen_training = dict(frozen["training"])
+    v100_training = dict(v100["training"])
+    assert frozen_training.pop("bf16") is True
+    assert v100_training.pop("bf16") is False
+    assert frozen_training.pop("fp16") is False
+    assert v100_training.pop("fp16") is True
+    assert v100_training == frozen_training
+    assert v100["dataset"] == frozen["dataset"]
+    assert v100["model"] == frozen["model"]
+    assert v100["runtime"] == frozen["runtime"]
+
+
 def test_materialized_config_preserves_frozen_budget(tmp_path: Path, monkeypatch) -> None:
     registry = load_registry(_repo_root() / "configs/experiments/m1_cross_family_screen_v1.yaml")
     registry["scratch_root"] = str(tmp_path / "m1_cross_family_screen_v1")

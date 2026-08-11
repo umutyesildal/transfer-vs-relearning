@@ -156,22 +156,31 @@ def main() -> None:
         optimizer_kwargs["foreach"] = bool(training["optimizer_foreach"])
     optimizer = torch.optim.AdamW(model.parameters(), **optimizer_kwargs)
     gradient_accumulation_steps = int(training.get("gradient_accumulation_steps", 1))
+    use_bf16 = bool(training.get("bf16", False))
+    use_fp16 = bool(training.get("fp16", False))
+    if use_bf16 and use_fp16:
+        raise ValueError("Smoke precision is ambiguous: bf16 and fp16 cannot both be enabled")
+    amp_enabled = use_bf16 or use_fp16
+    amp_dtype = torch.bfloat16 if use_bf16 else torch.float16
+    scaler = torch.amp.GradScaler("cuda", enabled=use_fp16)
     smoke_loss = 0.0
     gradient_norm = None
     for _ in range(args.optimizer_steps):
         optimizer.zero_grad(set_to_none=True)
         for _ in range(gradient_accumulation_steps):
-            with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=bool(training.get("bf16"))):
+            with torch.autocast(device_type="cuda", dtype=amp_dtype, enabled=amp_enabled):
                 output = model(**inputs)
                 scaled_loss = output.loss / gradient_accumulation_steps
             if not torch.isfinite(output.loss):
                 raise ValueError(f"Non-finite smoke loss before optimizer step: {output.loss.item()}")
             smoke_loss = float(output.loss.detach().cpu())
-            scaled_loss.backward()
+            scaler.scale(scaled_loss).backward()
+        scaler.unscale_(optimizer)
         gradient_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), float(training.get("max_grad_norm", 1.0)))
         if not torch.isfinite(gradient_norm):
             raise ValueError(f"Non-finite smoke gradient norm: {gradient_norm.item()}")
-        optimizer.step()
+        scaler.step(optimizer)
+        scaler.update()
         if any(not torch.isfinite(parameter).all() for parameter in model.parameters() if parameter.requires_grad):
             raise ValueError("Non-finite model parameter after smoke optimizer step")
     gradient_tensors = sum(1 for parameter in model.parameters() if parameter.grad is not None)
@@ -215,6 +224,8 @@ def main() -> None:
         "batch_size": batch_size,
         "gradient_accumulation_steps": gradient_accumulation_steps,
         "optimizer_foreach": training.get("optimizer_foreach", "framework_default"),
+        "amp_dtype": "bfloat16" if use_bf16 else "float16" if use_fp16 else "float32",
+        "gradient_scaler_enabled": use_fp16,
         "optimizer_steps": args.optimizer_steps,
         "model_load_dtype": str(training.get("model_load_dtype", "native_config")),
         "allow_pinned_remote_code": trust_remote_code,
