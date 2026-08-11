@@ -1,0 +1,98 @@
+version: m1_provenance_screen_v4_dose_pareto_v1
+contract_document: documentation/159_THREE_MODEL_M1_DOSE_PARETO_REMEDIATION_CONTRACT_TR.md
+contract_sha256: 909c60ff8ace454dc53eb941f0e18c43e991f8377a2bf750e9ba7f9fdc285f2c
+status: frozen_authorized_unexecuted
+scratch_root: /vol/tmp2/yesildau/m1_provenance_screen_v4_dose_pareto_v1
+dataset_root: /vol/tmp2/yesildau/m1_canonical_form_diversity_v1/datasets
+dataset_files:
+  dataset_manifest.json: c11f779229af14b196f2063ecdeb956e34444a30bf4086c331168f5cb11d6a26
+  train.jsonl: 8eb65505b22f5c7f8e67f2d1877efad7503489dd8bdf2608cad08791f7d05a67
+  validation.jsonl: 495cdcda9049b372159ef167f3da866e4cb82caf1977796efbb3baa9e07973e7
+general_corpus: /vol/tmp2/yesildau/general_capability_v1/wikitext2_raw_test.jsonl
+general_corpus_sha256: 578a0879807f928e423f61631ee697a865af006df21e60e10e25a534c345097a
+probe_registry: /vol/tmp2/yesildau/m1_form_generalization_v1/datasets/evaluations/four_form_probe_registry.csv
+probe_registry_sha256: 54bf2968bcffecee8f0438b0ac489a6ab5fd0150dca2c459a4a1ad9efe50796b
+expected_train_rows: 3500
+expected_validation_rows: 500
+expected_optimizer_updates: 252
+checkpoint_steps: [42, 84, 126, 168, 210, 252]
+expected_checkpoints_per_candidate: 6
+reserve_gib: 600
+reserve_inodes: 10000
+home_storage_policy:
+  mode: frozen_exact_reference_and_no_home_write
+  home_root: /vol/fob-vol6/mi25/yesildau
+  limit_bytes: 32212254720
+  reference_bytes: 14689423360
+  recursive_du_per_stage: false
+  home_write_allowed: false
+gates:
+  exact_prefix_min: 0.90
+  trained_cell_min: 0.80
+  heldout_cell_min: 0.80
+  robust_intersection_min: 0.70
+  generic_ppl_ratio_max: 1.25
+selection:
+  within_model: earliest_all_gates
+  cross_model_tie_break: [global_robust, min_relation_robust, heldout_cd, lower_ppl_ratio, lower_cost]
+  automatic_promotion: false
+  seed_43: requires_new_contract
+candidates:
+  - index: 0
+    label: olmo
+    model_id: allenai/OLMo-2-0425-1B
+    requested_revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+    base_model_manifest: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
+    base_model_manifest_sha256: 8702b80d5b7e4c996c8ce2ff5fe771ada08ab0080bde1926c0b1f53c607303dc
+    training_template: configs/training/m1_provenance_screen_v4_olmo_v100_fp16_seed42.yaml
+    base_general_summary: /vol/tmp2/yesildau/m1_provenance_screen_v3/evaluations/olmo/general_capability/base/20260811T095332Z_m1_provenance_screen_v3_olmo_base_general_capability/summary_metrics.json
+    base_general_summary_sha256: dfb557ce04e20b1b047c370482f20c95268b7dcb6272c8d5f5d2e0f4b62b1e20
+    runtime:
+      python: /vol/tmp2/yesildau/m1_provenance_screen_v3/compat_envs/torch260_cu124_v1/bin/python
+      torch: 2.6.0+cu124
+      expected_gpu_substring: V100
+      expected_compute_capability: "7.0"
+      expected_compiled_arch: sm_70
+      expected_amp_dtype: float16
+      min_free_memory_bytes: 32000000000
+      training_gres: gpu:v10032gb:1
+      evaluation_gres: gpu:v10032gb:1
+  - index: 1
+    label: falcon
+    model_id: tiiuae/falcon-rw-1b
+    requested_revision: e4b9872bb803165eb22f0a867d4e6a64d34fce19
+    base_model_manifest: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/tiiuae__falcon-rw-1b/model_manifest.json
+    base_model_manifest_sha256: c91b768e1d2fc651af8b1061293fbf5b23b9c0f03a4b565636fd25a3e310270d
+    training_template: configs/training/m1_provenance_screen_v4_falcon_rtx3090_bf16_seed42.yaml
+    base_general_summary: /vol/tmp2/yesildau/m1_provenance_screen_v3/evaluations/falcon/general_capability/base/20260811T073012Z_m1_provenance_screen_v3_falcon_base_general_capability/summary_metrics.json
+    base_general_summary_sha256: 2017a06204b9f156895b72d50fa4b588b7625d5143b7cd801cac5138d3a189ae
+    runtime:
+      python: /vol/tmp2/yesildau/m1_provenance_screen_v3/compat_envs/torch260_cu124_v1/bin/python
+      torch: 2.6.0+cu124
+      expected_gpu_substring: RTX 3090
+      expected_compute_capability: "8.6"
+      expected_compiled_arch: sm_86
+      expected_amp_dtype: bfloat16
+      min_free_memory_bytes: 21474836480
+      training_gres: gpu:rtx3090:1
+      evaluation_gres: gpu:rtx3090:1
+  - index: 2
+    label: pythia
+    model_id: EleutherAI/pythia-1.4b
+    requested_revision: 0da31d8fb309463877ed8c40e54a8f911dced3ec
+    base_model_manifest: /vol/tmp2/yesildau/m1_provenance_screen_v3_pythia_repair_retry_v1/models/EleutherAI__pythia-1.4b/model_manifest.json
+    base_model_manifest_sha256: d6255115a0dc4052d6ebe22a52c11e19648ee6247561493e0cb591428e491c7a
+    training_template: configs/training/m1_provenance_screen_v4_pythia_rtx3090_bf16_seed42.yaml
+    base_general_summary: /vol/tmp2/yesildau/m1_provenance_screen_v3_pythia_repair_retry_v1/evaluations/pythia/general_capability/base/20260811T184900Z_m1_provenance_screen_v3_pythia_base_general_capability/summary_metrics.json
+    base_general_summary_sha256: e161ce9815d4df826e654986738fe753f623123bd1ac504bf1b00b917176113c
+    runtime:
+      python: /vol/tmp2/yesildau/m1_provenance_screen_v3/compat_envs/torch260_cu124_v1/bin/python
+      torch: 2.6.0+cu124
+      expected_gpu_substring: RTX 3090
+      expected_compute_capability: "8.6"
+      expected_compiled_arch: sm_86
+      expected_amp_dtype: bfloat16
+      min_free_memory_bytes: 21474836480
+      training_gres: gpu:rtx3090:1
+      evaluation_gres: gpu:rtx3090:1
+retention: preserve_all_six_resumable_checkpoints_and_all_evidence_no_cleanup
