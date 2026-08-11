@@ -39,18 +39,18 @@ import transformers
 import yaml
 
 root = Path(sys.argv[1]).resolve()
-arches = torch.cuda.get_arch_list()
-if "sm_70" not in arches:
-    raise SystemExit(f"V100 sm_70 missing from compatibility build: {arches}")
+compiled_arches = torch._C._cuda_getArchFlags().split()
+if "sm_70" not in compiled_arches:
+    raise SystemExit(f"V100 sm_70 missing from compatibility build: {compiled_arches}")
 payload = {
-    "status": "PASS",
+    "status": "INSTALL_PASS_GPU_VALIDATION_PENDING",
     "python": str(root / "bin/python"),
     "torch": torch.__version__,
     "torch_cuda": torch.version.cuda,
-    "torch_arch_list": arches,
+    "torch_compiled_arches": compiled_arches,
     "transformers": transformers.__version__,
     "datasets": datasets.__version__,
-    "purpose": "OLMo V100 FP16 compatibility; scratch-only; project base env remains unchanged",
+    "purpose": "OLMo V100 FP16 compatibility install; scratch-only; GPU validation remains mandatory",
 }
 manifest = root / "compat_manifest.json"
 manifest.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
