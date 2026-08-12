@@ -149,6 +149,7 @@ def test_falcon_recovery_launchers_are_evaluation_only_and_dependency_closed() -
         repo_root() / "scripts/submit_m1_dose_pareto_falcon_recovery.sh"
     ).read_text(encoding="utf-8")
     assert "#SBATCH --array=2,4,5%1" in evaluation
+    assert "#SBATCH --partition=wbimlgpu" in evaluation
     assert "#SBATCH --nodelist=guppi5" in evaluation
     assert "case \"${SLURM_ARRAY_TASK_ID:?}\" in 2) step=126 ;; 4) step=210 ;; 5) step=252" in evaluation
     assert "train_clm.py" not in evaluation

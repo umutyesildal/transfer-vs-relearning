@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=m1-v4-eval-falcon-recovery
 #SBATCH --account=yesildau
-#SBATCH --partition=gpu
+#SBATCH --partition=wbimlgpu
 #SBATCH --gres=gpu:rtx3090:1
 #SBATCH --nodelist=guppi5
 #SBATCH --array=2,4,5%1
