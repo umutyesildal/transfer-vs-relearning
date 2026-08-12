@@ -28,6 +28,7 @@ from transfer_vs_relearning.corpora.vngrs.metadata import (
     METADATA_FOOTER_ROUTE_KIND,
     METADATA_FOOTER_SCRATCH_ROOT,
     METADATA_FOOTER_TRAILER_RANGE_HEADER,
+    VNGRS_LICENSE_REDIRECT_REPAIR_SHA256,
     VNGRS_REPOSITORY,
     VNGRS_REVISION,
     build_metadata_footer_feasibility_projection,
@@ -1257,6 +1258,7 @@ def _valid_metadata_footer_package() -> tuple[dict[str, object], dict[str, bytes
         "new_inode_count": len(artifact_rows) + len(METADATA_FOOTER_OUTPUT_PATHS),
         "write_order": list(METADATA_FOOTER_OUTPUT_PATHS),
         "contract_sha256": METADATA_FOOTER_CONTRACT_SHA256,
+        "license_redirect_repair_sha256": VNGRS_LICENSE_REDIRECT_REPAIR_SHA256,
         "manifest_sha256": hashlib.sha256(artifact_manifest_payload).hexdigest(),
         "route_kind": METADATA_FOOTER_ROUTE_KIND,
         "corpus_rows_retrieved": 0,
@@ -1473,6 +1475,23 @@ def test_metadata_footer_validator_rejects_relabelled_success_as_retryable_failu
     )
     assert validation["complete"] is False
     assert any("relabelled" in error or "429 or 503" in error for error in validation["errors"])
+
+
+def test_metadata_footer_validator_rejects_html_license_response() -> None:
+    package, payloads, manifest_payload, audit_payload = _valid_metadata_footer_package()
+    broken = copy.deepcopy(package)
+    license_row = next(
+        row for row in broken["request_ledger"] if row["evidence_role"] == "license_attribution"
+    )
+    license_row["content_type"] = "text/html"
+    validation = validate_metadata_footer_feasibility(
+        broken,
+        artifact_payloads=payloads,
+        artifact_manifest_payload=manifest_payload,
+        metadata_footer_audit_payload=audit_payload,
+    )
+    assert validation["complete"] is False
+    assert any("license request" in error for error in validation["errors"])
 
 
 def test_metadata_footer_validator_rejects_rows_route_and_full_object_artifact() -> None:
@@ -1841,7 +1860,7 @@ def test_metadata_executor_preserves_3xx_failure_context() -> None:
     )
     client = BoundedClient(_FakeOpener([redirect]))  # type: ignore[arg-type]
 
-    with pytest.raises(ExecutionBlocked, match="official Hugging Face CDN allowlist") as caught:
+    with pytest.raises(ExecutionBlocked, match="license attribution") as caught:
         client.request_with_retries(
             request_id="redirect-block",
             role="license_attribution",
@@ -1926,8 +1945,8 @@ def test_metadata_executor_rejects_unsafe_cdn_redirect_targets(location: str) ->
     )
     client = BoundedClient(_FakeOpener([redirect]))  # type: ignore[arg-type]
 
-    with pytest.raises(ExecutionBlocked, match="official Hugging Face CDN allowlist|absolute Location|redirect"):
-        client._attempt(method="GET", url=source_url, range_header="bytes=10-")
+    with pytest.raises(ExecutionBlocked, match="Hugging Face route allowlist|absolute|root-relative|redirect"):
+        client._attempt(role="footer_bytes", method="GET", url=source_url, range_header="bytes=10-")
 
 
 def test_metadata_executor_rejects_a_second_cdn_redirect() -> None:
@@ -1949,10 +1968,124 @@ def test_metadata_executor_rejects_a_second_cdn_redirect() -> None:
     client = BoundedClient(_FakeOpener([first, second]))  # type: ignore[arg-type]
 
     with pytest.raises(ExecutionBlocked, match="second HTTP 302"):
-        client._attempt(method="GET", url=source_url, range_header=None)
+        client._attempt(role="footer_bytes", method="GET", url=source_url, range_header=None)
 
     assert client.http_hop_count == 2
     assert client.redirect_hop_count == 1
+
+
+@pytest.mark.parametrize("root_relative", [False, True])
+def test_metadata_executor_follows_one_exact_license_307_resolve_cache_hop(root_relative: bool) -> None:
+    source_url = dataset_license_resolve_url()
+    target_path = (
+        f"/api/resolve-cache/datasets/{VNGRS_REPOSITORY}/{VNGRS_REVISION}/README.md"
+    )
+    target_url = f"https://huggingface.co{target_path}?download=true&etag=secret-etag"
+    location = f"{target_path}?download=true&etag=secret-etag" if root_relative else target_url
+    redirect = urllib.error.HTTPError(
+        source_url,
+        307,
+        "temporary redirect",
+        {"Location": location},
+        io.BytesIO(),
+    )
+    response = _FakeResponse(
+        200,
+        b"license bytes",
+        headers={"Content-Type": "text/plain", "Content-Length": "13"},
+        url=target_url,
+    )
+    opener = _RecordingOpener([redirect, response])
+    client = BoundedClient(opener)  # type: ignore[arg-type]
+
+    result, payload = client.request_with_retries(
+        request_id="license-attribution-307",
+        role="license_attribution",
+        path="README.md",
+        url=source_url,
+        method="GET",
+        range_header=None,
+        expected_status=200,
+        artifact_name="evidence/license/README.md",
+    )
+
+    assert payload == b"license bytes"
+    assert result.final_url == source_url
+    assert result.terminal_url == target_url
+    assert client.attempt_count == 1
+    assert client.http_hop_count == 2
+    assert client.redirect_hop_count == 1
+    assert client.retry_count == 0
+    assert len(client.request_rows) == 1
+    redirect_row = client.request_rows[0]["redirect_chain"][0]
+    assert redirect_row["http_status"] == 307
+    assert redirect_row["route_class"] == "license_resolve_cache"
+    assert redirect_row["host"] == "huggingface.co"
+    assert redirect_row["path_sha256"] == hashlib.sha256(target_path.encode("utf-8")).hexdigest()
+    assert redirect_row["query_keys"] == ["download", "etag"]
+    assert "secret-etag" not in json.dumps(client.request_rows, sort_keys=True)
+    assert opener.requests[1].get_method() == "GET"
+
+
+@pytest.mark.parametrize(
+    ("role", "source_url", "location"),
+    [
+        (
+            "footer_bytes",
+            "https://huggingface.co/datasets/example/repo/resolve/abc/file.parquet",
+            f"/api/resolve-cache/datasets/{VNGRS_REPOSITORY}/{VNGRS_REVISION}/README.md",
+        ),
+        (
+            "license_attribution",
+            "https://huggingface.co/datasets/example/repo/resolve/abc/README.md?download=true",
+            f"/api/resolve-cache/datasets/{VNGRS_REPOSITORY}/{VNGRS_REVISION}/README.md",
+        ),
+        (
+            "license_attribution",
+            dataset_license_resolve_url(),
+            f"/api/resolve-cache/datasets/{VNGRS_REPOSITORY}/{VNGRS_REVISION}/OTHER.md",
+        ),
+        (
+            "license_attribution",
+            dataset_license_resolve_url(),
+            f"https://evil.example/api/resolve-cache/datasets/{VNGRS_REPOSITORY}/{VNGRS_REVISION}/README.md",
+        ),
+        (
+            "license_attribution",
+            dataset_license_resolve_url(),
+            f"/api/resolve-cache/datasets/{VNGRS_REPOSITORY}/{VNGRS_REVISION}/README.md?token=secret",
+        ),
+    ],
+)
+def test_metadata_executor_rejects_307_outside_exact_license_route(
+    role: str, source_url: str, location: str
+) -> None:
+    redirect = urllib.error.HTTPError(
+        source_url,
+        307,
+        "temporary redirect",
+        {"Location": location},
+        io.BytesIO(),
+    )
+    client = BoundedClient(_FakeOpener([redirect]))  # type: ignore[arg-type]
+
+    with pytest.raises(ExecutionBlocked, match="exact immutable license route|route allowlist|query"):
+        client._attempt(role=role, method="GET", url=source_url, range_header=None)
+
+
+def test_metadata_executor_rejects_302_for_license_route() -> None:
+    source_url = dataset_license_resolve_url()
+    redirect = urllib.error.HTTPError(
+        source_url,
+        302,
+        "redirect",
+        {"Location": "https://cdn.hf.co/license"},
+        io.BytesIO(),
+    )
+    client = BoundedClient(_FakeOpener([redirect]))  # type: ignore[arg-type]
+
+    with pytest.raises(ExecutionBlocked, match="license attribution"):
+        client._attempt(role="license_attribution", method="GET", url=source_url, range_header=None)
 
 
 class _RaisingBytesIO(io.BytesIO):

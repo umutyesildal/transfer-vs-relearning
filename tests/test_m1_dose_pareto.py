@@ -4,17 +4,22 @@ import csv
 import json
 from pathlib import Path
 
+import pytest
 import yaml
 
 from transfer_vs_relearning.experiments.m1_dose_pareto import (
     CHECKPOINT_STEPS,
     CONTRACT_SHA256,
     AMENDMENT_SHA256,
+    FALCON_COMPLETED_CHEAP_STEPS,
+    FALCON_EVALUATION_RECOVERY_SHA256,
+    FALCON_RECOVERY_STEPS,
     PRECISION_REPAIR_SHA256,
     LABELS,
     VERSION,
     final_gate,
     load_registry,
+    validate_falcon_evaluation_recovery_state,
 )
 
 
@@ -86,6 +91,71 @@ def test_olmo_explicit_bf16_repair_binds_low_memory_parameter_state() -> None:
     assert training["per_device_train_batch_size"] == 5
     assert training["gradient_accumulation_steps"] == 100
     assert training["per_device_train_batch_size"] * training["gradient_accumulation_steps"] == 500
+
+
+def test_falcon_recovery_state_requires_exact_15_of_18_inventory(tmp_path: Path) -> None:
+    root = tmp_path / "m1_provenance_screen_v4_dose_pareto_v1"
+    training = root / "training" / "falcon" / "only-run"
+    training.mkdir(parents=True)
+    (training / "training_manifest.json").write_text(
+        json.dumps({"status": "complete"}), encoding="utf-8"
+    )
+    for step in CHECKPOINT_STEPS:
+        (training / "checkpoints" / f"checkpoint-{step}").mkdir(parents=True)
+    for label in LABELS:
+        steps = FALCON_COMPLETED_CHEAP_STEPS if label == "falcon" else CHECKPOINT_STEPS
+        for step in steps:
+            checkpoint = root / "evaluations" / label / f"checkpoint-{step}"
+            checkpoint.mkdir(parents=True)
+            (checkpoint / "cheap_gate.json").write_text(
+                json.dumps(
+                    {
+                        "status": "FAIL_HARD_STAGE_SKIPPED",
+                        "label": label,
+                        "step": step,
+                        "hard_stage_open": False,
+                    }
+                ),
+                encoding="utf-8",
+            )
+    state = validate_falcon_evaluation_recovery_state(
+        {"scratch_root": str(root)},
+        summary_root=root / "analysis" / "three_model_dose_pareto_summary_v1",
+    )
+    assert state["status"] == "PASS"
+    assert state["contract_sha256"] == FALCON_EVALUATION_RECOVERY_SHA256
+    assert state["available_checkpoint_count"] == 15
+    assert state["required_checkpoint_count"] == 18
+    assert state["recovery_array_indices"] == [2, 4, 5]
+    assert state["recovery_steps"] == list(FALCON_RECOVERY_STEPS)
+
+    forbidden = root / "evaluations" / "falcon" / "checkpoint-126"
+    forbidden.mkdir(parents=True)
+    with pytest.raises(FileExistsError, match="namespace is not absent"):
+        validate_falcon_evaluation_recovery_state(
+            {"scratch_root": str(root)},
+            summary_root=root / "analysis" / "three_model_dose_pareto_summary_v1",
+        )
+
+
+def test_falcon_recovery_launchers_are_evaluation_only_and_dependency_closed() -> None:
+    evaluation = (
+        repo_root() / "slurm/eval_m1_dose_pareto_falcon_recovery_rtx3090.slurm"
+    ).read_text(encoding="utf-8")
+    summary = (
+        repo_root() / "slurm/summarize_m1_dose_pareto_falcon_recovery.slurm"
+    ).read_text(encoding="utf-8")
+    submit = (
+        repo_root() / "scripts/submit_m1_dose_pareto_falcon_recovery.sh"
+    ).read_text(encoding="utf-8")
+    assert "#SBATCH --array=2,4,5%1" in evaluation
+    assert "#SBATCH --nodelist=guppi5" in evaluation
+    assert "case \"${SLURM_ARRAY_TASK_ID:?}\" in 2) step=126 ;; 4) step=210 ;; 5) step=252" in evaluation
+    assert "train_clm.py" not in evaluation
+    assert "prepare_m1_dose_pareto_evaluation.py" in evaluation
+    assert "summarize_m1_dose_pareto.py" in summary
+    assert "--dependency=afterok:${evaluation_id}" in submit
+    assert "rm " not in evaluation + summary + submit
 
 
 def test_final_gate_reproduces_eight_prompt_intersection(tmp_path: Path) -> None:

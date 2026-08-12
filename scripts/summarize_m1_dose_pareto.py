@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import re
 from pathlib import Path
 
 from transfer_vs_relearning.experiments.m1_dose_pareto import (
@@ -18,8 +19,13 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--registry", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, required=True)
+    parser.add_argument("--recovery-contract-sha256")
     args = parser.parse_args()
     registry = load_registry(args.registry.resolve())
+    if args.recovery_contract_sha256 is not None and re.fullmatch(
+        r"[0-9a-f]{64}", args.recovery_contract_sha256
+    ) is None:
+        raise ValueError("Recovery contract SHA-256 is invalid")
     root = Path(registry["scratch_root"])
     rows: list[dict[str, object]] = []
     nominees: list[dict[str, object]] = []
@@ -75,6 +81,7 @@ def main() -> None:
         writer.writerows(rows)
     write_json(args.output_root / "summary.json", {
         "status": "COMPLETE",
+        "recovery_contract_sha256": args.recovery_contract_sha256,
         "checkpoint_count": len(rows),
         "model_nominees": nominees,
         "selected_remediation_nominee": selected,

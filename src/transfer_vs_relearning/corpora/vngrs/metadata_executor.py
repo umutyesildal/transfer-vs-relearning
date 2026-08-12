@@ -22,7 +22,7 @@ import urllib.request
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable, Mapping
-from urllib.parse import parse_qsl, urlsplit
+from urllib.parse import parse_qsl, urljoin, urlsplit
 
 from .metadata import (
     FROZEN_SELECTED_SHARD_PATHS,
@@ -45,6 +45,7 @@ from .metadata import (
     VNGRS_SCHEMA,
     VNGRS_SHARD_COUNT,
     VNGRS_SPLIT,
+    VNGRS_LICENSE_REDIRECT_REPAIR_SHA256,
     build_metadata_footer_feasibility_projection,
     build_sampling_schedule,
     build_selection_evidence,
@@ -63,14 +64,27 @@ SCRATCH_ROOTS = ("/vol/tmp", "/vol/tmp2")
 REQUEST_TIMEOUT_SECONDS = 60
 METADATA_FOOTER_MAX_LOGICAL_ATTEMPTS = 121
 METADATA_FOOTER_MAX_HTTP_HOPS = 242
-HF_REDIRECT_STATUS = 302
+HF_SHARD_REDIRECT_STATUS = 302
+HF_LICENSE_REDIRECT_STATUS = 307
+HF_REDIRECT_STATUSES = frozenset({HF_SHARD_REDIRECT_STATUS, HF_LICENSE_REDIRECT_STATUS})
 HF_REDIRECT_MAX_URL_LENGTH = 8_192
 HF_REDIRECT_ALLOWED_HOST_SUFFIXES = ("xethub.hf.co", "cdn.hf.co")
-HF_REDIRECT_METADATA_FIELDS = frozenset(
-    {"location_sha256", "scheme", "host", "path_sha256", "url_length", "query_keys"}
+HF_LICENSE_REDIRECT_HOST = "huggingface.co"
+HF_LICENSE_REDIRECT_PATH = (
+    f"/api/resolve-cache/datasets/{VNGRS_REPOSITORY}/{VNGRS_REVISION}/README.md"
 )
-
-
+HF_REDIRECT_METADATA_FIELDS = frozenset(
+    {
+        "http_status",
+        "route_class",
+        "location_sha256",
+        "scheme",
+        "host",
+        "path_sha256",
+        "url_length",
+        "query_keys",
+    }
+)
 class ExecutionBlocked(RuntimeError):
     """A frozen 151an precondition, route, bound or integrity rule failed."""
 
@@ -219,7 +233,23 @@ class BoundedClient:
         if metadata.get("scheme") != "https" or not isinstance(metadata.get("host"), str):
             return False
         host = str(metadata["host"]).lower()
-        if not any(host == suffix or host.endswith("." + suffix) for suffix in HF_REDIRECT_ALLOWED_HOST_SUFFIXES):
+        status = metadata.get("http_status")
+        route_class = metadata.get("route_class")
+        if route_class == "shard_cdn":
+            route_valid = status == HF_SHARD_REDIRECT_STATUS and any(
+                host == suffix or host.endswith("." + suffix)
+                for suffix in HF_REDIRECT_ALLOWED_HOST_SUFFIXES
+            )
+        elif route_class == "license_resolve_cache":
+            route_valid = (
+                status == HF_LICENSE_REDIRECT_STATUS
+                and host == HF_LICENSE_REDIRECT_HOST
+                and metadata.get("path_sha256")
+                == hashlib.sha256(HF_LICENSE_REDIRECT_PATH.encode("utf-8")).hexdigest()
+            )
+        else:
+            route_valid = False
+        if not route_valid:
             return False
         if not isinstance(metadata.get("url_length"), int) or not 0 < metadata["url_length"] <= HF_REDIRECT_MAX_URL_LENGTH:
             return False
@@ -236,28 +266,65 @@ class BoundedClient:
         )
 
     @classmethod
-    def _validate_redirect_target(cls, location: str | None) -> tuple[str, dict[str, Any]]:
+    def _validate_redirect_target(
+        cls,
+        location: str | None,
+        *,
+        status: int,
+        role: str,
+        source_url: str,
+    ) -> tuple[str, dict[str, Any]]:
         if not isinstance(location, str) or not location:
             raise ExecutionBlocked(
-                "HTTP 302 lacked an absolute Location header",
-                context={"phase": "redirect_integrity", "location_present": False},
+                f"HTTP {status} lacked a Location header",
+                context={"phase": "redirect_integrity", "http_status": status, "location_present": False},
             )
         summary = cls._redact_location(location)
         if len(location) > HF_REDIRECT_MAX_URL_LENGTH:
             raise ExecutionBlocked(
-                "HTTP 302 Location exceeded the frozen URL-length bound",
-                context={"phase": "redirect_integrity", **summary},
+                f"HTTP {status} Location exceeded the frozen URL-length bound",
+                context={"phase": "redirect_integrity", "http_status": status, **summary},
+            )
+        if status == HF_SHARD_REDIRECT_STATUS:
+            if role == "license_attribution":
+                raise ExecutionBlocked(
+                    "license attribution does not permit the shard-only HTTP 302 redirect class",
+                    context={"phase": "redirect_integrity", "http_status": status, **summary},
+                )
+            resolved_location = location
+            route_class = "shard_cdn"
+        elif status == HF_LICENSE_REDIRECT_STATUS:
+            if role != "license_attribution" or source_url != dataset_license_resolve_url():
+                raise ExecutionBlocked(
+                    "HTTP 307 is permitted only for the exact immutable license route",
+                    context={"phase": "redirect_integrity", "http_status": status, **summary},
+                )
+            raw_target = urlsplit(location)
+            if raw_target.scheme or raw_target.netloc:
+                resolved_location = location
+            elif location.startswith("/"):
+                resolved_location = urljoin(source_url, location)
+            else:
+                raise ExecutionBlocked(
+                    "license HTTP 307 Location must be absolute or root-relative",
+                    context={"phase": "redirect_integrity", "http_status": status, **summary},
+                )
+            route_class = "license_resolve_cache"
+        else:
+            raise ExecutionBlocked(
+                f"HTTP {status} is outside the frozen redirect vocabulary",
+                context={"phase": "redirect_integrity", "http_status": status, **summary},
             )
         try:
-            parsed = urlsplit(location)
+            parsed = urlsplit(resolved_location)
             port = parsed.port
         except ValueError as exc:
             raise ExecutionBlocked(
-                "HTTP 302 Location contained an invalid port",
-                context={"phase": "redirect_integrity", **summary},
+                f"HTTP {status} Location contained an invalid port",
+                context={"phase": "redirect_integrity", "http_status": status, **summary},
             ) from exc
         host = parsed.hostname.lower() if parsed.hostname else None
-        if (
+        common_invalid = (
             parsed.scheme != "https"
             or not parsed.netloc
             or parsed.username is not None
@@ -266,14 +333,39 @@ class BoundedClient:
             or port is not None
             or not parsed.path.startswith("/")
             or host is None
-            or not any(host == suffix or host.endswith("." + suffix) for suffix in HF_REDIRECT_ALLOWED_HOST_SUFFIXES)
-        ):
-            raise ExecutionBlocked(
-                "HTTP 302 Location failed the official Hugging Face CDN allowlist",
-                context={"phase": "redirect_integrity", **summary},
+        )
+        shard_invalid = route_class == "shard_cdn" and (
+            host is None
+            or not any(
+                host == suffix or host.endswith("." + suffix)
+                for suffix in HF_REDIRECT_ALLOWED_HOST_SUFFIXES
             )
-        query_keys = sorted(key for key, _ in parse_qsl(parsed.query, keep_blank_values=True))
+        )
+        license_invalid = route_class == "license_resolve_cache" and (
+            host != HF_LICENSE_REDIRECT_HOST or parsed.path != HF_LICENSE_REDIRECT_PATH
+        )
+        if common_invalid or shard_invalid or license_invalid:
+            raise ExecutionBlocked(
+                f"HTTP {status} Location failed its frozen Hugging Face route allowlist",
+                context={"phase": "redirect_integrity", "http_status": status, **summary},
+            )
+        query_pairs = parse_qsl(parsed.query, keep_blank_values=True)
+        query_keys = sorted(key for key, _ in query_pairs)
+        if route_class == "license_resolve_cache":
+            query_map = {key: value for key, value in query_pairs}
+            if (
+                len(query_map) != len(query_pairs)
+                or not query_map.get("etag")
+                or set(query_map) - {"download", "etag"}
+                or ("download" in query_map and query_map["download"] != "true")
+            ):
+                raise ExecutionBlocked(
+                    "license HTTP 307 query failed the frozen secret-safe key/value shape",
+                    context={"phase": "redirect_integrity", "http_status": status, **summary},
+                )
         metadata = {
+            "http_status": status,
+            "route_class": route_class,
             "location_sha256": summary["location_sha256"],
             "scheme": parsed.scheme,
             "host": host,
@@ -281,7 +373,7 @@ class BoundedClient:
             "url_length": len(location),
             "query_keys": query_keys,
         }
-        return location, metadata
+        return resolved_location, metadata
 
     @staticmethod
     def _request_headers(*, range_header: str | None, cross_host: bool = False) -> dict[str, str]:
@@ -377,7 +469,7 @@ class BoundedClient:
             return None
         return int(raw.strip())
 
-    def _attempt(self, *, method: str, url: str, range_header: str | None) -> AttemptResult:
+    def _attempt(self, *, role: str, method: str, url: str, range_header: str | None) -> AttemptResult:
         self._check_attempt_bound()
         self.attempt_count += 1
         redirect_chain: list[dict[str, Any]] = []
@@ -395,13 +487,18 @@ class BoundedClient:
             except urllib.error.HTTPError as http_error:
                 response_headers = self._headers(http_error)
                 status = int(http_error.code)
-                if status == HF_REDIRECT_STATUS:
+                if status in HF_REDIRECT_STATUSES:
                     if hop_index == 1:
                         raise ExecutionBlocked(
-                            "a second HTTP 302 redirect exceeded the one-hop bound",
+                            f"a second HTTP {status} redirect exceeded the one-hop bound",
                             context=self.bound_context(phase="redirect_hop_bound", http_status=status),
                         )
-                    target, metadata = self._validate_redirect_target(response_headers.get("location"))
+                    target, metadata = self._validate_redirect_target(
+                        response_headers.get("location"),
+                        status=status,
+                        role=role,
+                        source_url=url,
+                    )
                     redirect_chain.append(metadata)
                     self.redirect_hop_count += 1
                     current_url = target
@@ -453,15 +550,20 @@ class BoundedClient:
             response_headers = self._headers(response)
             status_value = getattr(response, "status", None)
             status = int(status_value if status_value is not None else response.getcode())
-            if status == HF_REDIRECT_STATUS:
+            if status in HF_REDIRECT_STATUSES:
                 if hop_index == 1:
                     if hasattr(response, "close"):
                         response.close()
                     raise ExecutionBlocked(
-                        "a second HTTP 302 redirect exceeded the one-hop bound",
+                        f"a second HTTP {status} redirect exceeded the one-hop bound",
                         context=self.bound_context(phase="redirect_hop_bound", http_status=status),
                     )
-                target, metadata = self._validate_redirect_target(response_headers.get("location"))
+                target, metadata = self._validate_redirect_target(
+                    response_headers.get("location"),
+                    status=status,
+                    role=role,
+                    source_url=url,
+                )
                 redirect_chain.append(metadata)
                 self.redirect_hop_count += 1
                 current_url = target
@@ -506,7 +608,7 @@ class BoundedClient:
     ) -> tuple[AttemptResult, bytes | None]:
         ordinal = 0
         while True:
-            result = self._attempt(method=method, url=url, range_header=range_header)
+            result = self._attempt(role=role, method=method, url=url, range_header=range_header)
             retryable_http = result.status in {429, 503}
             no_response = result.status is None
             if result.status == expected_status:
@@ -1295,14 +1397,25 @@ def _execute_metadata_footer_wave_uncaught(
     )
     if license_payload is None:
         raise ExecutionBlocked("license response was empty")
+    license_content_type = (_header_value(license_result.headers, "content-type") or "").split(";", 1)[0]
+    license_content_encoding = _header_value(license_result.headers, "content-encoding") or "identity"
+    if license_content_type != "text/plain" or license_content_encoding != "identity":
+        raise ExecutionBlocked(
+            "license response is not identity-encoded raw text/plain bytes",
+            context=client.bound_context(
+                phase="license_response_integrity",
+                content_type=license_content_type or None,
+                content_encoding=license_content_encoding,
+            ),
+        )
     license_sha = hashlib.sha256(license_payload).hexdigest()
     for row in shard_rows:
         row["license_bytes_sha256"] = license_sha
     for request in client.request_rows:
         if request["request_id"] == "license_attribution-00000" and request["request_outcome"] == "metadata_success":
             request["etag"] = _header_value(license_result.headers, "etag")
-            request["content_type"] = (_header_value(license_result.headers, "content-type") or "text/plain").split(";", 1)[0]
-            request["content_encoding"] = _header_value(license_result.headers, "content-encoding") or "identity"
+            request["content_type"] = license_content_type
+            request["content_encoding"] = license_content_encoding
 
     artifact_rows = _artifact_rows(client.artifact_payloads)
     manifest_payload = serialize_metadata_footer_artifact_manifest(artifact_rows)
@@ -1332,6 +1445,7 @@ def _execute_metadata_footer_wave_uncaught(
         "new_inode_count": len(artifact_rows) + len(METADATA_FOOTER_OUTPUT_PATHS),
         "write_order": list(METADATA_FOOTER_OUTPUT_PATHS),
         "contract_sha256": METADATA_FOOTER_CONTRACT_SHA256,
+        "license_redirect_repair_sha256": VNGRS_LICENSE_REDIRECT_REPAIR_SHA256,
         "manifest_sha256": hashlib.sha256(manifest_payload).hexdigest(),
         "route_kind": METADATA_FOOTER_ROUTE_KIND,
         "corpus_rows_retrieved": 0,

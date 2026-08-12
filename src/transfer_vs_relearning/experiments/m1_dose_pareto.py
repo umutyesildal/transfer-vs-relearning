@@ -15,8 +15,11 @@ VERSION = "m1_provenance_screen_v4_dose_pareto_v1"
 CONTRACT_SHA256 = "909c60ff8ace454dc53eb941f0e18c43e991f8377a2bf750e9ba7f9fdc285f2c"
 AMENDMENT_SHA256 = "e13c2a08c482e027ab04c364306b6b62ec73897d9caca7b111a188796235b0cb"
 PRECISION_REPAIR_SHA256 = "6bbd299645ca36463b3fd3fdb9f90288e8ec3f4f6ba2312bd4ce704ccd225984"
+FALCON_EVALUATION_RECOVERY_SHA256 = "4ada146f01c777a2995d6bc4901e1cbaf9bae574b9d93263440fdfe9cca355fd"
 CHECKPOINT_STEPS = (42, 84, 126, 168, 210, 252)
 LABELS = ("olmo", "falcon", "pythia")
+FALCON_COMPLETED_CHEAP_STEPS = (42, 84, 168)
+FALCON_RECOVERY_STEPS = (126, 210, 252)
 SCRATCH_PREFIX = "/vol/tmp2/yesildau/"
 RELATIONS = ("profession", "born_in", "lives_in", "field_of_study", "works_in_industry")
 
@@ -126,6 +129,74 @@ def completed_training_run(registry: dict[str, Any], label: str) -> Path:
     if tuple(checkpoints) != CHECKPOINT_STEPS:
         raise ValueError(f"{label} checkpoint inventory drift: {checkpoints}")
     return complete[0]
+
+
+def validate_falcon_evaluation_recovery_state(
+    registry: dict[str, Any], *, summary_root: Path
+) -> dict[str, Any]:
+    """Validate the exact 15/18-row state before the bounded Falcon-only recovery."""
+
+    root = Path(registry["scratch_root"]).resolve()
+    if summary_root.resolve().parent != root / "analysis" or summary_root.exists():
+        raise FileExistsError(f"Falcon recovery summary root is invalid/existing: {summary_root}")
+    training_run = completed_training_run(registry, "falcon")
+    rows: list[dict[str, Any]] = []
+    missing: list[dict[str, Any]] = []
+    for label in LABELS:
+        expected_present = (
+            FALCON_COMPLETED_CHEAP_STEPS if label == "falcon" else CHECKPOINT_STEPS
+        )
+        expected_missing = FALCON_RECOVERY_STEPS if label == "falcon" else ()
+        for step in CHECKPOINT_STEPS:
+            checkpoint_root = root / "evaluations" / label / f"checkpoint-{step}"
+            cheap_path = checkpoint_root / "cheap_gate.json"
+            final_path = checkpoint_root / "final_gate.json"
+            if step in expected_missing:
+                if checkpoint_root.exists():
+                    raise FileExistsError(
+                        f"Missing Falcon checkpoint namespace is not absent: {checkpoint_root}"
+                    )
+                missing.append({"label": label, "step": step, "root": str(checkpoint_root)})
+                continue
+            if step not in expected_present or not cheap_path.is_file():
+                raise FileNotFoundError(cheap_path)
+            cheap = json.loads(cheap_path.read_text(encoding="utf-8"))
+            if cheap.get("label") != label or int(cheap.get("step", -1)) != step:
+                raise ValueError(f"Cheap-gate identity drift: {cheap_path}")
+            if cheap.get("status") not in {"PASS_HARD_STAGE_OPEN", "FAIL_HARD_STAGE_SKIPPED"}:
+                raise ValueError(f"Cheap-gate status drift: {cheap_path}")
+            hard_open = cheap.get("hard_stage_open")
+            if not isinstance(hard_open, bool):
+                raise ValueError(f"Cheap-gate hard-stage flag is invalid: {cheap_path}")
+            if hard_open != final_path.is_file():
+                raise ValueError(f"Cheap/final gate cascade drift: {checkpoint_root}")
+            rows.append(
+                {
+                    "label": label,
+                    "step": step,
+                    "cheap_gate": str(cheap_path),
+                    "cheap_gate_sha256": sha256_file(cheap_path),
+                    "hard_stage_open": hard_open,
+                    "final_gate": str(final_path) if final_path.is_file() else None,
+                    "final_gate_sha256": sha256_file(final_path) if final_path.is_file() else None,
+                }
+            )
+    if len(rows) != 15 or [(row["label"], row["step"]) for row in missing] != [
+        ("falcon", step) for step in FALCON_RECOVERY_STEPS
+    ]:
+        raise ValueError("Falcon recovery state is not the exact frozen 15/18-row inventory")
+    return {
+        "status": "PASS",
+        "contract_sha256": FALCON_EVALUATION_RECOVERY_SHA256,
+        "falcon_training_run": str(training_run),
+        "available_checkpoint_count": len(rows),
+        "required_checkpoint_count": len(LABELS) * len(CHECKPOINT_STEPS),
+        "available_rows": rows,
+        "missing_rows": missing,
+        "recovery_array_indices": [2, 4, 5],
+        "recovery_steps": list(FALCON_RECOVERY_STEPS),
+        "summary_root": str(summary_root.resolve()),
+    }
 
 
 def general_config(

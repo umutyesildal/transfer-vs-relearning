@@ -74,10 +74,18 @@ METADATA_FOOTER_RETRYABLE_ERROR_CODES = frozenset(
 )
 METADATA_FOOTER_RETRY_FAILURE_CLASSES = frozenset({"http_retryable", "transport_no_response"})
 _HF_REDIRECT_METADATA_FIELDS = frozenset(
-    {"location_sha256", "scheme", "host", "path_sha256", "url_length", "query_keys"}
+    {
+        "http_status", "route_class", "location_sha256", "scheme", "host", "path_sha256",
+        "url_length", "query_keys",
+    }
 )
 _HF_REDIRECT_ALLOWED_HOST_SUFFIXES = ("xethub.hf.co", "cdn.hf.co")
 _HF_REDIRECT_MAX_URL_LENGTH = 8_192
+_HF_LICENSE_REDIRECT_HOST = "huggingface.co"
+_HF_LICENSE_REDIRECT_PATH = (
+    f"/api/resolve-cache/datasets/{VNGRS_REPOSITORY}/{VNGRS_REVISION}/README.md"
+)
+VNGRS_LICENSE_REDIRECT_REPAIR_SHA256 = "57d8dbd0b84f5914e9b249b12d888cb1aa7c2ea6b6733197aaf117dbcb801853"
 
 
 def _valid_redirect_chain(value: Any) -> bool:
@@ -91,10 +99,25 @@ def _valid_redirect_chain(value: Any) -> bool:
     if not isinstance(entry, Mapping) or set(entry) != _HF_REDIRECT_METADATA_FIELDS:
         return False
     host = entry.get("host")
+    route_class = entry.get("route_class")
+    status = entry.get("http_status")
+    if route_class == "shard_cdn":
+        route_valid = status == 302 and isinstance(host, str) and any(
+            host == suffix or host.endswith("." + suffix)
+            for suffix in _HF_REDIRECT_ALLOWED_HOST_SUFFIXES
+        )
+    elif route_class == "license_resolve_cache":
+        route_valid = (
+            status == 307
+            and host == _HF_LICENSE_REDIRECT_HOST
+            and entry.get("path_sha256")
+            == hashlib.sha256(_HF_LICENSE_REDIRECT_PATH.encode("utf-8")).hexdigest()
+        )
+    else:
+        route_valid = False
     if (
         entry.get("scheme") != "https"
-        or not isinstance(host, str)
-        or not any(host == suffix or host.endswith("." + suffix) for suffix in _HF_REDIRECT_ALLOWED_HOST_SUFFIXES)
+        or not route_valid
         or not isinstance(entry.get("url_length"), int)
         or not 0 < entry["url_length"] <= _HF_REDIRECT_MAX_URL_LENGTH
     ):
@@ -109,6 +132,10 @@ def _valid_redirect_chain(value: Any) -> bool:
         isinstance(query_keys, list)
         and all(isinstance(key, str) for key in query_keys)
         and query_keys == sorted(query_keys)
+        and (
+            route_class != "license_resolve_cache"
+            or query_keys in (["etag"], ["download", "etag"])
+        )
     )
 
 
@@ -1089,7 +1116,11 @@ def validate_metadata_footer_feasibility(
             ):
                 errors.append(f"request row {index}: shared metadata/route HEAD request is invalid")
             if role == "license_attribution" and (
-                row.get("http_method") != "GET" or row.get("http_status") != 200 or row.get("request_url") != dataset_license_resolve_url()
+                row.get("http_method") != "GET"
+                or row.get("http_status") != 200
+                or row.get("request_url") != dataset_license_resolve_url()
+                or row.get("content_type") != "text/plain"
+                or row.get("content_encoding") != "identity"
             ):
                 errors.append(f"request row {index}: license request is not the immutable README route")
         elif failure_class not in METADATA_FOOTER_RETRY_FAILURE_CLASSES:
@@ -1471,6 +1502,8 @@ def validate_metadata_footer_feasibility(
         expected_artifact_paths = [row.get("relative_path") for row in artifact_rows if isinstance(row, Mapping)]
         if audit.get("contract_sha256") != METADATA_FOOTER_CONTRACT_SHA256:
             errors.append("metadata/footer audit is not bound to the corrected 151an contract SHA")
+        if audit.get("license_redirect_repair_sha256") != VNGRS_LICENSE_REDIRECT_REPAIR_SHA256:
+            errors.append("metadata/footer audit is not bound to the license-redirect repair contract SHA")
         if audit.get("manifest_sha256") != package.get("artifact_manifest_sha256"):
             errors.append("metadata/footer audit manifest SHA is not bound")
         if audit.get("artifact_paths") != expected_artifact_paths:
