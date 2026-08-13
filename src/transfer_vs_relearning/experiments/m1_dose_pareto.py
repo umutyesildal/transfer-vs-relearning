@@ -17,6 +17,7 @@ AMENDMENT_SHA256 = "e13c2a08c482e027ab04c364306b6b62ec73897d9caca7b111a188796235
 PRECISION_REPAIR_SHA256 = "6bbd299645ca36463b3fd3fdb9f90288e8ec3f4f6ba2312bd4ce704ccd225984"
 FALCON_EVALUATION_RECOVERY_SHA256 = "4ada146f01c777a2995d6bc4901e1cbaf9bae574b9d93263440fdfe9cca355fd"
 FALCON_EVALUATION_RTXA6000_RELOCATION_SHA256 = "e8e1d772ed7726e959f5ec5e24d81f1a4a3aeed2973f6aa3bbe5c22b078e9fda"
+FALCON_EVALUATION_RTXA6000_EXCLUSIVE_SHA256 = "6e57f90897db8202bcb338a84b6a3b99abb2bf3a887e1a2cdaefacdde08021c8"
 CHECKPOINT_STEPS = (42, 84, 126, 168, 210, 252)
 LABELS = ("olmo", "falcon", "pythia")
 FALCON_COMPLETED_CHEAP_STEPS = (42, 84, 168)
@@ -77,11 +78,11 @@ def evaluation_runtime_identity(
     expected = dict(candidate(registry, label)["runtime"])
     if falcon_relocation_sha256 is None:
         return expected
-    if (
-        label != "falcon"
-        or falcon_relocation_sha256 != FALCON_EVALUATION_RTXA6000_RELOCATION_SHA256
-    ):
-        raise ValueError("Runtime relocation is not bound to exact Falcon Document 165 authority")
+    if label != "falcon" or falcon_relocation_sha256 not in {
+        FALCON_EVALUATION_RTXA6000_RELOCATION_SHA256,
+        FALCON_EVALUATION_RTXA6000_EXCLUSIVE_SHA256,
+    }:
+        raise ValueError("Runtime relocation is not bound to exact Falcon Document 165/168 authority")
     expected["expected_gpu_substring"] = "RTX A6000"
     expected["min_free_memory_bytes"] = 40 * 1024**3
     return expected

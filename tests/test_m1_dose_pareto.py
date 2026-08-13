@@ -14,6 +14,7 @@ from transfer_vs_relearning.experiments.m1_dose_pareto import (
     FALCON_COMPLETED_CHEAP_STEPS,
     FALCON_EVALUATION_RECOVERY_SHA256,
     FALCON_EVALUATION_RTXA6000_RELOCATION_SHA256,
+    FALCON_EVALUATION_RTXA6000_EXCLUSIVE_SHA256,
     FALCON_RECOVERY_STEPS,
     PRECISION_REPAIR_SHA256,
     LABELS,
@@ -213,6 +214,46 @@ def test_falcon_rtxa6000_relocation_is_exact_and_access_checked() -> None:
     assert "40 * 1024**3" in preflight
     assert "train_clm.py" not in evaluation + summary + submit + preflight
     assert "rm " not in evaluation + summary + submit + preflight
+
+
+def test_falcon_rtxa6000_exclusive_retry_requires_runtime_cleanliness() -> None:
+    registry = load_registry(
+        repo_root() / "configs/experiments/m1_provenance_screen_v4_dose_pareto_v1.yaml"
+    )
+    runtime = evaluation_runtime_identity(
+        registry,
+        "falcon",
+        falcon_relocation_sha256=FALCON_EVALUATION_RTXA6000_EXCLUSIVE_SHA256,
+    )
+    assert runtime["expected_gpu_substring"] == "RTX A6000"
+    assert runtime["min_free_memory_bytes"] == 40 * 1024**3
+
+    evaluation = (
+        repo_root() / "slurm/eval_m1_dose_pareto_falcon_recovery_rtxa6000_exclusive.slurm"
+    ).read_text(encoding="utf-8")
+    submit = (
+        repo_root() / "scripts/submit_m1_dose_pareto_falcon_rtxa6000_exclusive_recovery.sh"
+    ).read_text(encoding="utf-8")
+    preflight = (
+        repo_root() / "scripts/preflight_m1_dose_pareto_falcon_rtxa6000_exclusive_recovery.py"
+    ).read_text(encoding="utf-8")
+    runtime_validator = (
+        repo_root() / "scripts/validate_m1_dose_pareto_runtime.py"
+    ).read_text(encoding="utf-8")
+    assert "#SBATCH --exclusive" in evaluation
+    assert "#SBATCH --array=2,4,5%1" in evaluation
+    assert "--require-empty-compute-apps" in evaluation
+    assert "--maximum-used-vram-bytes 536870912" in evaluation
+    assert evaluation.index("validate_m1_dose_pareto_runtime.py") < evaluation.index("mkdir -p")
+    assert 'DEAD_SUMMARY_JOB_ID = "456415"' in preflight
+    assert "scancel 456415" in submit
+    assert submit.index("scancel 456415") < submit.index("sbatch --test-only")
+    assert submit.count('evaluation_id="$(sbatch --parsable') == 1
+    assert "--dependency=afterok:${evaluation_id}" in submit
+    assert "--query-compute-apps=pid,process_name,used_memory" in runtime_validator
+    assert "Allocated GPU has compute processes" in runtime_validator
+    assert "train_clm.py" not in evaluation + submit + preflight
+    assert "rm " not in evaluation + submit + preflight
 
 
 def test_final_gate_reproduces_eight_prompt_intersection(tmp_path: Path) -> None:

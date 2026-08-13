@@ -2,6 +2,9 @@
 from __future__ import annotations
 
 import argparse
+import json
+import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -23,6 +26,8 @@ def main() -> None:
     parser.add_argument("--scratch-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--falcon-evaluation-relocation-sha256")
+    parser.add_argument("--require-empty-compute-apps", action="store_true")
+    parser.add_argument("--maximum-used-vram-bytes", type=int)
     args = parser.parse_args()
     registry = load_registry(args.registry.resolve())
     item = candidate(registry, args.label)
@@ -53,6 +58,63 @@ def main() -> None:
         raise ValueError(f"Torch drift: {torch.__version__}")
     if not torch.cuda.is_available() or torch.cuda.device_count() != 1:
         raise ValueError("Exactly one allocated CUDA device is required")
+    gpu_selector = os.environ.get("CUDA_VISIBLE_DEVICES", "").strip()
+    process_rows: list[str] = []
+    smi_identity: dict[str, object] | None = None
+    if args.require_empty_compute_apps:
+        if not gpu_selector or "," in gpu_selector:
+            raise ValueError("CUDA_VISIBLE_DEVICES must identify exactly one allocated device")
+        identity_result = subprocess.run(
+            [
+                "nvidia-smi",
+                f"--id={gpu_selector}",
+                "--query-gpu=index,uuid,name,memory.total,memory.free,memory.used",
+                "--format=csv,noheader,nounits",
+            ],
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        identity_rows = [row.strip() for row in identity_result.stdout.splitlines() if row.strip()]
+        if len(identity_rows) != 1:
+            raise ValueError(f"Allocated GPU identity is not unique: {identity_rows}")
+        values = [value.strip() for value in identity_rows[0].split(",")]
+        if len(values) != 6:
+            raise ValueError(f"Allocated GPU identity is malformed: {identity_rows[0]}")
+        smi_identity = {
+            "index": values[0],
+            "uuid": values[1],
+            "name": values[2],
+            "total_bytes": int(values[3]) * 1024**2,
+            "free_bytes": int(values[4]) * 1024**2,
+            "used_bytes": int(values[5]) * 1024**2,
+        }
+        apps_result = subprocess.run(
+            [
+                "nvidia-smi",
+                f"--id={gpu_selector}",
+                "--query-compute-apps=pid,process_name,used_memory",
+                "--format=csv,noheader,nounits",
+            ],
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        process_rows = [row.strip() for row in apps_result.stdout.splitlines() if row.strip()]
+        evidence = {
+            "slurm_job_id": os.environ.get("SLURM_JOB_ID"),
+            "slurm_array_job_id": os.environ.get("SLURM_ARRAY_JOB_ID"),
+            "slurm_array_task_id": os.environ.get("SLURM_ARRAY_TASK_ID"),
+            "slurm_job_nodelist": os.environ.get("SLURM_JOB_NODELIST"),
+            "cuda_visible_devices": gpu_selector,
+            "nvidia_smi": smi_identity,
+            "compute_app_rows": process_rows,
+        }
+        print("clean_allocation_evidence=" + json.dumps(evidence, sort_keys=True), flush=True)
+        if process_rows:
+            raise ValueError(f"Allocated GPU has compute processes: {process_rows}")
+        if args.maximum_used_vram_bytes is None or int(smi_identity["used_bytes"]) > args.maximum_used_vram_bytes:
+            raise ValueError(f"Allocated GPU used-VRAM gate failed: {smi_identity['used_bytes']}")
     name = torch.cuda.get_device_name(0)
     capability = ".".join(str(value) for value in torch.cuda.get_device_capability(0))
     if expected["expected_gpu_substring"] not in name or capability != expected["expected_compute_capability"]:
@@ -87,6 +149,11 @@ def main() -> None:
         "scratch_root": str(args.scratch_root.resolve()),
         "probe_loss": float(loss.detach().cpu()),
         "falcon_evaluation_relocation_sha256": args.falcon_evaluation_relocation_sha256,
+        "cuda_visible_devices": gpu_selector or None,
+        "clean_allocation_required": args.require_empty_compute_apps,
+        "nvidia_smi_identity": smi_identity,
+        "compute_app_rows": process_rows,
+        "maximum_used_vram_bytes": args.maximum_used_vram_bytes,
     })
     print(args.output.resolve())
 
