@@ -18,6 +18,7 @@ PRECISION_REPAIR_SHA256 = "6bbd299645ca36463b3fd3fdb9f90288e8ec3f4f6ba2312bd4ce7
 FALCON_EVALUATION_RECOVERY_SHA256 = "4ada146f01c777a2995d6bc4901e1cbaf9bae574b9d93263440fdfe9cca355fd"
 FALCON_EVALUATION_RTXA6000_RELOCATION_SHA256 = "e8e1d772ed7726e959f5ec5e24d81f1a4a3aeed2973f6aa3bbe5c22b078e9fda"
 FALCON_EVALUATION_RTXA6000_EXCLUSIVE_SHA256 = "6e57f90897db8202bcb338a84b6a3b99abb2bf3a887e1a2cdaefacdde08021c8"
+FALCON_EVALUATION_CLEAN_UUID_SHA256 = "b54983a5638391fec575a47f3934b4d674b9e8d655de7c6b5e8818fabc69778e"
 CHECKPOINT_STEPS = (42, 84, 126, 168, 210, 252)
 LABELS = ("olmo", "falcon", "pythia")
 FALCON_COMPLETED_CHEAP_STEPS = (42, 84, 168)
@@ -81,6 +82,7 @@ def evaluation_runtime_identity(
     if label != "falcon" or falcon_relocation_sha256 not in {
         FALCON_EVALUATION_RTXA6000_RELOCATION_SHA256,
         FALCON_EVALUATION_RTXA6000_EXCLUSIVE_SHA256,
+        FALCON_EVALUATION_CLEAN_UUID_SHA256,
     }:
         raise ValueError("Runtime relocation is not bound to exact Falcon Document 165/168 authority")
     expected["expected_gpu_substring"] = "RTX A6000"

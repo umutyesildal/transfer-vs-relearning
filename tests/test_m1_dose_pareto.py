@@ -15,6 +15,7 @@ from transfer_vs_relearning.experiments.m1_dose_pareto import (
     FALCON_EVALUATION_RECOVERY_SHA256,
     FALCON_EVALUATION_RTXA6000_RELOCATION_SHA256,
     FALCON_EVALUATION_RTXA6000_EXCLUSIVE_SHA256,
+    FALCON_EVALUATION_CLEAN_UUID_SHA256,
     FALCON_RECOVERY_STEPS,
     PRECISION_REPAIR_SHA256,
     LABELS,
@@ -254,6 +255,32 @@ def test_falcon_rtxa6000_exclusive_retry_requires_runtime_cleanliness() -> None:
     assert "Allocated GPU has compute processes" in runtime_validator
     assert "train_clm.py" not in evaluation + submit + preflight
     assert "rm " not in evaluation + submit + preflight
+
+
+def test_falcon_clean_uuid_retry_audits_before_torch_and_is_dependency_closed() -> None:
+    registry = load_registry(
+        repo_root() / "configs/experiments/m1_provenance_screen_v4_dose_pareto_v1.yaml"
+    )
+    runtime = evaluation_runtime_identity(
+        registry, "falcon", falcon_relocation_sha256=FALCON_EVALUATION_CLEAN_UUID_SHA256
+    )
+    assert runtime["expected_gpu_substring"] == "RTX A6000"
+    evaluation = (repo_root() / "slurm/eval_m1_dose_pareto_falcon_clean_uuid_recovery.slurm").read_text(encoding="utf-8")
+    selector = (repo_root() / "scripts/select_clean_a6000_uuid.py").read_text(encoding="utf-8")
+    submit = (repo_root() / "scripts/submit_m1_dose_pareto_falcon_clean_uuid_recovery.sh").read_text(encoding="utf-8")
+    preflight = (repo_root() / "scripts/preflight_m1_dose_pareto_falcon_clean_uuid_recovery.py").read_text(encoding="utf-8")
+    assert "#SBATCH --exclusive" in evaluation and "#SBATCH --array=2,4,5%1" in evaluation
+    assert evaluation.index("select_clean_a6000_uuid.py") < evaluation.index("validate_m1_dose_pareto_runtime.py")
+    assert 'export CUDA_VISIBLE_DEVICES="${selected_uuid}"' in evaluation
+    assert "import torch" not in selector
+    assert "lexicographically_smallest_clean_gpu_uuid" in selector
+    assert 'DEAD_SUMMARY_JOB_ID = "456467"' in preflight
+    assert "scancel 456467" in submit
+    assert submit.index("scancel 456467") < submit.index("sbatch --test-only")
+    assert submit.count('evaluation_id="$(sbatch --parsable') == 1
+    assert "--dependency=afterok:${evaluation_id}" in submit
+    assert "train_clm.py" not in evaluation + selector + submit + preflight
+    assert "rm " not in evaluation + selector + submit + preflight
 
 
 def test_final_gate_reproduces_eight_prompt_intersection(tmp_path: Path) -> None:
