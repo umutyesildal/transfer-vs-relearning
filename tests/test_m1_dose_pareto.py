@@ -13,11 +13,13 @@ from transfer_vs_relearning.experiments.m1_dose_pareto import (
     AMENDMENT_SHA256,
     FALCON_COMPLETED_CHEAP_STEPS,
     FALCON_EVALUATION_RECOVERY_SHA256,
+    FALCON_EVALUATION_RTXA6000_RELOCATION_SHA256,
     FALCON_RECOVERY_STEPS,
     PRECISION_REPAIR_SHA256,
     LABELS,
     VERSION,
     final_gate,
+    evaluation_runtime_identity,
     load_registry,
     validate_falcon_evaluation_recovery_state,
 )
@@ -157,6 +159,60 @@ def test_falcon_recovery_launchers_are_evaluation_only_and_dependency_closed() -
     assert "summarize_m1_dose_pareto.py" in summary
     assert "--dependency=afterok:${evaluation_id}" in submit
     assert "rm " not in evaluation + summary + submit
+
+
+def test_falcon_rtxa6000_relocation_is_exact_and_access_checked() -> None:
+    registry = load_registry(
+        repo_root() / "configs/experiments/m1_provenance_screen_v4_dose_pareto_v1.yaml"
+    )
+    default_runtime = evaluation_runtime_identity(registry, "falcon")
+    relocated = evaluation_runtime_identity(
+        registry,
+        "falcon",
+        falcon_relocation_sha256=FALCON_EVALUATION_RTXA6000_RELOCATION_SHA256,
+    )
+    assert default_runtime["expected_gpu_substring"] == "RTX 3090"
+    assert relocated["expected_gpu_substring"] == "RTX A6000"
+    assert relocated["expected_compute_capability"] == "8.6"
+    assert relocated["expected_compiled_arch"] == "sm_86"
+    assert relocated["min_free_memory_bytes"] == 40 * 1024**3
+    with pytest.raises(ValueError, match="Document 165"):
+        evaluation_runtime_identity(
+            registry, "falcon", falcon_relocation_sha256="0" * 64
+        )
+    with pytest.raises(ValueError, match="Document 165"):
+        evaluation_runtime_identity(
+            registry,
+            "olmo",
+            falcon_relocation_sha256=FALCON_EVALUATION_RTXA6000_RELOCATION_SHA256,
+        )
+
+    evaluation = (
+        repo_root() / "slurm/eval_m1_dose_pareto_falcon_recovery_rtxa6000.slurm"
+    ).read_text(encoding="utf-8")
+    summary = (
+        repo_root() / "slurm/summarize_m1_dose_pareto_falcon_recovery_rtxa6000.slurm"
+    ).read_text(encoding="utf-8")
+    submit = (
+        repo_root() / "scripts/submit_m1_dose_pareto_falcon_rtxa6000_recovery.sh"
+    ).read_text(encoding="utf-8")
+    preflight = (
+        repo_root() / "scripts/preflight_m1_dose_pareto_falcon_rtxa6000_recovery.py"
+    ).read_text(encoding="utf-8")
+    assert "#SBATCH --partition=gpu" in evaluation
+    assert "#SBATCH --nodelist=gruenau8" in evaluation
+    assert "#SBATCH --gres=gpu:rtxa6000:1" in evaluation
+    assert "#SBATCH --array=2,4,5%1" in evaluation
+    assert "--falcon-evaluation-relocation-sha256" in evaluation
+    assert "sbatch --test-only" in submit
+    assert submit.index("sbatch --test-only") < submit.index('evaluation_id="$(sbatch --parsable')
+    assert "--dependency=afterok:${evaluation_id}" in submit
+    assert 'TARGET_PARTITION = "gpu"' in preflight
+    assert 'TARGET_NODE = "gruenau8"' in preflight
+    assert 'TARGET_GRES = "gpu:rtxa6000:1"' in preflight
+    assert "40 * 1024**3" in preflight
+    assert "train_clm.py" not in evaluation + summary + submit + preflight
+    assert "rm " not in evaluation + summary + submit + preflight
 
 
 def test_final_gate_reproduces_eight_prompt_intersection(tmp_path: Path) -> None:

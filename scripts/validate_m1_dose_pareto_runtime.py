@@ -7,7 +7,11 @@ from pathlib import Path
 
 import yaml
 
-from transfer_vs_relearning.experiments.m1_dose_pareto import candidate, load_registry
+from transfer_vs_relearning.experiments.m1_dose_pareto import (
+    candidate,
+    evaluation_runtime_identity,
+    load_registry,
+)
 from transfer_vs_relearning.utils.io import write_json
 
 
@@ -18,10 +22,15 @@ def main() -> None:
     parser.add_argument("--template", type=Path, required=True)
     parser.add_argument("--scratch-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--falcon-evaluation-relocation-sha256")
     args = parser.parse_args()
     registry = load_registry(args.registry.resolve())
     item = candidate(registry, args.label)
-    expected = item["runtime"]
+    expected = evaluation_runtime_identity(
+        registry,
+        args.label,
+        falcon_relocation_sha256=args.falcon_evaluation_relocation_sha256,
+    )
     if Path(sys.executable).resolve() != Path(expected["python"]).resolve():
         raise ValueError(f"Python drift: {sys.executable}")
     if args.scratch_root.resolve() != Path(registry["scratch_root"]).resolve():
@@ -77,6 +86,7 @@ def main() -> None:
         "template": str(args.template.resolve()),
         "scratch_root": str(args.scratch_root.resolve()),
         "probe_loss": float(loss.detach().cpu()),
+        "falcon_evaluation_relocation_sha256": args.falcon_evaluation_relocation_sha256,
     })
     print(args.output.resolve())
 

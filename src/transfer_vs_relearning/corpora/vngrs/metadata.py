@@ -86,6 +86,7 @@ _HF_LICENSE_REDIRECT_PATH = (
     f"/api/resolve-cache/datasets/{VNGRS_REPOSITORY}/{VNGRS_REVISION}/README.md"
 )
 VNGRS_LICENSE_REDIRECT_REPAIR_SHA256 = "57d8dbd0b84f5914e9b249b12d888cb1aa7c2ea6b6733197aaf117dbcb801853"
+VNGRS_CONTENT_RANGE_REPAIR_SHA256 = "18f9a3c65d7e006a29645bfcef2a26a3d48eb1224291bfe2ca122fafbfc6e4f8"
 
 
 def _valid_redirect_chain(value: Any) -> bool:
@@ -1415,7 +1416,7 @@ def validate_metadata_footer_feasibility(
                 except ValueError as exc:
                     errors.append(f"request row {index}: invalid footer trailer: {exc}")
                 else:
-                    expected_range = f"bytes={shard.get('object_size_bytes', 0) - 8}-{shard.get('object_size_bytes', 0) - 1}/{shard.get('object_size_bytes')}"
+                    expected_range = f"bytes {shard.get('object_size_bytes', 0) - 8}-{shard.get('object_size_bytes', 0) - 1}/{shard.get('object_size_bytes')}"
                     if row.get("content_range") != expected_range:
                         errors.append(f"request row {index}: trailer Content-Range is not reconciled")
                     if row.get("range_header") != METADATA_FOOTER_TRAILER_RANGE_HEADER:
@@ -1432,7 +1433,7 @@ def validate_metadata_footer_feasibility(
                     expected_start = shard.get("object_size_bytes", 0) - len(payload)
                     if start_match is None or int(start_match.group("start")) != expected_start:
                         errors.append(f"request row {index}: footer Range start is not exact")
-                    expected_range = f"bytes={expected_start}-{shard.get('object_size_bytes', 0) - 1}/{shard.get('object_size_bytes')}"
+                    expected_range = f"bytes {expected_start}-{shard.get('object_size_bytes', 0) - 1}/{shard.get('object_size_bytes')}"
                     if row.get("content_range") != expected_range:
                         errors.append(f"request row {index}: footer Content-Range is not reconciled")
                     if row.get("response_evidence_artifact") != shard.get("footer_evidence_artifact"):
@@ -1504,6 +1505,8 @@ def validate_metadata_footer_feasibility(
             errors.append("metadata/footer audit is not bound to the corrected 151an contract SHA")
         if audit.get("license_redirect_repair_sha256") != VNGRS_LICENSE_REDIRECT_REPAIR_SHA256:
             errors.append("metadata/footer audit is not bound to the license-redirect repair contract SHA")
+        if audit.get("content_range_repair_sha256") != VNGRS_CONTENT_RANGE_REPAIR_SHA256:
+            errors.append("metadata/footer audit is not bound to the Content-Range repair contract SHA")
         if audit.get("manifest_sha256") != package.get("artifact_manifest_sha256"):
             errors.append("metadata/footer audit manifest SHA is not bound")
         if audit.get("artifact_paths") != expected_artifact_paths:

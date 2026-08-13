@@ -29,6 +29,7 @@ from transfer_vs_relearning.corpora.vngrs.metadata import (
     METADATA_FOOTER_SCRATCH_ROOT,
     METADATA_FOOTER_TRAILER_RANGE_HEADER,
     VNGRS_LICENSE_REDIRECT_REPAIR_SHA256,
+    VNGRS_CONTENT_RANGE_REPAIR_SHA256,
     VNGRS_REPOSITORY,
     VNGRS_REVISION,
     build_metadata_footer_feasibility_projection,
@@ -1143,9 +1144,9 @@ def _valid_metadata_footer_package() -> tuple[dict[str, object], dict[str, bytes
             if role == "head_metadata_route":
                 content_range = None
             elif role == "footer_trailer":
-                content_range = f"bytes={object_size_bytes - 8}-{object_size_bytes - 1}/{object_size_bytes}"
+                content_range = f"bytes {object_size_bytes - 8}-{object_size_bytes - 1}/{object_size_bytes}"
             else:
-                content_range = f"bytes={object_size_bytes - len(payload)}-{object_size_bytes - 1}/{object_size_bytes}"
+                content_range = f"bytes {object_size_bytes - len(payload)}-{object_size_bytes - 1}/{object_size_bytes}"
             request_rows.append(
                 {
                     "request_id": f"{role}-{index:05d}",
@@ -1259,6 +1260,7 @@ def _valid_metadata_footer_package() -> tuple[dict[str, object], dict[str, bytes
         "write_order": list(METADATA_FOOTER_OUTPUT_PATHS),
         "contract_sha256": METADATA_FOOTER_CONTRACT_SHA256,
         "license_redirect_repair_sha256": VNGRS_LICENSE_REDIRECT_REPAIR_SHA256,
+        "content_range_repair_sha256": VNGRS_CONTENT_RANGE_REPAIR_SHA256,
         "manifest_sha256": hashlib.sha256(artifact_manifest_payload).hexdigest(),
         "route_kind": METADATA_FOOTER_ROUTE_KIND,
         "corpus_rows_retrieved": 0,
@@ -1398,6 +1400,43 @@ def test_metadata_footer_validator_binds_object_metadata_separately_from_full_ob
     assert validation["total_response_bytes"] > 0
     assert all(row["object_sha256"] is None for row in package["shard_metadata"])
     assert all(row["object_metadata_evidence_sha256"] != row["footer_sha256"] for row in package["shard_metadata"])
+
+
+def test_metadata_footer_validator_distinguishes_range_request_from_content_range_response_syntax() -> None:
+    package, payloads, manifest_payload, audit_payload = _valid_metadata_footer_package()
+
+    trailer = next(
+        row for row in package["request_ledger"] if row["evidence_role"] == "footer_trailer"
+    )
+    footer = next(
+        row for row in package["request_ledger"] if row["evidence_role"] == "footer_bytes"
+    )
+    assert trailer["range_header"] == "bytes=-8"
+    assert str(trailer["content_range"]).startswith("bytes ")
+    assert str(footer["range_header"]).startswith("bytes=")
+    assert str(footer["content_range"]).startswith("bytes ")
+    assert validate_metadata_footer_feasibility(
+        package,
+        artifact_payloads=payloads,
+        artifact_manifest_payload=manifest_payload,
+        metadata_footer_audit_payload=audit_payload,
+    )["complete"]
+
+    invalid = copy.deepcopy(package)
+    invalid_trailer = next(
+        row for row in invalid["request_ledger"] if row["evidence_role"] == "footer_trailer"
+    )
+    invalid_trailer["content_range"] = str(invalid_trailer["content_range"]).replace(
+        "bytes ", "bytes=", 1
+    )
+    validation = validate_metadata_footer_feasibility(
+        invalid,
+        artifact_payloads=payloads,
+        artifact_manifest_payload=manifest_payload,
+        metadata_footer_audit_payload=audit_payload,
+    )
+    assert not validation["complete"]
+    assert any("trailer Content-Range is not reconciled" in error for error in validation["errors"])
 
 
 def test_metadata_footer_validator_accepts_real_retryable_http_failure_then_terminal_success() -> None:

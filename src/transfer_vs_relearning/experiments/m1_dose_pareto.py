@@ -16,6 +16,7 @@ CONTRACT_SHA256 = "909c60ff8ace454dc53eb941f0e18c43e991f8377a2bf750e9ba7f9fdc285
 AMENDMENT_SHA256 = "e13c2a08c482e027ab04c364306b6b62ec73897d9caca7b111a188796235b0cb"
 PRECISION_REPAIR_SHA256 = "6bbd299645ca36463b3fd3fdb9f90288e8ec3f4f6ba2312bd4ce704ccd225984"
 FALCON_EVALUATION_RECOVERY_SHA256 = "4ada146f01c777a2995d6bc4901e1cbaf9bae574b9d93263440fdfe9cca355fd"
+FALCON_EVALUATION_RTXA6000_RELOCATION_SHA256 = "e8e1d772ed7726e959f5ec5e24d81f1a4a3aeed2973f6aa3bbe5c22b078e9fda"
 CHECKPOINT_STEPS = (42, 84, 126, 168, 210, 252)
 LABELS = ("olmo", "falcon", "pythia")
 FALCON_COMPLETED_CHEAP_STEPS = (42, 84, 168)
@@ -66,6 +67,24 @@ def candidate(registry: dict[str, Any], label: str) -> dict[str, Any]:
     if len(matches) != 1:
         raise ValueError(f"Unknown/duplicate candidate: {label}")
     return matches[0]
+
+
+def evaluation_runtime_identity(
+    registry: dict[str, Any], label: str, *, falcon_relocation_sha256: str | None = None
+) -> dict[str, Any]:
+    """Resolve runtime identity, allowing only the exact Falcon RTX A6000 relocation."""
+
+    expected = dict(candidate(registry, label)["runtime"])
+    if falcon_relocation_sha256 is None:
+        return expected
+    if (
+        label != "falcon"
+        or falcon_relocation_sha256 != FALCON_EVALUATION_RTXA6000_RELOCATION_SHA256
+    ):
+        raise ValueError("Runtime relocation is not bound to exact Falcon Document 165 authority")
+    expected["expected_gpu_substring"] = "RTX A6000"
+    expected["min_free_memory_bytes"] = 40 * 1024**3
+    return expected
 
 
 def verify_sha(path: Path, expected: str) -> None:
