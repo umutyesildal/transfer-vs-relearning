@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from scripts import select_clean_a6000_uuid
 from scripts.select_clean_a6000_uuid import choose_clean_uuid, validate_visible_binding
 
 
@@ -46,3 +47,28 @@ def test_visible_binding_accepts_exact_indices_or_uuids_only() -> None:
         validate_visible_binding("0", rows)
     with pytest.raises(ValueError, match="does not match"):
         validate_visible_binding("4,5,6,7", rows)
+
+
+def test_no_candidate_cli_persists_full_failure_audit(tmp_path, monkeypatch) -> None:
+    rows = [gpu(f"GPU-{letter}{index}", free_gib=39) for index, letter in enumerate("abcd")]
+    gpu_payload = "\n".join(
+        f'{row["index"]}, {row["uuid"]}, {row["name"]}, 49152, 39936, 9216'
+        for row in rows
+    )
+
+    def fake_run(command: list[str]) -> str:
+        return gpu_payload if "--query-gpu=" in " ".join(command) else ""
+
+    output = tmp_path / "audit.json"
+    monkeypatch.setattr(select_clean_a6000_uuid, "_run", fake_run)
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "0,1,2,3")
+    monkeypatch.setattr(
+        "sys.argv", ["select_clean_a6000_uuid.py", "--output", str(output), "--contract-sha256", "abc"]
+    )
+    with pytest.raises(ValueError, match="No clean RTX A6000"):
+        select_clean_a6000_uuid.main()
+    payload = __import__("json").loads(output.read_text(encoding="utf-8"))
+    assert payload["status"] == "BLOCKED_NO_CLEAN_CANDIDATE"
+    assert payload["selected_uuid"] is None
+    assert len(payload["gpus"]) == 4
+    assert all(row["rejection_reasons"] for row in payload["gpus"])

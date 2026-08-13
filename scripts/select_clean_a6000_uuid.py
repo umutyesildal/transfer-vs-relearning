@@ -108,24 +108,55 @@ def main() -> None:
             ]
         )
         apps[uuid] = [line.strip() for line in result.splitlines() if line.strip()]
-    selected, audited = choose_clean_uuid(rows, apps)
+    base_payload = {
+        "contract_sha256": args.contract_sha256,
+        "selection_rule": "lexicographically_smallest_clean_gpu_uuid",
+        "expected_gpu_count": EXPECTED_GPU_COUNT,
+        "minimum_free_bytes": MINIMUM_FREE_BYTES,
+        "maximum_used_bytes": MAXIMUM_USED_BYTES,
+        "slurm_job_id": os.environ.get("SLURM_JOB_ID"),
+        "slurm_array_job_id": os.environ.get("SLURM_ARRAY_JOB_ID"),
+        "slurm_array_task_id": os.environ.get("SLURM_ARRAY_TASK_ID"),
+        "slurm_job_nodelist": os.environ.get("SLURM_JOB_NODELIST"),
+        "cuda_visible_devices_before_selection": visible_before,
+    }
+    try:
+        selected, audited = choose_clean_uuid(rows, apps)
+    except ValueError as exc:
+        audited = []
+        for row in rows:
+            uuid = str(row["uuid"])
+            process_rows = list(apps.get(uuid, []))
+            audited.append(
+                {
+                    **row,
+                    "compute_app_rows": process_rows,
+                    "clean_candidate": False,
+                    "rejection_reasons": [
+                        reason
+                        for reason, rejected in (
+                            ("compute_apps_present", bool(process_rows)),
+                            ("free_bytes_below_minimum", int(row["free_bytes"]) < MINIMUM_FREE_BYTES),
+                            ("used_bytes_above_maximum", int(row["used_bytes"]) > MAXIMUM_USED_BYTES),
+                        )
+                        if rejected
+                    ],
+                }
+            )
+        write_json(
+            output,
+            {
+                **base_payload,
+                "status": "BLOCKED_NO_CLEAN_CANDIDATE",
+                "selected_uuid": None,
+                "error": str(exc),
+                "gpus": audited,
+            },
+        )
+        raise
     write_json(
         output,
-        {
-            "status": "PASS",
-            "contract_sha256": args.contract_sha256,
-            "selection_rule": "lexicographically_smallest_clean_gpu_uuid",
-            "expected_gpu_count": EXPECTED_GPU_COUNT,
-            "minimum_free_bytes": MINIMUM_FREE_BYTES,
-            "maximum_used_bytes": MAXIMUM_USED_BYTES,
-            "selected_uuid": selected,
-            "slurm_job_id": os.environ.get("SLURM_JOB_ID"),
-            "slurm_array_job_id": os.environ.get("SLURM_ARRAY_JOB_ID"),
-            "slurm_array_task_id": os.environ.get("SLURM_ARRAY_TASK_ID"),
-            "slurm_job_nodelist": os.environ.get("SLURM_JOB_NODELIST"),
-            "cuda_visible_devices_before_selection": visible_before,
-            "gpus": audited,
-        },
+        {**base_payload, "status": "PASS", "selected_uuid": selected, "gpus": audited},
     )
     print(selected)
 

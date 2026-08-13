@@ -16,6 +16,7 @@ from transfer_vs_relearning.experiments.m1_dose_pareto import (
     FALCON_EVALUATION_RTXA6000_RELOCATION_SHA256,
     FALCON_EVALUATION_RTXA6000_EXCLUSIVE_SHA256,
     FALCON_EVALUATION_CLEAN_UUID_SHA256,
+    FALCON_EVALUATION_AUDIT_PERSISTENT_SHA256,
     FALCON_RECOVERY_STEPS,
     PRECISION_REPAIR_SHA256,
     LABELS,
@@ -277,6 +278,33 @@ def test_falcon_clean_uuid_retry_audits_before_torch_and_is_dependency_closed() 
     assert 'DEAD_SUMMARY_JOB_ID = "456467"' in preflight
     assert "scancel 456467" in submit
     assert submit.index("scancel 456467") < submit.index("sbatch --test-only")
+    assert submit.count('evaluation_id="$(sbatch --parsable') == 1
+    assert "--dependency=afterok:${evaluation_id}" in submit
+    assert "train_clm.py" not in evaluation + selector + submit + preflight
+    assert "rm " not in evaluation + selector + submit + preflight
+
+
+def test_falcon_audit_persistent_recovery_is_single_allocation_and_dependency_closed() -> None:
+    registry = load_registry(
+        repo_root() / "configs/experiments/m1_provenance_screen_v4_dose_pareto_v1.yaml"
+    )
+    runtime = evaluation_runtime_identity(
+        registry, "falcon", falcon_relocation_sha256=FALCON_EVALUATION_AUDIT_PERSISTENT_SHA256
+    )
+    assert runtime["expected_gpu_substring"] == "RTX A6000"
+    evaluation = (repo_root() / "slurm/eval_m1_dose_pareto_falcon_audit_persistent_recovery.slurm").read_text(encoding="utf-8")
+    selector = (repo_root() / "scripts/select_clean_a6000_uuid.py").read_text(encoding="utf-8")
+    submit = (repo_root() / "scripts/submit_m1_dose_pareto_falcon_audit_persistent_recovery.sh").read_text(encoding="utf-8")
+    preflight = (repo_root() / "scripts/preflight_m1_dose_pareto_falcon_audit_persistent_recovery.py").read_text(encoding="utf-8")
+    assert "#SBATCH --exclusive" in evaluation and "#SBATCH --array" not in evaluation
+    assert "for step in 126 210 252" in evaluation
+    assert evaluation.count("select_clean_a6000_uuid.py") == 1
+    assert evaluation.index("select_clean_a6000_uuid.py") < evaluation.index("validate_m1_dose_pareto_runtime.py")
+    assert selector.index('"status": "BLOCKED_NO_CLEAN_CANDIDATE"') < selector.rindex("raise")
+    assert 'export CUDA_VISIBLE_DEVICES="${selected_uuid}"' in evaluation
+    assert 'DEAD_SUMMARY_JOB_ID = "456502"' in preflight
+    assert "scancel 456502" in submit
+    assert submit.index("scancel 456502") < submit.index("sbatch --test-only")
     assert submit.count('evaluation_id="$(sbatch --parsable') == 1
     assert "--dependency=afterok:${evaluation_id}" in submit
     assert "train_clm.py" not in evaluation + selector + submit + preflight
