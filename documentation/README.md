@@ -11,6 +11,7 @@ so agents do not need to load the complete project history for every task.
 | Machine-readable current state | [`current/PROJECT_STATE.yaml`](current/PROJECT_STATE.yaml) |
 | Authority and minimum reading set | [`current/AUTHORITY.md`](current/AUTHORITY.md) |
 | Ordered next work | [`current/ROADMAP.md`](current/ROADMAP.md) |
+| Evaluation design and qualification | [`evaluation/README.md`](evaluation/README.md) |
 | Prospective protocol/execution rules | [`contracts/README.md`](contracts/README.md) |
 | Durable rationale | [`decisions/README.md`](decisions/README.md) |
 | Historical/scientific evidence | [`records/README.md`](records/README.md) and numbered docs |

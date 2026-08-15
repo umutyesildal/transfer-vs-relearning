@@ -61,5 +61,7 @@ Historical results stay attached to the contract version that produced them.
 
 ## Evaluation status
 
-No `eval-v1` contract is frozen yet. Documents 177 and 178 are design inputs. The next stage is a
-local evaluator/metric/schema inventory followed by task qualification.
+No `eval-v1` contract is frozen yet. The local inventory, upstream task-semantic audit and result
+schema now exist. The prospective protocol is
+[`evaluation/eval-v1.md`](evaluation/eval-v1.md). Its exact dataset revisions, environment/runtime
+evidence, parity checks, cheap-panel identity and numerical margins remain freeze blockers.

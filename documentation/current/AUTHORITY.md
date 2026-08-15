@@ -29,7 +29,7 @@ boundary.
 |---|---|
 | Repository orientation | root `README.md` |
 | Scientific interpretation | `current/STATUS.md` and cited result/gate records |
-| Evaluation design | Document 178, Document 177, relevant evaluator code/config/tests |
+| Evaluation design | `evaluation/README.md`, then only the named inventory/registry/contract section |
 | Execute a frozen local contract | that exact contract plus named inputs and acceptance tests |
 | HU/Slurm work | exact authorized contract, `ssh-client/README.md`, relevant launcher/preflight |
 | Corpus work | exact corpus contract, provenance manifest, contamination policy, relevant scripts |

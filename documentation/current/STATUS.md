@@ -10,10 +10,26 @@ model-screening runs, evaluation scripts, corpus tooling, Slurm launchers, scien
 papers, and study notes have been preserved in one verified local monorepo.
 
 The next scientific bottleneck is measurement stability. Document 178 gives the end-to-end design,
-but it does not yet freeze exact LM Evaluation Harness task IDs, revisions, datasets, prompts,
-few-shot settings, metrics, normalization schemas, checkpoint cadence, missingness semantics, or
-gates. Those details must be qualified and frozen as `eval-v1` before opening a new training
-family.
+and the first eval-v1 design pass now fixes the hybrid architecture, upstream harness release/task
+semantics, metric roles, normalized schema and proposed dense/full cadence. eval-v1 remains a draft:
+exact dataset revisions, environment/runtime evidence, parity checks, cheap-panel identity and
+numeric scientific margins are not frozen. No new training family can open before those close.
+
+## Evaluation design result
+
+- LM Evaluation Harness is pinned prospectively to v0.4.12 commit
+  `6d642546f4688648fced259eb3302efd36ece5af` in a dedicated future lock.
+- Official WikiText BPB is primary English retention; word/byte PPL remain reported.
+- v0.4.12 already includes `pile_10k`, so no custom replacement is currently needed.
+- BLiMP, HellaSwag, WinoGender slices, XNLI-EN, TurBLiMP and XNLI-TR form the proposed capability
+  bundle; TurkishMMLU remains conditional on access.
+- Project-native factual ranking, robust intersections, relation swaps, paired subject bootstrap
+  and generation integrity are preserved.
+- Canonical results are long tables; one-row-per-checkpoint output is a generated view.
+- Dense evaluation covers every checkpoint; full evaluation is proposed at entry/midpoint/endpoint.
+
+See the [`evaluation read set`](../evaluation/README.md) and
+[`eval-v1 draft`](../contracts/evaluation/eval-v1.md).
 
 ## Fixed design direction
 
@@ -42,14 +58,14 @@ These are constraints and evidence, not reasons to throw away existing implement
 
 ## Active work boundary
 
-The valid next work is local evaluation inventory and qualification:
+The valid next work is bounded evaluation qualification:
 
-1. map existing custom evaluators, configs, schemas, and historical result formats;
-2. identify which metrics are already scientifically usable and which need parity repair;
-3. pin and validate the intended LM Evaluation Harness task matrix;
-4. define one normalized row schema for M0/M1/M2-A/M2-B checkpoints;
-5. freeze cheap versus full evaluation cadence and failure/missingness semantics;
-6. add deterministic parity, identity, and resume tests;
+1. freeze exact dataset revisions/content manifests and the dedicated environment;
+2. run task validation and bounded OLMo base/runtime smoke under separate authority;
+3. prove canonical WikiText and TurBLiMP normalization parity;
+4. decide Pile-10k cadence and TurkishMMLU inclusion;
+5. freeze the cheap factual probe registry and numeric scientific margins;
+6. add deterministic parity, identity, normalization and resume tests;
 7. only then freeze `eval-v1`.
 
 This status does not authorize downloading tasks, running evaluation, accessing HU, using Slurm,

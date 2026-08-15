@@ -65,7 +65,12 @@ readiness:
 
 evaluation_target:
   contract_name: eval-v1
-  status: design_inputs_only
+  status: draft_upstream_semantics_qualified
+  draft_contract: documentation/contracts/evaluation/eval-v1.md
+  registry: configs/evaluation/eval_v1_registry.yaml
+  inventory: documentation/evaluation/EVALUATOR_INVENTORY_V1.md
+  task_qualification: documentation/evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md
+  result_schema: documentation/evaluation/RESULT_SCHEMA_V1.md
   applies_to:
     - M0
     - M1
@@ -81,6 +86,24 @@ evaluation_target:
   lm_eval_harness_required: true
   custom_fact_evaluator_required: true
   checkpoint_policy: cheap_panel_plus_precommitted_full_milestones
+  harness:
+    release: v0.4.12
+    git_commit: 6d642546f4688648fced259eb3302efd36ece5af
+    source_semantics_verified: true
+    dataset_revisions_frozen: false
+    environment_locked: false
+  architecture: hybrid_harness_custom_factual_and_normalizer
+  canonical_result_shape: long_tables_with_generated_checkpoint_view
+  freeze_blockers:
+    - dataset_revisions_and_content_manifests
+    - environment_lock_and_olmo_task_smoke
+    - wikitext_parity_and_heading_sensitivity
+    - pile_10k_runtime_and_cadence
+    - turblimp_group_aggregation_parity
+    - turkishmmlu_access_decision
+    - cheap_factual_probe_registry
+    - numeric_scientific_margins
+    - exact_training_checkpoint_bindings
 
 current_evidence:
   qwen_wikipedia_pilot:
@@ -121,13 +144,20 @@ current_evidence:
 
 active_priority:
   name: qualify_and_freeze_eval_v1
-  first_boundary: local_read_only_evaluation_inventory
+  first_boundary: task_data_runtime_and_parity_qualification
   training_before_completion: forbidden
-  required_outputs:
+  completed_outputs:
     - evaluator_and_metric_inventory
-    - lm_eval_task_qualification_matrix
-    - normalized_result_schema
-    - checkpoint_grid_and_cascade
+    - upstream_lm_eval_task_semantics
+    - normalized_result_schema_draft
+    - checkpoint_cadence_draft
+    - eval_v1_contract_draft
+  required_outputs:
+    - exact_dataset_revision_and_access_evidence
+    - lm_eval_validation_and_runtime_evidence
+    - wikitext_and_turblimp_parity_evidence
+    - cheap_factual_panel_hash
+    - numeric_gate_review
     - parity_and_resume_test_plan
     - frozen_eval_v1_contract
 
@@ -143,7 +173,9 @@ authorization:
   cleanup_or_deletion: false
 
 next_decision_required:
-  subject: evaluation_inventory_and_qualification_scope
+  subject: eval_v1_bounded_qualification_wave
   note: >-
-    Document 178 is a plan. A separate bounded task must inventory the current evaluators,
-    historical schemas, LM Evaluation Harness tasks, and exact gaps before eval-v1 can be frozen.
+    The local inventory, upstream v0.4.12 task semantics, draft cadence and normalized schema now
+    exist. A separate bounded qualification wave must freeze dataset revisions, validate the final
+    task set, measure runtime, prove WikiText/TurBLiMP parity, choose TurkishMMLU inclusion, hash
+    the cheap factual panel and review numeric margins before eval-v1 can be frozen.

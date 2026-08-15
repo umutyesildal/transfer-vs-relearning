@@ -31,7 +31,7 @@ before any later separately authorized publication.
 
 ## R1 — Evaluation inventory
 
-Status: active branch created; inventory itself not yet started.
+Status: completed locally on `agent/eval-harness`.
 
 Working branch: `agent/eval-harness`.
 
@@ -43,7 +43,13 @@ Working branch: `agent/eval-harness`.
 
 Exit condition: a reviewed inventory with no unowned metric or evaluator.
 
+Exit evidence: [`../evaluation/EVALUATOR_INVENTORY_V1.md`](../evaluation/EVALUATOR_INVENTORY_V1.md)
+classifies the existing implementation as reuse, repair, replace, or historical-only. The hybrid
+architecture and normalized schema own the previously missing integration surface.
+
 ## R2 — Evaluation qualification and freeze
+
+Status: active; upstream task semantics and draft protocol complete, execution qualification open.
 
 - pin LM Evaluation Harness and exact task/dataset revisions;
 - validate task IDs, prompts, few-shot settings, metrics, and availability;
@@ -54,6 +60,16 @@ Exit condition: a reviewed inventory with no unowned metric or evaluator.
 - create `eval-v1` contract and acceptance tests.
 
 Exit condition: semantic changes require `eval-v2`; all states use `eval-v1` unchanged.
+
+Current draft evidence:
+
+- [`../evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md`](../evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md);
+- [`../evaluation/RESULT_SCHEMA_V1.md`](../evaluation/RESULT_SCHEMA_V1.md);
+- [`../contracts/evaluation/eval-v1.md`](../contracts/evaluation/eval-v1.md);
+- [`../../configs/evaluation/eval_v1_registry.yaml`](../../configs/evaluation/eval_v1_registry.yaml).
+
+Remaining boundary: exact dataset revisions/access, locked environment, OLMo task smoke, WikiText
+and TurBLiMP parity, Pile-10k runtime, cheap-panel hash and reviewed numerical margins.
 
 ## R3 — Pipeline productionization
 

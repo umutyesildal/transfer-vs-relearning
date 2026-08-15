@@ -8,6 +8,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 STATE_PATH = ROOT / "documentation/current/PROJECT_STATE.yaml"
+EVAL_REGISTRY_PATH = ROOT / "configs/evaluation/eval_v1_registry.yaml"
 LEGACY_DIR = ROOT / "documentation/records/workspace-guidance"
 MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 
@@ -20,6 +21,12 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert state["readiness"]["ready_to_measure"] is False
     assert state["readiness"]["ready_to_train"] is False
     assert state["readiness"]["selected_primary_model"] is None
+    assert state["evaluation_target"]["status"] == "draft_upstream_semantics_qualified"
+    assert state["evaluation_target"]["harness"]["git_commit"] == (
+        "6d642546f4688648fced259eb3302efd36ece5af"
+    )
+    assert state["evaluation_target"]["harness"]["dataset_revisions_frozen"] is False
+    assert state["evaluation_target"]["harness"]["environment_locked"] is False
     assert state["repository"]["publication_authorized"] is False
     assert state["repository"]["publication_blockers"] == []
     assert state["repository"]["history_sanitization"][
@@ -40,6 +47,11 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["repository"]["history_sanitization"]["record"],
         state["scientific_design"]["current_design_plan"],
         *state["scientific_design"]["supervisor_realignments"],
+        state["evaluation_target"]["draft_contract"],
+        state["evaluation_target"]["registry"],
+        state["evaluation_target"]["inventory"],
+        state["evaluation_target"]["task_qualification"],
+        state["evaluation_target"]["result_schema"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],
@@ -66,6 +78,7 @@ def test_control_plane_markdown_links_resolve():
         *sorted((ROOT / "documentation/current").glob("*.md")),
         *sorted((ROOT / "documentation/contracts").glob("*.md")),
         *sorted((ROOT / "documentation/decisions").glob("*.md")),
+        *sorted((ROOT / "documentation/evaluation").glob("*.md")),
         ROOT / "documentation/records/README.md",
     ]
 
@@ -81,6 +94,28 @@ def test_control_plane_markdown_links_resolve():
             if not resolved.exists():
                 failures.append(f"{path.relative_to(ROOT)} -> {target}")
     assert not failures, "Broken documentation links:\n" + "\n".join(failures)
+
+
+def test_eval_v1_registry_is_draft_and_fail_closed():
+    registry = yaml.safe_load(EVAL_REGISTRY_PATH.read_text(encoding="utf-8"))
+
+    assert registry["name"] == "eval-v1"
+    assert registry["status"] == "draft"
+    assert registry["execution_ready"] is False
+    assert registry["execution_authorized"] is False
+    assert registry["harness"]["release"] == "v0.4.12"
+    assert registry["harness"]["git_commit"] == (
+        "6d642546f4688648fced259eb3302efd36ece5af"
+    )
+    tasks = {row["id"]: row for row in registry["standard_tasks"]}
+    assert tasks["wikitext"]["primary_metric"] == "bits_per_byte"
+    assert tasks["pile_10k"]["inclusion"] == "core_pending_runtime"
+    assert tasks["hellaswag"]["primary_metric"] == "acc_norm"
+    assert tasks["turblimp_core"]["primary_metric"] == "acc_norm"
+    assert tasks["xnli_en"]["dataset_config"] == "en"
+    assert tasks["xnli_tr"]["dataset_config"] == "tr"
+    assert tasks["turkishmmlu"]["status"] == "dataset_access_unverified"
+    assert registry["freeze_blockers"]
 
 
 def test_legacy_guidance_hashes_are_preserved():

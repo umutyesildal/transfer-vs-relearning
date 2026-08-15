@@ -1,0 +1,19 @@
+# Evaluation control plane
+
+This directory contains the small read set for evaluation work. It separates current evidence from
+the prospective protocol so an agent does not need the chronological archive by default.
+
+## Read order
+
+1. [`EVALUATOR_INVENTORY_V1.md`](EVALUATOR_INVENTORY_V1.md) — what already exists and what is reusable;
+2. [`LM_EVAL_TASK_QUALIFICATION_V1.md`](LM_EVAL_TASK_QUALIFICATION_V1.md) — verified upstream tasks and open blockers;
+3. [`RESULT_SCHEMA_V1.md`](RESULT_SCHEMA_V1.md) — canonical normalized artifacts;
+4. [`../contracts/evaluation/eval-v1.md`](../contracts/evaluation/eval-v1.md) — prospective protocol.
+
+The machine-readable draft registry is
+[`../../configs/evaluation/eval_v1_registry.yaml`](../../configs/evaluation/eval_v1_registry.yaml).
+Documents 177 and 178 remain the supervisor/design inputs. Historical numbered evaluation reports
+remain evidence and are not rewritten by this layer.
+
+`eval-v1` is not frozen and this directory grants no evaluation, download, HU, Slurm, training, or
+publication authority.
