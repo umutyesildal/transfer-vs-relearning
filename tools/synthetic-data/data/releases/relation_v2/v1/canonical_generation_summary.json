@@ -1,0 +1,15 @@
+{
+  "english_rows": 120500,
+  "facts": 25000,
+  "frequency_rule": "new relations use subject popularity only",
+  "relations": [
+    "profession",
+    "born_in",
+    "lives_in",
+    "field_of_study",
+    "works_in_industry"
+  ],
+  "subjects": 5000,
+  "turkish_rows": 60235,
+  "version": "relation_v2"
+}

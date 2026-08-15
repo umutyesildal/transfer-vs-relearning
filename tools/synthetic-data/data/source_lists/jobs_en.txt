@@ -1,0 +1,200 @@
+Footballer — 100
+Actor — 99
+Singer — 98
+Musician — 97
+Basketball player — 96
+YouTuber — 95
+Social media influencer — 95
+Doctor — 94
+Pilot — 94
+Entrepreneur — 93
+Lawyer — 92
+Politician — 92
+Model — 91
+Football manager — 90
+DJ — 90
+Film director — 89
+Journalist — 89
+Television presenter — 89
+Comedian — 88
+Chef — 88
+Police officer — 87
+Firefighter — 87
+Astronaut — 87
+Scientist — 86
+Teacher — 85
+Software engineer — 85
+Company executive (CEO) — 85
+Fashion designer — 84
+Photographer — 83
+Writer — 83
+Dancer — 82
+Veterinarian — 82
+Nurse — 81
+Architect — 81
+Psychologist — 80
+Prosecutor — 80
+Judge — 80
+Pharmacist — 79
+Dentist — 79
+Physiotherapist — 78
+Content creator — 78
+Computer engineer — 78
+Data scientist — 77
+Artificial intelligence specialist — 77
+Electrical and electronics engineer — 76
+Mechanical engineer — 76
+Civil engineer — 76
+Racing driver — 76
+Tennis player — 75
+Boxer — 75
+Sports commentator — 75
+Air traffic controller — 74
+Flight attendant — 74
+Diplomat — 74
+Economist — 73
+Finance specialist — 73
+Investment banker — 73
+Stock trader — 72
+Real estate agent — 72
+Graphic designer — 72
+Video game developer — 72
+Cybersecurity specialist — 71
+Robotics engineer — 71
+Social media manager — 71
+Marketing specialist — 70
+Advertising professional — 70
+Public relations specialist — 70
+Music producer — 70
+Film producer — 70
+Voice actor — 69
+Radio presenter — 69
+Sports coach — 69
+Personal trainer — 69
+Dietitian — 68
+Therapist — 68
+Psychiatrist — 68
+Surgeon — 68
+Paramedic — 67
+Emergency medical technician — 67
+Biologist — 67
+Chemist — 66
+Physicist — 66
+Astronomer — 66
+Academic — 66
+University professor — 66
+Researcher — 65
+Translator — 65
+Tour guide — 65
+Travel agent — 64
+Hotel manager — 64
+Event planner — 64
+Wedding planner — 63
+Hairdresser — 63
+Barber — 63
+Makeup artist — 63
+Fashion stylist — 62
+Tattoo artist — 62
+Interior architect — 62
+Industrial designer — 61
+Product designer — 61
+Web designer — 61
+Mobile application developer — 61
+Project manager — 60
+Human resources specialist — 60
+Management consultant — 60
+Accountant — 59
+Certified public accountant — 59
+Banker — 59
+Insurance advisor — 58
+Sales representative — 58
+Customer service representative — 58
+Office manager — 57
+Secretary — 57
+Civil servant — 57
+Soldier — 57
+Sailor — 56
+Ship captain — 56
+Train driver — 56
+Bus driver — 55
+Taxi driver — 55
+Truck driver — 55
+Courier — 55
+Postal worker — 54
+Logistics specialist — 54
+Warehouse manager — 54
+Purchasing specialist — 53
+Store manager — 53
+Cashier — 53
+Waiter — 53
+Barista — 52
+Bartender — 52
+Pastry chef — 52
+Baker — 51
+Butcher — 51
+Fisherman — 51
+Farmer — 50
+Gardener — 50
+Landscape architect — 50
+Forestry engineer — 49
+Environmental engineer — 49
+Renewable energy engineer — 49
+Geologist — 48
+Meteorologist — 48
+Urban planner — 47
+Sociologist — 47
+Anthropologist — 47
+Archaeologist — 47
+Historian — 46
+Librarian — 46
+Museum curator — 46
+Archivist — 45
+Editor — 45
+Copywriter — 45
+Mathematician — 44
+Statistician — 44
+Actuary — 43
+Financial auditor — 43
+Tax specialist — 43
+Notary — 42
+Prison officer — 41
+Security guard — 41
+Lifeguard — 40
+Social worker — 40
+Babysitter — 40
+Kindergarten teacher — 40
+Elderly care worker — 39
+Caregiver — 39
+Laboratory technician — 38
+Radiology technician — 38
+Optician — 37
+Audiologist — 37
+Occupational therapist — 37
+Speech therapist — 36
+Massage therapist — 36
+Yoga instructor — 36
+Pilates instructor — 35
+Sports referee — 35
+Miner — 35
+Oil rig worker — 34
+Welder — 34
+Electrician — 34
+Plumber — 33
+Carpenter — 33
+Bricklayer — 33
+Painter — 32
+Roofer — 32
+Auto mechanic — 32
+Machinery technician — 31
+Air conditioning technician — 31
+Elevator technician — 31
+Factory worker — 30
+Assembly line worker — 30
+Warehouse worker — 29
+Construction worker — 29
+Agricultural worker — 28
+Dishwasher — 24
+Laundry worker — 22
+Cleaner — 20
+Garbage collector — 18
+Sewer worker — 14

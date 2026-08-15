@@ -1,0 +1,200 @@
+Futbolcu — 100
+Oyuncu — 99
+Şarkıcı — 98
+Müzisyen — 97
+Basketbolcu — 96
+YouTuber — 95
+Sosyal medya fenomeni — 95
+Doktor — 94
+Pilot — 94
+Girişimci — 93
+Avukat — 92
+Politikacı — 92
+Model — 91
+Futbol teknik direktörü — 90
+DJ — 90
+Film yönetmeni — 89
+Gazeteci — 89
+Televizyon sunucusu — 89
+Komedyen — 88
+Şef aşçı — 88
+Polis memuru — 87
+İtfaiyeci — 87
+Astronot — 87
+Bilim insanı — 86
+Öğretmen — 85
+Yazılım mühendisi — 85
+Şirket yöneticisi (CEO) — 85
+Moda tasarımcısı — 84
+Fotoğrafçı — 83
+Yazar — 83
+Dansçı — 82
+Veteriner — 82
+Hemşire — 81
+Mimar — 81
+Psikolog — 80
+Savcı — 80
+Hâkim — 80
+Eczacı — 79
+Diş hekimi — 79
+Fizyoterapist — 78
+İçerik üreticisi — 78
+Bilgisayar mühendisi — 78
+Veri bilimci — 77
+Yapay zekâ uzmanı — 77
+Elektrik-elektronik mühendisi — 76
+Makine mühendisi — 76
+İnşaat mühendisi — 76
+Otomobil yarışçısı — 76
+Tenisçi — 75
+Boksör — 75
+Spor yorumcusu — 75
+Hava trafik kontrolörü — 74
+Kabin memuru — 74
+Diplomat — 74
+Ekonomist — 73
+Finans uzmanı — 73
+Yatırım bankacısı — 73
+Borsa yatırımcısı — 72
+Emlak danışmanı — 72
+Grafik tasarımcı — 72
+Video oyunu geliştiricisi — 72
+Siber güvenlik uzmanı — 71
+Robotik mühendisi — 71
+Sosyal medya yöneticisi — 71
+Pazarlama uzmanı — 70
+Reklamcı — 70
+Halkla ilişkiler uzmanı — 70
+Müzik yapımcısı — 70
+Sinema yapımcısı — 70
+Seslendirme sanatçısı — 69
+Radyo sunucusu — 69
+Spor antrenörü — 69
+Kişisel antrenör — 69
+Diyetisyen — 68
+Terapist — 68
+Psikiyatrist — 68
+Cerrah — 68
+Paramedik — 67
+Acil tıp teknisyeni — 67
+Biyolog — 67
+Kimyager — 66
+Fizikçi — 66
+Astronom — 66
+Akademisyen — 66
+Üniversite profesörü — 66
+Araştırmacı — 65
+Çevirmen — 65
+Turist rehberi — 65
+Seyahat acentesi danışmanı — 64
+Otel müdürü — 64
+Etkinlik organizatörü — 64
+Düğün planlayıcısı — 63
+Kuaför — 63
+Berber — 63
+Makyaj sanatçısı — 63
+Moda stilisti — 62
+Dövme sanatçısı — 62
+İç mimar — 62
+Endüstriyel tasarımcı — 61
+Ürün tasarımcısı — 61
+Web tasarımcısı — 61
+Mobil uygulama geliştiricisi — 61
+Proje yöneticisi — 60
+İnsan kaynakları uzmanı — 60
+Yönetim danışmanı — 60
+Muhasebeci — 59
+Mali müşavir — 59
+Bankacı — 59
+Sigorta danışmanı — 58
+Satış temsilcisi — 58
+Müşteri hizmetleri temsilcisi — 58
+Ofis yöneticisi — 57
+Sekreter — 57
+Devlet memuru — 57
+Asker — 57
+Denizci — 56
+Gemi kaptanı — 56
+Tren makinisti — 56
+Otobüs şoförü — 55
+Taksi şoförü — 55
+Kamyon şoförü — 55
+Kurye — 55
+Postacı — 54
+Lojistik uzmanı — 54
+Depo yöneticisi — 54
+Satın alma uzmanı — 53
+Mağaza müdürü — 53
+Kasiyer — 53
+Garson — 53
+Barista — 52
+Barmen — 52
+Pastacı — 52
+Fırıncı — 51
+Kasap — 51
+Balıkçı — 51
+Çiftçi — 50
+Bahçıvan — 50
+Peyzaj mimarı — 50
+Orman mühendisi — 49
+Çevre mühendisi — 49
+Yenilenebilir enerji mühendisi — 49
+Jeolog — 48
+Meteorolog — 48
+Şehir plancısı — 47
+Sosyolog — 47
+Antropolog — 47
+Arkeolog — 47
+Tarihçi — 46
+Kütüphaneci — 46
+Müze küratörü — 46
+Arşivci — 45
+Editör — 45
+Metin yazarı — 45
+Matematikçi — 44
+İstatistikçi — 44
+Aktüer — 43
+Finansal denetçi — 43
+Vergi uzmanı — 43
+Noter — 42
+Cezaevi görevlisi — 41
+Özel güvenlik görevlisi — 41
+Cankurtaran — 40
+Sosyal hizmet uzmanı — 40
+Çocuk bakıcısı — 40
+Anaokulu öğretmeni — 40
+Yaşlı bakım görevlisi — 39
+Hasta bakıcı — 39
+Laboratuvar teknisyeni — 38
+Radyoloji teknisyeni — 38
+Optisyen — 37
+Odyolog — 37
+Ergoterapist — 37
+Konuşma terapisti — 36
+Masaj terapisti — 36
+Yoga eğitmeni — 36
+Pilates eğitmeni — 35
+Spor hakemi — 35
+Madenci — 35
+Petrol platformu işçisi — 34
+Kaynakçı — 34
+Elektrikçi — 34
+Tesisatçı — 33
+Marangoz — 33
+Duvar ustası — 33
+Boyacı — 32
+Çatı ustası — 32
+Oto tamircisi — 32
+Makine teknisyeni — 31
+Klima teknisyeni — 31
+Asansör teknisyeni — 31
+Fabrika işçisi — 30
+Montaj işçisi — 30
+Depo işçisi — 29
+İnşaat işçisi — 29
+Tarım işçisi — 28
+Bulaşıkçı — 24
+Çamaşırhane görevlisi — 22
+Temizlik görevlisi — 20
+Çöp toplama görevlisi — 18
+Kanalizasyon işçisi — 14

@@ -1,0 +1,310 @@
+# Synthetic Fact Generation Pipeline
+
+This project contains a deterministic, template-based pipeline for generating synthetic training and probing data for a thesis on cross-lingual transfer in language models. The generator does not use an LLM or internet lookup.
+
+## Source Lists
+
+Canonical subject profiles are generated from UTF-8 text files in `data/source_lists/`:
+
+- `cities_en.txt`, `cities_tr.txt`
+- `company_en.txt`, `company_tr.txt`
+- `jobs_en.txt`, `jobs_tr.txt`
+- `names_en.txt`, `names_tr.txt`
+- `surnames_en.txt`, `surnames_tr.txt`
+- `university_en.txt`, `university_tr.txt`
+
+Each file has one item per line. Loading trims whitespace, ignores empty lines, and removes exact duplicate lines while preserving order. A cleaning report is written to `output/source_validation_report.json`.
+
+Profession files use aligned English/Turkish rows in this format:
+
+```text
+Footballer — 100
+Warehouse worker — 29
+```
+
+The separator may be `—`, `–`, or ` - `. Scores must be numeric integers from 0 to 100, and aligned English/Turkish scores must match.
+
+Source-list order is treated as a frequency-rank proxy for names, cities, universities, and companies.
+
+## Canonical Generation
+
+Run:
+
+```bash
+python3 generate_canonical.py
+```
+
+This creates `data/canonical_subject_profiles_5000.csv` with exactly 5,000 one-row-per-subject profiles:
+
+- 2,500 `english_like` subjects
+- 2,500 `turkish_like` subjects
+- 2,500 Branch A subjects
+- 2,500 Branch B subjects
+
+Use this end-to-end command to generate the canonical CSV, run the existing pipeline, and validate outputs:
+
+```bash
+python3 generate_canonical.py --run-pipeline
+```
+
+The canonical generation summary is written to `output/canonical_generation_summary.json`.
+
+## Subject And Object Assignment
+
+Names are generated without mixing language components:
+
+- `english_like`: `names_en.txt` + `surnames_en.txt`
+- `turkish_like`: `names_tr.txt` + `surnames_tr.txt`
+
+Only single-component first names and surnames are used. Multi-component source entries are excluded, hyphenated single components are preserved, and generated subjects are natural-cased two-part names.
+
+Name rarity uses first-name and surname source ranks:
+
+- `common`: both components mainly from the first third
+- `medium`: middle-third names or common/rare mixes
+- `rare`: at least one final-third component with high combined rarity
+
+The target rarity distribution is 40% common, 35% medium, and 25% rare within each name type.
+
+Professions are assigned coverage-first, then with deterministic weighted sampling based on profession popularity score. Subject popularity uses:
+
+```text
+fame_score = 0.75 * profession_popularity_score + 0.25 * deterministic_random_score
+```
+
+Subjects are ranked by fame score. Popularity buckets are fixed:
+
+- top 10%: `high`
+- next 30%: `medium`
+- bottom 60%: `low`
+
+Cities, universities, and companies are assigned through six deterministic profile patterns:
+
+- English-region domestic: English birthplace, residence, university, and employer
+- Turkish-region domestic: Turkish birthplace, residence, university, and employer
+- English-region study in Turkish region
+- Turkish-region study in English region
+- English-region work in Turkish region
+- Turkish-region work in English region
+
+The target distribution is 35%, 35%, 7.5%, 7.5%, 7.5%, and 7.5%. Pattern assignment is stratified across `name_type`, Branch A/B, popularity bucket, and name rarity so name language does not determine biography region. Residence follows the current employer region. Object sampling within the required regional pool uses coverage first, then inverse-square-root-rank weighting.
+
+`born_in` and `lives_in` share the same city vocabulary from `cities_en.txt` and `cities_tr.txt`. Each subject receives different birthplace and residence values, compared by normalized city identity, so the dataset can test relation-specific knowledge rather than only subject-city association. Example:
+
+```text
+Leran Dovik -> born_in -> Bristol
+Leran Dovik -> lives_in -> Manchester
+```
+
+Proper-name pairs are built safely:
+
+- English-origin object: `object_en = object_tr = original item`
+- Turkish-origin object: `object_tr = original item`, `object_en = Turkish-character-normalized item`
+
+No organization, city, or university names are translated or invented.
+
+## Compatibility And Frequencies
+
+Employer assignment uses a small keyword-based profession/employer compatibility layer within the employer region required by the profile pattern. It tries direct category matches, university employers for academic/research professions, general employers, broad compatible categories, and only then final fallback. The summary reports compatibility matches, general-employer fallback, and final fallback separately.
+
+The exposure mapping is unchanged:
+
+- `low`: 3 exposures
+- `medium`: 8 exposures
+- `high`: 15 exposures
+
+Relation-specific frequency rules:
+
+- `profession`: subject popularity bucket
+- `works_at`: subject popularity bucket, lowered one level if employer fallback was required
+- `born_in`: subject popularity bucket lowered one level
+- `lives_in`: same frequency bucket as `born_in`
+- `studied_at`: subject popularity bucket lowered one level, except education professions keep the base bucket
+
+Branch assignment remains subject-level. Branch A facts appear only in English training; Branch B facts appear in English training and Turkish repetition.
+
+## Canonical CSV Schema
+
+`data/canonical_subject_profiles_5000.csv` uses exactly these columns:
+
+- `row_id`
+- `subject_id`
+- `subject`
+- `profession_en`, `profession_tr`
+- `birthplace_en`, `birthplace_tr`
+- `residence_en`, `residence_tr`
+- `university_en`, `university_tr`
+- `employer_en`, `employer_tr`
+- `name_type`
+- `name_rarity_bucket`
+- `popularity_rank`
+- `popularity_bucket`
+- `profession_frequency_bucket`
+- `birthplace_frequency_bucket`
+- `residence_frequency_bucket`
+- `university_frequency_bucket`
+- `employer_frequency_bucket`
+- `branch_group`
+
+Each subject expands into five internal facts:
+
+- `profession`
+- `born_in`
+- `lives_in`
+- `studied_at`
+- `works_at`
+
+For example, `S00001` expands to:
+
+- `S00001_profession`
+- `S00001_born_in`
+- `S00001_lives_in`
+- `S00001_studied_at`
+- `S00001_works_at`
+
+The full canonical dataset expands to 25,000 facts.
+
+## Pipeline Outputs
+
+Run the existing pipeline:
+
+```bash
+python3 main.py
+```
+
+It reads `data/canonical_subject_profiles_5000.csv` and writes:
+
+- `output/english_training.jsonl`
+- `output/english_biographies.jsonl`
+- `output/english_qa_train.jsonl`
+- `output/english_training_m1_bio_qa.jsonl`
+- `output/english_training_m1_bio_qa_summary.json`
+- `output/english_biographies_multiview.jsonl`
+- `output/english_qa_multiform.jsonl`
+- `output/english_relation_contrastive.jsonl`
+- `output/english_training_m1_binding_mix.jsonl`
+- `output/english_training_m1_binding_mix_summary.json`
+- `output/turkish_repetition.jsonl`
+- `output/probes_en.csv`
+- `output/probes_tr.csv`
+
+Training and repetition rows contain:
+
+- `fact_id`
+- `row_id`
+- `subject_id`
+- `language`
+- `split`
+- `text`
+- `relation`
+- `subject`
+- `answer`
+- `name_type`
+- `name_rarity_bucket`
+- `popularity_rank`
+- `popularity_bucket`
+- `frequency_bucket`
+- `branch_group`
+- `template_id`
+
+Probe files contain the same metadata with `question` and `expected_answer`.
+
+## BIO-QA M1 Artifacts
+
+The pipeline now also writes a first English-only BIO-QA redesign for M1.
+
+Purpose:
+
+- keep M1 English-only for target facts,
+- move beyond isolated short fact statements,
+- give the model richer subject-centered biography rows,
+- keep answer-oriented English QA rows as a smaller extraction-support component.
+
+New BIO-QA outputs:
+
+- `output/english_biographies.jsonl`
+- `output/english_qa_train.jsonl`
+- `output/english_training_m1_bio_qa.jsonl`
+- `output/english_training_m1_bio_qa_summary.json`
+
+Design:
+
+- `english_biographies.jsonl` keeps fact-level traceability, but each row contains a full
+  five-fact English biography for the subject
+- `english_qa_train.jsonl` contains English QA rows in the form
+  `Question: ...` followed by `Answer: ...`
+- `english_training_m1_bio_qa.jsonl` merges the two into one biography-majority M1
+  training file
+- `english_training_m1_bio_qa_summary.json` records row counts and the mixture ratio
+
+Current first-pass mixture:
+
+- biography rows follow the existing relation-specific frequency counts
+- QA rows use a smaller count map:
+  - `low`: 1
+  - `medium`: 2
+  - `high`: 4
+
+This keeps the first merged BIO-QA dataset biography-majority while preserving a
+deterministic answer-oriented signal.
+
+## Binding-Focused M1 Artifacts
+
+The pipeline now also writes a second-generation English-only redesign aimed at the actual
+M1 failure mode seen in experiments:
+
+- the model often improves loss without producing robust English retrieval,
+- semantically close relations can still be confused,
+- and one prompt family does not guarantee another.
+
+New binding-focused outputs:
+
+- `output/english_biographies_multiview.jsonl`
+- `output/english_qa_multiform.jsonl`
+- `output/english_relation_contrastive.jsonl`
+- `output/english_training_m1_binding_mix.jsonl`
+- `output/english_training_m1_binding_mix_summary.json`
+
+Design:
+
+- `english_biographies_multiview.jsonl`
+  - deterministic multi-view English biographies
+  - each row still keeps fact-level traceability
+  - each biography includes all five facts for the subject
+  - views differ by format and information order
+- `english_qa_multiform.jsonl`
+  - English QA support rows across multiple prompt families
+  - direct question, paraphrase, cloze, and instruction-style forms
+- `english_relation_contrastive.jsonl`
+  - English multiple-choice relation-disambiguation rows
+  - subject-aware hard negatives are injected for confusable relation pairs
+  - especially:
+    - `born_in` vs `lives_in`
+    - `studied_at` vs `works_at`
+- `english_training_m1_binding_mix.jsonl`
+  - deterministic merged dataset
+  - groups rows by fact and orders them QA-first, then multiview biography, then
+    relation-contrastive support
+- `english_training_m1_binding_mix_summary.json`
+  - reports row counts, split counts, relation counts, and record-type counts
+
+Current second-pass mixture:
+
+- multiview biographies still use the existing relation-frequency exposure counts
+- multiform QA doubles the earlier QA count map to widen prompt coverage
+- relation-contrastive rows add one record per fact with four answer options
+
+This second-pass dataset is intended for the next English-side M1 branch where the goal is
+not just memorizing fact strings, but learning relation-aware and prompt-robust retrieval.
+
+## Validation
+
+The canonical stage validates source files, profession alignment, exact 5,000-row canonical shape, unique IDs and names, exact popularity and branch distributions, valid categorical values, non-empty objects, and frequency values.
+
+The pipeline validation checks that every subject expands into five facts, every fact appears in English training, only Branch B facts appear in Turkish repetition, every fact has one probe per language, metadata is consistent, `born_in` and `lives_in` remain distinct with matched frequencies, and row totals match frequency-derived expectations.
+
+Run tests:
+
+```bash
+python3 -m unittest discover -s tests
+```
