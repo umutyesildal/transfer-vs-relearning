@@ -46,3 +46,28 @@ checkpoints/
 errors.jsonl
 progress.json
 artifacts/pre_m2_followup_v1/
+
+# Workspace migration: secrets and local orchestration evidence
+ssh-client/.env
+.agents/STOP
+.agents/runs/
+.agents/state/
+
+# Workspace migration: reproducible local build/runtime state
+.tmp/
+tmp/
+output/
+outputs/
+**/*.inspect.ndjson
+
+# Reference PDFs are preserved locally and hash-inventoried. Publication or
+# Git LFS inclusion requires a separate copyright/license decision.
+papers/**/*.pdf
+
+# LaTeX build products; source, bibliography, data, and authored figures stay tracked.
+paper/**/*.aux
+paper/**/*.bbl
+paper/**/*.blg
+paper/**/*.log
+paper/**/*.out
+paper/**/main.pdf
