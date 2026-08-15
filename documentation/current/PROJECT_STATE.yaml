@@ -4,14 +4,25 @@ project: transfer-vs-relearning
 
 repository:
   layout: monorepo_v1
-  branch: migration/monorepo-v1
-  status: verified_local_only
+  branch: agent/eval-harness
+  status: main_cutover_complete_eval_harness_active
+  published: true
+  main_cutover_completed: true
   publication_authorized: false
   cutover_authorized: false
   original_worktrees_are_rollback_sources: true
   documentation_control_plane: active
   migration_record: documentation/migration/REPOSITORY_MIGRATION_V1.md
   publication_blockers: []
+  main_cutover:
+    remote: https://github.com/umutyesildal/transfer-vs-relearning
+    previous_main: 5ba61f7b80ac0343e38806f08225535311a8b124
+    cutover_commit: 695b648615bfd302fd3a755324bfee2d4c63f97f
+    method: fast_forward_only
+    migration_branch_published: true
+    eval_harness_branch_published: true
+    remote_agents_directory_verified: true
+    remote_reachable_blob_count_gte_10_mib: 0
   history_sanitization:
     status: completed
     removed_paths:

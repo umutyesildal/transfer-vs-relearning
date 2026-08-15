@@ -1,6 +1,6 @@
 # Repository Migration V1
 
-**Status:** V1 import/preservation verified; generated-output history later sanitized; not published
+**Status:** verified, history-sanitized, fast-forwarded to `main`, and remotely validated
 **Branch:** `migration/monorepo-v1`  
 **Base:** `transfer-vs-relearning` `corpus-update` at
 `9314a02b7a6986d760602002648372d266d04227`
@@ -136,3 +136,22 @@ the original `syntheticFacts` repository.
 See [`GENERATED_OUTPUT_HISTORY_SANITIZATION.md`](GENERATED_OUTPUT_HISTORY_SANITIZATION.md) for the
 exact paths, hashes, commands, preservation evidence, and post-filter checks. This operation did
 not authorize push, cutover, source-repository cleanup, or deletion of the private bundle.
+
+## Main cutover result
+
+The user subsequently authorized publication and main cutover. The following Git-only sequence
+completed without force push:
+
+1. fetched and verified `origin/main`;
+2. pushed `migration/monorepo-v1`;
+3. fast-forwarded local `main` from `5ba61f7b80ac0343e38806f08225535311a8b124` to
+   `695b648615bfd302fd3a755324bfee2d4c63f97f`;
+4. pushed `main`;
+5. created and pushed `agent/eval-harness` from that exact main commit.
+
+Post-push Git verification found the same SHA on all three remote branches, ten tracked files under
+`.agents`, no tracked `.migration` path, and zero reachable blobs at or above 10 MiB on remote
+`main` and `agent/eval-harness`. The original worktrees and private recovery bundle remain intact.
+
+This completed cutover does not authorize later pushes, branch deletion, cleanup, HU/SSH,
+evaluation, corpus materialization, or training.

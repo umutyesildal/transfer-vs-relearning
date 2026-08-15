@@ -4,7 +4,7 @@ This roadmap orders work; it does not authorize external execution.
 
 ## R0 — Documentation control plane
 
-Status: completed and validated on the local migration branch.
+Status: completed, validated, and published on `main`.
 
 - keep root README and AGENTS compact;
 - preserve previous guidance byte-for-byte;
@@ -19,7 +19,7 @@ documentation decision.
 
 ## R0.5 — Publication policy
 
-Status: completed locally; push/cutover remain separately unauthorized.
+Status: completed and verified on remote `main`.
 
 - preserved the exact pre-filter branch in a verified private Git bundle;
 - removed generated `output/` and `tools/synthetic-data/output/` paths from reachable history;
@@ -27,11 +27,13 @@ Status: completed locally; push/cutover remain separately unauthorized.
 - verified zero reachable blobs at or above 10 MiB.
 
 Exit condition: passed. A fresh secret and reachable-blob audit is still required immediately
-before any separately authorized publication.
+before any later separately authorized publication.
 
 ## R1 — Evaluation inventory
 
-Status: next; not started by this documentation wave.
+Status: active branch created; inventory itself not yet started.
+
+Working branch: `agent/eval-harness`.
 
 - inventory every current evaluation script, config, task, metric, denominator, output schema, and
   historical artifact shape;

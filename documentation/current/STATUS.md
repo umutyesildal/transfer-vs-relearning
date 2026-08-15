@@ -53,23 +53,24 @@ The valid next work is local evaluation inventory and qualification:
 7. only then freeze `eval-v1`.
 
 This status does not authorize downloading tasks, running evaluation, accessing HU, using Slurm,
-training a model, materializing a corpus, pushing the migration branch, or cleaning artifacts.
+training a model, materializing a corpus, making additional pushes, or cleaning artifacts.
 
 ## Repository state
 
-The migration branch `migration/monorepo-v1` is local-only. It preserves the main repository
-history and imports the synthetic-data commit topology under `tools/synthetic-data/` without
-squashing commits. Generated `output/` paths were subsequently removed from the reachable
-monorepo history after explicit approval. The original two worktrees remain rollback sources. See
-the
+The monorepo cutover is complete. GitHub `main` was fast-forwarded from
+`5ba61f7b80ac0343e38806f08225535311a8b124` to
+`695b648615bfd302fd3a755324bfee2d4c63f97f`; the migration branch was published and the active
+development branch is `agent/eval-harness`. Remote `main` includes `.agents`, documentation,
+synthetic-data tooling, paper material, scripts, configs, and tests. The original two worktrees
+remain rollback sources. See the
 [`migration record`](../migration/REPOSITORY_MIGRATION_V1.md).
 
 The reachable monorepo history now contains zero blobs at or above 10 MiB. Before filtering, the
 exact 249-commit branch was preserved in a verified private Git bundle; the original source repos
 were not changed. See the
 [`history-sanitization record`](../migration/GENERATED_OUTPUT_HISTORY_SANITIZATION.md). Push and
-cutover are still not authorized, but imported large generated blobs are no longer a publication
-blocker.
+cutover completed without force or merge commit. No additional push or branch mutation is
+authorized by this status.
 
 ## Canonical links
 

@@ -24,9 +24,9 @@ contracts are not frozen. `ready_to_measure` and `ready_to_train` are both false
 Slurm, training, evaluation, corpus-download, publication, or cleanup action follows from this
 README.
 
-The repository is also in a verified, local-only monorepo migration. Both source Git histories and
-all workspace material were preserved; the original worktrees remain rollback sources until a
-separate cutover decision.
+The verified monorepo is now published on `main`. Active evaluation-foundation work continues on
+`agent/eval-harness`. Both source histories and all workspace material were preserved; the
+original worktrees and private pre-filter bundle remain rollback sources.
 
 Read the concise live state in
 [`documentation/current/STATUS.md`](documentation/current/STATUS.md). The machine-readable state
