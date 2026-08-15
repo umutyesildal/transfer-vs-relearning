@@ -1,0 +1,71 @@
+#!/usr/bin/env expect
+set timeout 30
+
+if {$argc < 2} {
+    puts stderr "usage: hu_ssh_run.exp <host> <remote-command>"
+    exit 2
+}
+
+set script_dir [file dirname [file normalize [info script]]]
+set root_dir [file dirname $script_dir]
+set env_file [file join $root_dir ".env"]
+
+if {![file exists $env_file]} {
+    puts stderr "Missing environment file: $env_file"
+    exit 1
+}
+
+set fh [open $env_file r]
+set text [read $fh]
+close $fh
+
+set username ""
+set password ""
+foreach line [split $text "\n"] {
+    set line [string trim $line]
+    if {[regexp {^username\s*[:=]\s*["']?([^"',\s]+)} $line -> value]} {
+        set username $value
+    }
+    if {[regexp {^password\s*[:=]\s*["']?([^"',]+)} $line -> value]} {
+        set password $value
+    }
+}
+
+if {$username eq "" || $password eq ""} {
+    puts stderr "Could not read username/password from $env_file"
+    exit 1
+}
+
+set host [lindex $argv 0]
+set remote_cmd [lindex $argv 1]
+
+spawn ssh \
+    -o PreferredAuthentications=keyboard-interactive,password \
+    -o PubkeyAuthentication=no \
+    -o NumberOfPasswordPrompts=1 \
+    -o StrictHostKeyChecking=accept-new \
+    "$username@$host" \
+    "$remote_cmd"
+
+expect {
+    -re "(?i)are you sure you want to continue connecting" {
+        send -- "yes\r"
+        exp_continue
+    }
+    -re "(?i)password:" {
+        send -- "$password\r"
+        exp_continue
+    }
+    timeout {
+        puts stderr "SSH timed out waiting for login/output"
+        exit 124
+    }
+    -re "(?i)permission denied" {
+        puts stderr "SSH permission denied"
+        exit 1
+    }
+    eof {
+        catch wait result
+        exit [lindex $result 3]
+    }
+}

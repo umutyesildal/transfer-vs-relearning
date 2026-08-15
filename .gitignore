@@ -71,3 +71,10 @@ paper/**/*.blg
 paper/**/*.log
 paper/**/*.out
 paper/**/main.pdf
+
+# Presentation build/render intermediates copied locally for preservation.
+presentations/source/**/node_modules/
+presentations/source/**/final-render/
+presentations/source/**/*contact-sheet*.png
+presentations/source/**/*montage*.png
+presentations/source/**/*montage*.webp

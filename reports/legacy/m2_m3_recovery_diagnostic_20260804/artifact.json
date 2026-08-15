@@ -1,0 +1,244 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "Qwen M2/M3: Teşhis ve Yeniden Tasarım",
+    "description": "Qwen M2/M3 ailesinin neyi gösterdiğini, hangi kanıtın eksik olduğunu ve yeni bir deneyden önce izlenecek karar ağacını özetleyen teknik rapor.",
+    "generatedAt": "2026-08-04T19:29:38Z",
+    "cards": [],
+    "charts": [
+      {
+        "id": "state_accuracy_chart",
+        "title": "M1, M2-clean ve M3-fact yön doğrulukları",
+        "subtitle": "İki seed ortalaması; ölçüm candidate-ranking top-1 doğruluğudur.",
+        "type": "bar",
+        "dataset": "state_accuracy_means",
+        "sourceId": "doc136",
+        "valueFormat": "percent",
+        "encodings": {
+          "x": { "field": "direction", "type": "nominal", "label": "Değerlendirme yönü" },
+          "y": { "field": "accuracy", "type": "quantitative", "label": "Top-1 doğruluk" },
+          "color": { "field": "state", "type": "nominal", "label": "Model durumu" },
+          "tooltip": [
+            { "field": "accuracy", "type": "quantitative", "label": "Top-1", "format": "percent" },
+            { "field": "seed_count", "type": "quantitative", "label": "Seed sayısı" }
+          ]
+        }
+      },
+      {
+        "id": "change_decomposition_chart",
+        "title": "M2 kaybı ve M3 geri kazanımı",
+        "subtitle": "İki seed ortalaması, yüzde puan; M3 geri kazanımı M2 kaybının yalnız küçük kısmını telafi eder.",
+        "type": "bar",
+        "dataset": "direction_changes",
+        "sourceId": "doc136",
+        "valueFormat": "number",
+        "encodings": {
+          "x": { "field": "direction", "type": "nominal", "label": "Değerlendirme yönü" },
+          "y": { "field": "change_pp", "type": "quantitative", "label": "Değişim (pp)" },
+          "color": { "field": "contrast", "type": "nominal", "label": "Karşılaştırma" },
+          "tooltip": [
+            { "field": "change_pp", "type": "quantitative", "label": "Değişim (pp)" },
+            { "field": "seed_count", "type": "quantitative", "label": "Seed sayısı" }
+          ]
+        }
+      }
+    ],
+    "tables": [],
+    "sources": [
+      {
+        "id": "doc136",
+        "label": "Document 136 — completed endpoint metrics and frozen gate",
+        "path": "documentation/136_QWEN_M2_M3_ENDPOINT_EVALUATION_GPU_ALLOCATION_STATUS.md"
+      },
+      {
+        "id": "doc135",
+        "label": "Document 135 — frozen training contract and materialization",
+        "path": "documentation/135_QWEN_M2_M3_CONTRACT_AND_MATERIALIZATION_STATUS.md"
+      },
+      {
+        "id": "doc142",
+        "label": "Document 142 — exploratory mechanism analysis",
+        "path": "documentation/142_QWEN_M2_M3_EXPLORATORY_MECHANISM_ANALYSIS_RESULT_EN.md"
+      },
+      {
+        "id": "corpus110",
+        "label": "Document 110 — Turkish bridge corpus freeze",
+        "path": "documentation/110_TURKISH_BRIDGE_CORPUS_RESULT_AND_FREEZE.md"
+      },
+      {
+        "id": "contract_and_results",
+        "label": "Frozen M2/M3 contract and completed result synthesis",
+        "path": "transfer-vs-relearning/configs/experiments/qwen_m2_m3_contract_v1.json"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "title",
+        "type": "markdown",
+        "body": "# Qwen M2/M3: Teşhis ve Yeniden Tasarım"
+      },
+      {
+        "id": "technical_summary",
+        "type": "markdown",
+        "body": "## Teknik özet\n\n**Mevcut M2/M3 ailesini çöpe atmamalıyız; fakat onu tezin nihai transfer–relearning cevabı olarak da kabul etmemeliyiz.** Deney operasyonel olarak tam ve kontrollüdür: M2 ile M3 aynı factual değerlendirmeleri aldı, bütün 96/96 endpoint dilimi tamamlandı ve iki arm aynı M1 başlangıçları ile eşit bütçe kullandı. Sonuç, mevcut 1.05M-token müdahalede M2-clean'in Türkçe-prompt factual access'i ciddi düşürdüğünü; M3-fact'in bu kaybın küçük bir bölümünü geri aldığını; Branch-B'ye özgü birincil etkinin ise iki seed'de tekrarlanmadığını gösteriyor.\n\n**Kritik eksik, M2'nin gerçekten genel Türkçe dil modellemesini geliştirip geliştirmediğinin post-training olarak ölçülmemesidir.** Frozen kontrat Türkçe ve İngilizce generic PPL'yi ikincil outcome olarak tanımladı, fakat nihai rapor yalnız M1 baseline PPL'yi içeriyor. Bu nedenle şu anda iki farklı açıklamayı ayıramıyoruz: gerçek Türkçe adaptasyon sonrasında factual interference oluşması veya M2 manipülasyonunun Türkçe öğrenmeyi başaramaması.\n\n**Doğru ilerleyiş yeni eğitime hemen başlamak değil; önce frozen modeller ve mevcut checkpoint'ler üzerinde gecikmiş ikincil ölçümleri tamamlamaktır.** Bu ölçümler M2'nin çalıştığını gösterirse yeni çalışma retention-preserving adaptation tasarımına; çalışmadığını gösterirse dose/LR/corpus sampling kalibrasyonuna yönelmelidir."
+      },
+      {
+        "id": "established_findings",
+        "type": "markdown",
+        "sourceId": "doc136",
+        "body": "## Deney aslında neyi sağlam biçimde gösterdi?\n\nM2 ve M3 **aynı evaluation registry** üzerinde karşılaştırıldı: üç yön, dört form ve iki scaffold ile her model durumu için 24 slice ve 60k probe. M2-clean ile M3-fact seed içinde aynı frozen M1 checkpoint'inden bağımsız kardeş arm'lar olarak başladı. Dolayısıyla “aynı teste sokmadık” veya “yalnız birkaç probe yaptık” yorumu doğru değildir.\n\nBuna karşın sonuç olumlu değildir. İki seed ortalamasında M2-clean, M1'e göre TR→EN'de yaklaşık 18.79 pp ve TR→TR'de 6.73 pp geriledi. M3-fact, M2-clean'e göre TR→EN'de yaklaşık 1.88 pp ve TR→TR'de 1.65 pp kazandı; ancak M1 seviyesine yaklaşamadı. Birincil Branch-B etkileşimi seed 43'te geçti, seed 42'de güven aralığı sıfırı kesti. Bu yüzden frozen karar “primary success criterion not met” olarak kalmalıdır."
+      },
+      {
+        "id": "state_chart_intro",
+        "type": "markdown",
+        "body": "## M2 düşüşü geniş, M3 kazanımı küçük kaldı\n\nAşağıdaki grafik, iki seed'in ortalamasında yön bazlı durumu gösterir. EN→EN büyük ölçüde korunurken Türkçe içeren yönlerde M2 sonrasında belirgin gerileme vardır. M3 her iki Türkçe yönde M2'den daha iyidir; fakat fark, M2'nin açtığı boşluğu kapatacak büyüklükte değildir."
+      },
+      {
+        "id": "state_chart",
+        "type": "chart",
+        "chartId": "state_accuracy_chart"
+      },
+      {
+        "id": "change_chart_intro",
+        "type": "markdown",
+        "body": "## Betimsel toparlanma, ana kaybın yaklaşık onda biri\n\nDeğişim grafiğinde sıfırın altındaki çubuklar M1→M2 kaybını, üstündeki çubuklar M2→M3 toparlanmasını gösterir. Özellikle TR→EN'de +1.88 pp'lik M3 kazanımı gerçektir ve iki seed'de aynı işarettedir; fakat yaklaşık −18.79 pp'lik M2 kaybının yalnız küçük bir kısmını karşılar. Bu nedenle M3 için “hiçbir şey olmadı” demek fazla sert, “relearning başarılı oldu” demek ise kanıtı aşar."
+      },
+      {
+        "id": "change_chart",
+        "type": "chart",
+        "chartId": "change_decomposition_chart"
+      },
+      {
+        "id": "measurement_gap",
+        "type": "markdown",
+        "sourceId": "doc135",
+        "body": "## Asıl problem: M2 manipülasyon kontrolü yarım kaldı\n\nM2/M3 eğitimleri teknik olarak tamamlandı: arm başına 1,048,576 token, 2,048 adet 512-token block, 128 update ve sabit checkpoint-128 kullanıldı. Eğitim sonundaki shared-validation loss'ları yaklaşık 2.38 düzeyindeydi, fakat bunlar aynı model ve aynı frozen bloklar üzerinde M1 ile karşılaştırılmadı. Bu nedenle yalnız final loss'a bakarak “Türkçe öğrendi” diyemeyiz.\n\nAyrıca corpus 494k'dan fazla temiz train belgesi içerse de materializer stored-order satırları sırayla tokenlaştırıp tam 1.05M tokenda durdu. Dolayısıyla principal M2 tüm corpus'u görmedi. Kullanılan belge sayısı, konu dağılımı, ilk belgelerin temsil gücü ve uzun belgelerin token bütçesine hakim olup olmadığı henüz karar-düzeyinde raporlanmış değil."
+      },
+      {
+        "id": "decision_tree_intro",
+        "type": "markdown",
+        "body": "## Önce ölç, sonra hangi deneyi kuracağına karar ver\n\nAynı frozen Turkish validation blokları ve aynı English generic-PPL seti üzerinde M1, M2 ve M3'ü birlikte ölçmek iki rakip açıklamayı birbirinden ayırır. Bu, primary gate'i değiştirmez; önceden tanımlanmış fakat gecikmiş bir secondary-outcome completion olarak raporlanmalıdır."
+      },
+      {
+        "id": "decision_tree",
+        "type": "markdown",
+        "body": "### Karar ağacı\n\n- **TR PPL belirgin iyileşir ve EN korunursa:** M2 gerçek Türkçe adaptasyon yapmıştır; sorun factual interference'tır. Retention-preserving M2 v2 tasarlanır.\n\n- **TR PPL değişmez veya kötüleşirse:** M2 language-adaptation manipülasyonu yetersizdir. Dose, learning rate ve corpus sampling kalibre edilir.\n\n- **TR PPL iyileşir ama EN PPL/EN→EN ciddi bozulursa:** Recipe genel drift yaratmıştır. Müdahale daha düşük LR/dose veya kontrollü replay ile yumuşatılır."
+      },
+      {
+        "id": "phase_one",
+        "type": "markdown",
+        "body": "## Faz 1 — Yeni eğitimden önce yapılacak dört read-only iş\n\n1. **Altı frozen endpoint için ortak PPL tamamlaması:** M1/M2/M3 × seed 42/43; aynı Turkish validation ve aynı English PPL corpus'u. Raporlanacak kontrastlar M1→M2, M1→M3 ve M2→M3 olmalı.\n\n2. **Mevcut checkpoint eğrisi:** Run tree'lerde checkpoint-32/64/96/128 hâlâ duruyorsa, Turkish PPL, English PPL ve küçük önceden dondurulmuş factual diagnostic slice her checkpoint'te ölçülmeli. Bu sonuçlar eski primary endpoint'i değiştirmeyecek; yalnız düşüşün ne zaman başladığını gösterecek.\n\n3. **Gerçek kullanılan corpus dozunun auditi:** Kaç belge ve hangi başlıklar kullanıldı, belge başına token katkısı, konu/uzunluk dağılımı, tek bir uzun belgenin dominasyonu, train/validation hash ayrıklığı ve stored-order prefix'in full corpus'a temsil gücü çıkarılmalı.\n\n4. **Ölçüm ayrıştırması:** Candidate-ranking yanında correct-vs-hard-negative log-probability margin raporlanmalı. Daha doğal kullanım için küçük, frozen bir free-generation seti secondary olarak eklenebilir; ancak mevcut primary sonuç geriye dönük değiştirilmemeli."
+      },
+      {
+        "id": "phase_two",
+        "type": "markdown",
+        "body": "## Faz 2 — M2 gerçekten öğrenmediyse M2'yi kalibre et\n\nM2'nin amacı önce ölçülebilir Türkçe adaptasyon üretmektir. Bunun için yeni factual sonuçlara bakmadan, bir discovery seed üzerinde **dose × learning-rate** pilotu yapılmalı. Örnek başlangıç ızgarası 1M/5M/20M token ve 1e-6/3e-6/1e-5 learning rate olabilir; kesin değerler storage/runtime preflight sonrasında dondurulmalıdır. Belge seçimi full train corpus üzerinden deterministic document shuffle/stratified sample ile yapılmalı, belge başına token cap uygulanmalı ve kullanılan belge listesi hash'lenmelidir.\n\nRecipe seçimi yalnız şu önceden dondurulmuş ölçütlere dayanmalıdır: Turkish held-out PPL'de açık iyileşme, English generic PPL'de kabul edilebilir drift ve EN→EN factual retention guardrail. **TR→EN veya TR→TR factual sonuçları recipe seçiminde kullanılmamalıdır;** aksi hâlde sonraki transfer testi post-hoc optimize edilmiş olur. Seçilen recipe ikinci seed'de confirmatory olarak doğrulanmalıdır."
+      },
+      {
+        "id": "phase_three",
+        "type": "markdown",
+        "body": "## Faz 3 — M2 öğrendikten sonra yeni sibling M2/M3 ailesi\n\nYeni family yine her seed için aynı frozen M1'den başlayan bağımsız kardeş arm'lar olmalı. M2-clean ve M3-fact aynı toplam token/update, aynı generic belge sırası, aynı optimizer ve aynı fixed endpoint'i paylaşmalı; yalnız doğru factual exposure farklı olmalı.\n\nÇekirdek karşılaştırmaya ek olarak bir **M3-lexical control** yararlı olur: Türkçe subject/object yüzeylerini görür, fakat doğru ilişki bağını içeren tam cümleyi görmez. Böylece doğru factual sentence faydasını salt isim/kelime aşinalığından ayırabiliriz. Eğer compute sınırlıysa önce M2-clean vs M3-fact ana ailesi, sonra lexical control yapılabilir.\n\nYeni frozen evaluation dört katmana ayrılmalı: (1) Türkçe öğrenme — held-out TR PPL/LM loss; (2) İngilizce koruma — EN PPL ve EN→EN; (3) factual access — aynı EN→EN, TR→EN, TR→TR candidate-ranking matrisi; (4) ecological secondary — frozen free generation ve exact/alias-aware scoring. Böylece “Türkçe öğrendi mi?”, “İngilizceyi bozdu mu?” ve “fact'e erişti mi?” soruları birbirine karışmaz."
+      },
+      {
+        "id": "limitations",
+        "type": "markdown",
+        "sourceId": "doc142",
+        "body": "## Mevcut kanıtın sınırları\n\nExploratory relation/form/scaffold sonuçları düşüşün tek bir template veya relation yüzünden olmadığını, Türkçe içeren yönlerde geniş olduğunu gösteriyor. Ancak bunlar post-hoc alt grup özetleridir; yeni checkpoint seçmek, gate'i gevşetmek veya seed 43'ü tek başına başarı diye sunmak için kullanılamaz. Yeni deney eski sonucu silmemeli; eski family “geçerli negative/inconclusive pilot” olarak korunmalı ve yeni family açıkça `v2 amendment` olarak numaralandırılmalıdır."
+      },
+      {
+        "id": "recommendation",
+        "type": "markdown",
+        "body": "## Önerilen karar\n\n**Bugün yeni 25k veya yeni M2/M3 training başlatmayalım.** Önce Faz 1'i tamamlayalım. En yüksek bilgi/maliyet oranı altı frozen modelin ortak PPL değerlendirmesi ve mevcut 32/64/96/128 checkpoint eğrisidir. Bu iki sonuç geldikten sonra: M2 Türkçe PPL'yi iyileştiriyorsa interference-preserving v2; iyileştirmiyorsa M2 calibration pilotu tasarlanır.\n\nMevcut deneyin doğru tez cümlesi şimdilik şudur: “Aynı factual test suite üzerinde M2 ciddi Türkçe-prompt factual-access kaybı üretti; M3 küçük fakat yetersiz bir toparlanma sağladı; Branch-B'ye özgü etki iki seed'de tekrarlanmadı; post-training language-adaptation manipulation check eksik olduğu için mekanizma yorumu tamamlanmadı.”"
+      },
+      {
+        "id": "further_questions",
+        "type": "markdown",
+        "body": "## Karar vermeden önce yanıtlanacak sorular\n\n- M2 ve M3, aynı Turkish validation bloklarında M1'den gerçekten daha düşük PPL elde ediyor mu?\n- Türkçe PPL iyileşirken factual access düşüyorsa trade-off hangi checkpoint'te başlıyor?\n- Principal 1.05M-token prefix kaç farklı belgeden oluştu ve full corpus'u ne kadar temsil etti?\n- Daha düşük learning rate veya daha geniş deterministic document sample aynı Türkçe kazanımı daha az factual drift ile sağlayabilir mi?\n- M3 avantajı doğru ilişki bağından mı, yoksa yalnız Türkçe subject/object yüzeylerini görmekten mi geliyor?"
+      }
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "generatedAt": "2026-08-04T19:29:38Z",
+    "status": "ready",
+    "datasets": {
+      "headline_metrics": [
+        { "metric": "M1→M2 TR→EN", "value_pp": -18.79, "value_count": null },
+        { "metric": "M2→M3 TR→EN", "value_pp": 1.88, "value_count": null },
+        { "metric": "Primary gate", "value_pp": null, "value_count": 1 }
+      ],
+      "state_accuracy_means": [
+        { "direction": "EN→EN", "state": "M1", "accuracy": 0.99265, "seed_count": 2 },
+        { "direction": "EN→EN", "state": "M2-clean", "accuracy": 0.97145, "seed_count": 2 },
+        { "direction": "EN→EN", "state": "M3-fact", "accuracy": 0.97585, "seed_count": 2 },
+        { "direction": "TR→EN", "state": "M1", "accuracy": 0.52275, "seed_count": 2 },
+        { "direction": "TR→EN", "state": "M2-clean", "accuracy": 0.33495, "seed_count": 2 },
+        { "direction": "TR→EN", "state": "M3-fact", "accuracy": 0.35365, "seed_count": 2 },
+        { "direction": "TR→TR", "state": "M1", "accuracy": 0.29585, "seed_count": 2 },
+        { "direction": "TR→TR", "state": "M2-clean", "accuracy": 0.22855, "seed_count": 2 },
+        { "direction": "TR→TR", "state": "M3-fact", "accuracy": 0.24505, "seed_count": 2 }
+      ],
+      "direction_changes": [
+        { "direction": "EN→EN", "contrast": "M1→M2", "change_pp": -2.12, "seed_count": 2 },
+        { "direction": "EN→EN", "contrast": "M2→M3", "change_pp": 0.44, "seed_count": 2 },
+        { "direction": "TR→EN", "contrast": "M1→M2", "change_pp": -18.79, "seed_count": 2 },
+        { "direction": "TR→EN", "contrast": "M2→M3", "change_pp": 1.88, "seed_count": 2 },
+        { "direction": "TR→TR", "contrast": "M1→M2", "change_pp": -6.73, "seed_count": 2 },
+        { "direction": "TR→TR", "contrast": "M2→M3", "change_pp": 1.65, "seed_count": 2 }
+      ],
+      "decision_tree": []
+    },
+    "accessIssues": []
+  },
+  "sources": [
+    {
+      "id": "doc136",
+      "query": {
+        "engine": "duckdb",
+        "sql": "SELECT * FROM (VALUES ('state_accuracy','EN→EN','M1',0.99265,NULL),('state_accuracy','EN→EN','M2-clean',0.97145,NULL),('state_accuracy','EN→EN','M3-fact',0.97585,NULL),('state_accuracy','TR→EN','M1',0.52275,NULL),('state_accuracy','TR→EN','M2-clean',0.33495,NULL),('state_accuracy','TR→EN','M3-fact',0.35365,NULL),('state_accuracy','TR→TR','M1',0.29585,NULL),('state_accuracy','TR→TR','M2-clean',0.22855,NULL),('state_accuracy','TR→TR','M3-fact',0.24505,NULL),('direction_change','EN→EN','M1→M2',NULL,-2.12),('direction_change','EN→EN','M2→M3',NULL,0.44),('direction_change','TR→EN','M1→M2',NULL,-18.79),('direction_change','TR→EN','M2→M3',NULL,1.88),('direction_change','TR→TR','M1→M2',NULL,-6.73),('direction_change','TR→TR','M2→M3',NULL,1.65)) AS reviewed(row_type,direction,series,accuracy,change_pp)",
+        "description": "Reconstructs the reviewed two-seed means and paired-change values transcribed from Document 136.",
+        "executed_at": "2026-08-04T19:29:38Z",
+        "language": "sql"
+      }
+    },
+    {
+      "id": "doc135",
+      "query": {
+        "engine": "filesystem",
+        "description": "Frozen M2/M3 token, block, update, checkpoint and validation contract plus principal training losses.",
+        "executed_at": "2026-08-04T19:29:38Z",
+        "language": "markdown"
+      }
+    },
+    {
+      "id": "doc142",
+      "query": {
+        "engine": "filesystem",
+        "description": "Exploratory direction, relation, form, scaffold and branch decomposition of the frozen results.",
+        "executed_at": "2026-08-04T19:29:38Z",
+        "language": "markdown"
+      }
+    },
+    {
+      "id": "corpus110",
+      "query": {
+        "engine": "filesystem",
+        "description": "Frozen Turkish Wikipedia bridge corpus counts, contamination audit and hashes.",
+        "executed_at": "2026-08-04T19:29:38Z",
+        "language": "markdown"
+      }
+    },
+    {
+      "id": "contract_and_results",
+      "query": {
+        "engine": "duckdb",
+        "sql": "SELECT * FROM (VALUES (1,'TR PPL improves; EN remains acceptable','M2 learned Turkish but factual interference occurred','Design retention-preserving M2 v2'),(2,'TR PPL is flat or worse','The M2 language-adaptation manipulation was insufficient','Calibrate dose, learning rate and corpus sampling'),(3,'TR PPL improves but EN degrades','The recipe caused broad drift','Reduce aggressiveness and test controlled replay')) AS decision_tree(order_id,observed_result,interpretation,next_action)",
+        "description": "Decision table derived from the frozen contract's secondary PPL outcomes and the completed factual-access result.",
+        "executed_at": "2026-08-04T19:29:38Z",
+        "language": "sql"
+      }
+    }
+  ]
+}

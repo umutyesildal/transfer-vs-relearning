@@ -1,0 +1,750 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/tgq9mw",
+    "id": "tgq9mw",
+    "slide": 17,
+    "layoutId": "/ppt/slideLayouts/slideLayout1.xml",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "/ppt/slideMasters/slideMaster1.xml",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#132238",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "fontScheme": {
+      "name": "Office",
+      "majorFont": {
+        "latinTypeface": "Calibri Light",
+        "eastAsianTypeface": "Calibri Light",
+        "complexScriptTypeface": "Calibri Light"
+      },
+      "minorFont": {
+        "latinTypeface": "Calibri",
+        "eastAsianTypeface": "Calibri",
+        "complexScriptTypeface": "Calibri"
+      }
+    },
+    "typefaces": [
+      "Calibri",
+      "Calibri Light"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "/ppt/slideLayouts/slideLayout1.xml",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "/ppt/slideMasters/slideMaster1.xml",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "/ppt/slideMasters/slideMaster1.xml",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/hgjyp8bu",
+      "id": "12",
+      "name": "kicker",
+      "bbox": [
+        72,
+        55,
+        500,
+        26
+      ],
+      "geometry": "rect",
+      "text": "SCIENTIFIC INTERPRETATION",
+      "textPreview": "SCIENTIFIC INTERPRETATION",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "SCIENTIFIC INTERPRETATION"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "SCIENTIFIC INTERPRETATION",
+          "resolvedTextStyle": {
+            "fontSize": 15,
+            "color": "#89A9FF",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "SCIENTIFIC INTERPRETATION",
+              "fontSize": 15,
+              "color": "#89A9FF",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/k7y58zmp",
+      "id": "2",
+      "name": "headline",
+      "bbox": [
+        72,
+        105,
+        1100,
+        64
+      ],
+      "geometry": "rect",
+      "text": "The causal family is complete—not the thesis question",
+      "textPreview": "The causal family is complete—not the thesis question",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "The causal family is complete—not the thesis question"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "The causal family is complete—not the thesis question",
+          "resolvedTextStyle": {
+            "fontSize": 36,
+            "color": "#FFFFFF",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "The causal family is complete—not the thesis question",
+              "fontSize": 36,
+              "color": "#FFFFFF",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/l876143a",
+      "id": "3",
+      "name": "close-label-0",
+      "bbox": [
+        86,
+        211,
+        260,
+        32
+      ],
+      "geometry": "rect",
+      "text": "What we know",
+      "textPreview": "What we know",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "What we know"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "What we know",
+          "resolvedTextStyle": {
+            "fontSize": 21,
+            "color": "#64D8C7",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "What we know",
+              "fontSize": 21,
+              "color": "#64D8C7",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/69gna94v",
+      "id": "4",
+      "name": "close-body-0",
+      "bbox": [
+        360,
+        211,
+        790,
+        76
+      ],
+      "geometry": "rect",
+      "text": "English-acquired facts were already partly accessible from Turkish prompts; clean adaptation strongly reduced that access.",
+      "textPreview": "English-acquired facts were already partly accessible from Turkish prompts; clean adaptation strongly reduced that access.",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "English-acquired facts were already partly accessible from Turkish prompts; clean"
+          },
+          {
+            "index": 2,
+            "text": "adaptation strongly reduced that access."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "English-acquired facts were already partly accessible from Turkish prompts; clean adaptation strongly reduced that access.",
+          "resolvedTextStyle": {
+            "fontSize": 20,
+            "color": "#E8EDF6",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "English-acquired facts were already partly accessible from Turkish prompts; clean adaptation strongly reduced that access.",
+              "fontSize": 20,
+              "color": "#E8EDF6"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/7a9o3ulg",
+      "id": "5",
+      "name": "close-label-1",
+      "bbox": [
+        86,
+        339,
+        260,
+        32
+      ],
+      "geometry": "rect",
+      "text": "What M3 adds",
+      "textPreview": "What M3 adds",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "What M3 adds"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "What M3 adds",
+          "resolvedTextStyle": {
+            "fontSize": 21,
+            "color": "#FFC65A",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "What M3 adds",
+              "fontSize": 21,
+              "color": "#FFC65A",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/8bipczm1",
+      "id": "6",
+      "name": "close-body-1",
+      "bbox": [
+        360,
+        339,
+        790,
+        76
+      ],
+      "geometry": "rect",
+      "text": "Correct Turkish factual exposure produced a small, consistent descriptive recovery relative to M2-clean.",
+      "textPreview": "Correct Turkish factual exposure produced a small, consistent descriptive recovery relative to M2-clean.",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Correct Turkish factual exposure produced a small, consistent descriptive recovery"
+          },
+          {
+            "index": 2,
+            "text": "relative to M2-clean."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Correct Turkish factual exposure produced a small, consistent descriptive recovery relative to M2-clean.",
+          "resolvedTextStyle": {
+            "fontSize": 20,
+            "color": "#E8EDF6",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Correct Turkish factual exposure produced a small, consistent descriptive recovery relative to M2-clean.",
+              "fontSize": 20,
+              "color": "#E8EDF6"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/tcr65436",
+      "id": "7",
+      "name": "close-label-2",
+      "bbox": [
+        86,
+        467,
+        260,
+        32
+      ],
+      "geometry": "rect",
+      "text": "What we cannot claim",
+      "textPreview": "What we cannot claim",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "What we cannot claim"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "What we cannot claim",
+          "resolvedTextStyle": {
+            "fontSize": 21,
+            "color": "#89A9FF",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "What we cannot claim",
+              "fontSize": 21,
+              "color": "#89A9FF",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ud07e94r",
+      "id": "8",
+      "name": "close-body-2",
+      "bbox": [
+        360,
+        467,
+        790,
+        76
+      ],
+      "geometry": "rect",
+      "text": "The Branch-B-specific factual-relearning advantage was not replicated under the precommitted two-seed confidence rule.",
+      "textPreview": "The Branch-B-specific factual-relearning advantage was not replicated under the precommitted two-seed confidence rule.",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "The Branch-B-specific factual-relearning advantage was not replicated under the"
+          },
+          {
+            "index": 2,
+            "text": "precommitted two-seed confidence rule."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "The Branch-B-specific factual-relearning advantage was not replicated under the precommitted two-seed confidence rule.",
+          "resolvedTextStyle": {
+            "fontSize": 20,
+            "color": "#E8EDF6",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "The Branch-B-specific factual-relearning advantage was not replicated under the precommitted two-seed confidence rule.",
+              "fontSize": 20,
+              "color": "#E8EDF6"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/vy9o7elc",
+      "id": "9",
+      "name": "discussion",
+      "bbox": [
+        72,
+        604,
+        1136,
+        2
+      ],
+      "geometry": "rect",
+      "fillColor": "#3C4B63",
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/fehgnyto",
+      "id": "10",
+      "name": "discussion-text",
+      "bbox": [
+        72,
+        625,
+        1100,
+        46
+      ],
+      "geometry": "rect",
+      "text": "This is a valid negative/inconclusive result—not a failed experiment and not evidence that all future transfer mechanisms are exhausted.",
+      "textPreview": "This is a valid negative/inconclusive result—not a failed experiment and not evidence that all future transfer mechanisms are exhausted.",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "This is a valid negative/inconclusive result—not a failed experiment and not evidence that all future transfer"
+          },
+          {
+            "index": 2,
+            "text": "mechanisms are exhausted."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "This is a valid negative/inconclusive result—not a failed experiment and not evidence that all future transfer mechanisms are exhausted.",
+          "resolvedTextStyle": {
+            "fontSize": 19,
+            "color": "#FFFFFF",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "This is a valid negative/inconclusive result—not a failed experiment and not evidence that all future transfer mechanisms are exhausted.",
+              "fontSize": 19,
+              "color": "#FFFFFF",
+              "bold": true
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ud8fets3",
+      "id": "11",
+      "name": "page",
+      "bbox": [
+        1160,
+        684,
+        48,
+        18
+      ],
+      "geometry": "rect",
+      "text": "14",
+      "textPreview": "14",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 24,
+        "typeface": "Calibri",
+        "color": "tx1",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "14"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "14",
+          "resolvedTextStyle": {
+            "fontSize": 11,
+            "color": "#91A0B8",
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "14",
+              "fontSize": 11,
+              "color": "#91A0B8"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

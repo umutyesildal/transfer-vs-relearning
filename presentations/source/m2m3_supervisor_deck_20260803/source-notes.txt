@@ -1,0 +1,19 @@
+All audience-facing claims are sourced from the local chronological thesis evidence.
+
+Primary sources used:
+- documentation/94_PRE_M2_FROZEN_HARD_EVALUATION_REPORT.md
+- documentation/95_PRE_M2_PARAPHRASE_COUNTERBALANCE_REPORT.md
+- documentation/97_PRE_M2_DRIFT_ABLATION_REPORT.md
+- documentation/106_M1_CROSS_FAMILY_MODEL_SCREENING_RESULT.md
+- documentation/127_QWEN_SCALE_REPLICATION_RESULT_AND_SMOLLM_LAMBDA025_STATUS.md
+- documentation/128_SMOLLM_500_FACT_PROMPT_CONSISTENCY_REMEDIATION_PLAN.md
+- documentation/134_QWEN_PRE_M2_GPU_BLOCKER_AND_OFFLINE_PREPARATION_STATUS.md
+- documentation/135_QWEN_M2_M3_CONTRACT_AND_MATERIALIZATION_STATUS.md
+- documentation/136_QWEN_M2_M3_ENDPOINT_EVALUATION_GPU_ALLOCATION_STATUS.md
+- documentation/138_QWEN_M2_M3_COMPLETED_MILESTONE_AND_SCIENTIFIC_INTERPRETATION_EN.md
+- documentation/140a_QWEN_M2_M3_INDEPENDENT_REVIEW_RESULT_EN.md
+- documentation/142_QWEN_M2_M3_EXPLORATORY_MECHANISM_ANALYSIS_RESULT_EN.md
+- documentation/143_QWEN_M2_M3_ARTIFACT_RETENTION_FREEZE_AND_STORAGE_AUDIT_EN.md
+
+No external images or web claims are used. The visual template is the user's existing deck:
+outputs/max_m1_research_update.pptx.

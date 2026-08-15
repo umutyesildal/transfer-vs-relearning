@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "status": "in_progress_local_only",
+  "publication_authorized": false,
+  "source_inventory": {
+    "committed_to_git": false,
+    "sha256": "0fd8caaf2dcfba1b6aa180875d23748fe03b993f2bc2438fb4ee3bd55fab5dfb",
+    "regular_files": 35598,
+    "symlinks": 13,
+    "directories": 3669,
+    "total_regular_file_bytes": 2962980827,
+    "secret_local_only_files": 1
+  },
+  "source_repositories": {
+    "transfer_vs_relearning": {
+      "branch": "corpus-update",
+      "commit": "9314a02b7a6986d760602002648372d266d04227",
+      "history_role": "monorepo_spine",
+      "source_worktree_mutated": false
+    },
+    "synthetic_facts": {
+      "branch": "relation-redesign-v2",
+      "commit": "ec2b96a83b9aa0177db306182e432d966d688ec0",
+      "destination": "tools/synthetic-data",
+      "history_import": "git_subtree_without_squash",
+      "source_worktree_mutated": false
+    }
+  },
+  "byte_identical_path_stable_imports": [
+    "AGENTS.md",
+    "LUNA_WORKER_CURRENT_HANDOFF.md",
+    ".agents",
+    "documentation",
+    "paper",
+    "papers",
+    "scripts/build_supervisor_m1_docx.py",
+    "ssh-client",
+    "study-notes"
+  ],
+  "relocated_imports": [
+    {
+      "source": "Max_Meeting_Progress_and_One_Month_Plan.pptx",
+      "destination": "presentations/legacy/max_meeting_progress/Max_Meeting_Progress_and_One_Month_Plan.pptx"
+    },
+    {
+      "source": "Max_Meeting_Progress_and_One_Month_Plan",
+      "destination": "presentations/legacy/max_meeting_progress/rendered_slides"
+    },
+    {
+      "source": "outputs/*.pptx",
+      "destination": "presentations/legacy/research_updates"
+    },
+    {
+      "source": "outputs/reports/m2_m3_recovery_diagnostic_20260804",
+      "destination": "reports/legacy/m2_m3_recovery_diagnostic_20260804"
+    },
+    {
+      "source": "tmp and .tmp presentation-authoring sources",
+      "destination": "presentations/source"
+    },
+    {
+      "source": ".tmp/paper_work/build_source_digest.py",
+      "destination": "paper/tools/build_source_digest.py"
+    }
+  ],
+  "local_only_preservation": {
+    "secret_paths": [
+      "ssh-client/.env"
+    ],
+    "generated_or_runtime_classes": [
+      ".agents/runs",
+      ".agents/state",
+      ".agents/STOP",
+      ".tmp",
+      "tmp",
+      "output",
+      "outputs",
+      "virtual_environments",
+      "Python_and_test_caches",
+      "main_repo_untracked_artifacts",
+      "synthetic_repo_untracked_outputs"
+    ],
+    "reference_binary_policy": "papers/**/*.pdf are locally copied and hash-inventoried but Git-ignored pending copyright/license and Git LFS decision"
+  }
+}

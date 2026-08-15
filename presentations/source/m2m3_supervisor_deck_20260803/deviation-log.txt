@@ -1,0 +1,8 @@
+DEVIATION LOG
+
+- Output slide 6 reuses source slide 9 but expands the inherited chart from three to five
+  categories to show the frozen cross-family robustness screen. The chart frame is unchanged.
+- Output slide 12 reuses source slide 9 but expands the inherited chart from three to six
+  categories to show M1/M2/M3 TR-to-EN endpoint accuracy across both seeds. The chart frame is
+  unchanged.
+- No other intentional layout, typography, or geometry deviation is planned.

@@ -1,0 +1,5 @@
+seed,estimand,estimate_pp,ci_low_pp,ci_high_pp,confirmatory
+42,M2-B minus M2-A TR-to-EN,1.855,1.480,2.215,no
+43,M2-B minus M2-A TR-to-EN,1.895,1.485,2.330,no
+42,Branch interaction TR-to-EN,0.250,-0.510,1.010,yes
+43,Branch interaction TR-to-EN,1.350,0.510,2.180,yes

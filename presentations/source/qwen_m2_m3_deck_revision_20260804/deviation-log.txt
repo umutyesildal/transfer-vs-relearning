@@ -1,0 +1,12 @@
+Output 1: title and scope rewritten to frame the deck as a diagnostic milestone rather than a finished thesis result.
+Output 2: milestone summary rewritten to distinguish completion, evidence, and remaining uncertainty.
+Output 4: source slide 14 duplicated and rewritten as the causal motivation bridge.
+Output 7: model-family decision wording clarified so the initial 0/5 screen is not confused with Qwen's later repaired pass.
+Output 11: source slide 14 duplicated and rewritten to separate the three measurement layers.
+Output 15: source slide 13 title and decision wording clarified; statistics preserved.
+Output 14: endpoint title changed from the stronger "Turkish adaptation" claim to the directly observed M2-clean effect.
+Output 16: source slide 14 duplicated and rewritten to distinguish execution validity, primary failure, and unresolved interpretation.
+Output 17: source slide 14 duplicated and rewritten as the missing manipulation-check decision fork.
+Output 18: source slide 15 duplicated and rewritten as the immediate read-only diagnostic plan.
+Output 19: source slide 15 duplicated and rewritten as the supervisor decision/closing slide.
+All other source content is preserved except for sequential page-number updates.

@@ -1,0 +1,151 @@
+{
+  "outputSlides": [
+    {
+      "outputSlide": 1,
+      "sourceSlide": 1,
+      "narrativeRole": "opening thesis milestone",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {"action":"rewrite","sourceElementIds":["sh/547294r6","sh/k3yl0zql","sh/7qp4be9c","sh/ts7md4r2","sh/sryl4zqx"]}
+      ]
+    },
+    {
+      "outputSlide": 2,
+      "sourceSlide": 10,
+      "narrativeRole": "summary of progress since the last update",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {"action":"rewrite","sourceElementIds":["sh/q5gb21kb","sh/xc3mho32","sh/cbu58j2h","sh/zelojyl8","sh/ydcnatkn","sh/l036l83y","sh/kzu5c32t","sh/725onyl4","sh/s7yt4b21","sh/d87uxg3m"]}
+      ]
+    },
+    {
+      "outputSlide": 3,
+      "sourceSlide": 2,
+      "narrativeRole": "causal research design",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {"action":"rewrite","sourceElementIds":["sh/hcvy14ne","sh/9072xkry","sh/ozy1ofad","sh/a10jqpsj","sh/x4r21kru","sh/w3i1sfa9","sh/q5wjelsz","sh/ove9o7yd","sh/9wnqhczy","sh/nu58f2hs","sh/wjy9sry9","sh/xk7qlczu","sh/bip8jmho","sh/cnupgny5","sh/do3q9szq","sh/t8byxkn2","sh/76twva5c","sh/65kfmpor"]}
+      ]
+    },
+    {
+      "outputSlide": 4,
+      "sourceSlide": 3,
+      "narrativeRole": "probing and measurement evolution",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {"action":"rewrite","sourceElementIds":["sh/14ryd8fq","sh/cza94vmx","sh/298ryl4v","sh/3ah8rqlg","sh/pcjqtg36","sh/m5cra54z","sh/n6ls3alk","sh/m1c3mlsn","sh/943mhgre","sh/83ulovat","sh/a5c3ql8z","sh/x8nml0ra","sh/w7ulsvqp","sh/i9w3u58v","sh/f29gbyx0","sh/03ix43e5"]}
+      ]
+    },
+    {
+      "outputSlide": 5,
+      "sourceSlide": 8,
+      "narrativeRole": "SmolLM 500-fact result",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {"action":"rewrite","sourceElementIds":["sh/lgbepgvm","sh/18byd4zy","sh/g72x4zyd","sh/6h0fypgb","sh/tkby9kzm","sh/sjix0zy1","sh/je9g3ahk","sh/o7ydoret","sh/98rehwve","sh/m5gvmhwn","sh/0jydkreh","sh/1k7edwv2","sh/zipwbmdc","sh/kfixwbe1"]}
+      ]
+    },
+    {
+      "outputSlide": 6,
+      "sourceSlide": 9,
+      "narrativeRole": "cross-family model screen chart",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {"action":"rewrite","sourceElementIds":["sh/do3id4fy","sh/1cfmhgne","sh/mdonql4z","sh/9gzml0nq","sh/bih4na5w","sh/ah8nu54b","sh/oza1gfyh","sh/p0ji9kf2","sh/3y107axw","sh/cnu1kzyd","ch/upw7q1kz"]}
+      ]
+    },
+    {
+      "outputSlide": 7,
+      "sourceSlide": 8,
+      "narrativeRole": "replicated Qwen 2500-fact M1 evidence",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {"action":"rewrite","sourceElementIds":["sh/lgbepgvm","sh/18byd4zy","sh/g72x4zyd","sh/6h0fypgb","sh/tkby9kzm","sh/sjix0zy1","sh/je9g3ahk","sh/o7ydoret","sh/98rehwve","sh/m5gvmhwn","sh/0jydkreh","sh/1k7edwv2","sh/zipwbmdc","sh/kfixwbe1"]}
+      ]
+    },
+    {
+      "outputSlide": 8,
+      "sourceSlide": 6,
+      "narrativeRole": "pre-M2 bilingual evaluation and gate freeze",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {"action":"rewrite","sourceElementIds":["sh/bq547yhw","sh/yhg7epsj","sh/87ipkzal","sh/98rqt4r6","sh/ml07i9sv","sh/7m98ru9g","sh/oryp8fah","sh/h4bupgn6","sh/w32twb6l","sh/v2tcn650","sh/u1kbu1ov","sh/5svutgni","sh/47mt0b6x","sh/j6dcr65c","sh/twfux0ne","sh/svmt4v6t","sh/dcnm98zm","sh/qpwnet0b"]}
+      ]
+    },
+    {
+      "outputSlide": 9,
+      "sourceSlide": 7,
+      "narrativeRole": "matched M2-clean versus M3-fact intervention",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {"action":"rewrite","sourceElementIds":["sh/eh4jil4r","sh/cb2tkvap","sh/ydkbm5sv","sh/zedcfa9g","sh/kzmdova1","sh/l0vuh0rm","sh/eh0ba1sr","sh/baxkjqlk","sh/a9ojq5kz","sh/xcz2l03q","sh/cbq1sv25","sh/n6x0fqlo","sh/25ojml43","sh/o761ov2t","sh/f2d0b6lc"]}
+      ]
+    },
+    {
+      "outputSlide": 10,
+      "sourceSlide": 4,
+      "narrativeRole": "execution and integrity ledger",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {"action":"rewrite","sourceElementIds":["sh/p0batw72","sh/1cj2d8b6","sh/0ba143al","sh/rm1k7yt4","sh/ql8jytsj","sh/sna103ap","sh/3ihk3et8","sh/ih8ju9sn","sh/5cva1cfq","sh/i94r6xgz","sh/jadsz2xk","sh/a5kr2xg3","sh/g36tgryd","sh/h4fa9wfy"]}
+      ]
+    },
+    {
+      "outputSlide": 11,
+      "sourceSlide": 7,
+      "narrativeRole": "pre-adaptation M1 bilingual baseline",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {"action":"rewrite","sourceElementIds":["sh/eh4jil4r","sh/cb2tkvap","sh/ydkbm5sv","sh/zedcfa9g","sh/kzmdova1","sh/l0vuh0rm","sh/eh0ba1sr","sh/baxkjqlk","sh/a9ojq5kz","sh/xcz2l03q","sh/cbq1sv25","sh/n6x0fqlo","sh/25ojml43","sh/o761ov2t","sh/f2d0b6lc"]}
+      ]
+    },
+    {
+      "outputSlide": 12,
+      "sourceSlide": 9,
+      "narrativeRole": "M1 M2 M3 TR-to-EN result chart",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {"action":"rewrite","sourceElementIds":["sh/do3id4fy","sh/1cfmhgne","sh/mdonql4z","sh/9gzml0nq","sh/bih4na5w","sh/ah8nu54b","sh/oza1gfyh","sh/p0ji9kf2","sh/3y107axw","sh/cnu1kzyd","ch/upw7q1kz"]}
+      ]
+    },
+    {
+      "outputSlide": 13,
+      "sourceSlide": 8,
+      "narrativeRole": "two-seed primary causal interaction",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {"action":"rewrite","sourceElementIds":["sh/lgbepgvm","sh/18byd4zy","sh/g72x4zyd","sh/6h0fypgb","sh/tkby9kzm","sh/sjix0zy1","sh/je9g3ahk","sh/o7ydoret","sh/98rehwve","sh/m5gvmhwn","sh/0jydkreh","sh/1k7edwv2","sh/zipwbmdc","sh/kfixwbe1"]}
+      ]
+    },
+    {
+      "outputSlide": 14,
+      "sourceSlide": 10,
+      "narrativeRole": "scientific interpretation summary",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {"action":"rewrite","sourceElementIds":["sh/q5gb21kb","sh/xc3mho32","sh/cbu58j2h","sh/zelojyl8","sh/ydcnatkn","sh/l036l83y","sh/kzu5c32t","sh/725onyl4","sh/s7yt4b21","sh/d87uxg3m"]}
+      ]
+    },
+    {
+      "outputSlide": 15,
+      "sourceSlide": 5,
+      "narrativeRole": "remaining thesis work and decision boundary",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {"action":"rewrite","sourceElementIds":["sh/i54fmlc7","sh/dgbulwnm","sh/z2tcnm5s","sh/yhkbe1o7","sh/l4bupwny","sh/n6dcr65o","sh/m5kbi1oj","sh/w32dkbuh","sh/x4vedgvm","sh/ahkvi1cb","sh/k7mxovud","sh/58vehgvy"]}
+      ]
+    }
+  ],
+  "omittedSourceSlides": [
+    {"sourceSlide":1,"reason":"reused as the output title slide"},
+    {"sourceSlide":2,"reason":"reused for causal design"},
+    {"sourceSlide":3,"reason":"reused for probe evolution"},
+    {"sourceSlide":4,"reason":"reused for execution ledger"},
+    {"sourceSlide":5,"reason":"reused for remaining work"},
+    {"sourceSlide":6,"reason":"reused for pre-M2 contract"},
+    {"sourceSlide":7,"reason":"reused for intervention and baseline comparisons"},
+    {"sourceSlide":8,"reason":"reused for SmolLM, Qwen, and seed interaction evidence"},
+    {"sourceSlide":9,"reason":"reused for both quantitative charts"},
+    {"sourceSlide":10,"reason":"reused for progress and interpretation syntheses"}
+  ]
+}

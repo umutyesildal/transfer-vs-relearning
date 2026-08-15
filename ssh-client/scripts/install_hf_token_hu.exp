@@ -1,0 +1,80 @@
+#!/usr/bin/expect -f
+
+set timeout 120
+set script_dir [file dirname [file normalize [info script]]]
+set root_dir [file dirname $script_dir]
+set env_path [file join $root_dir ".env"]
+
+set username "yesildau"
+set password ""
+set hf_token ""
+set fh [open $env_path r]
+while {[gets $fh line] >= 0} {
+    set line [string trim $line]
+    if {[regexp {^(username|password|hf_access|HF_ACCESS|HF_ACCESS_TOKEN|HF_TOKEN|HUGGINGFACE_TOKEN|huggingface_token|hf-access)\s*[:=]\s*(.*)$} $line -> key value]} {
+        set value [string trim $value "\",\' \r\n\t"]
+        if {$key eq "username"} {
+            set username $value
+        } elseif {$key eq "password"} {
+            set password $value
+        } else {
+            set hf_token $value
+        }
+    }
+}
+close $fh
+
+if {$password eq "" || $hf_token eq ""} {
+    puts stderr "Required SSH password or Hugging Face token is missing from .env"
+    exit 2
+}
+
+set remote_cmd {bash -lc 'set -euo pipefail; token_dir=/vol/tmp2/yesildau/m1_cross_family_screen_v1/cache/huggingface; umask 077; mkdir -p "$token_dir"; printf "__HF_TOKEN_READY__\n"; IFS= read -r token; test -n "$token"; printf "%s" "$token" > "$token_dir/token"; chmod 600 "$token_dir/token"; test -s "$token_dir/token"; printf "__HF_TOKEN_INSTALLED__\n"'}
+
+log_user 1
+spawn ssh \
+    -o PreferredAuthentications=keyboard-interactive,password \
+    -o PubkeyAuthentication=no \
+    -o NumberOfPasswordPrompts=1 \
+    -o StrictHostKeyChecking=accept-new \
+    "$username@gruenau10.informatik.hu-berlin.de" \
+    $remote_cmd
+
+expect {
+    -re "(?i)are you sure you want to continue connecting" {
+        send -- "yes\r"
+        exp_continue
+    }
+    -re "(?i)password:" {
+        send -- "$password\r"
+        exp_continue
+    }
+    "__HF_TOKEN_READY__" {
+        log_user 0
+        send -- "$hf_token\n"
+        expect {
+            "__HF_TOKEN_INSTALLED__" {
+                log_user 1
+                puts "__HF_TOKEN_INSTALL_STATUS__=PASS"
+                exp_continue
+            }
+            timeout {
+                log_user 1
+                puts stderr "Timed out while installing Hugging Face token"
+                exit 124
+            }
+        }
+    }
+    -re "(?i)permission denied" {
+        puts stderr "SSH permission denied"
+        exit 1
+    }
+    timeout {
+        puts stderr "SSH timed out"
+        exit 124
+    }
+    eof {
+        catch wait result
+        exit [lindex $result 3]
+    }
+}

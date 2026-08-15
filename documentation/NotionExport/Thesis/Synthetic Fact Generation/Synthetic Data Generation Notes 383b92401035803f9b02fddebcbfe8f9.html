@@ -1,0 +1,796 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Synthetic Data Generation Notes</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="383b9240-1035-803f-9b02-fddebcbfe8f9" class="page sans"><header><h1 class="page-title" dir="auto">Synthetic Data Generation Notes</h1><p class="page-description" dir="auto"></p></header><div class="page-body"><h1 id="383b9240-1035-8019-b8d2-e8ded9848644" style="display:inline-block" dir="auto">Synthetic Fact Dataset: Design, Implementation, and Current Results</h1><h2 id="383b9240-1035-807d-82a3-d08a50d58298" style="display:inline-block" dir="auto">1. Objective</h2><p id="383b9240-1035-8023-8dc3-ff8e3c9045bf" class="" dir="auto">The goal of this dataset is to support a controlled experiment on cross-lingual factual knowledge transfer.</p><p id="383b9240-1035-8042-8dcd-cadc04cee67f" class="" dir="auto">The central question is whether factual knowledge that becomes retrievable in Turkish after Turkish adaptation was:</p><ul id="383b9240-1035-809e-9382-ebfd2d91fee7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">transferred from knowledge previously learned in English, or</li></ul><ul id="383b9240-1035-808e-ade3-f2c147e4f933" class="bulleted-list" dir="auto"><li style="list-style-type:disc">relearned from factual information appearing in the Turkish adaptation data.</li></ul><p id="383b9240-1035-800c-adcc-f7774681ed3f" class="" dir="auto">To study this question, we need facts whose source and exposure history are fully known. Real-world facts are not suitable for this purpose because the model may already have encountered them during its original pretraining.</p><p id="383b9240-1035-80f5-8c54-c9ea2cd2d914" class="" dir="auto">For this reason, we created a controlled synthetic biography dataset inspired by the bioS methodology.</p><p id="383b9240-1035-8071-806d-e7229a0de3ec" class="" dir="auto">The dataset uses synthetic subjects combined with controlled professions, cities, universities, and employers. The relationships between these subjects and objects are newly generated, even when some of the objects themselves are real-world entities.</p><hr id="383b9240-1035-80e6-9c71-e5640057221b" dir="auto"/><h2 id="383b9240-1035-80e7-9529-e5f16cf7bce8" style="display:inline-block" dir="auto">2. General Dataset Structure</h2><p id="383b9240-1035-8078-81d8-d89e79bf44e7" class="" dir="auto">The first full dataset contains:</p><ul id="383b9240-1035-8050-b3a2-f8d06e316c02" class="bulleted-list" dir="auto"><li style="list-style-type:disc">5,000 unique synthetic subjects</li></ul><ul id="383b9240-1035-8006-9d9a-f022971cd9ae" class="bulleted-list" dir="auto"><li style="list-style-type:disc">4 factual relations per subject</li></ul><ul id="383b9240-1035-806d-8620-e4a18f4b0040" class="bulleted-list" dir="auto"><li style="list-style-type:disc">20,000 factual relations in total</li></ul><p id="383b9240-1035-80cb-84e1-ec0bb42dcf84" class="" dir="auto">The four relations are:</p><ol type="1" id="383b9240-1035-80c2-976e-e43519701bfd" class="numbered-list" start="1" dir="auto"><li><code>profession</code></li></ol><ol type="1" id="383b9240-1035-800d-adaa-cd8cc964af24" class="numbered-list" start="2" dir="auto"><li><code>born_in</code></li></ol><ol type="1" id="383b9240-1035-80fb-a9b3-edba1ed0666d" class="numbered-list" start="3" dir="auto"><li><code>studied_at</code></li></ol><ol type="1" id="383b9240-1035-805d-a831-ec92d0eea402" class="numbered-list" start="4" dir="auto"><li><code>works_at</code></li></ol><p id="383b9240-1035-8008-a364-c013c4b35d2c" class="" dir="auto">An example subject profile is:</p><ul id="383b9240-1035-80a3-a5d4-c4a73ce4921f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Leran Dovik is a teacher.</li></ul><ul id="383b9240-1035-8004-a50f-fc66a9d55dda" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Leran Dovik was born in Bristol.</li></ul><ul id="383b9240-1035-8082-b3f2-ec13d7563778" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Leran Dovik studied at Northbridge University.</li></ul><ul id="383b9240-1035-80e4-a48d-e4a250c452f3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Leran Dovik works at Marston College.</li></ul><p id="383b9240-1035-80f1-8b42-f61dd4b6b39e" class="" dir="auto">Each subject is stored as one row in a canonical CSV file. The generation pipeline then expands each subject profile into four separate factual records.</p><p id="383b9240-1035-8056-b006-e5040333241c" class="" dir="auto">This one-row-per-subject structure keeps all subject-level metadata in one place and simplifies dataset management.</p><hr id="383b9240-1035-80d6-8073-ff41f133a755" dir="auto"/><h2 id="383b9240-1035-8058-a58f-c067be592114" style="display:inline-block" dir="auto">3. Canonical Subject-Profile Table</h2><p id="383b9240-1035-80c8-b62c-c0f42f983750" class="" dir="auto">The canonical CSV contains the following information:</p><ul id="383b9240-1035-8064-9c84-cef472a7f371" class="bulleted-list" dir="auto"><li style="list-style-type:disc">a unique row identifier</li></ul><ul id="383b9240-1035-8062-9338-ef5e58501bae" class="bulleted-list" dir="auto"><li style="list-style-type:disc">a unique subject identifier</li></ul><ul id="383b9240-1035-8018-a371-d73bfb452793" class="bulleted-list" dir="auto"><li style="list-style-type:disc">the synthetic full name</li></ul><ul id="383b9240-1035-8033-b4c6-dd3a362bff76" class="bulleted-list" dir="auto"><li style="list-style-type:disc">English and Turkish values for all four relations</li></ul><ul id="383b9240-1035-80ea-93c5-c8bff3ee9ea7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">name-language type</li></ul><ul id="383b9240-1035-8038-9d97-c32eaad73bae" class="bulleted-list" dir="auto"><li style="list-style-type:disc">name-rarity category</li></ul><ul id="383b9240-1035-800c-a66c-c18d6723ebb0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subject popularity rank</li></ul><ul id="383b9240-1035-80a6-a86c-e5b7deb57c41" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subject popularity category</li></ul><ul id="383b9240-1035-8004-9499-f60fc6c2e589" class="bulleted-list" dir="auto"><li style="list-style-type:disc">relation-specific frequency categories</li></ul><ul id="383b9240-1035-8052-9393-e8cf59825867" class="bulleted-list" dir="auto"><li style="list-style-type:disc">experimental branch assignment</li></ul><p id="383b9240-1035-80bc-9aa6-db1c9b637a0e" class="" dir="auto">The main columns are:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="383b9240-1035-8041-a3f0-d170d0068564" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">row_id
+subject_id
+subject
+profession_en
+profession_tr
+birthplace_en
+birthplace_tr
+university_en
+university_tr
+employer_en
+employer_tr
+name_type
+name_rarity_bucket
+popularity_rank
+popularity_bucket
+profession_frequency_bucket
+birthplace_frequency_bucket
+university_frequency_bucket
+employer_frequency_bucket
+branch_group</code></pre><p id="383b9240-1035-803b-b680-ecb12b88ac1a" class="" dir="auto">Internally, every subject is expanded into four deterministic fact IDs:</p><pre id="383b9240-1035-808a-9a90-dd618736c768" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">S00001_profession
+S00001_born_in
+S00001_studied_at
+S00001_works_at</code></pre><p id="383b9240-1035-805b-afa2-c4c0d5c74e4d" class="" dir="auto">This makes every fact traceable across the canonical table, training data, repetition data, and probing files.</p><hr id="383b9240-1035-802e-850d-cefb075644fb" dir="auto"/><h2 id="383b9240-1035-80b1-8bdb-daba100f42ff" style="display:inline-block" dir="auto">4. Source Data</h2><p id="383b9240-1035-8081-a0a4-c6d01264e586" class="" dir="auto">The profiles are generated from manually prepared single-line source lists.</p><p id="383b9240-1035-80d9-98a5-f00fb727409e" class="" dir="auto">The source files contain:</p><ul id="383b9240-1035-803c-9bf9-e2ead58c61d5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">English first names</li></ul><ul id="383b9240-1035-8071-b974-fbf6f3c61a40" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Turkish first names</li></ul><ul id="383b9240-1035-80a0-9a64-e2738b64e1e4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">English surnames</li></ul><ul id="383b9240-1035-8068-947c-c73350e0f967" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Turkish surnames</li></ul><ul id="383b9240-1035-8040-99b3-e5e218015be2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">English cities</li></ul><ul id="383b9240-1035-8098-99ea-dbec89eb23f1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Turkish cities</li></ul><ul id="383b9240-1035-8016-b15c-eca61c311f3f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">English companies</li></ul><ul id="383b9240-1035-809e-a789-c26b44cbcbd6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Turkish companies</li></ul><ul id="383b9240-1035-80e5-a702-dc0f774baa33" class="bulleted-list" dir="auto"><li style="list-style-type:disc">English universities</li></ul><ul id="383b9240-1035-8081-980c-f54ccc7f8ac4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Turkish universities</li></ul><ul id="383b9240-1035-805a-8cda-d47e3f5c5ffd" class="bulleted-list" dir="auto"><li style="list-style-type:disc">aligned English and Turkish profession lists</li></ul><p id="383b9240-1035-8040-9258-fc6b41b1dd7a" class="" dir="auto">The profession lists also contain popularity scores.</p><p id="383b9240-1035-80d9-bbd7-c6a9e36d4f1a" class="" dir="auto">An example profession entry is:</p><pre id="383b9240-1035-80cf-a6aa-d644dafbe3b8" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Footballer — 100
+Actor — 99
+Warehouse worker — 29
+Cleaner — 20</code></pre><p id="383b9240-1035-80ff-aa01-e739c74c4c5c" class="" dir="auto">The English and Turkish profession files are aligned by line position. This ensures that every English profession has the correct Turkish equivalent and the same popularity score.</p><p id="383b9240-1035-807b-9bce-c64f1e251366" class="" dir="auto">Before dataset generation, all source files are validated.</p><p id="383b9240-1035-806a-b6fc-ce21d6b41db7" class="" dir="auto">The validation process:</p><ul id="383b9240-1035-805e-93e5-cebee282ce9c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">removes empty lines</li></ul><ul id="383b9240-1035-805b-9528-e26465a8290c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">removes exact duplicates</li></ul><ul id="383b9240-1035-80f3-959e-ef4fc5919c6d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">checks required files</li></ul><ul id="383b9240-1035-805f-b4ac-fe6257b78667" class="bulleted-list" dir="auto"><li style="list-style-type:disc">validates profession scores</li></ul><ul id="383b9240-1035-80ff-8f2d-ca16c99b9097" class="bulleted-list" dir="auto"><li style="list-style-type:disc">verifies English–Turkish profession alignment</li></ul><ul id="383b9240-1035-80d6-a350-d6a6f4abd00d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">reports the cleaned size of every source list</li></ul><p id="383b9240-1035-80c1-890c-e9beeb15778a" class="" dir="auto">For example, many Turkish first-name and surname entries were duplicates or multi-component entries. These were removed before subject generation.</p><hr id="383b9240-1035-80bd-b9f6-c2480584fab9" dir="auto"/><h2 id="383b9240-1035-8004-93ff-fa516fabdfd7" style="display:inline-block" dir="auto">5. Synthetic Name Generation</h2><p id="383b9240-1035-80ca-a2e2-cadc7884a136" class="" dir="auto">The dataset contains:</p><ul id="383b9240-1035-80b9-9c9b-fd83b0e375df" class="bulleted-list" dir="auto"><li style="list-style-type:disc">2,500 English-like names</li></ul><ul id="383b9240-1035-804a-af6f-fd00e6908ce2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">2,500 Turkish-like names</li></ul><p id="383b9240-1035-80ac-abaf-f80e8589f88e" class="" dir="auto">Each subject name consists of exactly:</p><ul id="383b9240-1035-8075-9017-d99bb20c97c1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">one first name</li></ul><ul id="383b9240-1035-8017-9c26-c8079431dc9a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">one surname</li></ul><p id="383b9240-1035-804b-8006-ce2173b3b78e" class="" dir="auto">English-like names are generated only from English first-name and surname pools.</p><p id="383b9240-1035-8029-9633-c0c8921ba0e9" class="" dir="auto">Turkish-like names are generated only from Turkish first-name and surname pools.</p><p id="383b9240-1035-8028-97f3-f978fd8c7ffc" class="" dir="auto">The two component types are not mixed.</p><p id="383b9240-1035-8081-942f-e8ec533147af" class="" dir="auto">This prevents combinations such as an English first name with a Turkish surname and keeps the linguistic name categories controlled.</p><p id="383b9240-1035-808b-8884-d81682ec7d29" class="" dir="auto">All names are normalized to natural casing.</p><p id="383b9240-1035-80b3-ad2f-d350ecd39a59" class="" dir="auto">For example:</p><pre id="383b9240-1035-8058-87fe-f98b63dbe09c" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">LEONTYNE BUCK → Leontyne Buck
+ÖMER ÜZÜM → Ömer Üzüm</code></pre><p id="383b9240-1035-8053-8326-e0b0ed8d1c34" class="" dir="auto">Turkish characters are preserved.</p><p id="383b9240-1035-806c-ac62-c28793750257" class="" dir="auto">All 5,000 full-name combinations are unique.</p><hr id="383b9240-1035-808c-b1b1-d5dfc6a6aecb" dir="auto"/><h2 id="383b9240-1035-8052-8fd0-fff16e283a35" style="display:inline-block" dir="auto">6. Name Rarity</h2><p id="383b9240-1035-807c-afe4-fd010fec3fff" class="" dir="auto">The source lists are treated as approximate frequency-ranked lists. Earlier entries are assumed to be more common, while later entries are treated as less common.</p><p id="383b9240-1035-80b8-a909-f09c61527fa9" class="" dir="auto">Using the relative position of the first name and surname in their source lists, each full name receives a rarity category:</p><ul id="383b9240-1035-8034-8183-ff0a2cc98875" class="bulleted-list" dir="auto"><li style="list-style-type:disc">common</li></ul><ul id="383b9240-1035-8026-b6f9-fad6bb4dcafa" class="bulleted-list" dir="auto"><li style="list-style-type:disc">medium</li></ul><ul id="383b9240-1035-8090-9bee-cab81bfd001b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">rare</li></ul><p id="383b9240-1035-8076-9001-ea5865f0b40d" class="" dir="auto">The final distribution is:</p><ul id="383b9240-1035-8083-aaab-c515fcfdc28d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">2,000 common names</li></ul><ul id="383b9240-1035-80e9-b311-d4ad59dad6f1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">1,750 medium-rarity names</li></ul><ul id="383b9240-1035-8040-a7f8-da02bcc4317c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">1,250 rare names</li></ul><p id="383b9240-1035-8042-9e31-f3987b216dd1" class="" dir="auto">This allows us to test whether facts connected to more distinctive or rarer names are learned or transferred differently from facts connected to common names.</p><p id="383b9240-1035-800e-aa72-daaa8df79383" class="" dir="auto">The rarity distribution is controlled independently of:</p><ul id="383b9240-1035-80b9-bc0e-fd9667175f54" class="bulleted-list" dir="auto"><li style="list-style-type:disc">name type</li></ul><ul id="383b9240-1035-80b1-ae82-c2eef3e3904f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">experimental branch</li></ul><ul id="383b9240-1035-8033-a258-f57681016e68" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subject popularity</li></ul><hr id="383b9240-1035-80fa-a1c1-c0ba9714ec93" dir="auto"/><h2 id="383b9240-1035-80a9-ae24-c0dd0c9fefc6" style="display:inline-block" dir="auto">7. Subject Popularity</h2><p id="383b9240-1035-80db-bb04-d5fa5a089458" class="" dir="auto">Every synthetic subject receives a popularity score and rank.</p><p id="383b9240-1035-8071-b000-f57b953dfe24" class="" dir="auto">Profession popularity is used as the main signal because highly visible professions, such as football players, actors, and singers, are generally associated with more public textual exposure than less visible professions.</p><p id="383b9240-1035-80c2-afd5-fa2566fde45a" class="" dir="auto">However, profession popularity does not fully determine subject popularity.</p><p id="383b9240-1035-8012-acc3-ea5ad29c824f" class="" dir="auto">The score is generated using:</p><pre id="383b9240-1035-80c0-87c0-ff903eb22bc3" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">fame score =
+0.75 × profession popularity
++
+0.25 × deterministic random component</code></pre><p id="383b9240-1035-8036-8fc7-dc75e8307603" class="" dir="auto">The random component prevents all people with the same profession from receiving the same popularity.</p><p id="383b9240-1035-80bc-b65b-c76343f440f3" class="" dir="auto">The 5,000 subjects are ranked from most popular to least popular.</p><p id="383b9240-1035-8016-ae07-ffc70136bbf1" class="" dir="auto">The final distribution is:</p><ul id="383b9240-1035-80dd-aa62-f34fc150e6a5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">top 10%: high popularity — 500 subjects</li></ul><ul id="383b9240-1035-80be-8d9d-c758f839419b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">next 30%: medium popularity — 1,500 subjects</li></ul><ul id="383b9240-1035-807b-9ef5-e5abff4d9f76" class="bulleted-list" dir="auto"><li style="list-style-type:disc">bottom 60%: low popularity — 3,000 subjects</li></ul><p id="383b9240-1035-8018-bf8e-c851d233ee90" class="" dir="auto">This produces more low-popularity subjects than high-popularity subjects, reflecting a more realistic long-tail distribution.</p><hr id="383b9240-1035-807a-907b-f81f4df6714b" dir="auto"/><h2 id="383b9240-1035-80f6-a749-e5ed194b74a3" style="display:inline-block" dir="auto">8. Geographic Profile Design</h2><p id="383b9240-1035-80b8-a5d6-cb72d0ae05b6" class="" dir="auto">Initially, birthplace, university, and employer were assigned independently. This produced profiles that were technically possible but often lacked geographic coherence.</p><p id="383b9240-1035-805c-a7e2-e74338f20793" class="" dir="auto">For example, a person could be born in one country, study in another, and work in a third without any controlled reason.</p><p id="383b9240-1035-80b3-9c42-e54ef016cec1" class="" dir="auto">To improve this, the dataset now uses six explicit geographic profile patterns:</p><ol type="1" id="383b9240-1035-8057-ba4e-c560480dbb65" class="numbered-list" start="1" dir="auto"><li>English-region domestic</li></ol><ol type="1" id="383b9240-1035-808e-924d-ca65d05bbe24" class="numbered-list" start="2" dir="auto"><li>Turkish-region domestic</li></ol><ol type="1" id="383b9240-1035-80a8-b00b-f01d024a5d85" class="numbered-list" start="3" dir="auto"><li>English-region subject studying in the Turkish region</li></ol><ol type="1" id="383b9240-1035-80c8-98f2-d8992097cfd1" class="numbered-list" start="4" dir="auto"><li>Turkish-region subject studying in the English region</li></ol><ol type="1" id="383b9240-1035-80be-a65e-e72ee7b56110" class="numbered-list" start="5" dir="auto"><li>English-region subject working in the Turkish region</li></ol><ol type="1" id="383b9240-1035-8026-96ad-d2ee28e214b6" class="numbered-list" start="6" dir="auto"><li>Turkish-region subject working in the English region</li></ol><p id="383b9240-1035-80bb-bd8f-ea38b5a90bb4" class="" dir="auto">The distribution is:</p><ul id="383b9240-1035-8023-9dc8-f432b7af0376" class="bulleted-list" dir="auto"><li style="list-style-type:disc">1,750 English domestic profiles</li></ul><ul id="383b9240-1035-80fb-bc29-c163448b6843" class="bulleted-list" dir="auto"><li style="list-style-type:disc">1,750 Turkish domestic profiles</li></ul><ul id="383b9240-1035-8042-a730-c3263ee3440a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">375 English-region profiles with Turkish-region education</li></ul><ul id="383b9240-1035-8050-8149-db4b9aa82068" class="bulleted-list" dir="auto"><li style="list-style-type:disc">375 Turkish-region profiles with English-region education</li></ul><ul id="383b9240-1035-8011-9f2e-e5fb033b16af" class="bulleted-list" dir="auto"><li style="list-style-type:disc">375 English-region profiles with Turkish-region employment</li></ul><ul id="383b9240-1035-80e4-a26e-df3819a11d92" class="bulleted-list" dir="auto"><li style="list-style-type:disc">375 Turkish-region profiles with English-region employment</li></ul><p id="383b9240-1035-8028-9d4c-cf0c6b8a9554" class="" dir="auto">This creates mostly coherent domestic profiles while still including controlled study-abroad and work-abroad cases.</p><h3 id="383b9240-1035-8013-8b6a-f5ac698040df" style="display:inline-block" dir="auto">Name type remains independent</h3><p id="383b9240-1035-804d-983f-e8f8a85cd6ea" class="" dir="auto">A Turkish-like name is not automatically assigned to a Turkish-region profile.</p><p id="383b9240-1035-80eb-bcce-cf324922ea8b" class="" dir="auto">Similarly, an English-like name is not automatically assigned to an English-region profile.</p><p id="383b9240-1035-8019-990a-c2f43daeec6a" class="" dir="auto">This is important because otherwise name type and biography region would become correlated.</p><p id="383b9240-1035-80e7-822d-de22ce88e95b" class="" dir="auto">If all Turkish-like names had Turkish cities, universities, and employers, it would be impossible to determine whether an observed effect came from:</p><ul id="383b9240-1035-808c-a676-e0e3cf725b44" class="bulleted-list" dir="auto"><li style="list-style-type:disc">the linguistic form of the name, or</li></ul><ul id="383b9240-1035-80f5-9c69-d129cf4b65e5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">the broader Turkish context of the profile.</li></ul><p id="383b9240-1035-8030-94d7-cb2f27e47655" class="" dir="auto">Therefore, English-like and Turkish-like names are distributed across all geographic profile patterns.</p><hr id="383b9240-1035-8040-8659-d60aad77d9cf" dir="auto"/><h2 id="383b9240-1035-80fa-9d44-ddd563320c69" style="display:inline-block" dir="auto">9. Object Assignment</h2><p id="383b9240-1035-80b2-871d-d67e02b5aeb9" class="" dir="auto">Objects may be shared across many subjects.</p><p id="383b9240-1035-80d0-a5d2-f3d33492f788" class="" dir="auto">For example, multiple subjects may have:</p><ul id="383b9240-1035-8060-8227-f7f6697acaeb" class="bulleted-list" dir="auto"><li style="list-style-type:disc">the same profession</li></ul><ul id="383b9240-1035-8048-8126-f98c19c87b51" class="bulleted-list" dir="auto"><li style="list-style-type:disc">the same birthplace</li></ul><ul id="383b9240-1035-80ca-8913-cc4f5209778e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">the same university</li></ul><ul id="383b9240-1035-80b1-bec4-da5bf0990e85" class="bulleted-list" dir="auto"><li style="list-style-type:disc">the same employer</li></ul><p id="383b9240-1035-8003-ac28-d083b8cbc28f" class="" dir="auto">Only the subject and the subject–relation association are unique.</p><p id="383b9240-1035-80b3-b1c2-c533e54a1b55" class="" dir="auto">This is intentional.</p><p id="383b9240-1035-8088-a6fc-c210f1fd9442" class="" dir="auto">The model may already know objects such as London, İstanbul, Microsoft, or a profession such as teacher. However, it cannot already know the newly generated relationship:</p><pre id="383b9240-1035-80e1-a37b-e313c1de4ffb" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Synthetic subject → real object</code></pre><p id="383b9240-1035-80f5-91ce-c015bed9003a" class="" dir="auto">For example:</p><pre id="383b9240-1035-8088-b3a6-e872bba6f8d9" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Leran Dovik → born_in → London</code></pre><p id="383b9240-1035-802c-8c6a-e45ff2958b82" class="" dir="auto">is still a new synthetic fact even if the model already knows the city of London.</p><p id="383b9240-1035-80e1-8ade-ea1c776d82d2" class="" dir="auto">Objects are assigned independently of name type to avoid unwanted shortcuts.</p><hr id="383b9240-1035-8087-936d-d594f5312894" dir="auto"/><h2 id="383b9240-1035-8085-9d28-e79d8f78b38d" style="display:inline-block" dir="auto">10. Relation-Specific Frequency</h2><p id="383b9240-1035-80a0-93a5-c66d8b23f8cc" class="" dir="auto">Every relation receives its own frequency category:</p><ul id="383b9240-1035-80d5-b664-d84a5af003ab" class="bulleted-list" dir="auto"><li style="list-style-type:disc">low</li></ul><ul id="383b9240-1035-80d3-b3a1-e96d4e89780c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">medium</li></ul><ul id="383b9240-1035-8045-8c05-dd3dff7a80ef" class="bulleted-list" dir="auto"><li style="list-style-type:disc">high</li></ul><p id="383b9240-1035-8072-87f1-fecbaa1a2cc1" class="" dir="auto">The current exposure mapping is:</p><ul id="383b9240-1035-80c3-983f-c37571078cf8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">low: 3 training exposures</li></ul><ul id="383b9240-1035-804a-a000-d73e7bdcd93c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">medium: 8 training exposures</li></ul><ul id="383b9240-1035-80fc-83aa-f1e02c2281ad" class="bulleted-list" dir="auto"><li style="list-style-type:disc">high: 15 training exposures</li></ul><p id="383b9240-1035-80f4-8ee3-d4ccbe9bf6da" class="" dir="auto">Frequency is relation-specific.</p><p id="383b9240-1035-809f-82d8-dfafc08ec567" class="" dir="auto">For example, one person may have:</p><ul id="383b9240-1035-80db-89e2-fabfe68dfaec" class="bulleted-list" dir="auto"><li style="list-style-type:disc">profession: high</li></ul><ul id="383b9240-1035-8049-ab6f-fecfa5d305a7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">employer: high</li></ul><ul id="383b9240-1035-80c9-bfab-fbfdf6c5a3d4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">birthplace: medium</li></ul><ul id="383b9240-1035-803f-be2b-c2c9e46bd8c8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">university: low</li></ul><p id="383b9240-1035-8067-b629-da9fd0ac31ba" class="" dir="auto">This reflects the idea that different facts about the same person do not appear equally often in text.</p><p id="383b9240-1035-807b-83c8-d07fdc964800" class="" dir="auto">A famous football player’s profession and club may appear frequently, while the person’s birthplace or university may appear less often.</p><p id="383b9240-1035-801c-8200-f168c582e4c8" class="" dir="auto">The final dataset contains substantially more low-frequency facts than high-frequency facts:</p><ul id="383b9240-1035-8095-ac6b-cba781795b3d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">high-frequency facts: 689</li></ul><ul id="383b9240-1035-80b9-810a-f0b2f6476c41" class="bulleted-list" dir="auto"><li style="list-style-type:disc">medium-frequency facts: 3,799</li></ul><ul id="383b9240-1035-80fd-9ad3-e5de47c6b260" class="bulleted-list" dir="auto"><li style="list-style-type:disc">low-frequency facts: 15,512</li></ul><p id="383b9240-1035-80df-b54a-ce99f42c13da" class="" dir="auto">This distribution follows the intended long-tail structure.</p><p id="383b9240-1035-8025-85ed-e98f1638b400" class="" dir="auto">The generated English training data currently contains:</p><ul id="383b9240-1035-80ae-a5c5-db45a3256910" class="bulleted-list" dir="auto"><li style="list-style-type:disc">86,669 training records</li></ul><ul id="383b9240-1035-80d8-a3fb-dd09cf265856" class="bulleted-list" dir="auto"><li style="list-style-type:disc">20,000 unique facts</li></ul><p id="383b9240-1035-8044-8186-c265fe646502" class="" dir="auto">The number of records is larger than the fact count because facts are expressed multiple times according to their frequency category.</p><hr id="383b9240-1035-80a4-83b5-e08492c7c2f3" dir="auto"/><h2 id="383b9240-1035-8019-84dc-e5a43bb7a2a8" style="display:inline-block" dir="auto">11. Multi-Template Generation</h2><p id="383b9240-1035-8015-8d09-d9779d02256d" class="" dir="auto">The dataset uses a multi-template approach inspired by multiM.</p><p id="383b9240-1035-8022-ad6c-f3e4f983e907" class="" dir="auto">Each relation has:</p><ul id="383b9240-1035-80c0-b42c-ce9ea3fdf90e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">10 English training templates</li></ul><ul id="383b9240-1035-804d-9aa4-fa65df000a27" class="bulleted-list" dir="auto"><li style="list-style-type:disc">10 Turkish repetition templates</li></ul><ul id="383b9240-1035-80f9-97af-e57dc9d6c3d9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">at least 3 English probe templates</li></ul><ul id="383b9240-1035-80ea-a231-d801ef0faa75" class="bulleted-list" dir="auto"><li style="list-style-type:disc">at least 3 Turkish probe templates</li></ul><p id="383b9240-1035-80aa-a2a0-e5f6e9d3360f" class="" dir="auto">The purpose is to separate factual frequency from exact sentence repetition.</p><p id="383b9240-1035-80f6-a4b1-e62e855d6625" class="" dir="auto">For example, the fact:</p><pre id="383b9240-1035-808d-9b50-c745b045717d" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Corin Veylor → born_in → Telmora</code></pre><p id="383b9240-1035-80bc-912f-dbb27c615d09" class="" dir="auto">may be expressed as:</p><ul id="383b9240-1035-8051-ab68-e245eba6bf1a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Corin Veylor was born in Telmora.</li></ul><ul id="383b9240-1035-8013-a287-de26a81cb43e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">The birthplace of Corin Veylor is Telmora.</li></ul><ul id="383b9240-1035-800d-8d4a-caa5ec43cfd1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Telmora is the birthplace of Corin Veylor.</li></ul><ul id="383b9240-1035-8087-a9e1-df7d7383e662" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Corin Veylor&#x27;s place of birth is Telmora.</li></ul><p id="383b9240-1035-809c-9f7e-de56e165853e" class="" dir="auto">The fact remains the same, but its surface form changes.</p><p id="383b9240-1035-80f5-84d3-debc98938dcd" class="" dir="auto">This reduces the chance that the model only memorizes one exact sentence pattern.</p><p id="383b9240-1035-8010-9d90-dcdcddef9811" class="" dir="auto">The generator uses the fullname heuristic. Every sentence contains the complete subject name instead of pronouns such as he, she, or they.</p><p id="383b9240-1035-80c8-bf29-fb7d48657e0f" class="" dir="auto">This avoids coreference ambiguity and keeps every sentence directly connected to its canonical subject.</p><hr id="383b9240-1035-8018-a222-edd32b86046c" dir="auto"/><h2 id="383b9240-1035-8026-b7e5-e2c72eb69e1b" style="display:inline-block" dir="auto">12. Experimental Branches</h2><p id="383b9240-1035-8002-b5c9-ccac11df58ff" class="" dir="auto">The dataset contains two experimental branches.</p><h3 id="383b9240-1035-80b6-869d-cbf0e15fd84a" style="display:inline-block" dir="auto">Branch A: transfer condition</h3><p id="383b9240-1035-806d-a228-f64ea11ad67b" class="" dir="auto">For Branch A subjects:</p><ul id="383b9240-1035-8023-9cea-e3a83a52f964" class="bulleted-list" dir="auto"><li style="list-style-type:disc">all four facts appear in English training</li></ul><ul id="383b9240-1035-805d-8759-ca0d078d4968" class="bulleted-list" dir="auto"><li style="list-style-type:disc">none of the facts appear in Turkish repetition data</li></ul><p id="383b9240-1035-8079-b6ae-c2a6f4de9796" class="" dir="auto">This is the main transfer condition.</p><p id="383b9240-1035-800b-a929-d61c4e26cd2d" class="" dir="auto">If a Branch A fact becomes retrievable in Turkish after Turkish adaptation, the result cannot be explained by direct repetition of that fact in Turkish adaptation data.</p><h3 id="383b9240-1035-8058-8a97-df6cacf8f536" style="display:inline-block" dir="auto">Branch B: repetition condition</h3><p id="383b9240-1035-80bf-a3f3-fe9ebf624559" class="" dir="auto">For Branch B subjects:</p><ul id="383b9240-1035-80d5-97e8-e43d67adcb5e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">all four facts appear in English training</li></ul><ul id="383b9240-1035-8057-b318-c38e9f5ed4b9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">all four facts are repeated in Turkish adaptation data</li></ul><p id="383b9240-1035-8014-8cb1-c9a95d5c0f8b" class="" dir="auto">This condition represents Turkish-side reaffirmation or possible relearning.</p><p id="383b9240-1035-8025-b507-d581bf27493f" class="" dir="auto">The dataset contains:</p><ul id="383b9240-1035-8016-b95a-d986bdbabb89" class="bulleted-list" dir="auto"><li style="list-style-type:disc">2,500 Branch A subjects</li></ul><ul id="383b9240-1035-8066-b028-c8b78b343a2e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">2,500 Branch B subjects</li></ul><p id="383b9240-1035-8044-a0c1-e96e5c249900" class="" dir="auto">This produces:</p><ul id="383b9240-1035-80f8-bc92-f93b4fe395f8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">10,000 Branch A facts</li></ul><ul id="383b9240-1035-80d0-bcd5-e1d86b538a61" class="bulleted-list" dir="auto"><li style="list-style-type:disc">10,000 Branch B facts</li></ul><p id="383b9240-1035-8054-bb73-f92223d04bfd" class="" dir="auto">Branch assignment is subject-level rather than relation-level.</p><p id="383b9240-1035-801e-a495-ef6ecad7abb7" class="" dir="auto">This avoids partial leakage where one fact about a person is repeated in Turkish while another fact about the same person is intended to remain transfer-only.</p><p id="383b9240-1035-8086-9c75-c64bed5eb48f" class="" dir="auto">Branch assignment is stratified across:</p><ul id="383b9240-1035-8033-9d69-d0babef53299" class="bulleted-list" dir="auto"><li style="list-style-type:disc">name type</li></ul><ul id="383b9240-1035-80c9-b2ba-f3f360bfffe2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">name rarity</li></ul><ul id="383b9240-1035-80ae-86e9-e1eeb37d942e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">popularity</li></ul><ul id="383b9240-1035-801d-b447-c1cf78e27faa" class="bulleted-list" dir="auto"><li style="list-style-type:disc">profession popularity</li></ul><p id="383b9240-1035-806f-8800-e2f0c6715389" class="" dir="auto">This prevents the branch variable from becoming correlated with another dataset property.</p><hr id="383b9240-1035-801b-b715-ce56f1575766" dir="auto"/><h2 id="383b9240-1035-80f5-a293-e2b0c90e112a" style="display:inline-block" dir="auto">13. Probe Generation</h2><p id="383b9240-1035-80a7-b346-eac560daf04d" class="" dir="auto">Every fact receives:</p><ul id="383b9240-1035-801b-85ac-f50c6dacb2e3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">one English probe record</li></ul><ul id="383b9240-1035-8013-a841-c0c485c08828" class="bulleted-list" dir="auto"><li style="list-style-type:disc">one Turkish probe record</li></ul><p id="383b9240-1035-8069-ac8e-e1580b78834a" class="" dir="auto">The probe is generated from the same canonical fact table, but probe questions use templates that are different from the declarative training statements.</p><p id="383b9240-1035-80d1-adfe-e24741694919" class="" dir="auto">For example:</p><h3 id="383b9240-1035-805e-81b4-ecd0a2290c76" style="display:inline-block" dir="auto">Training sentence</h3><pre id="383b9240-1035-8053-8bbd-d160e46fed1b" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Leran Dovik works as a teacher.</code></pre><h3 id="383b9240-1035-8070-9aec-c2ab0031cb5c" style="display:inline-block" dir="auto">English probe</h3><pre id="383b9240-1035-8014-a13d-c7950ce79c73" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">What is Leran Dovik&#x27;s profession?</code></pre><h3 id="383b9240-1035-8062-8876-d6574c5acfe2" style="display:inline-block" dir="auto">Turkish probe</h3><pre id="383b9240-1035-80d1-9f83-d73641cd49c0" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Leran Dovik&#x27;in mesleği nedir?</code></pre><p id="383b9240-1035-80fc-92f2-e9635dc8b7a7" class="" dir="auto">The expected answer is taken directly from the canonical English or Turkish object.</p><p id="383b9240-1035-80cc-8d1c-fcee75079e86" class="" dir="auto">This design provides:</p><ul id="383b9240-1035-803e-94a3-cf61c4c72cd9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">20,000 English probes</li></ul><ul id="383b9240-1035-8098-9734-d864b9cf0576" class="bulleted-list" dir="auto"><li style="list-style-type:disc">20,000 Turkish probes</li></ul><p id="383b9240-1035-80c9-9905-fad0da4c0269" class="" dir="auto">The probes will allow us to compare factual retrieval:</p><ul id="383b9240-1035-80c7-ab44-d86d97b8f4b4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">in English before Turkish adaptation</li></ul><ul id="383b9240-1035-800b-baab-d029004c91b8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">in Turkish before Turkish adaptation</li></ul><ul id="383b9240-1035-806e-a018-c3701eee9454" class="bulleted-list" dir="auto"><li style="list-style-type:disc">in English after Turkish adaptation</li></ul><ul id="383b9240-1035-8052-8a3b-d5ce9e1e95c7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">in Turkish after Turkish adaptation</li></ul><ul id="383b9240-1035-807b-a15d-cab52fe5175e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">between transfer and repetition conditions</li></ul><hr id="383b9240-1035-80ce-af20-dfec4b6c31c6" dir="auto"/><h2 id="383b9240-1035-8049-b0e4-d7c5320a1bc8" style="display:inline-block" dir="auto">14. Generated Outputs</h2><p id="383b9240-1035-80d6-bcfe-c8e51b697dca" class="" dir="auto">The final generation pipeline creates four main files:</p><h3 id="383b9240-1035-8022-81a7-d453fecbdabc" style="display:inline-block" dir="auto">English acquisition data</h3><pre id="383b9240-1035-801a-9fb4-d1f0b055a5c4" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">english_training.jsonl</code></pre><p id="383b9240-1035-80a8-8017-f99b0b156f11" class="" dir="auto">This contains all 20,000 facts.</p><p id="383b9240-1035-8006-9fe1-c6f1b6570186" class="" dir="auto">Current size:</p><ul id="383b9240-1035-8082-9032-cb40b8904254" class="bulleted-list" dir="auto"><li style="list-style-type:disc">86,669 training records</li></ul><ul id="383b9240-1035-806e-a297-c9ffe8a5f415" class="bulleted-list" dir="auto"><li style="list-style-type:disc">20,000 unique facts</li></ul><h3 id="383b9240-1035-8013-9ec1-c020907b1414" style="display:inline-block" dir="auto">Turkish repetition data</h3><pre id="383b9240-1035-80df-9b5b-e0fb73f23f75" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">turkish_repetition.jsonl</code></pre><p id="383b9240-1035-8086-9343-ef1bc43e5962" class="" dir="auto">This contains only Branch B facts.</p><p id="383b9240-1035-8057-9f82-de62efdc12c0" class="" dir="auto">Current size:</p><ul id="383b9240-1035-8000-8c59-d9ea113c9e14" class="bulleted-list" dir="auto"><li style="list-style-type:disc">43,433 training records</li></ul><ul id="383b9240-1035-8048-9eec-e6453040e94e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">10,000 unique facts</li></ul><h3 id="383b9240-1035-803a-9abd-d921cafc833f" style="display:inline-block" dir="auto">English probing data</h3><pre id="383b9240-1035-807e-baf5-c62bc20d060f" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">probes_en.csv</code></pre><p id="383b9240-1035-808a-89cb-f0300a699041" class="" dir="auto">Current size:</p><ul id="383b9240-1035-80c1-9365-f781f8201d4d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">20,000 probe rows</li></ul><h3 id="383b9240-1035-807f-ae00-f22516cbb3c7" style="display:inline-block" dir="auto">Turkish probing data</h3><pre id="383b9240-1035-809f-b332-dcf872308fe7" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">probes_tr.csv</code></pre><p id="383b9240-1035-809f-affa-ffcd244be534" class="" dir="auto">Current size:</p><ul id="383b9240-1035-80b2-9e6d-edb63705787a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">20,000 probe rows</li></ul><p id="383b9240-1035-808d-b9a2-ef7925b6acbc" class="" dir="auto">All generated records preserve metadata such as:</p><ul id="383b9240-1035-8059-ba3b-fdabe02d6004" class="bulleted-list" dir="auto"><li style="list-style-type:disc">fact ID</li></ul><ul id="383b9240-1035-80c6-a4b9-ef8c94c1469d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subject ID</li></ul><ul id="383b9240-1035-8095-8d63-de2b9425f5dd" class="bulleted-list" dir="auto"><li style="list-style-type:disc">relation</li></ul><ul id="383b9240-1035-800e-9e0c-e05aa1a8df9a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">name type</li></ul><ul id="383b9240-1035-806f-aed9-ee23f32fc73f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">name rarity</li></ul><ul id="383b9240-1035-807c-a3b0-df6b2f222e10" class="bulleted-list" dir="auto"><li style="list-style-type:disc">popularity rank</li></ul><ul id="383b9240-1035-80a7-9a83-f57b43ff4a6f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">popularity bucket</li></ul><ul id="383b9240-1035-80ad-b3ef-d6dd35e57f15" class="bulleted-list" dir="auto"><li style="list-style-type:disc">frequency bucket</li></ul><ul id="383b9240-1035-804e-a608-e34c8b8aab70" class="bulleted-list" dir="auto"><li style="list-style-type:disc">branch</li></ul><ul id="383b9240-1035-806e-a37b-cb265cc5f5c7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">template ID</li></ul><p id="383b9240-1035-80a9-aed3-eb671827ee74" class="" dir="auto">This makes detailed subgroup analysis possible.</p><hr id="383b9240-1035-8093-8eb1-c458d925e687" dir="auto"/><h2 id="383b9240-1035-8029-a988-f9959e77bc6c" style="display:inline-block" dir="auto">15. Reproducibility and Validation</h2><p id="383b9240-1035-80b7-b6e4-cee47757630b" class="" dir="auto">The full generation process is deterministic.</p><p id="383b9240-1035-80e9-a57d-e20ab19e4303" class="" dir="auto">The default random seed is:</p><pre id="383b9240-1035-8044-b4ee-e50d5fea1ef2" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">42</code></pre><p id="383b9240-1035-8045-bf0b-d2963b7a2889" class="" dir="auto">Running the same pipeline with the same source files and configuration produces the same:</p><ul id="383b9240-1035-805e-8826-c4a338ba0958" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subjects</li></ul><ul id="383b9240-1035-80ed-88a2-c71a3c2d726b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">objects</li></ul><ul id="383b9240-1035-8005-a884-d1a45b302dcf" class="bulleted-list" dir="auto"><li style="list-style-type:disc">branches</li></ul><ul id="383b9240-1035-8025-a55b-c1524ac6b5e0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">ranks</li></ul><ul id="383b9240-1035-805b-a4a9-d25488bd8280" class="bulleted-list" dir="auto"><li style="list-style-type:disc">frequency categories</li></ul><ul id="383b9240-1035-8040-ab91-d324b3e2dc2e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">output files</li></ul><p id="383b9240-1035-80a6-a6f3-d9cf835b2fc0" class="" dir="auto">The implementation includes tests for:</p><ul id="383b9240-1035-8034-b557-dd9f4f78bf58" class="bulleted-list" dir="auto"><li style="list-style-type:disc">source-file parsing</li></ul><ul id="383b9240-1035-801d-a606-e276b266186e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">duplicate removal</li></ul><ul id="383b9240-1035-8067-9131-c3d6200fd558" class="bulleted-list" dir="auto"><li style="list-style-type:disc">profession alignment</li></ul><ul id="383b9240-1035-8036-8d68-cc76848a6329" class="bulleted-list" dir="auto"><li style="list-style-type:disc">name generation</li></ul><ul id="383b9240-1035-8044-8566-ea550a34558d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">full-name uniqueness</li></ul><ul id="383b9240-1035-808d-868a-cce6ca0ef925" class="bulleted-list" dir="auto"><li style="list-style-type:disc">casing normalization</li></ul><ul id="383b9240-1035-80a7-b356-fc3e97ea3356" class="bulleted-list" dir="auto"><li style="list-style-type:disc">rarity assignment</li></ul><ul id="383b9240-1035-80f8-b932-fb1c1697f0f9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">popularity ranking</li></ul><ul id="383b9240-1035-808f-b3f2-d5f2d7be6ea2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">branch balancing</li></ul><ul id="383b9240-1035-8049-a800-c4f885f0f0bf" class="bulleted-list" dir="auto"><li style="list-style-type:disc">geographic profile assignment</li></ul><ul id="383b9240-1035-8024-a53b-c77c1b8844f6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">fact expansion</li></ul><ul id="383b9240-1035-8076-b622-d543eb7ea8fb" class="bulleted-list" dir="auto"><li style="list-style-type:disc">output integrity</li></ul><p id="383b9240-1035-809e-849f-e7632dc386d4" class="" dir="auto">The current test suite contains:</p><ul id="383b9240-1035-8030-8e8a-d3eab0784fb3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">31 passing tests</li></ul><p id="383b9240-1035-80e9-a387-c68837539e35" class="" dir="auto">The final validations confirm:</p><ul id="383b9240-1035-8035-9abb-fd85a1701c7a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">5,000 unique subjects</li></ul><ul id="383b9240-1035-80d3-86f7-ffadab346478" class="bulleted-list" dir="auto"><li style="list-style-type:disc">20,000 unique facts</li></ul><ul id="383b9240-1035-8021-81c2-d462d7456fbb" class="bulleted-list" dir="auto"><li style="list-style-type:disc">2,500 English-like subjects</li></ul><ul id="383b9240-1035-80ce-8e65-d2c826492560" class="bulleted-list" dir="auto"><li style="list-style-type:disc">2,500 Turkish-like subjects</li></ul><ul id="383b9240-1035-80ea-9ef6-c0e185c5cd5f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">2,500 Branch A subjects</li></ul><ul id="383b9240-1035-80ef-aaab-c26bd5637916" class="bulleted-list" dir="auto"><li style="list-style-type:disc">2,500 Branch B subjects</li></ul><ul id="383b9240-1035-8012-8548-db8f3279ec11" class="bulleted-list" dir="auto"><li style="list-style-type:disc">20,000 English probes</li></ul><ul id="383b9240-1035-8063-944c-e4b17a1df34b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">20,000 Turkish probes</li></ul><ul id="383b9240-1035-8023-bed4-d8605c961652" class="bulleted-list" dir="auto"><li style="list-style-type:disc">no Branch A facts in Turkish repetition data</li></ul><hr id="383b9240-1035-8042-8959-e62be4d04c8f" dir="auto"/><h2 id="383b9240-1035-80f7-a26b-d934ad90adf9" style="display:inline-block" dir="auto">16. Current Limitation: Profession–Employer Compatibility</h2><p id="383b9240-1035-8041-b0e0-d9b6815b727d" class="" dir="auto">The main remaining data-quality issue concerns the relationship between professions and employers.</p><p id="383b9240-1035-801c-b426-f576387eec85" class="" dir="auto">The generator initially reported:</p><ul id="383b9240-1035-80d6-abf7-f60db4927b1c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">100% employer compatibility</li></ul><ul id="383b9240-1035-809d-bdcc-dd1f750e9b03" class="bulleted-list" dir="auto"><li style="list-style-type:disc">0% final fallback</li></ul><p id="383b9240-1035-80f6-b6d7-eb9e3c9e54eb" class="" dir="auto">However, this number includes 1,787 assignments that used a general-employer fallback.</p><p id="383b9240-1035-808a-b7ac-c6c2de77162a" class="" dir="auto">Therefore, the more informative breakdown is:</p><ul id="383b9240-1035-80fd-8079-fc9057a6e693" class="bulleted-list" dir="auto"><li style="list-style-type:disc">approximately 64% direct or category-based matches</li></ul><ul id="383b9240-1035-8035-bb0f-d45a900b2956" class="bulleted-list" dir="auto"><li style="list-style-type:disc">approximately 36% general-employer fallback</li></ul><ul id="383b9240-1035-80c0-b709-e3655b9796f0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">0% unassigned employers</li></ul><p id="383b9240-1035-8088-b35a-e5c0f8ad03d3" class="" dir="auto">This means every subject receives an employer, but not every profession–employer combination is equally natural.</p><p id="383b9240-1035-8092-a6c1-e6cd1a5b05a3" class="" dir="auto">Examples of potentially weak combinations include:</p><ul id="383b9240-1035-802b-a1f8-ecae3e7276ab" class="bulleted-list" dir="auto"><li style="list-style-type:disc">basketball player working at Boeing</li></ul><ul id="383b9240-1035-8053-9484-f30c5a908789" class="bulleted-list" dir="auto"><li style="list-style-type:disc">sports coach working at Goldman Sachs</li></ul><ul id="383b9240-1035-801d-9d00-e95cf222dcf5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">sewer worker working at Qualcomm</li></ul><ul id="383b9240-1035-808f-a56b-d893cf3d884f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">police officer working at Tesla</li></ul><p id="383b9240-1035-80e3-bf9c-f043658f6af9" class="" dir="auto">These facts are still technically usable as synthetic associations, but they reduce the naturalness of the biography profiles.</p><p id="383b9240-1035-801d-86c5-cb91b90cf83c" class="" dir="auto">The current company pools mainly contain large corporations. They do not contain enough:</p><ul id="383b9240-1035-80d6-ad0a-ea50bbcaa381" class="bulleted-list" dir="auto"><li style="list-style-type:disc">hospitals</li></ul><ul id="383b9240-1035-80c0-beb0-f5234112bb7d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">schools</li></ul><ul id="383b9240-1035-809a-9ca4-ebab050e9f11" class="bulleted-list" dir="auto"><li style="list-style-type:disc">sports clubs</li></ul><ul id="383b9240-1035-800b-9b06-cb464ef9f1b8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">public institutions</li></ul><ul id="383b9240-1035-802c-b4a7-e9fc040b1d46" class="bulleted-list" dir="auto"><li style="list-style-type:disc">police departments</li></ul><ul id="383b9240-1035-804c-8ff6-cba6310629b4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">municipal organizations</li></ul><ul id="383b9240-1035-80e3-8980-ca3935f5ab88" class="bulleted-list" dir="auto"><li style="list-style-type:disc">construction companies</li></ul><ul id="383b9240-1035-808b-8f5f-f1d42b7805e4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">farms</li></ul><ul id="383b9240-1035-8069-9b7d-c917594ce1c3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">airports</li></ul><ul id="383b9240-1035-8018-be3d-fc6609f5d964" class="bulleted-list" dir="auto"><li style="list-style-type:disc">prisons</li></ul><p id="383b9240-1035-80b9-b5a9-f04f72c19af7" class="" dir="auto">to support all 200 professions naturally.</p><h3 id="383b9240-1035-80cd-a98e-fd4d56a688db" style="display:inline-block" dir="auto">Planned correction</h3><p id="383b9240-1035-8035-8788-f48c42fe7e34" class="" dir="auto">The next focused improvement should either:</p><ol type="1" id="383b9240-1035-8016-9cb0-f2f94c1e61c5" class="numbered-list" start="1" dir="auto"><li>expand employer source lists with more organization types, or</li></ol><ol type="1" id="383b9240-1035-8036-9dd2-d7b7b7b627c8" class="numbered-list" start="2" dir="auto"><li>restrict employer assignment to professions that can be represented naturally by the available employer pools.</li></ol><p id="383b9240-1035-80e9-b594-e1b1305ec591" class="" dir="auto">This issue affects the semantic quality of the <code>works_at</code> relation, but it does not invalidate the subject generation, branch structure, frequency design, or the other three relations.</p><hr id="383b9240-1035-804d-9cb1-c088d2b9ce78" dir="auto"/><h2 id="383b9240-1035-808a-965d-dc001f9c0841" style="display:inline-block" dir="auto">17. Current Status</h2><p id="383b9240-1035-8089-9cf5-eb69bced1325" class="" dir="auto">The full technical pipeline is working.</p><p id="383b9240-1035-80e5-8e1a-ed9e5c9f7e56" class="" dir="auto">Completed components include:</p><ul id="383b9240-1035-8011-9b6d-c18720447b82" class="bulleted-list" dir="auto"><li style="list-style-type:disc">source-list validation</li></ul><ul id="383b9240-1035-8063-b589-d9474ed0225d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">5,000-subject generation</li></ul><ul id="383b9240-1035-804c-a762-dfc788b5edd5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">20,000-fact expansion</li></ul><ul id="383b9240-1035-8084-a1c7-ec135219249b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">name-type balancing</li></ul><ul id="383b9240-1035-80e9-8f44-e56ea61f6be8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">name-rarity assignment</li></ul><ul id="383b9240-1035-80f4-baac-e018b42aa4fd" class="bulleted-list" dir="auto"><li style="list-style-type:disc">popularity ranking</li></ul><ul id="383b9240-1035-80e4-b23c-e6c49f26bd8a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">geographic profile generation</li></ul><ul id="383b9240-1035-8006-b6c9-ddc2fde0f4a9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">relation-specific frequencies</li></ul><ul id="383b9240-1035-8013-bf04-e4302f4bcc05" class="bulleted-list" dir="auto"><li style="list-style-type:disc">branch assignment</li></ul><ul id="383b9240-1035-8015-8d73-fd514984848f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">multilingual template generation</li></ul><ul id="383b9240-1035-8048-9e07-da38f084e02c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">English and Turkish probing</li></ul><ul id="383b9240-1035-803f-9f8c-f32c1579b06d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">automated validation and testing</li></ul><p id="383b9240-1035-8001-9881-cd1c47f29ad4" class="" dir="auto">The dataset is ready for pilot experiments and pipeline testing.</p><p id="383b9240-1035-8019-a4bc-fbbf30865b81" class="" dir="auto">Before using it as the final thesis dataset, the remaining profession–employer compatibility issue should be addressed and the English and Turkish template banks should receive a final manual linguistic review.</p><p id="383b9240-1035-808a-9b13-c022419ee3b9" class="" dir="auto">After these checks, the next experimental stage will be:</p><ol type="1" id="383b9240-1035-8077-81f1-e8c6e13b8285" class="numbered-list" start="1" dir="auto"><li>teach the synthetic facts in English,</li></ol><ol type="1" id="383b9240-1035-8075-821d-ce1e8b441e20" class="numbered-list" start="2" dir="auto"><li>evaluate factual retrieval in English and Turkish,</li></ol><ol type="1" id="383b9240-1035-80be-8660-eb7ee30aa3fb" class="numbered-list" start="3" dir="auto"><li>adapt the model using Turkish data,</li></ol><ol type="1" id="383b9240-1035-80ba-bd3c-f223adbbf479" class="numbered-list" start="4" dir="auto"><li>expose only Branch B facts during Turkish adaptation,</li></ol><ol type="1" id="383b9240-1035-80c2-8d73-f5bdf97fb877" class="numbered-list" start="5" dir="auto"><li>evaluate both branches again,</li></ol><ol type="1" id="383b9240-1035-8068-8bc1-c4d272a2b92e" class="numbered-list" start="6" dir="auto"><li>compare Turkish retrieval between transfer-only and repetition conditions.</li></ol></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

@@ -1,0 +1,63 @@
+#!/usr/bin/expect -f
+
+set timeout 600
+set env_path ".env"
+
+if {[llength $argv] != 1} {
+    puts stderr "usage: scripts/hu_ssh_expect <remote-command>"
+    exit 2
+}
+
+set username "yesildau"
+set password ""
+set fh [open $env_path r]
+while {[gets $fh line] >= 0} {
+    set line [string trim $line]
+    if {[regexp {^(username|password)\s*[:=]\s*(.*)$} $line -> key value]} {
+        if {$key eq "username"} {
+            set username $value
+        } elseif {$key eq "password"} {
+            set password $value
+        }
+    }
+}
+close $fh
+
+if {$password eq ""} {
+    puts stderr "password not found in .env"
+    exit 2
+}
+set password [string trim $password "\",\' \r\n\t"]
+set username [string trim $username "\",\' \r\n\t"]
+
+set remote_cmd [lindex $argv 0]
+log_user 1
+spawn ssh \
+    -o PreferredAuthentications=keyboard-interactive,password \
+    -o PubkeyAuthentication=no \
+    -o NumberOfPasswordPrompts=1 \
+    -o StrictHostKeyChecking=accept-new \
+    "$username@gruenau10.informatik.hu-berlin.de" \
+    $remote_cmd
+expect {
+    -re "(?i)are you sure you want to continue connecting" {
+        send -- "yes\r"
+        exp_continue
+    }
+    -re "(?i)password:" {
+        send -- "$password\r"
+        exp_continue
+    }
+    -re "(?i)permission denied" {
+        puts stderr "SSH permission denied"
+        exit 1
+    }
+    timeout {
+        puts stderr "SSH timed out waiting for login or output"
+        exit 124
+    }
+    eof {
+        catch wait result
+        exit [lindex $result 3]
+    }
+}

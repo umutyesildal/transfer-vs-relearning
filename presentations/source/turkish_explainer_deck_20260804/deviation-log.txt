@@ -1,0 +1,6 @@
+1. Sunum 15 slayttan 25 slayta genişletildi; kullanıcı ayrıntılı Türkçe açıklamalar, örnekler ve kronoloji istedi.
+2. Üç kronoloji slaytı aynı dört-aşama inherited layout ile üretildi.
+3. EN→TR yönü yalnız kavramsal örnek olarak eklendi ve mevcut frozen sonuçta ölçülmediği açıkça belirtildi.
+4. Temsili subject/object örneği veri sonucu değildir; measurement yönlerini açıklamak için kullanıldı.
+5. PPL ve TR→TR için mevcut native chart frame'leri yeni doğrulanmış serilerle tekrar kullanıldı.
+6. Renk, tipografi, marjlar, footer düzeni ve master/layout ilişkisi kaynak deck ile korunmuştur.

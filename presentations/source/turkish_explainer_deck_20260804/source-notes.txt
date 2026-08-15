@@ -1,0 +1,31 @@
+Ana görsel kaynak:
+- outputs/qwen_m2_m3_research_update_august_2026.pptx
+
+Bilimsel ve kronolojik kaynaklar:
+- documentation/94_PRE_M2_FROZEN_HARD_EVALUATION_REPORT.md
+- documentation/95_PRE_M2_PARAPHRASE_COUNTERBALANCE_REPORT.md
+- documentation/96_PRE_M2_JOINT_RELATION_CONTROL_REPORT.md
+- documentation/97_PRE_M2_DRIFT_ABLATION_REPORT.md
+- documentation/102_M1_FORM_GENERALIZATION_REMEDIATION_RESULT.md
+- documentation/106_M1_CROSS_FAMILY_MODEL_SCREENING_RESULT.md
+- documentation/117_M1_RETENTION_REMEDIATION_AND_500_SUBJECT_SCALE_GATE.md
+- documentation/118_M1_RETENTION_EVALUATION_RESULT_AND_INTEGRITY_ADJUDICATION.md
+- documentation/120_M1_QWEN_RETENTION_SEED43_REPLICATION_RESULT.md
+- documentation/123_QWEN_SCALE_PROBE_RESULT_AND_SMOLLM_PILOT_STATUS.md
+- documentation/126_QWEN_SEED43_AND_SMOLLM_TRAINING_COMPLETION_REPORT.md
+- documentation/127_QWEN_SCALE_REPLICATION_RESULT_AND_SMOLLM_LAMBDA025_STATUS.md
+- documentation/128_SMOLLM_500_FACT_PROMPT_CONSISTENCY_REMEDIATION_PLAN.md
+- documentation/132_PRE_M2_QWEN_READINESS_AND_BASELINE_PLAN.md
+- documentation/134_QWEN_PRE_M2_GPU_BLOCKER_AND_OFFLINE_PREPARATION_STATUS.md
+- documentation/135_QWEN_M2_M3_CONTRACT_AND_MATERIALIZATION_STATUS.md
+- documentation/136_QWEN_M2_M3_ENDPOINT_EVALUATION_GPU_ALLOCATION_STATUS.md
+- documentation/138_QWEN_M2_M3_COMPLETED_MILESTONE_AND_SCIENTIFIC_INTERPRETATION_EN.md
+- documentation/140a_QWEN_M2_M3_INDEPENDENT_REVIEW_RESULT_EN.md
+- documentation/142_QWEN_M2_M3_EXPLORATORY_MECHANISM_ANALYSIS_RESULT_EN.md
+- documentation/143_QWEN_M2_M3_ARTIFACT_RETENTION_FREEZE_AND_STORAGE_AUDIT_EN.md
+- transfer-vs-relearning/src/transfer_vs_relearning/data/pre_m2_followup.py
+- transfer-vs-relearning/src/transfer_vs_relearning/data/m1_form_generalization.py
+- transfer-vs-relearning/src/transfer_vs_relearning/data/qwen_pre_m2.py
+
+Temsili örnekler:
+- “Kişi-017 / Profession 17 / Meslek 17” gerçek bir sonuç satırı değildir; direction, form, scaffold ve ranking mantığını anlatan temsili bir bağdır.

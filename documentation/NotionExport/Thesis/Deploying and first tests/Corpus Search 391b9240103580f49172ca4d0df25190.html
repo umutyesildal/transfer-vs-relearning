@@ -1,0 +1,768 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Corpus Search</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="391b9240-1035-80f4-9172-ca4d0df25190" class="page sans"><header><h1 class="page-title" dir="auto">Corpus Search</h1><p class="page-description" dir="auto"></p></header><div class="page-body"><p id="391b9240-1035-8089-9e41-e1885048ad6f" class="" dir="auto">
+</p><figure id="391b9240-1035-803f-a94e-c03f806f43b8" dir="ltr"><div class="source"><a href="Corpus%20Search/Turkce_monolingual_korpus_secimi_icin_kaynak-temelli_arastrma.pdf" data-notion-file="Corpus%20Search/Turkce_monolingual_korpus_secimi_icin_kaynak-temelli_arastrma.pdf" data-notion-file-alias="Türkçe monolingual korpus seçimi için kaynak-temelli araştırma.pdf">Türkçe monolingual korpus seçimi için kaynak-temelli araştırma.pdf</a></div></figure><h1 id="391b9240-1035-8011-bb23-e6e3cb448da8" style="display:inline-block" dir="auto"><strong>Türkçe monolingual korpus seçimi için kaynak-temelli araştırma</strong></h1><h2 id="391b9240-1035-80e7-ac28-c11d9f766611" style="display:inline-block" dir="auto"><strong>Kısa hüküm</strong></h2><p id="391b9240-1035-8020-a031-fc38346646b4" class="" dir="auto">Bu deney için <strong>en uygun birincil Türkçe korpusun tek başına “en büyük” olan değil, en iyi denetlenebilir, en kolay pinlenebilir ve en düşük içerik-riski taşıyan kaynak</strong> olması gerekir. Deneyin amacı Türkçede sentetik biyografik olguları tekrar öğretmek değil; İngilizcede öğrenilmiş olguların, Türkçe dil uyarlamasından sonra Türkçe istemlerle geri çağrılıp çağrılamadığını ölçmektir. Bu nedenle korpus seçiminin önceliği “Türkçe dil yapısı ve söz varlığı öğretmek”, ikincil önceliği ise “istem/yanıt biçimi, QA formatı, sentetik olgu sızıntısı ve gereksiz web gürültüsünden kaçınmak” olmalıdır. Bu ölçütlerle bakınca, <strong>küçük pilot için Türkçe Wikipedia tek başına</strong>, <strong>nihai deney için ise Wikipedia–FineWeb2 kontrollü karışımı</strong> en dengeli çözüm görünmektedir. Geniş web seçenekleri içinde bugün en güçlü aday <strong>HuggingFaceFW/fineweb-2’nin </strong><code><strong>tur_Latn</strong></code><strong> altkümesi</strong>dir; çünkü sürüm pinleme, dil-bazlı küresel deduplikasyon, ayrık <code>_removed</code> verisi, PII önlemleri ve Türkçe dâhil çok dilli değerlendirme dökümü açıkça belgelenmiştir.</p><p id="391b9240-1035-80d3-a14f-df838b14f44e" class="" dir="auto">Araştırmanın sonunda vardığım pratik öneri şöyledir. <strong>Pilot korpus:</strong> Wikimedia’nın tarihli Türkçe Wikipedia dökümü, <code>trwiki</code> 2026-06-01 sürümü, yalnızca makale ad alanı (<code>pages-articles</code>) ve makale metni çıkarımı. <strong>Nihai korpus:</strong> <code>%25 Türkçe Wikipedia + %75 FineWeb2 tur_Latn v2.1.1</code>, kaynaklar arası exact ve near-dedup sonrası, sentetik ad/fact taramasından geçirilmiş, sabit token bütçesine örneklenmiş karışım. <strong>Yedek/opsiyonel web alternatifi:</strong> HPLT 3.0 <code>tur_Latn</code>; teknik olarak çok güçlüdür ama edinim ve yeniden üretilebilirlik akışı FineWeb2’den daha ağırdır. <strong>Doğrudan önermediğim korpuslar:</strong> mC4 Türkçe, CulturaX Türkçe ve OSCAR-2301 Türkçe. Bunların hiçbiri “kötü” değildir; ancak bu deneyin kontrollülük, lisans netliği, bugün erişilebilirlik ve iş yükü ölçütlerinde FineWeb2–Wikipedia kombinasyonundan daha avantajlı değildir. Özellikle OSCAR-2301’in Hugging Face erişimi şu anda geçici olarak askıya alınmış durumda ve kullanım koşulları araştırma/TDM istisnaları etrafında daha hassas bir yüzey oluşturuyor.</p><h2 id="391b9240-1035-8048-aaf6-ef36c0848b58" style="display:inline-block" dir="auto"><strong>Ciddi adaylar ve teknik uygunlukları</strong></h2><h3 id="391b9240-1035-80d7-ac08-f296d24ded6f" style="display:inline-block" dir="auto"><strong>Türkçe Wikipedia</strong></h3><p id="391b9240-1035-806b-a344-f4c80e4726be" class="" dir="auto"><strong>Resmî ad:</strong> Turkish Wikipedia / <code>trwiki</code> dump. <strong>Resmî kaynak:</strong> Wikimedia Dumps ve Wikimedia istatistik verisi. <strong>Güncel erişim:</strong> Wikimedia dump sunucusunda <code>trwiki/latest/</code> altında; 2026-06-01 tarihli en güncel makale dökümü dizinde görünüyor. <strong>Önerilen edinim nesnesi:</strong> <code>pages-articles-multistream</code> ailesi. <strong>Sürüm/snapshot:</strong> 2026-06-01 dump tarihi bugün için açıkça görülebiliyor. <strong>Yaklaşık ham boyut:</strong> <code>trwiki-latest-pages-articles-multistream.xml.bz2</code> yaklaşık 1.11 GB sıkıştırılmış; <code>pages-articles.xml.bz2</code> yaklaşık 1.04 GB. <strong>Belge sayısı:</strong> Türkçe Wikipedia makale sayısı 2026-07-01 itibarıyla 653,491. <strong>Token sayısı:</strong> Wikimedia resmen model-token sayısı vermez; bu kaynak için gerçek model-token sayısı ancak sizin tokenizer’ınızla ölçülmelidir. Makale sayısı ve dump boyutuna göre, temiz metin çıkarımından sonra <strong>yaklaşık birkaç yüz milyon tokenlık</strong> bir korpus beklemek makuldür; bunu raporda “tahmin” olarak ele almak gerekir, “raporlanmış istatistik” olarak değil. <strong>Alan/kompozisyon:</strong> ansiklopedik ve yarı-formal genel bilgi metni. <strong>Dil saflığı:</strong> çok yüksek; fakat maddelerde alıntılar, yabancı özel adlar ve sınırlı İngilizce kırıntıları bulunabilir. <strong>Deduplikasyon:</strong> kaynak yapısı gereği web kümelerine göre daha temizdir ama şablon, tekrar eden kaynakça ve boilerplate kalıntıları çıkarım kalitesine bağlıdır. <strong>Kalite filtreleme:</strong> Wikimedia dökümü kendi başına LM odaklı kalite filtresinden geçmez; kalite temelde topluluk düzeni ve sizin wiki-metni çıkarımınızla belirlenir. <strong>Belge yapısı:</strong> XML içinde wikitext; doğrudan causal LM verisi değildir, önce düz metne dönüştürülmelidir. <strong>Streaming:</strong> HF <code>streaming=True</code> biçiminde değil; HTTP/bz2 akışı veya yerel ayrıştırma mümkündür. <strong>Sürüm pinleme:</strong> çok güçlü; tarihli dump dizini üzerinden tam pinlenebilir. <strong>Lisans:</strong> Wikipedia metni CC BY-SA 4.0 ve bazı tarihsel içeriklerde GFDL koşullarıyla ilişkilidir. <strong>Akademik kullanım:</strong> çok uygundur. <strong>Yeniden dağıtım:</strong> share-alike ve atıf yükümlülükleri göz önüne alınmalıdır. <strong>Etik/kişisel veri:</strong> yaşayan kişiler biyografileri ve kullanıcı katkıları nedeniyle dikkat gerektirir ama genel web korpuslarına göre daha düşüktür. <strong>Bu deney için uygunluk:</strong> çok yüksek kontrol, düşük kontaminasyon riski ve kolay tam tarama avantajı verir; asıl zayıflığı dar alan çeşitliliğidir.</p><p id="391b9240-1035-80dc-b645-e3842767ea31" class="" dir="auto">Bu kaynağın asıl bilimsel değeri, deneyin “Türkçe yapı öğrenimi” kısmını en temiz şekilde test etmesidir. Eğer İngilizcede öğretilmiş sentetik olguların Türkçe istemlerle geri çağrılması Wikipedia-only uyarlamada da görülüyorsa, bu çok güçlü bir bulgudur; çünkü sonuç web gürültüsü, haber biçemi veya geniş crawl kontaminasyonu ile açıklanamaz. Bu yüzden Wikipedia’yı nihai korpus olarak değilse bile <strong>pilot ve ablation koşulu</strong> olarak kesinlikle korurdum.</p><h3 id="391b9240-1035-809e-8260-d7412bcb665d" style="display:inline-block" dir="auto"><strong>FineWeb2 Türkçe</strong></h3><p id="391b9240-1035-8042-9447-ca1579978921" class="" dir="auto"><strong>Resmî ad:</strong> <code>HuggingFaceFW/fineweb-2</code>, Türkçe için <code>tur_Latn</code> altkümesi. <strong>Resmî kaynak:</strong> Hugging Face dataset card ve FineWeb2 üretim kodu. <strong>Güncel erişim:</strong> Hugging Face üzerinden açık; önceki sürümler branch olarak tutuluyor. <strong>Sürüm/snapshot:</strong> güncel kartta <code>v2.1.1</code> (2025-10-27) belirtiliyor; <code>revision=&quot;v2.0.0&quot;</code> gibi branch pinleme açıkça belgelenmiş. <strong>Yaklaşık ham boyut:</strong> Türkçe <code>tur_Latn</code> için 284.52 GB UTF-8 byte, 125.53 GB disk boyutu. <strong>Belge sayısı:</strong> 95,129,129. <strong>Token sayısı:</strong> FineWeb2 özellikle model-token sayısını raporlamıyor; bunun yerine kelime sayısı veriyor ve Türkçe için 41,933,799,420 sözcük raporluyor. <strong>Alan/kompozisyon:</strong> 2013 yazından 2024 Nisanına kadar 96 Common Crawl anlık görüntüsünden çıkarılmış geniş web metni. <strong>Dil tanılama:</strong> GlotLID ile dil + yazı sistemi tespiti; dil başına farklı minimum güven eşikleri uygulanmış. <strong>Dil saflığı:</strong> yüksek, ama hiçbir web korpusunda sıfır karışım garantisi yok. <strong>Deduplikasyon:</strong> dil bazında küresel deduplikasyon; duplicate cluster boyutu <code>minhash_cluster_size</code> metadata’sında tutuluyor, ayrıca <code>_removed</code> altkümeleri yayımlanıyor. <strong>Kalite filtreleme:</strong> orijinal FineWeb filtreleri çok dillilik için yeniden uyarlanmış; dil başına eşikler ve stopword listeleri var; ayrıca bazı C4 filtreleri çok dilli koşulda performansı düşürdüğü için kullanılmamış. <strong>Belge yapısı:</strong> Parquet tabanlı düz belge kayıtları; causal LM için uygundur. <strong>Streaming:</strong> hem <code>datasets</code> hem Datatrove akışı açıkça belgelenmiş. <strong>Sürüm pinleme:</strong> çok güçlü. <strong>Lisans:</strong> ODC-BY 1.0; ayrıca Common Crawl kullanım koşullarına tabi. <strong>Akademik kullanım:</strong> güçlü. <strong>Yeniden dağıtım:</strong> lisans ve kaynak-içerik koşulları incelenmeli, ama pratikte en açık seçeneklerden biri. <strong>Etik/kişisel veri:</strong> e-posta ve public IP anonymization uygulanmış; yine de PII kalabileceği açıkça not ediliyor ve opt-out formu bulunuyor. <strong>Bu deney için uygunluk:</strong> bugün erişilebilen geniş web seçenekleri içinde en iyi genel adaydır.</p><p id="391b9240-1035-80d4-bb87-d894fbcef2e3" class="" dir="auto">FineWeb2’yi bu deney için bu kadar güçlü yapan şey yalnızca büyüklük değil. Daha önemlisi, <strong>Türkçe dahil 9 dil üzerinde ablation ile ayarlanmış olması</strong>, <code>_removed</code> verisini ayrıca yayımlaması, Türkçe altkümesinin ayrı ve temizce örneklenebilmesi ve sürüm kontrolünün açık olmasıdır. Ayrıca “test split should not be trained on” uyarısı veri kaçağını önleme kültürünün güçlü olduğunu gösterir; bu da kontrollü deneyler için artıdır. Bu nedenle “broad Turkish web corpus only” seçeneğinde benim ilk tercihim FineWeb2 olur.</p><h3 id="391b9240-1035-8048-8cd7-c58957650b5f" style="display:inline-block" dir="auto"><strong>HPLT Türkçe</strong></h3><p id="391b9240-1035-8074-bec9-c6e0793bac9c" class="" dir="auto"><strong>Resmî ad:</strong> <code>HPLT/HPLT3.0</code>, Türkçe için <code>tur_Latn</code>. <strong>Resmî kaynak:</strong> HPLT 3.0 dataset card ve HPLT indirme manifesti. <strong>Güncel erişim:</strong> Hugging Face kartı üzerinden keşfediliyor ama gerçek dosyalar HF’de host edilmiyor; indirme HPLT veri gölündeki <code>.map</code> dosyalarıyla yapılıyor. <strong>Sürüm/snapshot:</strong> HPLT 3.0, Temmuz 2025 çıkışı. <strong>Yaklaşık ham boyut:</strong> Türkçe için 228.895 GB byte. <strong>Belge sayısı:</strong> 159,467,000. <strong>Segment sayısı:</strong> 3.11443 milyar. <strong>Token sayısı:</strong> 149,977,000,000 token, HPLT’nin Gemma 3 sözlüğüyle raporladığı ölçüme göre. <strong>Alan/kompozisyon:</strong> 2012–2024 Internet Archive + Common Crawl web belgeleri. <strong>Dil tanılama:</strong> OpenLID 2.0. <strong>Deduplikasyon:</strong> çoğu dilde küresel deduplikasyon; kartta Türkçe için bunu kapsayan genel ilke açıkça belirtiliyor. <strong>Kalite filtreleme:</strong> Monotextor hattı, web register etiketleri, kalite skoru sıralaması, WDS bin’leri, adult content/credential/robots düzeltmeleri. <strong>Belge yapısı:</strong> sade metin ve yapılandırılmış normalleştirilmiş XML temsili bulunuyor; metadata zengin. <strong>Streaming:</strong> <code>load_dataset()</code> ile <code>.jsonl.zst</code> dosyalarını map üzerinden okutma ve <code>streaming=True</code> kullanımı belge üzerinde örnek kodla gösteriliyor. <strong>Sürüm pinleme:</strong> release 3.0 ve manifest tabanlı pinleme güçlü. <strong>Lisans:</strong> paketleme/metaveri CC0, ama HPLT metinlerin telifine sahip olmadığını açıkça söylüyor; takedown politikası var. <strong>Akademik kullanım:</strong> çok iyi. <strong>Yeniden dağıtım:</strong> dikkat ister. <strong>Etik/kişisel veri:</strong> PII annotation ve zengin provenance artı puan; yine de web-crawl metni. <strong>Bu deney için uygunluk:</strong> teknik kalite olarak çok güçlü, ama operasyonel karmaşıklık FineWeb2’den daha yüksek.</p><p id="391b9240-1035-8045-ac18-f8af0cd30c82" class="" dir="auto">HPLT’nin bu deney için en ilginç tarafı, FineWeb2’ye göre daha farklı veri kökenine sahip olmasıdır; kart, verinin büyük ölçüde Internet Archive’dan geldiğini ve dolayısıyla yalnız Common Crawl tabanlı veri kümelerine tamamlayıcı olduğunu açıkça söylüyor. Ayrıca HPLT v2 kartı, Hugging Face’in 9 dilli değerlendirmesine atıfla, Türkçe dâhil bazı dillerde HPLT v2’nin FineWeb2 ile aynı düzeyde veya daha iyi olduğunu not ediyor. Bu yüzden HPLT 3.0, <strong>tezin ana kurulumundan çok, ikinci faz bir robustness/replication koşulu</strong> için çok değerlidir. Ama ilk tez deneyi için dosya edinimi, map yönetimi ve metadata bolluğu gereksiz operasyon yükü ekler.</p><h3 id="391b9240-1035-802c-a7dd-c08713f91d14" style="display:inline-block" dir="auto"><strong>CulturaX Türkçe</strong></h3><p id="391b9240-1035-802c-b074-eaf78eef6a3b" class="" dir="auto"><strong>Resmî ad:</strong> <code>uonlp/CulturaX</code>, Türkçe bölümü. <strong>Resmî kaynak:</strong> Hugging Face dataset card ve CulturaX makalesi. <strong>Güncel erişim:</strong> Hugging Face’de mevcut, fakat dosyalara erişmeden önce koşulları kabul edip iletişim bilgisi paylaşmak gerekiyor. <strong>Sürüm/snapshot:</strong> kart, mC4 v3.1.0 ile erişilebilir tüm OSCAR sürümlerinin 20.19, 21.09, 22.01 ve 23.01 birleşiminden üretildiğini söylüyor. <strong>Yaklaşık ham boyut:</strong> toplam 16 TB Parquet, sıkıştırmasız 27 TB. <strong>Türkçe belge sayısı:</strong> 94,207,460. <strong>Türkçe token sayısı:</strong> 64,292,787,164 token. <strong>Alan/kompozisyon:</strong> mC4 + çoklu OSCAR sürümleri; yani geniş crawl verisinin derin temizlenmiş ve deduplike edilmiş yeniden inşası. <strong>Dil tanılama:</strong> kartta çok aşamalı language identification sürecinden söz ediliyor; ayrıntı makalede. <strong>Deduplikasyon:</strong> document-level MinHash ile fuzzy dedup. <strong>Kalite filtreleme:</strong> URL tabanlı, metric tabanlı, document refinement ve dedup kademeleri; perplexity için Wikipedia dump’larından eğitilmiş KenLM kullanılmış. <strong>Belge yapısı:</strong> Parquet. <strong>Streaming:</strong> HF/Dask/Polars uyumlu yapı üzerinden pratikte mümkün. <strong>Sürüm pinleme:</strong> HF revision ile yapılabilir, ancak erişim gating’i vardır. <strong>Lisans:</strong> mC4 ve OSCAR lisanslarını takip eder; bu, lisans yüzeyini FineWeb2’den daha karmaşık hale getirir. <strong>Akademik kullanım:</strong> iyi, fakat lisans ve erişim koşulları daha ağır. <strong>Yeniden dağıtım:</strong> karmaşık. <strong>Etik/kişisel veri:</strong> web-corpus niteliği sürer. <strong>Bu deney için uygunluk:</strong> kalite ve büyüklük çok iyi; fakat bu deney için gereğinden fazla büyük, erişimi gated ve lisans yüzeyi daha karışık.</p><p id="391b9240-1035-80b8-9407-c5c3a0b5dd58" class="" dir="auto">CulturaX’i nihai öneri yapmıyorum; çünkü bu deney “Türkçe dil yapısı öğret ve sentetik gerçekleri öğretme” problemidir, “olabildiğince çok Türkçe web verisi kullan” problemi değildir. CulturaX’in asıl avantajı aşırı ölçek ve temizleme derinliğidir. Tez ölçeğinde ise bu avantajın büyük kısmı kullanılmadan kalır; buna karşılık karmaşıklık, kaynak çakışması ve lisans yükü artar. Eğer bir danışman özellikle <strong>mC4 + OSCAR mirasının temizlenmiş bir süperseti</strong> ile replikasyon istiyorsa, CulturaX mantıklıdır; ama varsayılan tez seçimi olarak değil.</p><h3 id="391b9240-1035-80b7-b763-ff8547603615" style="display:inline-block" dir="auto"><strong>mC4 Türkçe</strong></h3><p id="391b9240-1035-80ac-9475-f7dc1afe9405" class="" dir="auto"><strong>Resmî ad:</strong> <code>allenai/c4</code>, çok dilli varyant içinde Türkçe altküme <code>tr</code>. <strong>Resmî kaynak:</strong> AllenAI/Hugging Face dataset card, AllenNLP resmi tartışma başlığı ve Türkçe mC4 üzerinde eğitilmiş model kartı/README’si. <strong>Güncel erişim:</strong> Hugging Face’dan açıkça yüklenebilir ve <code>streaming=True</code> desteklenir. <strong>Sürüm/snapshot:</strong> çok dilli mC4 kamuya 2021’de açıldı; HF kartı bugün hâlâ aktif ve Ocak 2024’te güncellenmiş görünüyor. <strong>Yaklaşık ham boyut:</strong> resmî AllenAI tartışmasına göre Türkçe yaklaşık 285 GB sıkıştırılmamış metin. <strong>Türkçe belge sayısı:</strong> resmî kart Türkçe doc sayısını yayımlamıyor; bu, akış üzerinden bir tam sayım gerektirir. <strong>Token sayısı:</strong> Türkçe mC4 üzerinde eğitilmiş açık model belgeleri, bozuk encoding temizliğinden sonra 242 GB ve 31,240,963,926 token raporluyor. <strong>Alan/kompozisyon:</strong> Common Crawl kaynaklı genel web metni. <strong>Dil tanılama:</strong> mC4 için CLD3 kullanıldığı açıkça belirtiliyor. <strong>Deduplikasyon:</strong> kart ve resmi tartışma, kapsamlı deduplikasyondan söz ediyor; açıklayıcı tartışmada paragraf-hash tabanlı dedup mantığı da anlatılıyor. <strong>Kalite filtreleme:</strong> doğal dil dışındaki içerik ve boilerplate için heuristik temizlik var; ancak FineWeb2 düzeyinde modern, dil-başına ayarlı filtreleme değil. <strong>Belge yapısı:</strong> <code>url</code>, <code>text</code>, <code>timestamp</code> alanlarıyla düz belge. <strong>Streaming:</strong> evet. <strong>Sürüm pinleme:</strong> HF repo commit veya yerel snapshot ile yapılabilir; ancak tekil sürüm kimliği FineWeb2 kadar temiz değil. <strong>Lisans:</strong> ODC-BY + Common Crawl şartları. <strong>Akademik kullanım:</strong> iyi. <strong>Yeniden dağıtım:</strong> dikkat ister. <strong>Etik/kişisel veri:</strong> genel web kümesi. <strong>Bu deney için uygunluk:</strong> bugün hâlâ kullanılabilir, fakat daha yeni alternatifler karşısında yaşlı ve daha gürültülü kalıyor.</p><p id="391b9240-1035-80ba-9008-dc35243fb6f3" class="" dir="auto">mC4’ü alt sıralara koymamın nedeni erişimsizlik değil; tam tersine erişim ve akış kolay. Sorun, bu deney için <strong>daha yaşlı, daha kaba filtrelenmiş ve daha zayıf sürüm pinlenen</strong> bir nokta olması. Üstelik Türkçe için kamuya açık meta-istatistiklerin bir kısmı dağılmış durumda; örneğin ham boyut AllenAI tartışmasında, token sayısı ise downstream model belgelerinde görünüyor. Bu, “bugün hâlâ iş gören ama artık birincil tercih olmayan” bir aday profili çıkarıyor.</p><h3 id="391b9240-1035-80e0-9e99-f40a0372eb52" style="display:inline-block" dir="auto"><strong>OSCAR Türkçe</strong></h3><p id="391b9240-1035-80ef-b1d6-d5c717645e70" class="" dir="auto"><strong>Resmî ad:</strong> <code>oscar-corpus/OSCAR-2301</code>, Türkçe altkorpus. <strong>Resmî kaynak:</strong> Hugging Face dataset card ve OSCAR resmî dokümantasyonu. <strong>Güncel erişim:</strong> Hugging Face kartı şu anda erişimin geçici olarak askıya alındığını açıkça söylüyor; bu nedenle “hemen kullanılabilir” statüsünde değil. <strong>Sürüm/snapshot:</strong> 23.01, Kasım/Aralık 2022 Common Crawl’dan üretilmiş. <strong>Yaklaşık Türkçe ölçek:</strong> 26,654,330 belge, 8,290,890,087 whitespace-separable word ve 73.7 GB içerik uzunluğu. <strong>Dil tanılama:</strong> Ungoliant hattı ve fastText kökenli sınıflandırma mirasıyla belge-düzeyi tanılama; kart, aynı belgede başka dillerden satırların bulunabileceğini açıkça kabul ediyor. <strong>Deduplikasyon:</strong> orijinal ve deduplicated sürümler var; ayrıca near-dedup için TLSH/LSH metadataları sağlanıyor. <strong>Kalite filtreleme:</strong> KenLM tabanlı adult-content detection, blocklist-based categories ve quality warnings alanları var; buna rağmen kart “not properly filtered yet” diye uyarıyor. <strong>Belge yapısı:</strong> zengin WARC header ve metadata içeren belge kayıtları. <strong>Streaming:</strong> teknik olarak mümkün olsa da erişim askısı pratik engel. <strong>Lisans:</strong> yalnız paketleme/metaveri CC0; metin içeriği üçüncü taraf crawl verisi ve bazı yargı alanlarında araştırma/TDM istisnalarıyla sınırlı. <strong>Akademik kullanım:</strong> dikkatli koşullu kullanım. <strong>Bu deney için uygunluk:</strong> tarihsel ve teknik olarak önemli; fakat <strong>bugün önerilecek birincil kaynak değil</strong>.</p><p id="391b9240-1035-80fb-b2bc-c0f7bcd91a74" class="" dir="auto">OSCAR’ın Türkçe altkorpusu küçük model continued pretraining için aslında biçimsel olarak uygun bir veri türü sunar; ama sizin problem tanımınızda “currently accessible” şartı açık. Bu koşul altında OSCAR-2301’i ana öneride tutmak doğru olmaz. Eğer daha sonra erişim yeniden açılırsa, OSCAR en çok <strong>mC4 ile modern FineWeb2/HPLT arasında tarihsel karşılaştırma kolu</strong> olarak değerli olur.</p><h2 id="391b9240-1035-80ad-8c07-d6d1819d9114" style="display:inline-block" dir="auto"><strong>Deney ölçütlerine göre kıyaslama</strong></h2><p id="391b9240-1035-800a-a9ba-fd2f585d7d44" class="" dir="auto">Bu deney için en kritik ölçütler, sıradan LLM ön-eğitiminden biraz farklıdır. Burada istediğiniz şey yalnızca “Türkçe performans artsın” değildir; aynı zamanda <strong>sentetik İngilizce olguların Türkçede doğrudan tekrar öğretim olmadan erişilebilir olup olmadığı</strong>dır. Bu nedenle korpusun “factual density”si tek başına avantaj değildir; hatta aşırı geniş, biyografi-zengin web korpusları kontrol zorluğu yüzünden dezavantaja dönebilir. Bu çerçevede <strong>Türkçe Wikipedia</strong> dil saflığı, düşük İngilizce karışımı, kolay tam tarama ve düşük operasyon maliyeti nedeniyle birincil kontrol koşulu olarak en güçlü kaynaktır. Buna karşılık <strong>FineWeb2 Türkçe</strong>, sözcüksel ve biçimbilimsel çeşitlilik, alan çeşitliliği ve daha doğal web Türkçesi avantajı sağlar. <strong>HPLT 3.0</strong>, teknik kalite ve kaynak çeşitliliği bakımından FineWeb2’ye yakın hatta bazı yönlerden daha iyi olabilir; ancak operasyonel maliyet ve indirme karmaşıklığı daha yüksektir. <strong>mC4</strong>, bugün artık daha eski bir baseline’dır. <strong>CulturaX</strong>, kalite açısından güçlü olsa da tez ölçeği için aşırı büyük ve lisans yüzeyi daha karmaşıktır. <strong>OSCAR-2301</strong> ise güncel erişim problemi nedeniyle ana akıştan düşer.</p><p id="391b9240-1035-8074-9276-f49283ee4be8" class="" dir="auto">“Türkçe dil saflığı” ve “minimal English content” açısından en güvenli ikili Wikipedia ve FineWeb2’dir; ama farklı nedenlerle. Wikipedia bunu kaynak türü sayesinde sağlar. FineWeb2 ise bunu dil-yazı tanılama ve dil başına filtre eşikleriyle yapar. “Minimal duplicated content” için FineWeb2 ve HPLT 3.0 öne çıkar; ikisi de küresel/dil-bazlı deduplikasyonu belgelemektedir. “Instruction/QA formatına bağımlılık olmama” koşulu bakımından burada incelediğim bütün ciddi adaylar uygundur; bunlar ham belge korpuslarıdır, instruction tuning veri kümeleri değildir. “Sabit token budget örneklenebilirliği” ve “5,000 sentetik özne adı taranabilirliği” açısından en elverişli kaynaklar yine Wikipedia ve FineWeb2’dir; çünkü biri küçük ve tam taranabilir, diğeri ise streamable, Parquet tabanlı ve revision-pinnable’dır.</p><p id="391b9240-1035-805e-8db5-da588e43aecd" class="" dir="auto">Bu nedenlerle deney açısından net sıralamam şu mantık üstüne oturuyor: <strong>kontrollü pilot için Wikipedia</strong>, <strong>geniş web için FineWeb2</strong>, <strong>ileri seviye alternatif web için HPLT3</strong>, <strong>eski fakat kullanılabilir baseline için mC4</strong>, <strong>aşırı büyük birleşik seçenek için CulturaX</strong>, <strong>erişim problemi yüzünden beklemeye alınmış kaynak olarak OSCAR</strong>.</p><h2 id="391b9240-1035-8014-ba73-ffd0ee0aa7e4" style="display:inline-block" dir="auto"><strong>Wikipedia, geniş web ve kontrollü karışım</strong></h2><p id="391b9240-1035-806d-8405-cb186f29bda2" class="" dir="auto"><strong>Wikipedia-only</strong> seçeneğinin en büyük avantajı temizliktir. Ansiklopedik üslup, yüksek Türkçe saflığı, nispeten düşük tekrar ve kolay yeniden üretim, sentetik bilgi transferi gibi hassas bir deney için çok kıymetlidir. Ayrıca bütün korpusu baştan sona sentetik özne ve ilişki taramasından geçirmek gerçekçidir. Dezavantajı ise dil çeşitliliğinin darlığıdır: konuşma Türkçesi, forum/web register’ları, başlık kalıpları, kısa doğal cümleler, ürün ve günlük yaşam söz varlığı, hatta birçok çekimsel varyant ansiklopedik düzlemde yetersiz temsil edilir. Bu da “Türkçe istemlerle retrieval” yerine yalnızca “Türkçe biçimsel düzenlilik” öğrenilmiş bir model üretebilir.</p><p id="391b9240-1035-808a-94cd-d210301b41c5" class="" dir="auto"><strong>Broad web-only</strong> seçeneği, özellikle FineWeb2 veya HPLT3 ile, çok daha doğal ve geniş bir Türkçe dağılım sunar. Bu, causal LM continued pretraining için önemli bir artıdır; çünkü model Türkçe dizilim, eklemeli yapı, sözcük biçimleri ve farklı kayıt düzeylerine daha yaygın maruz kalır. Ancak aynı genişlik, daha yüksek PII riski, daha fazla gerçek biyografik bağlam, kaynaklar arası duplikasyon ve sentetik özne/fact sızıntısı taramasında daha büyük iş yükü anlamına gelir. Bu deneyin “factual transfer” boyutu düşünüldüğünde, geniş web yalnız başına bazen gereksiz biçimde bulanıklaştırıcı olabilir.</p><p id="391b9240-1035-806e-be50-fe428eab8134" class="" dir="auto">Bu yüzden en iyi tasarım <strong>kontrollü Wikipedia–web karışımıdır</strong>. Benim önerdiğim karışım, <strong>nihai deney için </strong><code><strong>%25 Wikipedia + %75 FineWeb2 tur_Latn</strong></code> oranıdır. Bu oranla Wikipedia temiz bir biçimsel/ansiklopedik omurga verir; FineWeb2 ise sözcüksel ve söylemsel çeşitliliği getirir. Deduplikasyonun kaynaklar arası düzeyde yeniden yapılması özellikle önemlidir; çünkü Wikipedia içeriği web corpuslarında mirror veya alıntı olarak tekrar bulunabilir. Bu karışım “temizlik”, “alan çeşitliliği”, “adversarial contamination kontrolü” ve “tez ölçeğinde işlenebilirlik” arasında en iyi uzlaşmadır. Eğer danışmanınız ikinci bir web kaynağı isterse, FineWeb2’nin küçük bir diliminden vazgeçip <code>%10 HPLT3 tur_Latn</code> eklemek mantıklı bir robustness koşulu olabilir; ancak bu, ana önerim değil, opsiyonel genişleme önerimdir.</p><h2 id="391b9240-1035-8077-9b47-f7e24407523d" style="display:inline-block" dir="auto"><strong>Yeniden üretilebilir edinim ve ön işleme planı</strong></h2><p id="391b9240-1035-804e-ab4c-eb1f5bbcdbd8" class="" dir="auto">Edinim planında üç ilke gözetilmelidir: <strong>tarih/sürüm pinleme, yerel manifest üretimi ve bütün ara dosyaların hash’lenmesi</strong>. Pilot için tarihli Wikimedia dump’ını kullanın; “latest” yalnız keşif içindir, deneyde ise tarihli dump dizini pinlenmelidir. Nihai deneyde FineWeb2 için <code>revision=&quot;v2.1.1&quot;</code> kullanın; yalnız <code>data/tur_Latn/train/*</code> altını çekin, <code>_removed</code> ve <code>test</code> split’lerini eğitimden dışlayın. HPLT3 ancak opsiyonel ikinci web kaynağı olarak eklenecekse <code>tur_Latn.map</code> manifest dosyası ve release 3.0 ile pinlensin. Her indirilen parçanın SHA-256 özeti ve orijinal upstream manifest/MD5 dosyası proje manifestine kaydedilsin.</p><p id="391b9240-1035-8055-82d9-e4be338c825c" class="" dir="auto">Ön işleme hattını şu sırayla öneriyorum. İlk adımda, Wikipedia için yalnızca <strong>article namespace</strong> metni çıkarılsın; kategori etiketleri, referans blokları, tablo kalıntıları, infobox şablon artıkları ve harici link boilerplate’i temizlensin. FineWeb2 ve HPLT3 için belge metni dışında kalan metadata alanları eğitim akışına sokulmasın. Metin eğitimi için korunan normalizasyon <strong>NFC</strong> olsun; çünkü eğitim verisini gereksiz biçimde “compatibility fold” etmek istemezsiniz. Buna karşılık kontaminasyon taraması için ayrı bir görünüm üretin: <code>NFC → casefold → whitespace collapse → punctuation simplification</code>. Böylece eğitim metni doğal kalır, tarama ise daha hassas olur. Web kaynaklarında ek bir ikinci-pass language-ID uygulanabilir; fakat bunu tam korpus yerine önce 1–5 milyon belgeli doğrulama örneğinde yapmanız yeterlidir. Amaç veri kümesini yeniden inşa etmek değil, saflık raporu üretmektir. FineWeb2 ve HPLT3 zaten güçlü language-ID taşıdığı için ikinci geçiş burada güvence amaçlıdır, birincil filtre değil.</p><p id="391b9240-1035-803f-80ea-c641523b4d80" class="" dir="auto">Uzunluk ve boilerplate filtreleri kaynak-bağımlı olmalıdır. Wikipedia için çok kısa madde taslaklarını çıkarmak üzere örneğin 80–100 karakter altı düz metinleri atmak mantıklıdır. Web kaynaklarında daha agresif filtre gerekir; 200 karakter altı, aşırı URL yoğun, satır-tekrarlı ve karakter-tekrarlı belgeleri atın. Sonra <strong>kaynak içi exact dedup</strong> uygulayın: normalize edilmiş düz metin SHA-256 hash’i ile. Ardından <strong>kaynaklar arası near-dedup</strong> uygulayın; asıl kritik adım budur, çünkü web korpusları Wikipedia veya aynı haber/gövde metinlerini tekrar taşıyabilir. MinHash ya da TLSH tabanlı 5-gram yakınlık kümeleri yeterlidir; ancak bu adımı yalnız nihai karışım üzerinde yapın. Deduplikasyondan sonra sabit RNG tohumuyla token-budget-aware örnekleme gerçekleştirin. Eğitim/validasyon bölmesini <strong>token tabanlı ve kaynak-oranını koruyacak</strong> biçimde yapın; örneğin final koşulunda toplam hedef tokenin yaklaşık <code>%0.5–1</code>’ini validation olarak ayırın. En sonda tokenizer analizi yapın: karakter/token oranı, İngilizce alt-token oranı, Türkçe özel karakterlerin bölünme davranışı ve ortalama packed sequence doluluk oranı raporlansın. Bütün bunlar tek bir <code>dataset_manifest.json</code> içinde sürüm, kaynak, tarih, hash, filtre sayıları, atılan belge sayıları ve sampling seed ile kaydedilsin.</p><h2 id="391b9240-1035-8043-882b-cb8e5ff31d81" style="display:inline-block" dir="auto"><strong>Kontaminasyon kontrolü, token bütçeleri ve nihai öneriler</strong></h2><p id="391b9240-1035-803b-8de0-d6c5495bdf74" class="" dir="auto">Kontaminasyon planı bu projenin bel kemiğidir. Tarama birimi belge olmalı ve şu eşleşmeler kaydedilmelidir: <strong>tüm 5,000 sentetik özne adı</strong>, her özne için normalize/casefold varyantları, İngilizce ve Türkçe sentetik fact cümleleri, özne–nesne çiftleri, fact ID’leri, veri dosyası adları ve bilinen dataset identifier kalıpları. Uygulamada bunu Aho–Corasick veya benzeri çoklu desen eşleyici ile yapmak en temiz yoldur. Karar kuralı şu olmalı: <strong>özne adı geçen her belge otomatik inceleme kuyruğuna girsin; öznenin benzersiz ve açıkça sentetik olduğu durumlarda belge doğrudan atılsın.</strong> Ayrıca özne + nesne aynı cümlede ya da dar bir pencere içinde geçiyorsa belge kesin atılsın. İngilizce veya Türkçe sentetik fact cümlelerinin normalize edilmiş eşleşmeleri, veri dosyası adları, fact ID’leri ve tam satır/hash çakışmaları da doğrudan atma sebebidir. Buna karşılık şehir, şirket, örgüt gibi <strong>nesne adları tek başına atma sebebi olmamalıdır</strong>; çünkü bunlar bilinçli olarak gerçek dünyadan seçilmiş olabilir. Yanlış pozitifleri azaltmak için özne listesi ikiye ayrılmalıdır: “benzersiz sentetik özne” ve “potansiyel gerçek/ad-soyad çakışmalı özne”. İkinci sınıf için yalnızca özne + nesne veya özne + fact-sentence eşleşmelerinde atma yapılmalıdır. Kabul eşiğim nettir: <strong>son eğitim korpusunda doğrulanmış sentetik özne ya da özne–nesne ilişkisi için kabul edilebilir eşleşme sayısı sıfır olmalıdır.</strong> Yalnızca nesne-tabanlı gürültü eşleşmeleri raporlanır ama silme sebebi olmaz. Bütün kararlar belge kimliği, kaynak URL/dump id’si, eşleşme türü, normalized match, karakter ofseti ve “removed/kept/manual-review” etiketiyle kaydedilmelidir.</p><p id="391b9240-1035-803e-98d1-ec9d6b624006" class="" dir="auto">Pilot bütçe için benim tavsiyem şudur. <strong>Minimum yararlı bütçe:</strong> 50M Türkçe token. <strong>Tercih edilen pilot bütçe:</strong> 100M token. Bu ölçek, 124M GPT-2 ya da 135M SmolLM2 sınıfı bir modelde dil uyarlamanın başladığını görmeye yeter; aynı zamanda İngilizce sentetik olgu kümesini tamamen “yeniden yazacak” kadar devasa değildir. Sıkı paketleme ile 100M token saklama maliyeti düşüktür; <code>uint16</code> dizinleriyle yaklaşık yüzlerce MB, <code>uint32</code> saklamayla da birkaç yüz MB düzeyindedir. Ham düz metin karşılığı birkaç GB’tan küçüktür. Tek A100 80GB üstünde bu ölçek rahatlıkla uygulanabilir; pratik duvar saati uygulama ayrıntılarına bağlı olsa da “aynı gün / gece çalışması” bandı gerçekçidir. Bu pilot için önerim <strong>yalnız Türkçe Wikipedia</strong> kullanmanızdır; çünkü burada amaç sonucu mümkün olduğunca net okumaktır.</p><p id="391b9240-1035-800f-86e0-e61d2e50ecc3" class="" dir="auto">Nihai deney için önerim <strong>tercih edilen 300M token</strong>, <strong>kabul edilebilir 200M–500M token</strong> aralığıdır. 300M token, küçük bir causal LM’yi Türkçeye anlamlı biçimde adapte etmek için yeterince güçlü; ama projeyi “Türkçe üzerinde neredeyse yeniden ön-eğitim” seviyesine taşımayacak kadar da kontrollüdür. 500M üzeri bütçeler, özellikle küçük modellerde, iki risk doğurur: birincisi İngilizce sentetik bilgilerin aşırı overwrite edilmesi; ikincisi de tezin asıl sorusunun “transfer”den çok “ne kadar Türkçe devam-eğitimi gerekiyor” sorusuna kayması. Bu yüzden M2/M3 ya da birden fazla kurulum eşlemesi yapılacaksa <strong>ham belge sayısı değil, efektif eğitim tokeni ve optimizer step sayısı eşlenmelidir</strong>. Pilot ve final arasında tek değişkenin token bütçesi ve/veya korpus karışımı olması, bilimsel yorumlamayı ciddi biçimde kolaylaştırır.</p><p id="391b9240-1035-803b-958b-e1fbf920aab7" class="" dir="auto">Aşağıdaki tablo nihai sıralamamı özetliyor:</p><table id="391b9240-1035-8015-b21f-fff6608f4aaf" class="simple-table" dir="ltr"><thead class="simple-table-header"><tr id="391b9240-1035-8032-b5cd-d61bfef350fe" dir="ltr"><th id="fRlG" class="simple-table-header-color simple-table-header"><strong>Sıra</strong></th><th id="b^j:" class="simple-table-header-color simple-table-header"><strong>Korpus</strong></th><th id="eipp" class="simple-table-header-color simple-table-header"><strong>Güncel erişim</strong></th><th id="Hitd" class="simple-table-header-color simple-table-header"><strong>Türkçe ölçek</strong></th><th id="kLnA" class="simple-table-header-color simple-table-header"><strong>Güçlü yan</strong></th><th id="Xkum" class="simple-table-header-color simple-table-header"><strong>Başlıca sorun</strong></th><th id="Y[kk" class="simple-table-header-color simple-table-header"><strong>Karar</strong></th></tr></thead><tbody><tr id="391b9240-1035-805b-abdc-e1e4ddcdb98e" dir="ltr"><td id="fRlG" class="">1</td><td id="b^j:" class=""><strong>Türkçe Wikipedia </strong><code><strong>trwiki</strong></code><strong> 2026-06-01</strong></td><td id="eipp" class="">Açık, tarihli dump pinlenebilir.</td><td id="Hitd" class="">653,491 makale; dump ~1.11 GB sıkıştırılmış.</td><td id="kLnA" class="">En temiz ve en kolay denetlenebilir kaynak.</td><td id="Xkum" class="">Alan çeşitliliği sınırlı.</td><td id="Y[kk" class=""><strong>Pilot için birincil öneri</strong></td></tr><tr id="391b9240-1035-80b0-b48e-c7b5fd7d769d" dir="ltr"><td id="fRlG" class="">2</td><td id="b^j:" class=""><strong>FineWeb2 </strong><code><strong>tur_Latn</strong></code><strong> v2.1.1</strong></td><td id="eipp" class="">Açık, HF revision pinlenebilir.</td><td id="Hitd" class="">95.1M belge, 41.93B kelime, 125.53 GB disk.</td><td id="kLnA" class="">Modern filtreleme, küresel dedup, güçlü reproducibility.</td><td id="Xkum" class="">PII ve web gürültüsü tamamen sıfır değil.</td><td id="Y[kk" class=""><strong>Nihai karışımın web omurgası</strong></td></tr><tr id="391b9240-1035-80fc-b9d2-fc496a03ceb5" dir="ltr"><td id="fRlG" class="">3</td><td id="b^j:" class=""><strong>HPLT 3.0 </strong><code><strong>tur_Latn</strong></code></td><td id="eipp" class="">Açık, ama HF dışı map dosyalarıyla indiriliyor.</td><td id="Hitd" class="">159.5M belge, 149.98B token.</td><td id="kLnA" class="">Çok güçlü kalite hattı ve zengin metadata.</td><td id="Xkum" class="">Operasyonel karmaşıklık daha yüksek.</td><td id="Y[kk" class=""><strong>Opsiyonel robustness alternatifi</strong></td></tr><tr id="391b9240-1035-8080-8be2-f5a81e680642" dir="ltr"><td id="fRlG" class="">4</td><td id="b^j:" class=""><strong>CulturaX Türkçe</strong></td><td id="eipp" class="">Gated erişim, mevcut.</td><td id="Hitd" class="">94.2M belge, 64.29B token.</td><td id="kLnA" class="">Derin temizlik ve MinHash dedup.</td><td id="Xkum" class="">Aşırı büyük, karmaşık lisans yüzeyi.</td><td id="Y[kk" class=""><strong>İkincil alternatif, varsayılan değil</strong></td></tr><tr id="391b9240-1035-8095-91db-d64ed661d8aa" dir="ltr"><td id="fRlG" class="">5</td><td id="b^j:" class=""><strong>mC4 Türkçe </strong><code><strong>allenai/c4</strong></code><strong>, </strong><code><strong>tr</strong></code></td><td id="eipp" class="">Açık ve streamable.</td><td id="Hitd" class="">~285 GB ham; downstream raporda 242 GB / 31.24B token.</td><td id="kLnA" class="">Kolay erişim, tarihsel güçlü baseline.</td><td id="Xkum" class="">Daha yaşlı filtreleme ve dağınık metadata.</td><td id="Y[kk" class=""><strong>Baseline olarak mümkün</strong></td></tr><tr id="391b9240-1035-8069-b835-e93d9fd70e15" dir="ltr"><td id="fRlG" class="">6</td><td id="b^j:" class=""><strong>OSCAR-2301 Türkçe</strong></td><td id="eipp" class="">Şu anda erişim askıda.</td><td id="Hitd" class="">26.65M belge, 8.29B word, 73.7 GB.</td><td id="kLnA" class="">Zengin metadata, per-document yapı.</td><td id="Xkum" class="">Erişim ve lisans yüzeyi problemli.</td><td id="Y[kk" class=""><strong>Bugün ana öneri değil</strong></td></tr></tbody></table><p id="391b9240-1035-809e-a1d6-e0e966ce426f" class="" dir="auto">Nihai teslim önerilerim açık biçimde şöyledir. <strong>Önerilen pilot korpus:</strong> tarihli Türkçe Wikipedia dump’ı, tek kaynak, 50M minimum ve 100M tercih edilen token bütçesi. <strong>Önerilen nihai korpus:</strong> <code>trwiki 2026-06-01</code> ile <code>HuggingFaceFW/fineweb-2</code> <code>tur_Latn</code> <code>v2.1.1</code> karışımı; ağırlık <strong>%25 Wikipedia / %75 FineWeb2</strong>. <strong>Kesin kaynak tanımları:</strong> <code>trwiki</code> dump tarihi <code>2026-06-01</code>; <code>HuggingFaceFW/fineweb-2</code> subset <code>tur_Latn</code>, revision <code>v2.1.1</code>. <strong>Lisans değerlendirmesi:</strong> Wikipedia tarafında CC BY-SA/GFDL sorumlulukları; FineWeb2 tarafında ODC-BY + Common Crawl terms; ikisi de akademik çalışma için kullanılabilir görünür, fakat model ağırlıklarını kamuya açma planı varsa danışman/sorumlu hukuk ofisi onayı isabetli olur. <strong>Yeniden üretilebilir edinim planı:</strong> tarihli dump + revision pin + SHA-256 + manifest. <strong>Ön işleme planı:</strong> wiki text extraction, NFC normalization, source-specific length/boilerplate filtering, merge sonrası exact + near dedup, contamination scan, tokenizer audit, sabit token örnekleme. <strong>Kontaminasyon planı:</strong> özne odaklı sıfır tolerans, nesne-tekil eşleşmelere toleranslı raporlama. <strong>Açık riskler ve danışman onayı gerektiren kararlar:</strong> model ağırlıklarının yeniden dağıtımı halinde lisans yorumu; HPLT3’ün opsiyonel ikinci web kaynağı olarak eklenip eklenmeyeceği; final karışım oranının <code>%25/%75</code> mi yoksa <code>%30/%70</code> mi sabitleneceği; ve validation’ın tek sabit kaynak mı yoksa karışım-oranını koruyan bir split mi olacağı.</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

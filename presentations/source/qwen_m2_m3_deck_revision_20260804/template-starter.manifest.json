@@ -1,0 +1,222 @@
+{
+  "sourcePptx": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/outputs/qwen_m2_m3_research_update_august_2026.pptx",
+  "mapPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-frame-map.json",
+  "output": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter.pptx",
+  "outputBytes": 83675,
+  "sourceSlideCount": 15,
+  "slideCount": 19,
+  "previewDir": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview",
+  "layoutDir": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout",
+  "contactSheet": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-contact-sheet.png",
+  "slides": [
+    {
+      "outputSlide": 1,
+      "sourceSlide": 1,
+      "narrativeRole": "opening thesis and milestone frame",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-01.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-01.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-01.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-01.layout.json"
+    },
+    {
+      "outputSlide": 2,
+      "sourceSlide": 2,
+      "narrativeRole": "milestone summary and central interpretation",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-02.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-02.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-02.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-02.layout.json"
+    },
+    {
+      "outputSlide": 3,
+      "sourceSlide": 3,
+      "narrativeRole": "preserve-only core research question",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-03.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-03.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-03.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-03.layout.json"
+    },
+    {
+      "outputSlide": 4,
+      "sourceSlide": 14,
+      "narrativeRole": "causal motivation for sibling M2 and M3 arms",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-04.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-04.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-04.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-04.layout.json"
+    },
+    {
+      "outputSlide": 5,
+      "sourceSlide": 4,
+      "narrativeRole": "preserve-only measurement evolution",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-05.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-05.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-05.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-05.layout.json"
+    },
+    {
+      "outputSlide": 6,
+      "sourceSlide": 5,
+      "narrativeRole": "preserve-only SmolLM negative result",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-06.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-06.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-06.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-06.layout.json"
+    },
+    {
+      "outputSlide": 7,
+      "sourceSlide": 6,
+      "narrativeRole": "preserve-only cross-family model decision",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-07.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-07.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-07.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-07.layout.json"
+    },
+    {
+      "outputSlide": 8,
+      "sourceSlide": 7,
+      "narrativeRole": "preserve-only replicated Qwen M1 result",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-08.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-08.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-08.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-08.layout.json"
+    },
+    {
+      "outputSlide": 9,
+      "sourceSlide": 8,
+      "narrativeRole": "preserve-only pre-M2 readiness package",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-09.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-09.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-09.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-09.layout.json"
+    },
+    {
+      "outputSlide": 10,
+      "sourceSlide": 9,
+      "narrativeRole": "preserve-only matched M2/M3 intervention",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-10.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-10.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-10.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-10.layout.json"
+    },
+    {
+      "outputSlide": 11,
+      "sourceSlide": 14,
+      "narrativeRole": "three-layer evaluation logic",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-11.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-11.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-11.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-11.layout.json"
+    },
+    {
+      "outputSlide": 12,
+      "sourceSlide": 10,
+      "narrativeRole": "preserve-only execution and integrity evidence",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-12.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-12.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-12.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-12.layout.json"
+    },
+    {
+      "outputSlide": 13,
+      "sourceSlide": 11,
+      "narrativeRole": "preserve-only pre-adaptation baseline",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-13.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-13.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-13.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-13.layout.json"
+    },
+    {
+      "outputSlide": 14,
+      "sourceSlide": 12,
+      "narrativeRole": "preserve-only descriptive endpoint result",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-14.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-14.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-14.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-14.layout.json"
+    },
+    {
+      "outputSlide": 15,
+      "sourceSlide": 13,
+      "narrativeRole": "primary interaction replication result",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-15.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-15.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-15.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-15.layout.json"
+    },
+    {
+      "outputSlide": 16,
+      "sourceSlide": 14,
+      "narrativeRole": "precise failure diagnosis",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-16.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-16.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-16.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-16.layout.json"
+    },
+    {
+      "outputSlide": 17,
+      "sourceSlide": 14,
+      "narrativeRole": "missing manipulation check and conditional interpretation",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-17.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-17.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-17.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-17.layout.json"
+    },
+    {
+      "outputSlide": 18,
+      "sourceSlide": 15,
+      "narrativeRole": "immediate read-only diagnostic plan",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-18.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-18.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-18.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-18.layout.json"
+    },
+    {
+      "outputSlide": 19,
+      "sourceSlide": 15,
+      "narrativeRole": "supervisor decision and closing recommendation",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-preview/starter-slide-19.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-19.png",
+      "layoutPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.tmp/qwen_m2_m3_deck_revision_20260804/template-starter-layout/starter-slide-19.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-19.layout.json"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+Kaynak sunum: outputs/qwen_m2_m3_research_update_august_2026.pptx
+
+Yapı ve stil:
+- 1280 × 720, beyaz veya lacivert arka plan.
+- Calibri / Calibri Light; lacivert ana metin, mavi vurgu, turkuaz doğrulama, turuncu risk/karar.
+- Üstte kısa bölüm etiketi, tek satırlık sonuç başlığı, altta ince kaynak çizgisi ve sayfa numarası.
+- Yeniden kullanılabilir kalıplar: başlık; koyu üç satırlı sentez; dört aşamalı akış; üç ölçüm kartı; iki karşılaştırma kartı; grafik + iki metrik; yürütme günlüğü; sonuç/karar slaytı.
+- Kaynak sunumdaki boş structural placeholder bulunmuyor. Master ve Title Slide layout korunacak.
+
+Yerleştirme sözleşmesi:
+- Her çıktı slaytı bir kaynak slaytın birebir kopyasıdır.
+- Metin, grafik serileri ve speaker notes yalnız doğrulanmış inherited öğelerde değiştirilecek.
+- Yeni görsel primitive eklenmeyecek; kronoloji ve örnekler mevcut kart/akış/grafik çerçevelerine yerleştirilecek.
+- Türkçe metin uzarsa font küçültmek yerine metin kısaltılacak veya daha uygun kaynak kalıp kullanılacak.

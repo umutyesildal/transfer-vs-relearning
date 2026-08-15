@@ -1,0 +1,839 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>First Run Report</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="393b9240-1035-80b0-990d-fadc235033eb" class="page sans"><header><h1 class="page-title" dir="auto">First Run Report</h1><p class="page-description" dir="auto"></p></header><div class="page-body"><h1 id="393b9240-1035-805c-a82b-f22ff85bea8a" style="display:inline-block" dir="auto">HU Server Setup ve M0 Micro Evaluation Raporu</h1><h2 id="393b9240-1035-807d-b28b-d331f2229741" style="display:inline-block" dir="auto">Genel Durum</h2><p id="393b9240-1035-80fe-826d-ec9ea74ac59d" class="" dir="auto">HU sunucusunda <code>transfer-vs-relearning</code> reposu <code>corpus-update</code> branch’i üzerinde başarıyla hazırlandı. İlk hedeflenen setup adımları tamamlandı:</p><ul id="393b9240-1035-8075-ad83-e57618bf728f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">repo doğrulandı,</li></ul><ul id="393b9240-1035-8090-ad63-fdd75a85946e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Conda ortamı çalıştırıldı,</li></ul><ul id="393b9240-1035-8034-a1a7-f8a78b6d0b99" class="bulleted-list" dir="auto"><li style="list-style-type:disc">CUDA/A100 erişimi kontrol edildi,</li></ul><ul id="393b9240-1035-8094-8ad6-cd20b27190d3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dependency check yapıldı,</li></ul><ul id="393b9240-1035-80e5-bcc2-da6250c8dac8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">test suite çalıştırıldı,</li></ul><ul id="393b9240-1035-80ae-a4fa-f90d36eee817" class="bulleted-list" dir="auto"><li style="list-style-type:disc">eksik synthetic dataset artifact’leri düzeltildi,</li></ul><ul id="393b9240-1035-80fc-ae89-edce2e73141c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">GPT-2 snapshot indirildi ve doğrulandı,</li></ul><ul id="393b9240-1035-809e-82f8-c7963f33dde3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">4-subject micro evaluation başarıyla çalıştırıldı,</li></ul><ul id="393b9240-1035-807b-8337-dad970a09fae" class="bulleted-list" dir="auto"><li style="list-style-type:disc">parser smoke test problemi düzeltildi,</li></ul><ul id="393b9240-1035-801c-9772-ec4315e37589" class="bulleted-list" dir="auto"><li style="list-style-type:disc">düzeltme commitlenip GitHub’a pushlandı.</li></ul><p id="393b9240-1035-8092-8347-f43e3631fc87" class="" dir="auto">Remote branch artık şu commit üzerindedir:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="393b9240-1035-808d-9ba8-ddb8de33d141" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">638b697fe67a4fa1ede76241caf4fa4215bde72f</code></pre><p id="393b9240-1035-80c5-927d-d5be2e927b0f" class="" dir="auto">Commit mesajı:</p><pre id="393b9240-1035-8090-9fb5-ceaeef4a172a" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Fix corpus production parser smoke test</code></pre><hr id="393b9240-1035-808f-b83a-d3d3d757c046" dir="auto"/><h2 id="393b9240-1035-80cc-beca-dadf197225ab" style="display:inline-block" dir="auto">1. Repo ve Branch Durumu</h2><p id="393b9240-1035-8033-8b52-ee1215eccbc7" class="" dir="auto">Repository HU sunucusunda şu path altında çalıştırıldı:</p><pre id="393b9240-1035-8000-9573-f71ccbe78230" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">/vol/fob-vol6/mi25/yesildau/transfer-vs-relearning</code></pre><p id="393b9240-1035-8007-a965-c70fcbd905ca" class="" dir="auto">Aktif branch:</p><pre id="393b9240-1035-80b0-96e3-d8ae8464385a" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">corpus-update</code></pre><p id="393b9240-1035-80c0-bae3-e18986f64f1a" class="" dir="auto">İlk doğrulanan commit:</p><pre id="393b9240-1035-8077-8b3d-f3ef53eb66bd" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">3080903b76b79e422fc49f72cdd56591e54bf719</code></pre><p id="393b9240-1035-8086-b0f1-e47cb5a929ac" class="" dir="auto">Parser smoke fix sonrası yeni commit:</p><pre id="393b9240-1035-80bc-9c1c-c22922739523" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">638b697fe67a4fa1ede76241caf4fa4215bde72f</code></pre><p id="393b9240-1035-800a-9d61-cdc8d8e5a9de" class="" dir="auto">Push sorunu önce HTTPS credential ve SSH host key nedeniyle oluştu. Daha sonra deploy key ayarı düzeltildi ve push başarıyla tamamlandı.</p><p id="393b9240-1035-8026-95e2-f7b9999945d1" class="" dir="auto">Son doğrulama:</p><pre id="393b9240-1035-80ab-a7d2-e12b0e41c8ed" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">local HEAD:           638b697fe67a4fa1ede76241caf4fa4215bde72f
+origin/corpus-update: 638b697fe67a4fa1ede76241caf4fa4215bde72f</code></pre><p id="393b9240-1035-80ec-8b13-ca0c4f616c6f" class="" dir="auto">Repo-local remote ayarı:</p><pre id="393b9240-1035-8089-b131-fc22c61e98c0" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">origin fetch: https://github.com/umutyesildal/transfer-vs-relearning.git
+origin push:  git@github.com:umutyesildal/transfer-vs-relearning.git</code></pre><p id="393b9240-1035-80e6-83ff-c0dd1f5b069e" class="" dir="auto">Bu sayede bundan sonra bu repoda push işlemleri SSH deploy key üzerinden yapılabilecek.</p><hr id="393b9240-1035-804b-bdb1-ecde829ca8af" dir="auto"/><h2 id="393b9240-1035-809c-85c2-c23f4a6c4128" style="display:inline-block" dir="auto">2. Conda ve GPU Ortamı</h2><p id="393b9240-1035-80bc-953f-eb1010f87bbb" class="" dir="auto">Conda environment başarıyla aktive edildi:</p><pre id="393b9240-1035-809f-ac27-d96a06527dde" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">xfer-relearn</code></pre><p id="393b9240-1035-8056-b014-ff4a858ef03b" class="" dir="auto">Python:</p><pre id="393b9240-1035-80a0-a1a5-c37c78722a23" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Python 3.11.15</code></pre><p id="393b9240-1035-806c-b47a-d6e5fcdb6770" class="" dir="auto">Python path:</p><pre id="393b9240-1035-8082-a58b-f071736e61dc" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">/vol/fob-vol6/mi25/yesildau/.conda/envs/xfer-relearn/bin/python</code></pre><p id="393b9240-1035-80a0-9ce7-dbf18ab77ef3" class="" dir="auto">Torch/CUDA durumu:</p><pre id="393b9240-1035-80e0-adf2-f88560c83c9c" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Torch: 2.7.0+cu128
+CUDA version: 12.8
+CUDA available: True
+GPU: NVIDIA A100 80GB PCIe
+BF16 supported: True</code></pre><p id="393b9240-1035-80a8-b0a2-e4d22474b8f2" class="" dir="auto">Bu sonuç bizim için önemli çünkü evaluator BF16 destekli A100 üzerinde çalışacak şekilde tasarlandı. Micro evaluation’da model gerçekten CUDA üzerinde çalıştı.</p><p id="393b9240-1035-80f6-8901-c4617485b3b8" class="" dir="auto">Dependency kontrolü:</p><pre id="393b9240-1035-8094-85e7-e2ee46f4acc7" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">pip check: No broken requirements found.</code></pre><p id="393b9240-1035-80ce-94fd-ff2bd3a904b0" class="" dir="auto">Yani ortamda broken dependency görünmüyor.</p><hr id="393b9240-1035-80d4-99eb-e4032caacb8f" dir="auto"/><h2 id="393b9240-1035-808e-aa07-e868a0bec986" style="display:inline-block" dir="auto">3. Test Suite Durumu</h2><p id="393b9240-1035-806f-ad05-d50efc5a4326" class="" dir="auto">İlk test çalıştırmasında corpus parser smoke test başarısız oldu.</p><p id="393b9240-1035-8099-bf27-d85ab0a79ee4" class="" dir="auto">Hata:</p><pre id="393b9240-1035-801c-b4f6-d134223e1b09" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">mwxml.errors.MalformedXML: &lt;siteinfo&gt; tag not found when processing a &lt;mediawiki&gt;</code></pre><p id="393b9240-1035-80d8-81e7-ee1ef2927759" class="" dir="auto">Sebep:</p><p id="393b9240-1035-807a-bbd6-dce601631a33" class="" dir="auto">Production parser smoke testinde kullanılan tiny XML fixture, <code>mwxml</code> için geçerli bir MediaWiki dump yapısına sahip değildi. <code>mwxml</code>, <code>&lt;mediawiki&gt;</code> içinde <code>&lt;siteinfo&gt;</code> bekliyor.</p><p id="393b9240-1035-8067-a973-daa60ee19a3a" class="" dir="auto">Yapılan fix:</p><ol type="1" id="393b9240-1035-80c1-b46c-ca8d797eb15a" class="numbered-list" start="1" dir="auto"><li><code>tests/test_corpora_phase1.py</code> içindeki tiny XML fixture’a geçerli bir <code>&lt;siteinfo&gt;</code> bloğu eklendi.</li></ol><ol type="1" id="393b9240-1035-8051-96e6-f3e9ddb062df" class="numbered-list" start="2" dir="auto"><li><code>src/transfer_vs_relearning/corpora/extract.py</code> içinde <code>page.namespace is None</code> durumu güvenli hale getirildi.</li></ol><p id="393b9240-1035-80ca-b04b-e3db28fd1599" class="" dir="auto">Kod değişikliği mantığı:</p><pre id="393b9240-1035-8026-a4d9-e193681e7f95" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Eski:
+namespace = int(getattr(page, &quot;namespace&quot;, -1) or -1)
+
+Yeni:
+namespace_value = getattr(page, &quot;namespace&quot;, -1)
+namespace = -1 if namespace_value is None else int(namespace_value)</code></pre><p id="393b9240-1035-802b-a7cb-e4d07d52ea79" class="" dir="auto">Bu değişiklik production parser yolunu zayıflatmadı. Aksine gerçek <code>mwxml</code> davranışına karşı daha sağlam hale getirdi.</p><p id="393b9240-1035-8067-ae10-dc14f4d67fb1" class="" dir="auto">Final test sonucu:</p><pre id="393b9240-1035-80c1-9a42-ef42a32f2eb0" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">59 passed in 2.77s
+compileall ok</code></pre><p id="393b9240-1035-80cf-93e9-e88b0cbfaccf" class="" dir="auto">Skip yok. Bu çok iyi bir durum çünkü HU ortamında hem Torch hem <code>mwxml</code>/<code>mwparserfromhell</code> çalışır durumda doğrulandı.</p><hr id="393b9240-1035-80c7-b9c8-ea61f6118dd4" dir="auto"/><h2 id="393b9240-1035-8068-b955-fbd49f72f94c" style="display:inline-block" dir="auto">4. Synthetic Dataset Sorunu ve Çözümü</h2><p id="393b9240-1035-805d-971e-fd9dd9340ed1" class="" dir="auto">Başta <code>artifacts/datasets/synthetic_v1</code> klasörü eksikti. Klasörde yalnızca bazı küçük manifest/summary dosyaları vardı:</p><pre id="393b9240-1035-8069-80ed-e7ba8eea923d" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">manifest.json
+pilot_100_subjects.json
+validation_summary.json
+validation_summary.md</code></pre><p id="393b9240-1035-80b2-a161-d452aa74dab1" class="" dir="auto">Ama asıl gerekli dataset dosyaları yoktu:</p><pre id="393b9240-1035-80c8-91d4-ddac14bd6609" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">data/canonical_subject_profiles_5000.csv
+output/english_training.jsonl
+output/turkish_repetition.jsonl
+output/probes_en.csv
+output/probes_tr.csv</code></pre><p id="393b9240-1035-805d-b305-e3c184d13a33" class="" dir="auto">Bu yüzden validation ve pilot selection başarısız oldu.</p><p id="393b9240-1035-80c4-b805-f8a17e0651fc" class="" dir="auto">Hata:</p><pre id="393b9240-1035-8009-aa40-cdb3f0d3d221" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">FileNotFoundError:
+artifacts/datasets/synthetic_v1/data/canonical_subject_profiles_5000.csv</code></pre><p id="393b9240-1035-80af-a679-d8286839c82f" class="" dir="auto">Çözüm:</p><p id="393b9240-1035-80dd-b94e-e9dbb98ae707" class="" dir="auto">Eksik artifact klasörü silinmeden güvenli şekilde kenara alındı:</p><pre id="393b9240-1035-80ac-865d-f70af28d6911" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">artifacts/datasets/synthetic_v1.incomplete_20260704T164833Z</code></pre><p id="393b9240-1035-80b6-9bb7-f691fec49995" class="" dir="auto">Sonra dataset yeniden sync edildi.</p><p id="393b9240-1035-804a-a013-c50b690e793a" class="" dir="auto">Validation sonucu:</p><pre id="393b9240-1035-804a-a908-d02d2728b087" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Validation passed
+Facts: 25000
+candidates: {&#x27;profession&#x27;: 200, &#x27;city&#x27;: 130, &#x27;university&#x27;: 91, &#x27;employer&#x27;: 241}</code></pre><p id="393b9240-1035-80f2-bd74-d7636b246a2f" class="" dir="auto">Bu, dataset’in artık evaluator için kullanılabilir olduğunu gösteriyor.</p><hr id="393b9240-1035-808e-acb6-c33a217513b8" dir="auto"/><h2 id="393b9240-1035-800b-b5cd-e1e210600be0" style="display:inline-block" dir="auto">5. GPT-2 Snapshot</h2><p id="393b9240-1035-80a0-9526-d5e32bfaf818" class="" dir="auto">GPT-2 modeli başarıyla indirildi.</p><p id="393b9240-1035-8097-a5b9-d3df4a765058" class="" dir="auto">Model:</p><pre id="393b9240-1035-80e9-bdc1-c0d19362288e" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">openai-community/gpt2</code></pre><p id="393b9240-1035-800f-aed0-c7fd4b65f44b" class="" dir="auto">Resolved revision:</p><pre id="393b9240-1035-8058-8c9d-e77ca431f30b" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">607a30d783dfa663caf39e06633721c8d4cfcd7e</code></pre><p id="393b9240-1035-8043-89e8-e6bfc32b1462" class="" dir="auto">Manifest path:</p><pre id="393b9240-1035-80c9-b401-c76d2e1bc0de" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">artifacts/models/openai-community__gpt2/model_manifest.json</code></pre><p id="393b9240-1035-80d4-b467-d1681aca6ee6" class="" dir="auto">Bu snapshot evaluator tarafından offline kullanılabilecek. GPU job’larında:</p><pre id="393b9240-1035-8020-8763-dec99229ef70" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">HF_HUB_OFFLINE=1
+TRANSFORMERS_OFFLINE=1</code></pre><p id="393b9240-1035-80ed-865e-d25e5f87a0a6" class="" dir="auto">ile model yeniden internetten çekilmeden kullanılabilir.</p><hr id="393b9240-1035-80da-88e3-c73280f52347" dir="auto"/><h2 id="393b9240-1035-8061-a04e-d0270b66c101" style="display:inline-block" dir="auto">6. Micro Evaluation Config</h2><p id="393b9240-1035-8038-bddc-e58db2589798" class="" dir="auto">Önce <code>/tmp/m0_gpt2_micro_direct.yaml</code> kullanılmıştı. Fakat <code>/tmp</code> node-local olduğu için login node’da oluşturulan dosya GPU node’da bulunamadı.</p><p id="393b9240-1035-806c-9737-f5a695c4a252" class="" dir="auto">Bu yüzden bundan sonra sabit repo-local config path kullanılacak:</p><pre id="393b9240-1035-806e-a9a6-fea312778cb9" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">runs/local_configs/m0_gpt2_micro_direct.yaml</code></pre><p id="393b9240-1035-807a-9498-f919c9472b0e" class="" dir="auto">Bu doğru karar çünkü:</p><ul id="393b9240-1035-8052-a751-d34a13e87e17" class="bulleted-list" dir="auto"><li style="list-style-type:disc">login node ve GPU node aynı shared filesystem üzerinden erişebilir,</li></ul><ul id="393b9240-1035-80f0-835f-ed27bfff6c98" class="bulleted-list" dir="auto"><li style="list-style-type:disc">config kaybolmaz,</li></ul><ul id="393b9240-1035-80d6-b508-f64ffbfe3df6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">her seferinde yeni geçici dosya oluşturulmaz,</li></ul><ul id="393b9240-1035-80f5-81b2-e950a671a9e9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">operasyonel tekrar edilebilirlik artar.</li></ul><p id="393b9240-1035-8083-a5ae-db0561436652" class="" dir="auto">Micro config şu amaçla kullanıldı:</p><ul id="393b9240-1035-807c-895e-d564f6da0e9a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">4 subject</li></ul><ul id="393b9240-1035-80bb-8532-ebd9577f15ed" class="bulleted-list" dir="auto"><li style="list-style-type:disc">5 relation</li></ul><ul id="393b9240-1035-80cb-96ed-c467c42bd951" class="bulleted-list" dir="auto"><li style="list-style-type:disc">2 language</li></ul><ul id="393b9240-1035-80f6-9bf4-f599cae536e5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">toplam 40 probe-language evaluation</li></ul><hr id="393b9240-1035-8044-883c-cfabc8017d5a" dir="auto"/><h2 id="393b9240-1035-8003-be3c-f132c7e4ea09" style="display:inline-block" dir="auto">7. 4-Subject Micro Pilot</h2><p id="393b9240-1035-803d-aaca-fc36cd650e27" class="" dir="auto">Pilot seçimi 4 subject ile yapıldı. Bunun sebebi pilot selector’ın balanced diagnostic seçim için subject sayısının 4’e bölünebilir olmasını istemesi.</p><p id="393b9240-1035-8078-a314-f6264aac47e8" class="" dir="auto">Selected subjects:</p><pre id="393b9240-1035-808b-9422-f3b9b8db299d" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">S01995
+S02152
+S02856
+S03381</code></pre><p id="393b9240-1035-80b5-acc8-ccab51960a21" class="" dir="auto">Distribution:</p><pre id="393b9240-1035-80dd-8253-f6b62d7a5996" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">subjects: 4
+branch_group: A=2, B=2
+name_type: english_like=2, turkish_like=2
+branch_x_name_type:
+  A|english_like=1
+  A|turkish_like=1
+  B|english_like=1
+  B|turkish_like=1
+relation_counts:
+  born_in=4
+  lives_in=4
+  profession=4
+  studied_at=4
+  works_at=4</code></pre><p id="393b9240-1035-8092-b01a-f6f22b54875e" class="" dir="auto">Bu küçük pilot population-level sonuç üretmek için değil, pipeline smoke test için kullanıldı.</p><hr id="393b9240-1035-80e8-bef9-c1c749515857" dir="auto"/><h2 id="393b9240-1035-80dd-b8d4-e0135952c336" style="display:inline-block" dir="auto">8. Micro Evaluation Sonucu</h2><p id="393b9240-1035-80a1-a2ae-cc90e77b406e" class="" dir="auto">Run directory:</p><pre id="393b9240-1035-802c-a709-fd7517d1eca8" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">runs/evaluation/m0_gpt2_micro_direct/20260704T165220Z_f359d82e</code></pre><p id="393b9240-1035-8017-b4ae-e392473a3e31" class="" dir="auto">Run tamamlandı:</p><pre id="393b9240-1035-80ac-a416-f74a6804ccd2" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">completion_status: completed
+expected_probe_count: 40
+successful_probe_count: 40
+failed_probe_count: 0</code></pre><p id="393b9240-1035-802b-9220-fc2cc194c62f" class="" dir="auto">Error yok:</p><pre id="393b9240-1035-8060-bd70-e75ae9c8cb8e" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">No errors.jsonl</code></pre><p id="393b9240-1035-8045-bb63-f83d228fe6cb" class="" dir="auto">Model/GPU bilgileri:</p><pre id="393b9240-1035-8017-aeb7-f96c0d5fd0be" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">model_id: openai-community/gpt2
+model_revision: 607a30d783dfa663caf39e06633721c8d4cfcd7e
+device: cuda
+gpu_name: NVIDIA A100 80GB PCIe
+dtype: torch.bfloat16
+python_version: 3.11.15
+pytorch_version: 2.7.0+cu128
+cuda_version: 12.8
+selected_subject_count: 4
+selected_fact_count: 20
+expected_probe_count: 40
+successful_probe_count: 40
+failed_probe_count: 0</code></pre><p id="393b9240-1035-80fe-80c3-fa5bce2627fd" class="" dir="auto">Bu bizim için ana teknik başarıdır: evaluator gerçek GPT-2 snapshot’ını CUDA üzerinde yükledi, candidate scoring yaptı, BF16 çalıştı, bütün 40 probe’u hatasız tamamladı ve sonuç dosyalarını üretti.</p><hr id="393b9240-1035-807a-99c7-d0a0228021b5" dir="auto"/><h2 id="393b9240-1035-80dc-9b72-d8b735415e56" style="display:inline-block" dir="auto">9. Micro Evaluation Metrics Yorumu</h2><p id="393b9240-1035-8097-b0a9-d696e89bcb0d" class="" dir="auto">Primary mean-logprob sonuçları:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" integrity="sha512-QXFMVAusM85vUYDaNgcYeU3rzSlc+bTV4JvkfJhjxSHlQEo+ig53BtnGkvFTiNJh8D+wv6uWAQ2vJaVmxe8d3w==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><pre id="393b9240-1035-8073-8345-fcc3140c3195" class="code code-wrap" data-notion-code-syntax="json"><code class="language-json" style="white-space:pre-wrap;word-break:break-all">{
+  &quot;mean_rank&quot;: 68.975,
+  &quot;median_rank&quot;: 47.0,
+  &quot;mrr&quot;: 0.055508103715951565,
+  &quot;top1_accuracy&quot;: 0.0,
+  &quot;top5_accuracy&quot;: 0.075
+}</code></pre><p id="393b9240-1035-8079-aaca-daaef689ed6d" class="" dir="auto">Total-logprob sensitivity:</p><pre id="393b9240-1035-80e1-b94a-f9a4bb8421e1" class="code code-wrap" data-notion-code-syntax="json"><code class="language-json" style="white-space:pre-wrap;word-break:break-all">{
+  &quot;mean_rank&quot;: 90.6,
+  &quot;median_rank&quot;: 89.5,
+  &quot;mrr&quot;: 0.05256817240809797,
+  &quot;top1_accuracy&quot;: 0.0,
+  &quot;top5_accuracy&quot;: 0.075
+}</code></pre><p id="393b9240-1035-8024-805c-c366a6514db9" class="" dir="auto">Bu sonuç M0 için beklenen bir sonuçtur.</p><p id="393b9240-1035-8074-a930-df086ca196eb" class="" dir="auto">Çünkü M0 henüz sentetik fact’leri görmedi. Dolayısıyla:</p><ul id="393b9240-1035-803b-b94c-d9cebc396f1e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">doğru subject-profession ilişkisini bilmemesi,</li></ul><ul id="393b9240-1035-8086-8c66-fabc13da2047" class="bulleted-list" dir="auto"><li style="list-style-type:disc">doğru birthplace/lives_in ayrımını yapamaması,</li></ul><ul id="393b9240-1035-8076-b23b-dce990aa54eb" class="bulleted-list" dir="auto"><li style="list-style-type:disc">doğru university/employer seçememesi</li></ul><p id="393b9240-1035-8082-8977-fea6c13cb1c7" class="" dir="auto">normaldir.</p><p id="393b9240-1035-80e7-88bb-d0d2f222f7be" class="" dir="auto">Bu aşamada amacımız yüksek accuracy görmek değildi. Amacımız şunları doğrulamaktı:</p><ul id="393b9240-1035-8038-9edb-ea96bc770fd4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">candidate inventory doğru yükleniyor mu?</li></ul><ul id="393b9240-1035-806d-944d-e6add3682659" class="bulleted-list" dir="auto"><li style="list-style-type:disc">English/Turkish probes okunuyor mu?</li></ul><ul id="393b9240-1035-80d5-b414-d59930883f71" class="bulleted-list" dir="auto"><li style="list-style-type:disc">model snapshot local path’ten yükleniyor mu?</li></ul><ul id="393b9240-1035-802c-821e-e7dd53abb3d4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">tokenizer çalışıyor mu?</li></ul><ul id="393b9240-1035-8020-aca3-d7d343abf513" class="bulleted-list" dir="auto"><li style="list-style-type:disc">answer-token likelihood scoring çalışıyor mu?</li></ul><ul id="393b9240-1035-809e-9e3b-fab367e534a2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">candidate batching çalışıyor mu?</li></ul><ul id="393b9240-1035-8006-b611-e238dc9ba3a5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">output dosyaları yazılıyor mu?</li></ul><ul id="393b9240-1035-80db-91ea-fabba087cd6b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">relation-binding metrics üretiliyor mu?</li></ul><ul id="393b9240-1035-806d-92cc-eaef82bcaa8c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">GPU/BF16 yolu çalışıyor mu?</li></ul><p id="393b9240-1035-804a-80a7-ef565dd1924c" class="" dir="auto">Hepsi doğrulandı.</p><p id="393b9240-1035-80a8-ad9b-e6fab9c022ab" class="" dir="auto">Relation-binding sonucu:</p><pre id="393b9240-1035-80d2-9393-e7fd6445d4da" class="code code-wrap" data-notion-code-syntax="json"><code class="language-json" style="white-space:pre-wrap;word-break:break-all">{
+  &quot;pairwise_relation_binding_accuracy&quot;: 0.0,
+  &quot;combined_swapped_answer_rate&quot;: 0.0
+}</code></pre><p id="393b9240-1035-8095-9751-fdbf0ad2d8c9" class="" dir="auto">Bu da M0 için normaldir. Çünkü model sentetik subject’lerin birthplace/residence fact’lerini öğrenmedi.</p><hr id="393b9240-1035-8088-bde7-ec9d56cbb285" dir="auto"/><h2 id="393b9240-1035-8084-b85c-c8976917e6f5" style="display:inline-block" dir="auto">10. Git Temizliği ve Commit</h2><p id="393b9240-1035-805f-a019-c442969e8bb5" class="" dir="auto">Parser smoke fix önce local uncommitted durumdaydı. Sonra yalnızca şu iki dosya commitlendi:</p><pre id="393b9240-1035-80f8-9330-f735f5eecd28" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">src/transfer_vs_relearning/corpora/extract.py
+tests/test_corpora_phase1.py</code></pre><p id="393b9240-1035-800d-b328-cf46230a3578" class="" dir="auto">Commit:</p><pre id="393b9240-1035-8013-883f-c84a003335fe" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">638b697 Fix corpus production parser smoke test</code></pre><p id="393b9240-1035-80b3-848c-fb99a9f8b8db" class="" dir="auto">Push tamamlandı.</p><p id="393b9240-1035-8079-b23b-e08223e538fe" class="" dir="auto">Commitlenmeyen local artifact’ler:</p><pre id="393b9240-1035-8095-9b45-dbd5c69c5729" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">artifacts/datasets/synthetic_v1.incomplete_20260704T164833Z/
+artifacts/datasets/synthetic_v1/pilot_4_subjects.json
+artifacts/models/openai-community__gpt2/</code></pre><p id="393b9240-1035-80a8-9d46-f5984010c73d" class="" dir="auto">Bunlar local çalışma artifact’leridir ve commitlenmemeleri doğru.</p><hr id="393b9240-1035-8041-9bcd-e62141c689d0" dir="auto"/><h2 id="393b9240-1035-8044-8338-f0edffb15ad7" style="display:inline-block" dir="auto">11. Özellikle Yapılmayanlar</h2><p id="393b9240-1035-802e-946b-d1bb50bce1f0" class="" dir="auto">Talimatlara uygun olarak şunlar yapılmadı:</p><ul id="393b9240-1035-8016-acf9-ce64aa28baa2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">full 100-subject evaluation çalıştırılmadı,</li></ul><ul id="393b9240-1035-80fb-b2bc-f13c1f8b65e0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">QA-matched sensitivity evaluation çalıştırılmadı,</li></ul><ul id="393b9240-1035-8016-a06a-e50f5509d226" class="bulleted-list" dir="auto"><li style="list-style-type:disc">M1/M2/M3 training yapılmadı,</li></ul><ul id="393b9240-1035-8092-9178-dd351a617721" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Turkish Wikipedia dump indirilmedi,</li></ul><ul id="393b9240-1035-809c-9adc-eec922e18627" class="bulleted-list" dir="auto"><li style="list-style-type:disc">official Wikimedia metadata fetch yapılmadı,</li></ul><ul id="393b9240-1035-80dd-a7f7-cf2e1fb51ab3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Phase 2 tokenization yapılmadı,</li></ul><ul id="393b9240-1035-805e-aa6a-f58477420d34" class="bulleted-list" dir="auto"><li style="list-style-type:disc">uzun Slurm job submit edilmedi,</li></ul><ul id="393b9240-1035-8047-b772-dd74aca60b7c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">model artifact’leri commitlenmedi,</li></ul><ul id="393b9240-1035-80e9-9e42-cc2ee4ead082" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dataset backup/pilot artifact’leri commitlenmedi.</li></ul><p id="393b9240-1035-8070-836a-e0db0aa400e2" class="" dir="auto">Bu önemli çünkü her aşamayı kontrollü ve audit edilebilir şekilde ilerletiyoruz.</p><hr id="393b9240-1035-8066-87c2-d23917e9f76b" dir="auto"/><h2 id="393b9240-1035-8031-8e0f-ffcc01c506aa" style="display:inline-block" dir="auto">12. Mevcut Milestone Kararı</h2><p id="393b9240-1035-8018-b465-dc6f1da083ae" class="" dir="auto">Bu aşama başarıyla tamamlandı:</p><pre id="393b9240-1035-8077-aca7-e6411c6bb36f" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">HU setup + M0 4-subject micro evaluation</code></pre><p id="393b9240-1035-801e-90e6-ef58442aca0d" class="" dir="auto">Bu milestone şunları kanıtladı:</p><ol type="1" id="393b9240-1035-80ae-9b23-d30f765e4985" class="numbered-list" start="1" dir="auto"><li>HU ortamı çalışıyor.</li></ol><ol type="1" id="393b9240-1035-8015-bb4b-c58e356046b8" class="numbered-list" start="2" dir="auto"><li>A100 GPU kullanılabiliyor.</li></ol><ol type="1" id="393b9240-1035-80a8-86d6-f4ff21f04472" class="numbered-list" start="3" dir="auto"><li>Conda environment uygun.</li></ol><ol type="1" id="393b9240-1035-802a-bc56-ea0af01aac67" class="numbered-list" start="4" dir="auto"><li>Test suite geçiyor.</li></ol><ol type="1" id="393b9240-1035-80eb-9e00-ef80684459a8" class="numbered-list" start="5" dir="auto"><li>Dataset artifact’leri doğru sync edilebiliyor.</li></ol><ol type="1" id="393b9240-1035-8004-a1c5-f53db4bdcf2a" class="numbered-list" start="6" dir="auto"><li>GPT-2 snapshot indirilebiliyor.</li></ol><ol type="1" id="393b9240-1035-8036-8961-f61b8e1cdcea" class="numbered-list" start="7" dir="auto"><li>Evaluator CUDA üzerinde çalışıyor.</li></ol><ol type="1" id="393b9240-1035-806d-a724-e7c1edcf6f2a" class="numbered-list" start="8" dir="auto"><li>Candidate ranking pipeline hatasız.</li></ol><ol type="1" id="393b9240-1035-80f3-9883-c76b06061b9e" class="numbered-list" start="9" dir="auto"><li>Micro-level outputs ve metrics üretiliyor.</li></ol><ol type="1" id="393b9240-1035-8027-a0a7-e99969d97f47" class="numbered-list numbered-list-digits-2" start="10" dir="auto"><li>Repo’daki parser smoke test production parser yoluyla geçiyor.</li></ol><hr id="393b9240-1035-8051-b88e-cd8a842a3da5" dir="auto"/><h2 id="393b9240-1035-80a5-87e5-c6e318714237" style="display:inline-block" dir="auto">13. Sonraki Plan</h2><p id="393b9240-1035-805b-8776-d3fa749726a2" class="" dir="auto">Bir sonraki mantıklı adım:</p><pre id="393b9240-1035-8029-87e4-f6d5b82aef5d" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">100-subject M0 direct evaluation</code></pre><p id="393b9240-1035-80f7-9adc-d5af03aa6c8c" class="" dir="auto">Bu, mevcut ana config ile yapılacak:</p><pre id="393b9240-1035-80c2-aa1b-dffd93db94e1" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">configs/evaluation/m0_gpt2_pilot_direct.yaml</code></pre><p id="393b9240-1035-8052-b6b2-e0aab11bcacc" class="" dir="auto">Bu run’da beklenen:</p><ul id="393b9240-1035-801e-b1f4-c4d2bf0d9107" class="bulleted-list" dir="auto"><li style="list-style-type:disc">100 subject</li></ul><ul id="393b9240-1035-801e-8c64-db151e0f36b8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">5 relation</li></ul><ul id="393b9240-1035-801e-b541-e13ab16910c0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">2 language</li></ul><ul id="393b9240-1035-8000-9de8-ef95782baf86" class="bulleted-list" dir="auto"><li style="list-style-type:disc">1.000 probe-language result</li></ul><p id="393b9240-1035-8061-bdbe-d9e505f537d2" class="" dir="auto">Bu hâlâ model training değildir. Sadece M0 base model evaluation’dır.</p><p id="393b9240-1035-8099-bb13-e4ce972a6289" class="" dir="auto">100-subject direct evaluation tamamlandıktan sonra:</p><pre id="393b9240-1035-80d3-8fb1-f81d8cb54159" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">100-subject M0 QA-matched sensitivity evaluation</code></pre><p id="393b9240-1035-8015-a15a-e37cd1f2a237" class="" dir="auto">çalıştırılacak.</p><p id="393b9240-1035-8033-b3c8-e63938545931" class="" dir="auto">Bu iki sonuç bize M0 baseline’ını verecek.</p><p id="393b9240-1035-800f-a3b0-f6126edffc88" class="" dir="auto">Daha sonra M1 English fact acquisition aşamasına geçilecek.</p><hr id="393b9240-1035-806a-b72b-e0ede9649dc0" dir="auto"/><h2 id="393b9240-1035-80c8-b3d4-ebcf7592d5c7" style="display:inline-block" dir="auto">14. Genel Özet</h2><p id="393b9240-1035-8064-aa45-f5008760e4a4" class="" dir="auto">HU tarafında ilk operasyonel kurulum başarıyla tamamlandı. Başta üç sorun vardı:</p><ol type="1" id="393b9240-1035-80c8-8054-cb4d39accd10" class="numbered-list" start="1" dir="auto"><li>dataset artifact eksikti,</li></ol><ol type="1" id="393b9240-1035-8099-ace0-fbe076e51877" class="numbered-list" start="2" dir="auto"><li>production parser smoke test fixture eksikti,</li></ol><ol type="1" id="393b9240-1035-80eb-aec3-e55ff8b5965a" class="numbered-list" start="3" dir="auto"><li><code>/tmp</code> config GPU node’da kayboldu.</li></ol><p id="393b9240-1035-807a-8571-ed733c061070" class="" dir="auto">Üçü de çözüldü.</p><p id="393b9240-1035-80b9-b97f-fc7affebeb9f" class="" dir="auto">Şu an sistem:</p><ul id="393b9240-1035-8058-9d72-f8b89cf8cd37" class="bulleted-list" dir="auto"><li style="list-style-type:disc">testlerden geçiyor,</li></ul><ul id="393b9240-1035-80b6-989c-d90ddf19692e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dataset’i doğruluyor,</li></ul><ul id="393b9240-1035-801c-b273-e57b65dbefce" class="bulleted-list" dir="auto"><li style="list-style-type:disc">GPT-2’yi local snapshot’tan yüklüyor,</li></ul><ul id="393b9240-1035-800e-ae1b-d769b029cbbc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">A100 üzerinde BF16 evaluator çalıştırıyor,</li></ul><ul id="393b9240-1035-80bb-a569-f3de1108b2c7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">4-subject micro evaluation’ı hatasız tamamlıyor.</li></ul><p id="393b9240-1035-80cc-bfd3-e7d8d29cfe82" class="" dir="auto">Bu nedenle artık kontrollü şekilde 100-subject M0 direct pilot’a geçebiliriz.</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

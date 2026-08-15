@@ -1,0 +1,34 @@
+SOURCE DECK AUDIT
+
+Source: outputs/max_m1_research_update.pptx
+Slides: 10
+Canvas: 1280 x 720
+Fonts: Calibri / Calibri Light via the source theme
+Visual system: white canvas, navy headlines, blue kicker labels, teal positive evidence,
+orange/red limitations, light-gray evidence surfaces, dark navy closing slide.
+
+Reusable source patterns:
+- Slide 1: minimal title page.
+- Slide 2: four-stage causal/process map.
+- Slide 3: one example plus three probe cards and a bottom takeaway.
+- Slide 4: three-row method/evidence ledger.
+- Slide 5: two large comparison cards plus a strategy boundary.
+- Slide 6: large evidence box, compact metric ladder, and bottom guardrail band.
+- Slide 7: two-condition comparison with a full-width conclusion.
+- Slide 8: two large metrics with a transition arrow and bottom setup/meaning bands.
+- Slide 9: editable native bar chart plus two metric callouts.
+- Slide 10: dark three-part synthesis/decision page.
+
+Insertion contract:
+- Every output slide duplicates one source slide.
+- All visible narrative text is rewritten through inherited objects.
+- Existing background, shapes, rules, cards, chart frames, typography, spacing, and page chrome
+  are preserved.
+- The native chart inherited from source slide 9 is edited in place on output slides 6 and 12.
+- No new visual primitive or external image is introduced.
+- Speaker notes contain [Sources] blocks that point to the numbered project evidence reports.
+
+Narrative job:
+By the end, the supervisor should understand how stronger evaluation invalidated the apparent
+SmolLM endpoint, why Qwen became the selected model, how the controlled M2/M3 family was executed,
+what the negative/inconclusive causal result means, and why substantial thesis work remains.

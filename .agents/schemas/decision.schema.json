@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ThesisOrchestratorDecision",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "goal_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["continue", "rework", "done", "blocked", "awaiting_authorization"]
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "task": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "scope_class": {
+      "type": "string",
+      "enum": [
+        "local_read_only",
+        "local_write",
+        "external_read_only",
+        "external_write",
+        "destructive"
+      ]
+    },
+    "requires_user_authorization": {
+      "type": "boolean"
+    },
+    "authorization_request": {
+      "type": "string"
+    },
+    "allowed_paths": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "forbidden_actions": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "required_evidence": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "required": [
+    "goal_id",
+    "status",
+    "task_id",
+    "task",
+    "reason",
+    "scope_class",
+    "requires_user_authorization",
+    "authorization_request",
+    "allowed_paths",
+    "forbidden_actions",
+    "acceptance_criteria",
+    "required_evidence"
+  ]
+}

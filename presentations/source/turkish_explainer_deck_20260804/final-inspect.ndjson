@@ -1,0 +1,497 @@
+{"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster1.xml","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout1.xml","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/y90nupkv","slide":1,"title":"TEZ ARAŞTIRMA GÜNCELLEMESİ","textShapes":5}
+{"kind":"shape","id":"sh/fu94fe98","slide":1,"name":"accent","bbox":[0,0,18,720]}
+{"kind":"textbox","id":"sh/547294r6","slide":1,"name":"eyebrow","text":"TEZ ARAŞTIRMA GÜNCELLEMESİ","textPreview":"TEZ ARAŞTIRMA GÜNCELLEMESİ","textChars":26,"textLines":1,"bbox":[86,82,420,28]}
+{"kind":"textbox","id":"sh/k3yl0zql","slide":1,"name":"title","text":"Sağlam İngilizce edinimden\nTürkçe factual adaptasyona","textPreview":"Sağlam İngilizce edinimden | Türkçe factual adaptasyona","textChars":53,"textLines":2,"bbox":[86,148,950,152]}
+{"kind":"textbox","id":"sh/7qp4be9c","slide":1,"name":"subtitle","text":"Yöntemler, kronoloji, örnekler, Qwen M1 ve M2/M3 sonuçları","textPreview":"Yöntemler, kronoloji, örnekler, Qwen M1 ve M2/M3 sonuçları","textChars":58,"textLines":1,"bbox":[88,330,780,52]}
+{"kind":"shape","id":"sh/65g3298r","slide":1,"name":"rule","bbox":[88,420,170,5]}
+{"kind":"textbox","id":"sh/ts7md4r2","slide":1,"name":"meta","text":"Umut Yeşildal  ·  Tez ilerleme görüşmesi  ·  Ağustos 2026","textPreview":"Umut Yeşildal  ·  Tez ilerleme görüşmesi  ·  Ağustos 2026","textChars":57,"textLines":1,"bbox":[88,462,740,30]}
+{"kind":"textbox","id":"sh/sryl4zqx","slide":1,"name":"scope","text":"500 ve 2.500 fact · iki seed · 240.000 endpoint probe","textPreview":"500 ve 2.500 fact · iki seed · 240.000 endpoint probe","textChars":53,"textLines":1,"bbox":[88,510,800,30]}
+{"kind":"notes","id":"nt/y90nupkv","slide":1,"text":"[Sources]\n- documentation/138_QWEN_M2_M3_COMPLETED_MILESTONE_AND_SCIENTIFIC_INTERPRETATION_EN.md\n- documentation/143_QWEN_M2_M3_ARTIFACT_RETENTION_FREEZE_AND_STORAGE_AUDIT_EN.md"}
+{"kind":"slide","id":"sl/hwbqtkby","slide":2,"title":"ANA HİKÂYE","textShapes":10}
+{"kind":"textbox","id":"sh/mtwrmxg7","slide":2,"name":"kicker","text":"ANA HİKÂYE","textPreview":"ANA HİKÂYE","textChars":10,"textLines":1,"bbox":[72,55,500,26]}
+{"kind":"textbox","id":"sh/9072xkry","slide":2,"name":"headline","text":"Bir M1 adayından kontrollü M2/M3 sonucuna geldik","textPreview":"Bir M1 adayından kontrollü M2/M3 sonucuna geldik","textChars":48,"textLines":1,"bbox":[72,105,1100,64]}
+{"kind":"textbox","id":"sh/ozy1ofad","slide":2,"name":"close-label-0","text":"Ölçüm sertleşti","textPreview":"Ölçüm sertleşti","textChars":15,"textLines":1,"bbox":[86,211,260,32]}
+{"kind":"textbox","id":"sh/b29kza94","slide":2,"name":"close-body-0","text":"Exact ezber yerine unseen Forms A–D, direct/QA, binding, PPL ve robust intersection ölçüldü.","textPreview":"Exact ezber yerine unseen Forms A–D, direct/QA, binding, PPL ve robust intersection ölçüldü.","textChars":92,"textLines":1,"bbox":[360,211,790,76]}
+{"kind":"textbox","id":"sh/a10jqpsj","slide":2,"name":"close-label-1","text":"Model seçildi","textPreview":"Model seçildi","textChars":13,"textLines":1,"bbox":[86,339,260,32]}
+{"kind":"textbox","id":"sh/x4r21kru","slide":2,"name":"close-body-1","text":"SmolLM robust gate’i geçemedi; Qwen 2.500 fact’te iki seed ile replicate edildi.","textPreview":"SmolLM robust gate’i geçemedi; Qwen 2.500 fact’te iki seed ile replicate edildi.","textChars":80,"textLines":1,"bbox":[360,339,790,76]}
+{"kind":"textbox","id":"sh/w3i1sfa9","slide":2,"name":"close-label-2","text":"Causal family bitti","textPreview":"Causal family bitti","textChars":19,"textLines":1,"bbox":[86,467,260,32]}
+{"kind":"textbox","id":"sh/r65knqtk","slide":2,"name":"close-body-2","text":"M2-clean ve M3-fact dört sibling run, sabit endpoint ve 240.000 probe ile tamamlandı.","textPreview":"M2-clean ve M3-fact dört sibling run, sabit endpoint ve 240.000 probe ile tamamlandı.","textChars":85,"textLines":1,"bbox":[360,467,790,76]}
+{"kind":"shape","id":"sh/q5wjelsz","slide":2,"name":"discussion","bbox":[72,604,1136,2]}
+{"kind":"textbox","id":"sh/ove9o7yd","slide":2,"name":"discussion-text","text":"M3 küçük bir recovery sağladı; primary interaction yalnız bir seed’de geçti. Bu deney tamamlandı, tez değil.","textPreview":"M3 küçük bir recovery sağladı; primary interaction yalnız bir seed’de geçti. Bu deney tamamlandı, tez değil.","textChars":108,"textLines":1,"bbox":[72,625,1100,46]}
+{"kind":"textbox","id":"sh/9wnqhczy","slide":2,"name":"page","text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[1160,684,48,18]}
+{"kind":"notes","id":"nt/hwbqtkby","slide":2,"text":"[Sources]\n- documentation/106_M1_CROSS_FAMILY_MODEL_SCREENING_RESULT.md\n- documentation/127_QWEN_SCALE_REPLICATION_RESULT_AND_SMOLLM_LAMBDA025_STATUS.md\n- documentation/136_QWEN_M2_M3_ENDPOINT_EVALUATION_GPU_ALLOCATION_STATUS.md\n- documentation/138_QWEN_M2_M3_COMPLETED_MILESTONE_AND_SCIENTIFIC_INTERPRETATION_EN.md"}
+{"kind":"slide","id":"sl/ofy9wn61","slide":3,"title":"ARAŞTIRMA SORUSU","textShapes":18}
+{"kind":"textbox","id":"sh/6d0fytg3","slide":3,"name":"kicker","text":"ARAŞTIRMA SORUSU","textPreview":"ARAŞTIRMA SORUSU","textChars":16,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/cza94vmx","slide":3,"name":"slide-title","text":"Asıl soru transfer mi, yeniden öğrenme mi?","textPreview":"Asıl soru transfer mi, yeniden öğrenme mi?","textChars":42,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"textbox","id":"sh/d0jax03i","slide":3,"name":"question","text":"Türkçe adaptation, İngilizcede öğrenilmiş bir fact’i tekrar görmeden erişilebilir yapabilir mi; fact tekrar edilirse ne değişir?","textPreview":"Türkçe adaptation, İngilizcede öğrenilmiş bir fact’i tekrar görmeden erişilebilir yapabilir mi; fact tekrar edilirse ne değişir?","textChars":128,"textLines":1,"bbox":[72,150,1136,74]}
+{"kind":"shape","id":"sh/298ryl4v","slide":3,"name":"stage-0","bbox":[72,285,244,250]}
+{"kind":"textbox","id":"sh/3ah8rqlg","slide":3,"name":"stage-id-0","text":"M0","textPreview":"M0","textChars":2,"textLines":1,"bbox":[94,307,70,38]}
+{"kind":"textbox","id":"sh/obq90bml","slide":3,"name":"stage-title-0","text":"Bilgi yok","textPreview":"Bilgi yok","textChars":9,"textLines":1,"bbox":[94,357,196,48]}
+{"kind":"textbox","id":"sh/pcjqtg36","slide":3,"name":"stage-body-0","text":"Synthetic binding başlangıçta erişilebilir değildir.","textPreview":"Synthetic binding başlangıçta erişilebilir değildir.","textChars":52,"textLines":1,"bbox":[94,418,196,86]}
+{"kind":"shape","id":"sh/m5cra54z","slide":3,"name":"stage-1","bbox":[350,285,244,250]}
+{"kind":"textbox","id":"sh/n6ls3alk","slide":3,"name":"stage-id-1","text":"M1","textPreview":"M1","textChars":2,"textLines":1,"bbox":[372,307,70,38]}
+{"kind":"textbox","id":"sh/n2l4fq98","slide":3,"name":"stage-title-1","text":"İngilizce edinim","textPreview":"İngilizce edinim","textChars":16,"textLines":1,"bbox":[372,357,196,48]}
+{"kind":"textbox","id":"sh/m1c3mlsn","slide":3,"name":"stage-body-1","text":"Target fact’ler İngilizcede robust biçimde öğrenilir.","textPreview":"Target fact’ler İngilizcede robust biçimde öğrenilir.","textChars":53,"textLines":1,"bbox":[372,418,196,86]}
+{"kind":"shape","id":"sh/943mhgre","slide":3,"name":"stage-2","bbox":[628,285,244,250]}
+{"kind":"textbox","id":"sh/83ulovat","slide":3,"name":"stage-id-2","text":"M2","textPreview":"M2","textChars":2,"textLines":1,"bbox":[650,307,70,38]}
+{"kind":"textbox","id":"sh/v6l4jq94","slide":3,"name":"stage-title-2","text":"Temiz Türkçe","textPreview":"Temiz Türkçe","textChars":12,"textLines":1,"bbox":[650,357,196,48]}
+{"kind":"textbox","id":"sh/a5c3ql8z","slide":3,"name":"stage-body-2","text":"Target fact tekrarı olmadan Türkçe adaptation yapılır.","textPreview":"Target fact tekrarı olmadan Türkçe adaptation yapılır.","textChars":54,"textLines":1,"bbox":[650,418,196,86]}
+{"kind":"shape","id":"sh/x8nml0ra","slide":3,"name":"stage-3","bbox":[906,285,244,250]}
+{"kind":"textbox","id":"sh/w7ulsvqp","slide":3,"name":"stage-id-3","text":"M3","textPreview":"M3","textChars":2,"textLines":1,"bbox":[928,307,70,38]}
+{"kind":"textbox","id":"sh/ja54na9g","slide":3,"name":"stage-title-3","text":"Türkçe fact","textPreview":"Türkçe fact","textChars":11,"textLines":1,"bbox":[928,357,196,48]}
+{"kind":"textbox","id":"sh/i9w3u58v","slide":3,"name":"stage-body-3","text":"Yalnız Branch B fact’leri matched bütçede tekrar edilir.","textPreview":"Yalnız Branch B fact’leri matched bütçede tekrar edilir.","textChars":56,"textLines":1,"bbox":[928,418,196,86]}
+{"kind":"textbox","id":"sh/e10f2twf","slide":3,"name":"takeaway","text":"Matched M2/M3 siblings, generic adaptation etkisini factual re-exposure etkisinden ayırır.","textPreview":"Matched M2/M3 siblings, generic adaptation etkisini factual re-exposure etkisinden ayırır.","textChars":90,"textLines":1,"bbox":[72,578,1060,42]}
+{"kind":"shape","id":"sh/f29gbyx0","slide":3,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/03ix43e5","slide":3,"name":"source","text":"Expose tasarımı ve frozen causal contract; raporlar 133–136","textPreview":"Expose tasarımı ve frozen causal contract; raporlar 133–136","textChars":59,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/14ryd8fq","slide":3,"name":"page","text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/ofy9wn61","slide":3,"text":"[Sources]\n- documentation/100_MASTER_PROJECT_STATUS_AND_EXECUTION_PLAN.md\n- documentation/133_QWEN_2500_FACT_M2_M3_EXECUTION_HANDOFF_PLAN.md\n- documentation/135_QWEN_M2_M3_CONTRACT_AND_MATERIALIZATION_STATUS.md"}
+{"kind":"slide","id":"sl/jyx0ra1s","slide":4,"title":"KRONOLOJİ I","textShapes":18}
+{"kind":"textbox","id":"sh/1wbapc7q","slide":4,"name":"kicker","text":"KRONOLOJİ I","textPreview":"KRONOLOJİ I","textChars":11,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/1cj2d8b6","slide":4,"name":"slide-title","text":"17–19 Temmuz: ölçüm sertleşti, model farkları açıldı","textPreview":"17–19 Temmuz: ölçüm sertleşti, model farkları açıldı","textChars":52,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"textbox","id":"sh/0ba143al","slide":4,"name":"question","text":"M1’in yalnız canonical string’i değil, unseen promptlarda aynı binding’i koruması gerektiği netleşti.","textPreview":"M1’in yalnız canonical string’i değil, unseen promptlarda aynı binding’i koruması gerektiği netleşti.","textChars":101,"textLines":1,"bbox":[72,150,1136,74]}
+{"kind":"shape","id":"sh/rm1k7yt4","slide":4,"name":"stage-0","bbox":[72,285,244,250]}
+{"kind":"textbox","id":"sh/ql8jytsj","slide":4,"name":"stage-id-0","text":"17","textPreview":"17","textChars":2,"textLines":1,"bbox":[94,307,70,38]}
+{"kind":"textbox","id":"sh/doj29oba","slide":4,"name":"stage-title-0","text":"Hard evaluation","textPreview":"Hard evaluation","textChars":15,"textLines":1,"bbox":[94,357,196,48]}
+{"kind":"textbox","id":"sh/sna103ap","slide":4,"name":"stage-body-0","text":"17 Temmuz: Forms A–C ve direct/QA; exact başarının yeterli olmadığı görüldü.","textPreview":"17 Temmuz: Forms A–C ve direct/QA; exact başarının yeterli olmadığı görüldü.","textChars":76,"textLines":1,"bbox":[94,418,196,86]}
+{"kind":"shape","id":"sh/3ihk3et8","slide":4,"name":"stage-1","bbox":[350,285,244,250]}
+{"kind":"textbox","id":"sh/ih8ju9sn","slide":4,"name":"stage-id-1","text":"18","textPreview":"18","textChars":2,"textLines":1,"bbox":[372,307,70,38]}
+{"kind":"textbox","id":"sh/kbm987y5","slide":4,"name":"stage-title-1","text":"Kontroller","textPreview":"Kontroller","textChars":10,"textLines":1,"bbox":[372,357,196,48]}
+{"kind":"textbox","id":"sh/5cva1cfq","slide":4,"name":"stage-body-1","text":"18 Temmuz: A/B counterbalance, joint relation ve PPL/drift ablation tamamlandı.","textPreview":"18 Temmuz: A/B counterbalance, joint relation ve PPL/drift ablation tamamlandı.","textChars":79,"textLines":1,"bbox":[372,418,196,86]}
+{"kind":"shape","id":"sh/i94r6xgz","slide":4,"name":"stage-2","bbox":[628,285,244,250]}
+{"kind":"textbox","id":"sh/jadsz2xk","slide":4,"name":"stage-id-2","text":"19","textPreview":"19","textChars":2,"textLines":1,"bbox":[650,307,70,38]}
+{"kind":"textbox","id":"sh/w72947yt","slide":4,"name":"stage-title-2","text":"A–D remediation","textPreview":"A–D remediation","textChars":15,"textLines":1,"bbox":[650,357,196,48]}
+{"kind":"textbox","id":"sh/x8vaxsfe","slide":4,"name":"stage-body-2","text":"19 Temmuz: A/B training’e girdi; C/D held-out kaldı; robust gate sertleşti.","textPreview":"19 Temmuz: A/B training’e girdi; C/D held-out kaldı; robust gate sertleşti.","textChars":75,"textLines":1,"bbox":[650,418,196,86]}
+{"kind":"shape","id":"sh/a5kr2xg3","slide":4,"name":"stage-3","bbox":[906,285,244,250]}
+{"kind":"textbox","id":"sh/v6tsv2xo","slide":4,"name":"stage-id-3","text":"19","textPreview":"19","textChars":2,"textLines":1,"bbox":[928,307,70,38]}
+{"kind":"textbox","id":"sh/g36tgryd","slide":4,"name":"stage-title-3","text":"Model screen","textPreview":"Model screen","textChars":12,"textLines":1,"bbox":[928,357,196,48]}
+{"kind":"textbox","id":"sh/h4fa9wfy","slide":4,"name":"stage-body-3","text":"19 Temmuz: Qwen, Gemma, StableLM ve Llama aynı frozen contract ile test edildi.","textPreview":"19 Temmuz: Qwen, Gemma, StableLM ve Llama aynı frozen contract ile test edildi.","textChars":79,"textLines":1,"bbox":[928,418,196,86]}
+{"kind":"textbox","id":"sh/p0batw72","slide":4,"name":"takeaway","text":"Qwen factual olarak öne çıktı; ilk PPL hatası retention-preserving replay ihtiyacını açtı.","textPreview":"Qwen factual olarak öne çıktı; ilk PPL hatası retention-preserving replay ihtiyacını açtı.","textChars":90,"textLines":1,"bbox":[72,578,1060,42]}
+{"kind":"shape","id":"sh/oz29krqh","slide":4,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/3ytsrmpw","slide":4,"name":"source","text":"Raporlar 94–106; tarih ve kararlar chronological record’dan alınmıştır","textPreview":"Raporlar 94–106; tarih ve kararlar chronological record’dan alınmıştır","textChars":70,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/2xkrih8b","slide":4,"name":"page","text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/jyx0ra1s","slide":4,"text":"[Sources]\n- documentation/94_PRE_M2_FROZEN_HARD_EVALUATION_REPORT.md\n- documentation/95_PRE_M2_PARAPHRASE_COUNTERBALANCE_REPORT.md\n- documentation/96_PRE_M2_JOINT_RELATION_CONTROL_REPORT.md\n- documentation/97_PRE_M2_DRIFT_ABLATION_REPORT.md\n- documentation/102_M1_FORM_GENERALIZATION_REMEDIATION_RESULT.md\n- documentation/106_M1_CROSS_FAMILY_MODEL_SCREENING_RESULT.md"}
+{"kind":"slide","id":"sl/i107q5of","slide":5,"title":"KRONOLOJİ II","textShapes":18}
+{"kind":"textbox","id":"sh/pkr6tgjy","slide":5,"name":"kicker","text":"KRONOLOJİ II","textPreview":"KRONOLOJİ II","textChars":12,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/dgbulwnm","slide":5,"name":"slide-title","text":"23–30 Temmuz: Qwen ölçeklendi, SmolLM dalı kapandı","textPreview":"23–30 Temmuz: Qwen ölçeklendi, SmolLM dalı kapandı","textChars":50,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"textbox","id":"sh/cf2tcr61","slide":5,"name":"question","text":"Amaç: Qwen factual strength’ini düşük PPL drift ile korumak ve SmolLM binding müdahalelerini adil karşılaştırmaktı.","textPreview":"Amaç: Qwen factual strength’ini düşük PPL drift ile korumak ve SmolLM binding müdahalelerini adil karşılaştırmaktı.","textChars":115,"textLines":1,"bbox":[72,150,1136,74]}
+{"kind":"shape","id":"sh/z2tcnm5s","slide":5,"name":"stage-0","bbox":[72,285,244,250]}
+{"kind":"textbox","id":"sh/yhkbe1o7","slide":5,"name":"stage-id-0","text":"23","textPreview":"23","textChars":2,"textLines":1,"bbox":[94,307,70,38]}
+{"kind":"textbox","id":"sh/l4bupwny","slide":5,"name":"stage-title-0","text":"Retention replay","textPreview":"Retention replay","textChars":16,"textLines":1,"bbox":[94,357,196,48]}
+{"kind":"textbox","id":"sh/032tgr6d","slide":5,"name":"stage-body-0","text":"23–24 Temmuz: seed 42 adjudication, seed 43 replication; 2.500-fact scale gate zorunlu oldu.","textPreview":"23–24 Temmuz: seed 42 adjudication, seed 43 replication; 2.500-fact scale gate zorunlu oldu.","textChars":92,"textLines":1,"bbox":[94,418,196,86]}
+{"kind":"shape","id":"sh/n6dcr65o","slide":5,"name":"stage-1","bbox":[350,285,244,250]}
+{"kind":"textbox","id":"sh/m5kbi1oj","slide":5,"name":"stage-id-1","text":"25","textPreview":"25","textChars":2,"textLines":1,"bbox":[372,307,70,38]}
+{"kind":"textbox","id":"sh/w32dkbuh","slide":5,"name":"stage-title-1","text":"Scale probe","textPreview":"Scale probe","textChars":11,"textLines":1,"bbox":[372,357,196,48]}
+{"kind":"textbox","id":"sh/x4vedgvm","slide":5,"name":"stage-body-1","text":"25–26 Temmuz: Qwen seed 42, 2.500 fact ve 11 checkpoint ile güçlü Pareto noktaları verdi.","textPreview":"25–26 Temmuz: Qwen seed 42, 2.500 fact ve 11 checkpoint ile güçlü Pareto noktaları verdi.","textChars":89,"textLines":1,"bbox":[372,418,196,86]}
+{"kind":"shape","id":"sh/ahkvi1cb","slide":5,"name":"stage-2","bbox":[628,285,244,250]}
+{"kind":"textbox","id":"sh/v2twb6dw","slide":5,"name":"stage-id-2","text":"28","textPreview":"28","textChars":2,"textLines":1,"bbox":[650,307,70,38]}
+{"kind":"textbox","id":"sh/k7mxovud","slide":5,"name":"stage-title-2","text":"Yeni wave","textPreview":"Yeni wave","textChars":9,"textLines":1,"bbox":[650,357,196,48]}
+{"kind":"textbox","id":"sh/58vehgvy","slide":5,"name":"stage-body-2","text":"28 Temmuz: Qwen seed 43 ile SmolLM control/contrastive training’leri tamamlandı.","textPreview":"28 Temmuz: Qwen seed 43 ile SmolLM control/contrastive training’leri tamamlandı.","textChars":80,"textLines":1,"bbox":[650,418,196,86]}
+{"kind":"shape","id":"sh/i54fmlc7","slide":5,"name":"stage-3","bbox":[906,285,244,250]}
+{"kind":"textbox","id":"sh/j6dwfqds","slide":5,"name":"stage-id-3","text":"29","textPreview":"29","textChars":2,"textLines":1,"bbox":[928,307,70,38]}
+{"kind":"textbox","id":"sh/sb6xsvu9","slide":5,"name":"stage-title-3","text":"Karar","textPreview":"Karar","textChars":5,"textLines":1,"bbox":[928,357,196,48]}
+{"kind":"textbox","id":"sh/tcfel0vu","slide":5,"name":"stage-body-3","text":"29–30 Temmuz: Qwen iki seed’de geçti; SmolLM %55,8’de kaldı ve ana dal kapandı.","textPreview":"29–30 Temmuz: Qwen iki seed’de geçti; SmolLM %55,8’de kaldı ve ana dal kapandı.","textChars":79,"textLines":1,"bbox":[928,418,196,86]}
+{"kind":"textbox","id":"sh/hgrmpwj2","slide":5,"name":"takeaway","text":"29 Temmuz’da seed 42 step 75 ve seed 43 step 50 seçildi; iki Qwen M1 artifact’i freeze edildi.","textPreview":"29 Temmuz’da seed 42 step 75 ve seed 43 step 50 seçildi; iki Qwen M1 artifact’i freeze edildi.","textChars":94,"textLines":1,"bbox":[72,578,1060,42]}
+{"kind":"shape","id":"sh/gfi5grih","slide":5,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/fe94nm1w","slide":5,"name":"source","text":"Raporlar 117–128; 2.500-fact replication ve SmolLM kapanış zinciri","textPreview":"Raporlar 117–128; 2.500-fact replication ve SmolLM kapanış zinciri","textChars":66,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/ud0ne10b","slide":5,"name":"page","text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/i107q5of","slide":5,"text":"[Sources]\n- documentation/117_M1_RETENTION_REMEDIATION_AND_500_SUBJECT_SCALE_GATE.md\n- documentation/118_M1_RETENTION_EVALUATION_RESULT_AND_INTEGRITY_ADJUDICATION.md\n- documentation/120_M1_QWEN_RETENTION_SEED43_REPLICATION_RESULT.md\n- documentation/123_QWEN_SCALE_PROBE_RESULT_AND_SMOLLM_PILOT_STATUS.md\n- documentation/126_QWEN_SEED43_AND_SMOLLM_TRAINING_COMPLETION_REPORT.md\n- documentation/127_QWEN_SCALE_REPLICATION_RESULT_AND_SMOLLM_LAMBDA025_STATUS.md\n- documentation/128_SMOLLM_500_FACT_PROMPT_CONSISTENCY_REMEDIATION_PLAN.md"}
+{"kind":"slide","id":"sl/x8f69ofe","slide":6,"title":"KRONOLOJİ III","textShapes":18}
+{"kind":"textbox","id":"sh/0fy5k3id","slide":6,"name":"kicker","text":"KRONOLOJİ III","textPreview":"KRONOLOJİ III","textChars":13,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/yhg7epsj","slide":6,"name":"slide-title","text":"31 Temmuz–3 Ağustos: M2/M3 tamamlandı ve donduruldu","textPreview":"31 Temmuz–3 Ağustos: M2/M3 tamamlandı ve donduruldu","textChars":51,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"textbox","id":"sh/zi98nu94","slide":6,"name":"question","text":"Outcome görülmeden önce yönler, aliases, bütçe, checkpoint, estimand ve gate donduruldu.","textPreview":"Outcome görülmeden önce yönler, aliases, bütçe, checkpoint, estimand ve gate donduruldu.","textChars":88,"textLines":1,"bbox":[72,150,1136,74]}
+{"kind":"shape","id":"sh/87ipkzal","slide":6,"name":"stage-0","bbox":[72,285,244,250]}
+{"kind":"textbox","id":"sh/98rqt4r6","slide":6,"name":"stage-id-0","text":"31","textPreview":"31","textChars":2,"textLines":1,"bbox":[94,307,70,38]}
+{"kind":"textbox","id":"sh/ml07i9sv","slide":6,"name":"stage-title-0","text":"Pre-M2 freeze","textPreview":"Pre-M2 freeze","textChars":13,"textLines":1,"bbox":[94,357,196,48]}
+{"kind":"textbox","id":"sh/7m98ru9g","slide":6,"name":"stage-body-0","text":"31 Temmuz: bilingual baseline, PPL, contamination, registries ve evaluation contract hazırlandı.","textPreview":"31 Temmuz: bilingual baseline, PPL, contamination, registries ve evaluation contract hazırlandı.","textChars":96,"textLines":1,"bbox":[94,418,196,86]}
+{"kind":"shape","id":"sh/oryp8fah","slide":6,"name":"stage-1","bbox":[350,285,244,250]}
+{"kind":"textbox","id":"sh/pc76hkr2","slide":6,"name":"stage-id-1","text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[372,307,70,38]}
+{"kind":"textbox","id":"sh/h4bupgn6","slide":6,"name":"stage-title-1","text":"Dört training","textPreview":"Dört training","textChars":13,"textLines":1,"bbox":[372,357,196,48]}
+{"kind":"textbox","id":"sh/w32twb6l","slide":6,"name":"stage-body-1","text":"1 Ağustos: M2-42, M3-42, M2-43 ve M3-43 checkpoint-128’e ulaştı.","textPreview":"1 Ağustos: M2-42, M3-42, M2-43 ve M3-43 checkpoint-128’e ulaştı.","textChars":64,"textLines":1,"bbox":[372,418,196,86]}
+{"kind":"shape","id":"sh/v2tcn650","slide":6,"name":"stage-2","bbox":[628,285,244,250]}
+{"kind":"textbox","id":"sh/u1kbu1ov","slide":6,"name":"stage-id-2","text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[650,307,70,38]}
+{"kind":"textbox","id":"sh/5svutgni","slide":6,"name":"stage-title-2","text":"96/96 evaluation","textPreview":"96/96 evaluation","textChars":16,"textLines":1,"bbox":[650,357,196,48]}
+{"kind":"textbox","id":"sh/47mt0b6x","slide":6,"name":"stage-body-2","text":"2 Ağustos: 240.000 probe tamamlandı; frozen gate 23:25Z’de uygulandı.","textPreview":"2 Ağustos: 240.000 probe tamamlandı; frozen gate 23:25Z’de uygulandı.","textChars":69,"textLines":1,"bbox":[650,418,196,86]}
+{"kind":"shape","id":"sh/j6dcr65c","slide":6,"name":"stage-3","bbox":[906,285,244,250]}
+{"kind":"textbox","id":"sh/i54bylor","slide":6,"name":"stage-id-3","text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[928,307,70,38]}
+{"kind":"textbox","id":"sh/twfux0ne","slide":6,"name":"stage-title-3","text":"Review + freeze","textPreview":"Review + freeze","textChars":15,"textLines":1,"bbox":[928,357,196,48]}
+{"kind":"textbox","id":"sh/svmt4v6t","slide":6,"name":"stage-body-3","text":"3 Ağustos: exploratory analysis, independent review ve dört model-only artifact donduruldu.","textPreview":"3 Ağustos: exploratory analysis, independent review ve dört model-only artifact donduruldu.","textChars":91,"textLines":1,"bbox":[928,418,196,86]}
+{"kind":"textbox","id":"sh/cbe5g3ih","slide":6,"name":"takeaway","text":"Current causal family operational olarak kapandı; primary criterion geçmedi ve yeni training otomatik açılmadı.","textPreview":"Current causal family operational olarak kapandı; primary criterion geçmedi ve yeni training otomatik açılmadı.","textChars":111,"textLines":1,"bbox":[72,578,1060,42]}
+{"kind":"shape","id":"sh/dcnm98zm","slide":6,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/qpwnet0b","slide":6,"name":"source","text":"Raporlar 132–143; M2/M3 execution, evaluation, review ve retention closure","textPreview":"Raporlar 132–143; M2/M3 execution, evaluation, review ve retention closure","textChars":74,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/bq547yhw","slide":6,"name":"page","text":"6","textPreview":"6","textChars":1,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/x8f69ofe","slide":6,"text":"[Sources]\n- documentation/132_PRE_M2_QWEN_READINESS_AND_BASELINE_PLAN.md\n- documentation/134_QWEN_PRE_M2_GPU_BLOCKER_AND_OFFLINE_PREPARATION_STATUS.md\n- documentation/135_QWEN_M2_M3_CONTRACT_AND_MATERIALIZATION_STATUS.md\n- documentation/136_QWEN_M2_M3_ENDPOINT_EVALUATION_GPU_ALLOCATION_STATUS.md\n- documentation/140a_QWEN_M2_M3_INDEPENDENT_REVIEW_RESULT_EN.md\n- documentation/142_QWEN_M2_M3_EXPLORATORY_MECHANISM_ANALYSIS_RESULT_EN.md\n- documentation/143_QWEN_M2_M3_ARTIFACT_RETENTION_FREEZE_AND_STORAGE_AUDIT_EN.md"}
+{"kind":"slide","id":"sl/gnmp4jqx","slide":7,"title":"TEK BİR TEMSİLİ FACT","textShapes":18}
+{"kind":"textbox","id":"sh/50v2pgna","slide":7,"name":"kicker","text":"TEK BİR TEMSİLİ FACT","textPreview":"TEK BİR TEMSİLİ FACT","textChars":20,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/cb2tkvap","slide":7,"name":"slide-title","text":"Aynı binding farklı dil yüzeylerinde test edilir","textPreview":"Aynı binding farklı dil yüzeylerinde test edilir","textChars":48,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"shape","id":"sh/dcbud0ra","slide":7,"name":"direct-example","bbox":[72,150,710,270]}
+{"kind":"textbox","id":"sh/ydkbm5sv","slide":7,"name":"direct-fact","text":"Temsili bağ: subject → relation → object","textPreview":"Temsili bağ: subject → relation → object","textChars":40,"textLines":1,"bbox":[100,176,630,32]}
+{"kind":"textbox","id":"sh/zedcfa9g","slide":7,"name":"train-label","text":"İngilizce kayıt — M1","textPreview":"İngilizce kayıt — M1","textChars":20,"textLines":1,"bbox":[100,228,250,25]}
+{"kind":"textbox","id":"sh/kzmdova1","slide":7,"name":"train-examples","text":"Kişi-017 works as Profession 17.\nSubject: Kişi-017 · relation: profession\nObject: Profession 17","textPreview":"Kişi-017 works as Profession 17. | Subject: Kişi-017 · relation: profession | Object: Profession 17","textChars":95,"textLines":3,"bbox":[100,264,620,62]}
+{"kind":"textbox","id":"sh/l0vuh0rm","slide":7,"name":"heldout-label","text":"Türkçe fact — M3 örneği","textPreview":"Türkçe fact — M3 örneği","textChars":23,"textLines":1,"bbox":[100,342,250,25]}
+{"kind":"textbox","id":"sh/eh0ba1sr","slide":7,"name":"heldout-example","text":"Kişi-017 → Meslek 17 · Türkçe object alias","textPreview":"Kişi-017 → Meslek 17 · Türkçe object alias","textChars":42,"textLines":1,"bbox":[100,377,630,27]}
+{"kind":"shape","id":"sh/fi9c369c","slide":7,"name":"ladder","bbox":[826,150,334,270]}
+{"kind":"textbox","id":"sh/baxkjqlk","slide":7,"name":"ladder-title","text":"Sabit bağ","textPreview":"Sabit bağ","textChars":9,"textLines":1,"bbox":[854,176,278,30]}
+{"kind":"textbox","id":"sh/a9ojq5kz","slide":7,"name":"ladder-1","text":"S","textPreview":"S","textChars":1,"textLines":1,"bbox":[854,232,100,28]}
+{"kind":"textbox","id":"sh/xcz2l03q","slide":7,"name":"ladder-1r","text":"Kişi-017","textPreview":"Kişi-017","textChars":8,"textLines":1,"bbox":[954,234,178,26]}
+{"kind":"textbox","id":"sh/cbq1sv25","slide":7,"name":"ladder-2","text":"R","textPreview":"R","textChars":1,"textLines":1,"bbox":[854,285,100,28]}
+{"kind":"textbox","id":"sh/n6x0fqlo","slide":7,"name":"ladder-2r","text":"profession / meslek","textPreview":"profession / meslek","textChars":19,"textLines":1,"bbox":[954,287,178,26]}
+{"kind":"textbox","id":"sh/25ojml43","slide":7,"name":"ladder-3","text":"O","textPreview":"O","textChars":1,"textLines":1,"bbox":[854,338,100,28]}
+{"kind":"textbox","id":"sh/p8fih03e","slide":7,"name":"ladder-3r","text":"Profession 17 ↔ Meslek 17","textPreview":"Profession 17 ↔ Meslek 17","textChars":25,"textLines":1,"bbox":[954,340,178,26]}
+{"kind":"shape","id":"sh/o761ov2t","slide":7,"name":"recipe","bbox":[72,476,1088,116]}
+{"kind":"textbox","id":"sh/f2d0b6lc","slide":7,"name":"recipe-title","text":"Neden temsili?","textPreview":"Neden temsili?","textChars":14,"textLines":1,"bbox":[100,499,1032,30]}
+{"kind":"textbox","id":"sh/eh4jil4r","slide":7,"name":"recipe-body","text":"Bu örnek bir sonuç satırı değildir; direction, form, scaffold ve ranking mantığını açıklar.","textPreview":"Bu örnek bir sonuç satırı değildir; direction, form, scaffold ve ranking mantığını açıklar.","textChars":91,"textLines":1,"bbox":[100,544,1032,46]}
+{"kind":"shape","id":"sh/id4ju1oz","slide":7,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/jedkn654","slide":7,"name":"source","text":"Prompt ve Turkish fact template mantığı; qwen_pre_m2.py","textPreview":"Prompt ve Turkish fact template mantığı; qwen_pre_m2.py","textChars":55,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/4fm1wb6p","slide":7,"name":"page","text":"7","textPreview":"7","textChars":1,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/gnmp4jqx","slide":7,"text":"[Sources]\n- transfer-vs-relearning/src/transfer_vs_relearning/data/qwen_pre_m2.py\n- transfer-vs-relearning/tests/test_qwen_pre_m2.py\n- Illustrative example only; not an empirical dataset row."}
+{"kind":"slide","id":"sl/fu1gfa1s","slide":8,"title":"DİL YÖNLERİ","textShapes":18}
+{"kind":"textbox","id":"sh/5sne5wne","slide":8,"name":"kicker","text":"DİL YÖNLERİ","textPreview":"DİL YÖNLERİ","textChars":11,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/18byd4zy","slide":8,"name":"slide-title","text":"Okun yönü prompt ve beklenen cevabın dilidir","textPreview":"Okun yönü prompt ve beklenen cevabın dilidir","textChars":44,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"textbox","id":"sh/g72x4zyd","slide":8,"name":"question","text":"Aynı temsili fact: Kişi-017 → profession → Profession 17 / Meslek 17","textPreview":"Aynı temsili fact: Kişi-017 → profession → Profession 17 / Meslek 17","textChars":68,"textLines":1,"bbox":[72,150,1136,74]}
+{"kind":"shape","id":"sh/ri9g7uhw","slide":8,"name":"stage-0","bbox":[72,285,244,250]}
+{"kind":"textbox","id":"sh/6h0fypgb","slide":8,"name":"stage-id-0","text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[94,307,70,38]}
+{"kind":"textbox","id":"sh/tkby9kzm","slide":8,"name":"stage-title-0","text":"EN→EN · Koruma","textPreview":"EN→EN · Koruma","textChars":14,"textLines":1,"bbox":[94,357,196,48]}
+{"kind":"textbox","id":"sh/sjix0zy1","slide":8,"name":"stage-body-0","text":"Q: What occupation does Kişi-017 have?\nA: Profession 17","textPreview":"Q: What occupation does Kişi-017 have? | A: Profession 17","textChars":55,"textLines":2,"bbox":[94,418,196,86]}
+{"kind":"shape","id":"sh/je9g3ahk","slide":8,"name":"stage-1","bbox":[350,285,244,250]}
+{"kind":"textbox","id":"sh/id0fu50z","slide":8,"name":"stage-id-1","text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[372,307,70,38]}
+{"kind":"textbox","id":"sh/o7ydoret","slide":8,"name":"stage-title-1","text":"TR→EN · Erişim","textPreview":"TR→EN · Erişim","textChars":14,"textLines":1,"bbox":[372,357,196,48]}
+{"kind":"textbox","id":"sh/98rehwve","slide":8,"name":"stage-body-1","text":"S: Kişi-017 ne iş yapıyor?\nC: Profession 17","textPreview":"S: Kişi-017 ne iş yapıyor? | C: Profession 17","textChars":43,"textLines":2,"bbox":[372,418,196,86]}
+{"kind":"shape","id":"sh/m5gvmhwn","slide":8,"name":"stage-2","bbox":[628,285,244,250]}
+{"kind":"textbox","id":"sh/n6pwfmd8","slide":8,"name":"stage-id-2","text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[650,307,70,38]}
+{"kind":"textbox","id":"sh/0jydkreh","slide":8,"name":"stage-title-2","text":"TR→TR · Uçtan uca","textPreview":"TR→TR · Uçtan uca","textChars":17,"textLines":1,"bbox":[650,357,196,48]}
+{"kind":"textbox","id":"sh/1k7edwv2","slide":8,"name":"stage-body-2","text":"S: Kişi-017 ne iş yapıyor?\nC: Meslek 17","textPreview":"S: Kişi-017 ne iş yapıyor? | C: Meslek 17","textChars":39,"textLines":2,"bbox":[650,418,196,86]}
+{"kind":"shape","id":"sh/ehgvihwr","slide":8,"name":"stage-3","bbox":[906,285,244,250]}
+{"kind":"textbox","id":"sh/zipwbmdc","slide":8,"name":"stage-id-3","text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[928,307,70,38]}
+{"kind":"textbox","id":"sh/kfixwbe1","slide":8,"name":"stage-title-3","text":"EN→TR · Kavramsal","textPreview":"EN→TR · Kavramsal","textChars":17,"textLines":1,"bbox":[928,357,196,48]}
+{"kind":"textbox","id":"sh/lgbepgvm","slide":8,"name":"stage-body-3","text":"Q: What occupation...?\nA: Meslek 17\nBu kontratta ölçülmedi.","textPreview":"Q: What occupation...? | A: Meslek 17 | Bu kontratta ölçülmedi.","textChars":59,"textLines":3,"bbox":[928,418,196,86]}
+{"kind":"textbox","id":"sh/tw7e9gnq","slide":8,"name":"takeaway","text":"Primary TR→EN, Turkish prompt access’i ölçerken Turkish answer lexicalization etkisini dışarıda tutar.","textPreview":"Primary TR→EN, Turkish prompt access’i ölçerken Turkish answer lexicalization etkisini dışarıda tutar.","textChars":102,"textLines":1,"bbox":[72,578,1060,42]}
+{"kind":"shape","id":"sh/svydgb65","slide":8,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/7u5w765k","slide":8,"name":"source","text":"Frozen directions: EN→EN, TR→EN, TR→TR; EN→TR yalnız açıklayıcı örnek","textPreview":"Frozen directions: EN→EN, TR→EN, TR→TR; EN→TR yalnız açıklayıcı örnek","textChars":69,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/6twve1oz","slide":8,"name":"page","text":"8","textPreview":"8","textChars":1,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/fu1gfa1s","slide":8,"text":"[Sources]\n- transfer-vs-relearning/src/transfer_vs_relearning/data/qwen_pre_m2.py\n- documentation/135_QWEN_M2_M3_CONTRACT_AND_MATERIALIZATION_STATUS.md\n- EN→TR was not part of the frozen evaluated direction set."}
+{"kind":"slide","id":"sl/udsvah03","slide":9,"title":"PROMPT SCAFFOLD","textShapes":15}
+{"kind":"textbox","id":"sh/lsn2h4fa","slide":9,"name":"kicker","text":"PROMPT SCAFFOLD","textPreview":"PROMPT SCAFFOLD","textChars":15,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/1cfmhgne","slide":9,"name":"slide-title","text":"Direct ve QA aynı soruyu farklı çerçevede sunar","textPreview":"Direct ve QA aynı soruyu farklı çerçevede sunar","textChars":47,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"shape","id":"sh/0b65obm9","slide":9,"name":"v1","bbox":[72,154,488,340]}
+{"kind":"textbox","id":"sh/nex4jq5k","slide":9,"name":"v1-title","text":"Direct","textPreview":"Direct","textChars":6,"textLines":1,"bbox":[100,180,432,32]}
+{"kind":"textbox","id":"sh/mdonql4z","slide":9,"name":"v1-result","text":"Prompt etiketsiz verilir","textPreview":"Prompt etiketsiz verilir","textChars":24,"textLines":1,"bbox":[100,228,432,34]}
+{"kind":"textbox","id":"sh/9gzml0nq","slide":9,"name":"v1-weak","text":"Örnek","textPreview":"Örnek","textChars":5,"textLines":1,"bbox":[100,291,240,27]}
+{"kind":"textbox","id":"sh/ofq5svm5","slide":9,"name":"v1-lines","text":"Kişi-017 ne iş yapıyor?\n→ model cevabı doğrudan üretir","textPreview":"Kişi-017 ne iş yapıyor? | → model cevabı doğrudan üretir","textChars":54,"textLines":2,"bbox":[100,329,400,62]}
+{"kind":"textbox","id":"sh/bih4na5w","slide":9,"name":"v1-diagnosis","text":"Question surface’e duyarlılığı ölçen en sade çerçeve.","textPreview":"Question surface’e duyarlılığı ölçen en sade çerçeve.","textChars":53,"textLines":1,"bbox":[100,420,410,55]}
+{"kind":"shape","id":"sh/ah8nu54b","slide":9,"name":"v2","bbox":[608,154,552,340]}
+{"kind":"textbox","id":"sh/oza1gfyh","slide":9,"name":"v2-title","text":"QA scaffold","textPreview":"QA scaffold","textChars":11,"textLines":1,"bbox":[636,180,496,32]}
+{"kind":"textbox","id":"sh/p0ji9kf2","slide":9,"name":"v2-replace","text":"Soru: Kişi-017 ne iş yapıyor?\nCevap:","textPreview":"Soru: Kişi-017 ne iş yapıyor? | Cevap:","textChars":36,"textLines":2,"bbox":[636,228,480,64]}
+{"kind":"textbox","id":"sh/2xsjepgb","slide":9,"name":"v2-result","text":"Beklenen: Meslek 17","textPreview":"Beklenen: Meslek 17","textChars":19,"textLines":1,"bbox":[636,319,480,34]}
+{"kind":"textbox","id":"sh/3y107axw","slide":9,"name":"v2-change","text":"Aynı fact · aynı candidates","textPreview":"Aynı fact · aynı candidates","textChars":27,"textLines":1,"bbox":[636,371,480,28]}
+{"kind":"textbox","id":"sh/cnu1kzyd","slide":9,"name":"v2-limit","text":"Yalnız scaffold değişir; direction ve form aynı tutulur.","textPreview":"Yalnız scaffold değişir; direction ve form aynı tutulur.","textChars":56,"textLines":1,"bbox":[636,426,480,55]}
+{"kind":"textbox","id":"sh/do3id4fy","slide":9,"name":"relations","text":"Her Form A–D hem direct hem QA ile test edilir: 4 × 2 = 8 hücre.","textPreview":"Her Form A–D hem direct hem QA ile test edilir: 4 × 2 = 8 hücre.","textChars":64,"textLines":1,"bbox":[72,548,1088,30]}
+{"kind":"shape","id":"sh/qlcjipgn","slide":9,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/bml0buxs","slide":9,"name":"source","text":"English/Turkish scaffold templates; pre_m2_followup.py ve qwen_pre_m2.py","textPreview":"English/Turkish scaffold templates; pre_m2_followup.py ve qwen_pre_m2.py","textChars":72,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/0ru1ozyp","slide":9,"name":"page","text":"9","textPreview":"9","textChars":1,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/udsvah03","slide":9,"text":"[Sources]\n- transfer-vs-relearning/src/transfer_vs_relearning/data/pre_m2_followup.py\n- transfer-vs-relearning/src/transfer_vs_relearning/data/qwen_pre_m2.py"}
+{"kind":"slide","id":"sl/m90b6t0r","slide":10,"title":"FORMS A–D","textShapes":18}
+{"kind":"textbox","id":"sh/lk7ut0va","slide":10,"name":"kicker","text":"FORMS A–D","textPreview":"FORMS A–D","textChars":9,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/xc3mho32","slide":10,"name":"slide-title","text":"Anlam sabit kalır, soru sözdizimi değişir","textPreview":"Anlam sabit kalır, soru sözdizimi değişir","textChars":41,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"textbox","id":"sh/cbu58j2h","slide":10,"name":"question","text":"Relation = profession, subject = Kişi-017; dört Türkçe prompt aynı object’i istemektedir.","textPreview":"Relation = profession, subject = Kişi-017; dört Türkçe prompt aynı object’i istemektedir.","textChars":89,"textLines":1,"bbox":[72,150,1136,74]}
+{"kind":"shape","id":"sh/zelojyl8","slide":10,"name":"stage-0","bbox":[72,285,244,250]}
+{"kind":"textbox","id":"sh/ydcnatkn","slide":10,"name":"stage-id-0","text":"A","textPreview":"A","textChars":1,"textLines":1,"bbox":[94,307,70,38]}
+{"kind":"textbox","id":"sh/l036l83y","slide":10,"name":"stage-title-0","text":"Form A · Temel","textPreview":"Form A · Temel","textChars":14,"textLines":1,"bbox":[94,357,196,48]}
+{"kind":"textbox","id":"sh/kzu5c32t","slide":10,"name":"stage-body-0","text":"Kişi-017 hangi mesleği yapıyor?","textPreview":"Kişi-017 hangi mesleği yapıyor?","textChars":31,"textLines":1,"bbox":[94,418,196,86]}
+{"kind":"shape","id":"sh/725onyl4","slide":10,"name":"stage-1","bbox":[350,285,244,250]}
+{"kind":"textbox","id":"sh/m1cnetkj","slide":10,"name":"stage-id-1","text":"B","textPreview":"B","textChars":1,"textLines":1,"bbox":[372,307,70,38]}
+{"kind":"textbox","id":"sh/s7yt4b21","slide":10,"name":"stage-title-1","text":"Form B · Profesyonel","textPreview":"Form B · Profesyonel","textChars":20,"textLines":1,"bbox":[372,357,196,48]}
+{"kind":"textbox","id":"sh/d87uxg3m","slide":10,"name":"stage-body-1","text":"Kişi-017 profesyonel olarak hangi işte çalışıyor?","textPreview":"Kişi-017 profesyonel olarak hangi işte çalışıyor?","textChars":49,"textLines":1,"bbox":[372,418,196,86]}
+{"kind":"shape","id":"sh/q5gb21kb","slide":10,"name":"stage-2","bbox":[628,285,244,250]}
+{"kind":"textbox","id":"sh/r6pcv6lw","slide":10,"name":"stage-id-2","text":"C","textPreview":"C","textChars":1,"textLines":1,"bbox":[650,307,70,38]}
+{"kind":"textbox","id":"sh/0bit8b2d","slide":10,"name":"stage-title-2","text":"Form C · Kayıt","textPreview":"Form C · Kayıt","textChars":14,"textLines":1,"bbox":[650,357,196,48]}
+{"kind":"textbox","id":"sh/1cru1g3y","slide":10,"name":"stage-body-2","text":"Kişi-017 için belirtilen meslek nedir?","textPreview":"Kişi-017 için belirtilen meslek nedir?","textChars":38,"textLines":1,"bbox":[650,418,196,86]}
+{"kind":"shape","id":"sh/e9gb61k7","slide":10,"name":"stage-3","bbox":[906,285,244,250]}
+{"kind":"textbox","id":"sh/fapcz6ls","slide":10,"name":"stage-id-3","text":"D","textPreview":"D","textChars":1,"textLines":1,"bbox":[928,307,70,38]}
+{"kind":"textbox","id":"sh/ozitcv29","slide":10,"name":"stage-title-3","text":"Form D · Gündelik","textPreview":"Form D · Gündelik","textChars":17,"textLines":1,"bbox":[928,357,196,48]}
+{"kind":"textbox","id":"sh/p0ru503u","slide":10,"name":"stage-body-3","text":"Kişi-017 ne iş yapıyor?","textPreview":"Kişi-017 ne iş yapıyor?","textChars":23,"textLines":1,"bbox":[928,418,196,86]}
+{"kind":"textbox","id":"sh/xwnupgvy","slide":10,"name":"takeaway","text":"M1 recipe A/B yüzeylerini görür; C/D held-out kalır. Robust access bütün formlarda korunmalıdır.","textPreview":"M1 recipe A/B yüzeylerini görür; C/D held-out kalır. Robust access bütün formlarda korunmalıdır.","textChars":96,"textLines":1,"bbox":[72,578,1060,42]}
+{"kind":"shape","id":"sh/wvetgbud","slide":10,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/bu5cnqd8","slide":10,"name":"source","text":"Exact Turkish templates; qwen_pre_m2.py","textPreview":"Exact Turkish templates; qwen_pre_m2.py","textChars":39,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/atwbelcn","slide":10,"name":"page","text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/m90b6t0r","slide":10,"text":"[Sources]\n- transfer-vs-relearning/src/transfer_vs_relearning/data/qwen_pre_m2.py\n- transfer-vs-relearning/src/transfer_vs_relearning/data/m1_form_generalization.py"}
+{"kind":"slide","id":"sl/jetc3ut0","slide":11,"title":"ÖLÇÜMÜN EVRİMİ","textShapes":16}
+{"kind":"textbox","id":"sh/65wzelo7","slide":11,"name":"kicker","text":"ÖLÇÜMÜN EVRİMİ","textPreview":"ÖLÇÜMÜN EVRİMİ","textChars":14,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/xcryxg7y","slide":11,"name":"slide-title","text":"Exact completion’dan robust binding’e geçtik","textPreview":"Exact completion’dan robust binding’e geçtik","textChars":44,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"shape","id":"sh/wbih4b6d","slide":11,"name":"example","bbox":[72,156,1136,116]}
+{"kind":"textbox","id":"sh/n69grmpw","slide":11,"name":"fact","text":"Tek fact  →  farklı promptlar, scaffoldlar ve kontroller","textPreview":"Tek fact  →  farklı promptlar, scaffoldlar ve kontroller","textChars":56,"textLines":1,"bbox":[100,182,720,34]}
+{"kind":"textbox","id":"sh/250zy18b","slide":11,"name":"train-form","text":"Evaluator, M2/M3 başlamadan önce adım adım daha zor hale getirildi.","textPreview":"Evaluator, M2/M3 başlamadan önce adım adım daha zor hale getirildi.","textChars":67,"textLines":1,"bbox":[100,229,650,26]}
+{"kind":"shape","id":"sh/98rytw72","slide":11,"name":"initial-probe-0","bbox":[72,318,340,184]}
+{"kind":"textbox","id":"sh/o7ih0r6h","slide":11,"name":"initial-probe-title-0","text":"Exact-prefix","textPreview":"Exact-prefix","textChars":12,"textLines":1,"bbox":[96,341,292,30]}
+{"kind":"textbox","id":"sh/72t03qp0","slide":11,"name":"initial-probe-example-0","text":"Kişi-017 works as Profession ...","textPreview":"Kişi-017 works as Profession ...","textChars":32,"textLines":1,"bbox":[96,390,292,48]}
+{"kind":"textbox","id":"sh/61kzalof","slide":11,"name":"initial-probe-result-0","text":"Storage ölçer","textPreview":"Storage ölçer","textChars":13,"textLines":1,"bbox":[96,456,292,25]}
+{"kind":"shape","id":"sh/ofqtgnyt","slide":11,"name":"initial-probe-1","bbox":[450,318,340,184]}
+{"kind":"textbox","id":"sh/9gza9sze","slide":11,"name":"initial-probe-title-1","text":"Held-out forms","textPreview":"Held-out forms","textChars":14,"textLines":1,"bbox":[474,341,292,30]}
+{"kind":"textbox","id":"sh/mdobedg3","slide":11,"name":"initial-probe-example-1","text":"Forms A–D × direct/QA; unseen C/D dahil","textPreview":"Forms A–D × direct/QA; unseen C/D dahil","textChars":39,"textLines":1,"bbox":[474,390,292,48]}
+{"kind":"textbox","id":"sh/nehs7iho","slide":11,"name":"initial-probe-result-1","text":"Prompt transfer ölçer","textPreview":"Prompt transfer ölçer","textChars":21,"textLines":1,"bbox":[474,456,292,25]}
+{"kind":"shape","id":"sh/0b6tc3yx","slide":11,"name":"initial-probe-2","bbox":[828,318,340,184]}
+{"kind":"textbox","id":"sh/1cfa58zi","slide":11,"name":"initial-probe-title-2","text":"Binding + retention","textPreview":"Binding + retention","textChars":19,"textLines":1,"bbox":[852,341,292,30]}
+{"kind":"textbox","id":"sh/epobatgr","slide":11,"name":"initial-probe-example-2","text":"Ranking, forced choice, PPL, generic output, intrusion","textPreview":"Ranking, forced choice, PPL, generic output, intrusion","textChars":54,"textLines":1,"bbox":[852,390,292,48]}
+{"kind":"textbox","id":"sh/zaxs3yhc","slide":11,"name":"initial-probe-result-2","text":"Yorumu korur","textPreview":"Yorumu korur","textChars":12,"textLines":1,"bbox":[852,456,292,25]}
+{"kind":"shape","id":"sh/cn6t83y1","slide":11,"name":"initial-result","bbox":[72,548,1136,82]}
+{"kind":"textbox","id":"sh/dofa18z6","slide":11,"name":"initial-result-text","text":"Bir familiar promptun başarısı yetmez; aynı binding gerekli bütün unseen koşullarda korunmalıdır.","textPreview":"Bir familiar promptun başarısı yetmez; aynı binding gerekli bütün unseen koşullarda korunmalıdır.","textChars":97,"textLines":1,"bbox":[100,573,1080,34]}
+{"kind":"shape","id":"sh/tsnip0ny","slide":11,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/87ehgv6d","slide":11,"name":"source","text":"Frozen hard evaluation ve controls; raporlar 94–98","textPreview":"Frozen hard evaluation ve controls; raporlar 94–98","textChars":50,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/7650nq5s","slide":11,"name":"page","text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/jetc3ut0","slide":11,"text":"[Sources]\n- documentation/94_PRE_M2_FROZEN_HARD_EVALUATION_REPORT.md\n- documentation/95_PRE_M2_PARAPHRASE_COUNTERBALANCE_REPORT.md\n- documentation/96_PRE_M2_JOINT_RELATION_CONTROL_REPORT.md\n- documentation/97_PRE_M2_DRIFT_ABLATION_REPORT.md"}
+{"kind":"slide","id":"sl/8f2psfyx","slide":12,"title":"ROBUST INTERSECTION","textShapes":14}
+{"kind":"textbox","id":"sh/1oj61kn6","slide":12,"name":"kicker","text":"ROBUST INTERSECTION","textPreview":"ROBUST INTERSECTION","textChars":19,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/1gbm9s3a","slide":12,"name":"slide-title","text":"Bir fact robust sayılmak için 8/8 hücreyi geçmelidir","textPreview":"Bir fact robust sayılmak için 8/8 hücreyi geçmelidir","textChars":52,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"textbox","id":"sh/0f2lgnmp","slide":12,"name":"capacity-control","text":"4 form × 2 scaffold = 8 hücre. Tek bir hücre başarısızsa fact-level robust değeri 0 olur.","textPreview":"4 form × 2 scaffold = 8 hücre. Tek bir hücre başarısızsa fact-level robust değeri 0 olur.","textChars":89,"textLines":1,"bbox":[72,130,1080,30]}
+{"kind":"shape","id":"sh/ra943il8","slide":12,"name":"m360","bbox":[118,205,400,218]}
+{"kind":"textbox","id":"sh/q903ad4n","slide":12,"name":"m360-title","text":"7 / 8 başarılı","textPreview":"7 / 8 başarılı","textChars":14,"textLines":1,"bbox":[150,234,336,34]}
+{"kind":"textbox","id":"sh/dcbm583y","slide":12,"name":"m360-overlap","text":"0","textPreview":"0","textChars":1,"textLines":1,"bbox":[150,294,336,54]}
+{"kind":"textbox","id":"sh/sb2lcnmd","slide":12,"name":"m360-label","text":"fact-level robust","textPreview":"fact-level robust","textChars":17,"textLines":1,"bbox":[150,361,336,27]}
+{"kind":"textbox","id":"sh/b6d4f2lc","slide":12,"name":"arrow","text":"≠","textPreview":"≠","textChars":1,"textLines":1,"bbox":[562,275,120,64]}
+{"kind":"shape","id":"sh/a543mx4r","slide":12,"name":"m17","bbox":[726,205,436,218]}
+{"kind":"textbox","id":"sh/wvupgz6t","slide":12,"name":"m17-title","text":"8 / 8 başarılı","textPreview":"8 / 8 başarılı","textChars":14,"textLines":1,"bbox":[758,234,372,34]}
+{"kind":"textbox","id":"sh/xw3q94ne","slide":12,"name":"m17-overlap","text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[758,294,372,54]}
+{"kind":"textbox","id":"sh/atc7epon","slide":12,"name":"m17-label","text":"fact-level robust","textPreview":"fact-level robust","textChars":17,"textLines":1,"bbox":[758,361,372,27]}
+{"kind":"shape","id":"sh/bulo7u58","slide":12,"name":"setup","bbox":[72,474,1136,80]}
+{"kind":"textbox","id":"sh/orapcf6h","slide":12,"name":"setup-text","text":"A-dir ✓  A-QA ✓  B-dir ✓  B-QA ✓  C-dir ✓  C-QA ✓  D-dir ✓  D-QA ✗","textPreview":"A-dir ✓  A-QA ✓  B-dir ✓  B-QA ✓  C-dir ✓  C-QA ✓  D-dir ✓  D-QA ✗","textChars":66,"textLines":1,"bbox":[94,500,1092,30]}
+{"kind":"textbox","id":"sh/9sj65kn2","slide":12,"name":"capacity-meaning","text":"Population robust accuracy = 8/8 geçen fact sayısı ÷ toplam fact sayısı.","textPreview":"Population robust accuracy = 8/8 geçen fact sayısı ÷ toplam fact sayısı.","textChars":72,"textLines":1,"bbox":[72,590,1136,32]}
+{"kind":"shape","id":"sh/mps7a5or","slide":12,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/nq1o3a5w","slide":12,"name":"source","text":"Eight-cell robust definition; qwen_m2_m3.py ve rapor 136","textPreview":"Eight-cell robust definition; qwen_m2_m3.py ve rapor 136","textChars":56,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/0nap8f6l","slide":12,"name":"page","text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/8f2psfyx","slide":12,"text":"[Sources]\n- transfer-vs-relearning/src/transfer_vs_relearning/metrics/qwen_m2_m3.py\n- documentation/136_QWEN_M2_M3_ENDPOINT_EVALUATION_GPU_ALLOCATION_STATUS.md"}
+{"kind":"slide","id":"sl/hgzapcr6","slide":13,"title":"SCORING YÖNTEMİ","textShapes":15}
+{"kind":"textbox","id":"sh/kjmxsfm1","slide":13,"name":"kicker","text":"SCORING YÖNTEMİ","textPreview":"SCORING YÖNTEMİ","textChars":15,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/q50nydsj","slide":13,"name":"slide-title","text":"Candidate ranking factual binding’i daha temiz ölçer","textPreview":"Candidate ranking factual binding’i daha temiz ölçer","textChars":52,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"shape","id":"sh/bq9orito","slide":13,"name":"v1","bbox":[72,154,488,340]}
+{"kind":"textbox","id":"sh/o3i5w3ad","slide":13,"name":"v1-title","text":"Free generation","textPreview":"Free generation","textChars":15,"textLines":1,"bbox":[100,180,432,32]}
+{"kind":"textbox","id":"sh/p4r6p8by","slide":13,"name":"v1-result","text":"Kişi-017 ne iş yapıyor?","textPreview":"Kişi-017 ne iş yapıyor?","textChars":23,"textLines":1,"bbox":[100,228,432,34]}
+{"kind":"textbox","id":"sh/21gnuts7","slide":13,"name":"v1-weak","text":"Model çıktısı","textPreview":"Model çıktısı","textChars":13,"textLines":1,"bbox":[100,291,240,27]}
+{"kind":"textbox","id":"sh/32ponyts","slide":13,"name":"v1-lines","text":"“Sanırım bir mühendis...”\nAlias, uzunluk ve biçim sonucu etkiler.","textPreview":"“Sanırım bir mühendis...” | Alias, uzunluk ve biçim sonucu etkiler.","textChars":65,"textLines":2,"bbox":[100,329,400,62]}
+{"kind":"textbox","id":"sh/gzy5s3a1","slide":13,"name":"v1-diagnosis","text":"Doğal output faydalıdır ama yüzey biçimine kırılgandır.","textPreview":"Doğal output faydalıdır ama yüzey biçimine kırılgandır.","textChars":55,"textLines":1,"bbox":[100,420,410,55]}
+{"kind":"shape","id":"sh/1076lobm","slide":13,"name":"v2","bbox":[608,154,552,340]}
+{"kind":"textbox","id":"sh/hcfy9k3u","slide":13,"name":"v2-title","text":"Candidate ranking","textPreview":"Candidate ranking","textChars":17,"textLines":1,"bbox":[636,180,496,32]}
+{"kind":"textbox","id":"sh/gb6x0zm9","slide":13,"name":"v2-replace","text":"Candidates: Meslek 16, 17, 18, 19","textPreview":"Candidates: Meslek 16, 17, 18, 19","textChars":33,"textLines":1,"bbox":[636,228,480,64]}
+{"kind":"textbox","id":"sh/vaxg7ulo","slide":13,"name":"v2-result","text":"Top-1 = Meslek 17","textPreview":"Top-1 = Meslek 17","textChars":17,"textLines":1,"bbox":[636,319,480,34]}
+{"kind":"textbox","id":"sh/u9ofyp43","slide":13,"name":"v2-change","text":"correct_rank_mean = 1","textPreview":"correct_rank_mean = 1","textChars":21,"textLines":1,"bbox":[636,371,480,28]}
+{"kind":"textbox","id":"sh/t8fy5k3i","slide":13,"name":"v2-limit","text":"Aynı inventory; candidates model likelihood ile sıralanır.","textPreview":"Aynı inventory; candidates model likelihood ile sıralanır.","textChars":58,"textLines":1,"bbox":[636,426,480,55]}
+{"kind":"textbox","id":"sh/876xwfmx","slide":13,"name":"relations","text":"Relation forced choice: aynı subject için yanlış relation object’i doğru binding’i geçmemelidir.","textPreview":"Relation forced choice: aynı subject için yanlış relation object’i doğru binding’i geçmemelidir.","textChars":96,"textLines":1,"bbox":[72,548,1088,30]}
+{"kind":"shape","id":"sh/7mdg3als","slide":13,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/6l4fu547","slide":13,"name":"source","text":"Frozen candidate-ranking ve relation-binding ölçümleri; raporlar 106, 127, 136","textPreview":"Frozen candidate-ranking ve relation-binding ölçümleri; raporlar 106, 127, 136","textChars":78,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/lkvy103m","slide":13,"name":"page","text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/hgzapcr6","slide":13,"text":"[Sources]\n- transfer-vs-relearning/src/transfer_vs_relearning/data/candidates.py\n- transfer-vs-relearning/src/transfer_vs_relearning/metrics/qwen_m2_m3.py\n- documentation/136_QWEN_M2_M3_ENDPOINT_EVALUATION_GPU_ALLOCATION_STATUS.md"}
+{"kind":"slide","id":"sl/6lsnupw7","slide":14,"title":"PERPLEXITY — PPL","textShapes":10}
+{"kind":"textbox","id":"sh/ls7idofu","slide":14,"name":"kicker","text":"PERPLEXITY — PPL","textPreview":"PERPLEXITY — PPL","textChars":16,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/xc7eds76","slide":14,"name":"slide-title","text":"PPL factual accuracy değil, genel dil drift’ini ölçer","textPreview":"PPL factual accuracy değil, genel dil drift’ini ölçer","textChars":53,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"shape","id":"sh/jepwf2pc","slide":14,"name":"metric-generic perplexity drift","bbox":[710,180,450,132]}
+{"kind":"textbox","id":"sh/idgvmx8r","slide":14,"name":"metric-value-generic perplexity drift","text":"≤1,25×","textPreview":"≤1,25×","textChars":6,"textLines":1,"bbox":[734,200,402,52]}
+{"kind":"textbox","id":"sh/5grehs7i","slide":14,"name":"metric-label-generic perplexity drift","text":"frozen hard drift gate","textPreview":"frozen hard drift gate","textChars":22,"textLines":1,"bbox":[734,258,402,38]}
+{"kind":"shape","id":"sh/kfidonqx","slide":14,"name":"metric-M1 continuations ended in EOS","bbox":[710,332,450,132]}
+{"kind":"textbox","id":"sh/zi5c3y98","slide":14,"name":"metric-value-M1 continuations ended in EOS","text":"<1,10×","textPreview":"<1,10×","textChars":6,"textLines":1,"bbox":[734,352,402,52]}
+{"kind":"textbox","id":"sh/ehwvat8n","slide":14,"name":"metric-label-M1 continuations ended in EOS","text":"tercih edilen bölge","textPreview":"tercih edilen bölge","textChars":19,"textLines":1,"bbox":[734,410,402,38]}
+{"kind":"textbox","id":"sh/c3e1gjyd","slide":14,"name":"preserved","text":"Düşük PPL: frozen generic text model için daha az şaşırtıcıdır; aynı corpus ve token stream ile karşılaştırılır.","textPreview":"Düşük PPL: frozen generic text model için daha az şaşırtıcıdır; aynı corpus ve token stream ile karşılaştırılır.","textChars":112,"textLines":1,"bbox":[710,500,450,66]}
+{"kind":"textbox","id":"sh/x4ni9ofy","slide":14,"name":"interpretation","text":"Model fact’lerde güçlü ama PPL’de kötü—veya PPL’de iyi ama robust access’te zayıf—olabilir.","textPreview":"Model fact’lerde güçlü ama PPL’de kötü—veya PPL’de iyi ama robust access’te zayıf—olabilir.","textChars":91,"textLines":1,"bbox":[710,580,450,52]}
+{"kind":"shape","id":"sh/a1wze9g7","slide":14,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/b2507exs","slide":14,"name":"source","text":"Qwen PPL trade-off ve selected checkpoints; raporlar 106 ve 127","textPreview":"Qwen PPL trade-off ve selected checkpoints; raporlar 106 ve 127","textChars":63,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/kre1k3y9","slide":14,"name":"page","text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"chart","id":"ch/6xcv21sz","slide":14,"name":"Chart","chartType":"bar","bbox":[72,180,580,350]}
+{"kind":"notes","id":"nt/6lsnupw7","slide":14,"text":"[Sources]\n- documentation/106_M1_CROSS_FAMILY_MODEL_SCREENING_RESULT.md\n- documentation/127_QWEN_SCALE_REPLICATION_RESULT_AND_SMOLLM_LAMBDA025_STATUS.md"}
+{"kind":"slide","id":"sl/vaxsvy10","slide":15,"title":"SMOLLM — 500 FACT","textShapes":14}
+{"kind":"textbox","id":"sh/l0bqlgf2","slide":15,"name":"kicker","text":"SMOLLM — 500 FACT","textPreview":"SMOLLM — 500 FACT","textChars":17,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/547mhg3m","slide":15,"name":"slide-title","text":"SmolLM fact’leri depoladı ama robust access çözülemedi","textPreview":"SmolLM fact’leri depoladı ama robust access çözülemedi","textChars":54,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"textbox","id":"sh/k3y5ov21","slide":15,"name":"capacity-control","text":"Final gate, Forms A–D × direct/QA sekiz-hücre robustness’ı global ve relation bazında gerektiriyordu.","textPreview":"Final gate, Forms A–D × direct/QA sekiz-hücre robustness’ı global ve relation bazında gerektiriyordu.","textChars":101,"textLines":1,"bbox":[72,130,1080,30]}
+{"kind":"shape","id":"sh/76p4jqls","slide":15,"name":"m360","bbox":[118,205,400,218]}
+{"kind":"textbox","id":"sh/65gnqlk7","slide":15,"name":"m360-title","text":"Exact storage","textPreview":"Exact storage","textChars":13,"textLines":1,"bbox":[150,234,336,34]}
+{"kind":"textbox","id":"sh/t87ml0ji","slide":15,"name":"m360-overlap","text":"%100","textPreview":"%100","textChars":4,"textLines":1,"bbox":[150,294,336,54]}
+{"kind":"textbox","id":"sh/s7y5sv2x","slide":15,"name":"m360-label","text":"canonical acquisition","textPreview":"canonical acquisition","textChars":21,"textLines":1,"bbox":[150,361,336,27]}
+{"kind":"textbox","id":"sh/na5476l8","slide":15,"name":"arrow","text":"≠","textPreview":"≠","textChars":1,"textLines":1,"bbox":[562,275,120,64]}
+{"kind":"shape","id":"sh/m9c3e1kn","slide":15,"name":"m17","bbox":[726,205,436,218]}
+{"kind":"textbox","id":"sh/wrm9kvep","slide":15,"name":"m17-title","text":"En iyi robust access","textPreview":"En iyi robust access","textChars":20,"textLines":1,"bbox":[758,234,372,34]}
+{"kind":"textbox","id":"sh/hsvat0fa","slide":15,"name":"m17-overlap","text":"%55,8","textPreview":"%55,8","textChars":5,"textLines":1,"bbox":[758,294,372,54]}
+{"kind":"textbox","id":"sh/upkrilwj","slide":15,"name":"m17-label","text":"frozen gate: ≥%70","textPreview":"frozen gate: ≥%70","textChars":17,"textLines":1,"bbox":[758,361,372,27]}
+{"kind":"shape","id":"sh/vqdsrqx4","slide":15,"name":"setup","bbox":[72,474,1136,80]}
+{"kind":"textbox","id":"sh/4vm9ovel","slide":15,"name":"setup-text","text":"Control %39,6 · contrastive %52,2 · higher λ %50,4 · prompt consistency %55,8","textPreview":"Control %39,6 · contrastive %52,2 · higher λ %50,4 · prompt consistency %55,8","textChars":77,"textLines":1,"bbox":[94,500,1092,30]}
+{"kind":"textbox","id":"sh/5wvax0f6","slide":15,"name":"capacity-meaning","text":"Müdahaleler mekanizmayı iyileştirdi; fakat SmolLM’i M2/M3 için uygun hale getirmedi.","textPreview":"Müdahaleler mekanizmayı iyileştirdi; fakat SmolLM’i M2/M3 için uygun hale getirmedi.","textChars":84,"textLines":1,"bbox":[72,590,1136,32]}
+{"kind":"shape","id":"sh/it4rm5wv","slide":15,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/judsvqxg","slide":15,"name":"source","text":"SmolLM frozen comparison ve remediation; raporlar 106, 127–128","textPreview":"SmolLM frozen comparison ve remediation; raporlar 106, 127–128","textChars":62,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/0z29cbyh","slide":15,"name":"page","text":"15","textPreview":"15","textChars":2,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/vaxsvy10","slide":15,"text":"[Sources]\n- documentation/106_M1_CROSS_FAMILY_MODEL_SCREENING_RESULT.md\n- documentation/127_QWEN_SCALE_REPLICATION_RESULT_AND_SMOLLM_LAMBDA025_STATUS.md\n- documentation/128_SMOLLM_500_FACT_PROMPT_CONSISTENCY_REMEDIATION_PLAN.md"}
+{"kind":"slide","id":"sl/gny5sjyp","slide":16,"title":"MODEL AİLESİ TARAMASI","textShapes":10}
+{"kind":"textbox","id":"sh/2pcfa5oz","slide":16,"name":"kicker","text":"MODEL AİLESİ TARAMASI","textPreview":"MODEL AİLESİ TARAMASI","textChars":21,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/8z2h8bq1","slide":16,"name":"slide-title","text":"Factual robustness’ta yalnız Qwen tüm gate’leri geçti","textPreview":"Factual robustness’ta yalnız Qwen tüm gate’leri geçti","textChars":53,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"shape","id":"sh/ytkf2h8j","slide":16,"name":"metric-generic perplexity drift","bbox":[710,180,450,132]}
+{"kind":"textbox","id":"sh/zutgvm94","slide":16,"name":"metric-value-generic perplexity drift","text":"1,461×","textPreview":"1,461×","textChars":6,"textLines":1,"bbox":[734,200,402,52]}
+{"kind":"textbox","id":"sh/kv2h4rqp","slide":16,"name":"metric-label-generic perplexity drift","text":"ilk Qwen PPL oranı","textPreview":"ilk Qwen PPL oranı","textChars":18,"textLines":1,"bbox":[734,258,402,38]}
+{"kind":"shape","id":"sh/lwbyxwra","slide":16,"name":"metric-M1 continuations ended in EOS","bbox":[710,332,450,132]}
+{"kind":"textbox","id":"sh/ip4zel83","slide":16,"name":"metric-value-M1 continuations ended in EOS","text":"0 / 5","textPreview":"0 / 5","textChars":5,"textLines":1,"bbox":[734,352,402,52]}
+{"kind":"textbox","id":"sh/3qdg7qpo","slide":16,"name":"metric-label-M1 continuations ended in EOS","text":"bütün gate’leri geçen aile","textPreview":"bütün gate’leri geçen aile","textChars":26,"textLines":1,"bbox":[734,410,402,38]}
+{"kind":"textbox","id":"sh/fm1gzq5o","slide":16,"name":"preserved","text":"Qwen held-out robustness ve relation binding’de near-ceiling sonuç verdi.","textPreview":"Qwen held-out robustness ve relation binding’de near-ceiling sonuç verdi.","textChars":73,"textLines":1,"bbox":[710,500,450,66]}
+{"kind":"textbox","id":"sh/e1sf65o3","slide":16,"name":"interpretation","text":"Sonraki adım model aramak değil, Qwen factual strength’ini retention replay ile korumaktı.","textPreview":"Sonraki adım model aramak değil, Qwen factual strength’ini retention replay ile korumaktı.","textChars":90,"textLines":1,"bbox":[710,580,450,52]}
+{"kind":"shape","id":"sh/1ojy10ne","slide":16,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/gnax8v6t","slide":16,"name":"source","text":"Frozen 500-fact cross-family screen; rapor 106","textPreview":"Frozen 500-fact cross-family screen; rapor 106","textChars":46,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/nqlg3a5k","slide":16,"name":"page","text":"16","textPreview":"16","textChars":2,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"chart","id":"ch/d8fa943i","slide":16,"name":"Chart","chartType":"bar","bbox":[72,180,580,350]}
+{"kind":"notes","id":"nt/gny5sjyp","slide":16,"text":"[Sources]\n- documentation/106_M1_CROSS_FAMILY_MODEL_SCREENING_RESULT.md"}
+{"kind":"slide","id":"sl/14bup87q","slide":17,"title":"QWEN — 2.500 FACT","textShapes":14}
+{"kind":"textbox","id":"sh/14rqpgne","slide":17,"name":"kicker","text":"QWEN — 2.500 FACT","textPreview":"QWEN — 2.500 FACT","textChars":17,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/1c7e50ni","slide":17,"name":"slide-title","text":"Qwen M1 gate’ini iki bağımsız seed’de geçti","textPreview":"Qwen M1 gate’ini iki bağımsız seed’de geçti","textChars":43,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"textbox","id":"sh/gbedwfmx","slide":17,"name":"capacity-control","text":"Frozen kural, exact, hard, robust, binding, PPL ve integrity gate’lerini geçen en erken checkpoint’i seçti.","textPreview":"Frozen kural, exact, hard, robust, binding, PPL ve integrity gate’lerini geçen en erken checkpoint’i seçti.","textChars":107,"textLines":1,"bbox":[72,130,1080,30]}
+{"kind":"shape","id":"sh/rm5czq50","slide":17,"name":"m360","bbox":[118,205,400,218]}
+{"kind":"textbox","id":"sh/6lwvql4v","slide":17,"name":"m360-title","text":"Seed 42 · step 75","textPreview":"Seed 42 · step 75","textChars":17,"textLines":1,"bbox":[150,234,336,34]}
+{"kind":"textbox","id":"sh/t8ne10n6","slide":17,"name":"m360-overlap","text":"%96,08","textPreview":"%96,08","textChars":6,"textLines":1,"bbox":[150,294,336,54]}
+{"kind":"textbox","id":"sh/snedsvml","slide":17,"name":"m360-label","text":"robust · exact %99,96 · PPL ×1,082","textPreview":"robust · exact %99,96 · PPL ×1,082","textChars":34,"textLines":1,"bbox":[150,361,336,27]}
+{"kind":"textbox","id":"sh/jilcvq54","slide":17,"name":"arrow","text":"↔","textPreview":"↔","textChars":1,"textLines":1,"bbox":[562,275,120,64]}
+{"kind":"shape","id":"sh/ihcvml4j","slide":17,"name":"m17","bbox":[726,205,436,218]}
+{"kind":"textbox","id":"sh/4by9or6l","slide":17,"name":"m17-title","text":"Seed 43 · step 50","textPreview":"Seed 43 · step 50","textChars":17,"textLines":1,"bbox":[758,234,372,34]}
+{"kind":"textbox","id":"sh/pc7qhwn6","slide":17,"name":"m17-overlap","text":"%96,20","textPreview":"%96,20","textChars":6,"textLines":1,"bbox":[758,294,372,54]}
+{"kind":"textbox","id":"sh/29grm1of","slide":17,"name":"m17-label","text":"robust · exact %99,68 · PPL ×1,032","textPreview":"robust · exact %99,68 · PPL ×1,032","textChars":34,"textLines":1,"bbox":[758,361,372,27]}
+{"kind":"shape","id":"sh/3ap8fm50","slide":17,"name":"setup","bbox":[72,474,1136,80]}
+{"kind":"textbox","id":"sh/gnepkr69","slide":17,"name":"setup-text","text":"500 subject · 2.500 fact · seed başına 20.000 hard probe · Forms A–D × direct/QA","textPreview":"500 subject · 2.500 fact · seed başına 20.000 hard probe · Forms A–D × direct/QA","textChars":80,"textLines":1,"bbox":[94,500,1092,30]}
+{"kind":"textbox","id":"sh/honqdwnu","slide":17,"name":"capacity-meaning","text":"Qwen replicated intermediate-scale M1 oldu; iki selected artifact freeze edildi.","textPreview":"Qwen replicated intermediate-scale M1 oldu; iki selected artifact freeze edildi.","textChars":80,"textLines":1,"bbox":[72,590,1136,32]}
+{"kind":"shape","id":"sh/ulw7ihoj","slide":17,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/fm58bm54","slide":17,"name":"source","text":"Qwen scale replication ve artifact freeze; rapor 127","textPreview":"Qwen scale replication ve artifact freeze; rapor 127","textChars":52,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/0ji9wb6t","slide":17,"name":"page","text":"17","textPreview":"17","textChars":2,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/14bup87q","slide":17,"text":"[Sources]\n- documentation/127_QWEN_SCALE_REPLICATION_RESULT_AND_SMOLLM_LAMBDA025_STATUS.md"}
+{"kind":"slide","id":"sl/y5wne50z","slide":18,"title":"TÜRKÇE ADAPTATION ÖNCESİ","textShapes":15}
+{"kind":"textbox","id":"sh/qh03ql8j","slide":18,"name":"kicker","text":"TÜRKÇE ADAPTATION ÖNCESİ","textPreview":"TÜRKÇE ADAPTATION ÖNCESİ","textChars":24,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/wrelszu9","slide":18,"name":"slide-title","text":"M1’de Türkçe promptlardan zaten kısmi access vardı","textPreview":"M1’de Türkçe promptlardan zaten kısmi access vardı","textChars":50,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"shape","id":"sh/hsn2l4bu","slide":18,"name":"v1","bbox":[72,154,488,340]}
+{"kind":"textbox","id":"sh/itw3upcf","slide":18,"name":"v1-title","text":"M1 seed 42 · step 75","textPreview":"M1 seed 42 · step 75","textChars":20,"textLines":1,"bbox":[100,180,432,32]}
+{"kind":"textbox","id":"sh/je5knut0","slide":18,"name":"v1-result","text":"EN→EN %99,29 · TR→EN %52,03","textPreview":"EN→EN %99,29 · TR→EN %52,03","textChars":27,"textLines":1,"bbox":[100,228,432,34]}
+{"kind":"textbox","id":"sh/4felwzu5","slide":18,"name":"v1-weak","text":"Türkçe uçtan uca","textPreview":"Türkçe uçtan uca","textChars":16,"textLines":1,"bbox":[100,291,240,27]}
+{"kind":"textbox","id":"sh/5gnmp4bq","slide":18,"name":"v1-lines","text":"TR→TR %29,05\nEN PPL 15,909 · TR PPL 17,349","textPreview":"TR→TR %29,05 | EN PPL 15,909 · TR PPL 17,349","textChars":42,"textLines":2,"bbox":[100,329,400,62]}
+{"kind":"textbox","id":"sh/6hw3y9sb","slide":18,"name":"v1-diagnosis","text":"Türkçe adaptation başlamadan önce cross-lingual access mevcuttu.","textPreview":"Türkçe adaptation başlamadan önce cross-lingual access mevcuttu.","textChars":64,"textLines":1,"bbox":[100,420,410,55]}
+{"kind":"shape","id":"sh/rip4retw","slide":18,"name":"v2","bbox":[608,154,552,340]}
+{"kind":"textbox","id":"sh/fapkr6pw","slide":18,"name":"v2-title","text":"M1 seed 43 · step 50","textPreview":"M1 seed 43 · step 50","textChars":20,"textLines":1,"bbox":[636,180,496,32]}
+{"kind":"textbox","id":"sh/upg3i18r","slide":18,"name":"v2-replace","text":"EN→EN %99,24\nTR→EN %52,52","textPreview":"EN→EN %99,24 | TR→EN %52,52","textChars":25,"textLines":2,"bbox":[636,228,480,64]}
+{"kind":"textbox","id":"sh/1cr2tg72","slide":18,"name":"v2-result","text":"TR→TR %30,12","textPreview":"TR→TR %30,12","textChars":12,"textLines":1,"bbox":[636,319,480,34]}
+{"kind":"textbox","id":"sh/gbylkbqh","slide":18,"name":"v2-change","text":"EN PPL 15,170 · TR PPL 15,741","textPreview":"EN PPL 15,170 · TR PPL 15,741","textChars":29,"textLines":1,"bbox":[636,371,480,28]}
+{"kind":"textbox","id":"sh/7mpknmp0","slide":18,"name":"v2-limit","text":"İki seed, causal family için neredeyse aynı factual başlangıç noktasını verdi.","textPreview":"İki seed, causal family için neredeyse aynı factual başlangıç noktasını verdi.","textChars":78,"textLines":1,"bbox":[636,426,480,55]}
+{"kind":"textbox","id":"sh/6lg3e18f","slide":18,"name":"relations","text":"M2’nin hem Türkçe access’i artırma alanı hem de koruması gereken mevcut access vardı.","textPreview":"M2’nin hem Türkçe access’i artırma alanı hem de koruması gereken mevcut access vardı.","textChars":85,"textLines":1,"bbox":[72,548,1088,30]}
+{"kind":"shape","id":"sh/to72pw76","slide":18,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/snylgrql","slide":18,"name":"source","text":"Frozen bilingual/PPL M1 baseline; raporlar 134 ve 136","textPreview":"Frozen bilingual/PPL M1 baseline; raporlar 134 ve 136","textChars":53,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/bi94zqp4","slide":18,"name":"page","text":"18","textPreview":"18","textChars":2,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/y5wne50z","slide":18,"text":"[Sources]\n- documentation/134_QWEN_PRE_M2_GPU_BLOCKER_AND_OFFLINE_PREPARATION_STATUS.md\n- documentation/136_QWEN_M2_M3_ENDPOINT_EVALUATION_GPU_ALLOCATION_STATUS.md"}
+{"kind":"slide","id":"sl/nid43ytk","slide":19,"title":"M2/M3 MÜDAHALESİ","textShapes":15}
+{"kind":"textbox","id":"sh/9kb2hcre","slide":19,"name":"kicker","text":"M2/M3 MÜDAHALESİ","textPreview":"M2/M3 MÜDAHALESİ","textChars":16,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/9gb6xgbi","slide":19,"name":"slide-title","text":"M2 ve M3 yalnız factual exposure bakımından ayrıldı","textPreview":"M2 ve M3 yalnız factual exposure bakımından ayrıldı","textChars":51,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"shape","id":"sh/8v2pobax","slide":19,"name":"v1","bbox":[72,154,488,340]}
+{"kind":"textbox","id":"sh/vitozqt8","slide":19,"name":"v1-title","text":"M2-clean","textPreview":"M2-clean","textChars":8,"textLines":1,"bbox":[100,180,432,32]}
+{"kind":"textbox","id":"sh/ahk7qls3","slide":19,"name":"v1-result","text":"1.048.576 token · 128 update","textPreview":"1.048.576 token · 128 update","textChars":28,"textLines":1,"bbox":[100,228,432,34]}
+{"kind":"textbox","id":"sh/xkbq10be","slide":19,"name":"v1-weak","text":"Exposure kuralı","textPreview":"Exposure kuralı","textChars":15,"textLines":1,"bbox":[100,291,240,27]}
+{"kind":"textbox","id":"sh/wj2psvat","slide":19,"name":"v1-lines","text":"Generic Turkish + neutral filler\nSıfır target synthetic fact","textPreview":"Generic Turkish + neutral filler | Sıfır target synthetic fact","textChars":60,"textLines":2,"bbox":[100,329,400,62]}
+{"kind":"textbox","id":"sh/jmd83atk","slide":19,"name":"v1-diagnosis","text":"Temiz Türkçe adaptation mevcut factual access’e ne yapıyor?","textPreview":"Temiz Türkçe adaptation mevcut factual access’e ne yapıyor?","textChars":59,"textLines":1,"bbox":[100,420,410,55]}
+{"kind":"shape","id":"sh/il47u5sz","slide":19,"name":"v2","bbox":[608,154,552,340]}
+{"kind":"textbox","id":"sh/cri1gnql","slide":19,"name":"v2-title","text":"M3-fact","textPreview":"M3-fact","textChars":7,"textLines":1,"bbox":[636,180,496,32]}
+{"kind":"textbox","id":"sh/dsri9sr6","slide":19,"name":"v2-replace","text":"Aynı Turkish blocks ve bütçe\nNeutral filler yerine doğru Branch B fact’leri","textPreview":"Aynı Turkish blocks ve bütçe | Neutral filler yerine doğru Branch B fact’leri","textChars":75,"textLines":2,"bbox":[636,228,480,64]}
+{"kind":"textbox","id":"sh/qpgjex8f","slide":19,"name":"v2-result","text":"1.048.576 token · 128 update","textPreview":"1.048.576 token · 128 update","textChars":28,"textLines":1,"bbox":[636,319,480,34]}
+{"kind":"textbox","id":"sh/rqp07290","slide":19,"name":"v2-change","text":"4 cycle · 5.000 factual exposure","textPreview":"4 cycle · 5.000 factual exposure","textChars":32,"textLines":1,"bbox":[636,371,480,28]}
+{"kind":"textbox","id":"sh/0vi1k7qx","slide":19,"name":"v2-limit","text":"Branch A sıfır exposure alır; M3, M2’den değil matching M1’den başlar.","textPreview":"Branch A sıfır exposure alır; M3, M2’den değil matching M1’den başlar.","textChars":70,"textLines":1,"bbox":[636,426,480,55]}
+{"kind":"textbox","id":"sh/1gridcr2","slide":19,"name":"relations","text":"Primary estimand: [(M3 − M2) Branch B] − [(M3 − M2) Branch A], TR→EN","textPreview":"Primary estimand: [(M3 − M2) Branch B] − [(M3 − M2) Branch A], TR→EN","textChars":68,"textLines":1,"bbox":[72,548,1088,30]}
+{"kind":"shape","id":"sh/et0jix8r","slide":19,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/zu90b29c","slide":19,"name":"source","text":"Frozen matched-input causal contract; raporlar 133 ve 135","textPreview":"Frozen matched-input causal contract; raporlar 133 ve 135","textChars":57,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/oj21o7qt","slide":19,"name":"page","text":"19","textPreview":"19","textChars":2,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/nid43ytk","slide":19,"text":"[Sources]\n- documentation/133_QWEN_2500_FACT_M2_M3_EXECUTION_HANDOFF_PLAN.md\n- documentation/135_QWEN_M2_M3_CONTRACT_AND_MATERIALIZATION_STATUS.md"}
+{"kind":"slide","id":"sl/zyxsni5k","slide":20,"title":"YÜRÜTME VE BÜTÜNLÜK","textShapes":14}
+{"kind":"textbox","id":"sh/8b654f61","slide":20,"name":"kicker","text":"YÜRÜTME VE BÜTÜNLÜK","textPreview":"YÜRÜTME VE BÜTÜNLÜK","textChars":19,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/qpwjmh8n","slide":20,"name":"slide-title","text":"Dört run tek bir precommitted endpoint’te değerlendirildi","textPreview":"Dört run tek bir precommitted endpoint’te değerlendirildi","textChars":57,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"textbox","id":"sh/rq50vmp8","slide":20,"name":"attempt-title-0","text":"Training — 1 Ağustos","textPreview":"Training — 1 Ağustos","textChars":20,"textLines":1,"bbox":[82,150,260,36]}
+{"kind":"textbox","id":"sh/4nu1krqh","slide":20,"name":"attempt-example-0","text":"Seed 42 ve 43 için ayrı M2-clean/M3-fact siblings; her çift matching frozen M1’den başladı.","textPreview":"Seed 42 ve 43 için ayrı M2-clean/M3-fact siblings; her çift matching frozen M1’den başladı.","textChars":91,"textLines":1,"bbox":[362,150,760,58]}
+{"kind":"textbox","id":"sh/po3itc72","slide":20,"name":"attempt-result-0","text":"Dördü de 128 update tamamladı · fixed checkpoint-128","textPreview":"Dördü de 128 update tamamladı · fixed checkpoint-128","textChars":52,"textLines":1,"bbox":[362,222,760,30]}
+{"kind":"shape","id":"sh/2lczih8r","slide":20,"name":"attempt-line-0","bbox":[72,272,1070,1]}
+{"kind":"textbox","id":"sh/3ml0rmpw","slide":20,"name":"attempt-title-1","text":"Evaluation — 2 Ağustos","textPreview":"Evaluation — 2 Ağustos","textChars":22,"textLines":1,"bbox":[82,300,260,36]}
+{"kind":"textbox","id":"sh/gjuhg7ql","slide":20,"name":"attempt-example-1","text":"State başına 24 slice × 2.500 probe; bütün form, scaffold ve direction hücreleri.","textPreview":"State başına 24 slice × 2.500 probe; bütün form, scaffold ve direction hücreleri.","textChars":81,"textLines":1,"bbox":[362,300,760,58]}
+{"kind":"textbox","id":"sh/hk3ipcr6","slide":20,"name":"attempt-result-1","text":"96 / 96 slice · 240.000 M2/M3 endpoint probe","textPreview":"96 / 96 slice · 240.000 M2/M3 endpoint probe","textChars":44,"textLines":1,"bbox":[362,372,760,30]}
+{"kind":"shape","id":"sh/dkfmp4zy","slide":20,"name":"attempt-line-1","bbox":[72,422,1070,1]}
+{"kind":"textbox","id":"sh/cj65wzyd","slide":20,"name":"attempt-title-2","text":"Independent review — 3 Ağustos","textPreview":"Independent review — 3 Ağustos","textChars":30,"textLines":1,"bbox":[82,450,260,36]}
+{"kind":"textbox","id":"sh/rid4nuhs","slide":20,"name":"attempt-example-2","text":"Raw manifests, registry membership, hashes, bootstrap logic ve gate read-only kontrol edildi.","textPreview":"Raw manifests, registry membership, hashes, bootstrap logic ve gate read-only kontrol edildi.","textChars":93,"textLines":1,"bbox":[362,450,760,58]}
+{"kind":"textbox","id":"sh/qh4nupg7","slide":20,"name":"attempt-result-2","text":"PASS WITH CONCERNS · blocker veya major issue yok","textPreview":"PASS WITH CONCERNS · blocker veya major issue yok","textChars":49,"textLines":1,"bbox":[362,522,760,30]}
+{"kind":"shape","id":"sh/pwvmlkzm","slide":20,"name":"attempt-line-2","bbox":[72,572,1070,1]}
+{"kind":"shape","id":"sh/4vm5sfy1","slide":20,"name":"attempt-lesson","bbox":[72,603,1136,48]}
+{"kind":"textbox","id":"sh/3ud4juhg","slide":20,"name":"attempt-lesson-text","text":"Sonuç görüldükten sonra checkpoint, seed, threshold veya primary metric seçilmedi.","textPreview":"Sonuç görüldükten sonra checkpoint, seed, threshold veya primary metric seçilmedi.","textChars":82,"textLines":1,"bbox":[96,616,1088,24]}
+{"kind":"shape","id":"sh/2t4nqpgb","slide":20,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/hsvmhkzq","slide":20,"name":"source","text":"Execution, independent review ve retention freeze; raporlar 135, 136, 140a, 143","textPreview":"Execution, independent review ve retention freeze; raporlar 135, 136, 140a, 143","textChars":79,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/grm5ofy5","slide":20,"name":"page","text":"20","textPreview":"20","textChars":2,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/zyxsni5k","slide":20,"text":"[Sources]\n- documentation/135_QWEN_M2_M3_CONTRACT_AND_MATERIALIZATION_STATUS.md\n- documentation/136_QWEN_M2_M3_ENDPOINT_EVALUATION_GPU_ALLOCATION_STATUS.md\n- documentation/140a_QWEN_M2_M3_INDEPENDENT_REVIEW_RESULT_EN.md\n- documentation/143_QWEN_M2_M3_ARTIFACT_RETENTION_FREEZE_AND_STORAGE_AUDIT_EN.md"}
+{"kind":"slide","id":"sl/m1wvqtk3","slide":21,"title":"PRIMARY DIRECTION: TR→EN","textShapes":10}
+{"kind":"textbox","id":"sh/hwjy98rm","slide":21,"name":"kicker","text":"PRIMARY DIRECTION: TR→EN","textPreview":"PRIMARY DIRECTION: TR→EN","textChars":24,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/1gbmxs7a","slide":21,"name":"slide-title","text":"Türkçe adaptation access’i düşürdü; M3 azını geri aldı","textPreview":"Türkçe adaptation access’i düşürdü; M3 azını geri aldı","textChars":54,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"shape","id":"sh/ra9kryp8","slide":21,"name":"metric-generic perplexity drift","bbox":[710,180,450,132]}
+{"kind":"textbox","id":"sh/qp03yt8n","slide":21,"name":"metric-value-generic perplexity drift","text":"−18,8 pp","textPreview":"−18,8 pp","textChars":8,"textLines":1,"bbox":[734,200,402,52]}
+{"kind":"textbox","id":"sh/dcb2t87y","slide":21,"name":"metric-label-generic perplexity drift","text":"M1 → M2, iki seed","textPreview":"M1 → M2, iki seed","textChars":17,"textLines":1,"bbox":[734,258,402,38]}
+{"kind":"shape","id":"sh/sb2lk36t","slide":21,"name":"metric-M1 continuations ended in EOS","bbox":[710,332,450,132]}
+{"kind":"textbox","id":"sh/b6d432pc","slide":21,"name":"metric-value-M1 continuations ended in EOS","text":"+1,9 pp","textPreview":"+1,9 pp","textChars":7,"textLines":1,"bbox":[734,352,402,52]}
+{"kind":"textbox","id":"sh/al43uxor","slide":21,"name":"metric-label-M1 continuations ended in EOS","text":"M2 → M3, iki seed","textPreview":"M2 → M3, iki seed","textChars":17,"textLines":1,"bbox":[734,410,402,38]}
+{"kind":"textbox","id":"sh/4jax4nqd","slide":21,"name":"preserved","text":"Dominant effect: M2’de geniş Turkish-prompt factual-access degradation.","textPreview":"Dominant effect: M2’de geniş Turkish-prompt factual-access degradation.","textChars":71,"textLines":1,"bbox":[710,500,450,66]}
+{"kind":"textbox","id":"sh/5kjydsri","slide":21,"name":"interpretation","text":"M3 iki seed’de M2’den yüksek; ancak M1 baseline’ın çok altında kalıyor.","textPreview":"M3 iki seed’de M2’den yüksek; ancak M1 baseline’ın çok altında kalıyor.","textChars":71,"textLines":1,"bbox":[710,580,450,52]}
+{"kind":"shape","id":"sh/ixsf2d87","slide":21,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/jy1gbi9s","slide":21,"name":"source","text":"Frozen state accuracy ve paired contrasts; raporlar 136 ve 142","textPreview":"Frozen state accuracy ve paired contrasts; raporlar 136 ve 142","textChars":62,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/wvax03q1","slide":21,"name":"page","text":"21","textPreview":"21","textChars":2,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"chart","id":"ch/ydsje9gf","slide":21,"name":"Chart","chartType":"bar","bbox":[72,180,580,350]}
+{"kind":"notes","id":"nt/m1wvqtk3","slide":21,"text":"[Sources]\n- documentation/136_QWEN_M2_M3_ENDPOINT_EVALUATION_GPU_ALLOCATION_STATUS.md\n- documentation/142_QWEN_M2_M3_EXPLORATORY_MECHANISM_ANALYSIS_RESULT_EN.md"}
+{"kind":"slide","id":"sl/5onypobq","slide":22,"title":"SECONDARY DIRECTION: TR→TR","textShapes":10}
+{"kind":"textbox","id":"sh/gf65w7ql","slide":22,"name":"kicker","text":"SECONDARY DIRECTION: TR→TR","textPreview":"SECONDARY DIRECTION: TR→TR","textChars":26,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/6987itcr","slide":22,"name":"slide-title","text":"Türkçe cevap üretiminde de aynı yönlü pattern görüldü","textPreview":"Türkçe cevap üretiminde de aynı yönlü pattern görüldü","textChars":53,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"shape","id":"sh/k7qpgjul","slide":22,"name":"metric-generic perplexity drift","bbox":[710,180,450,132]}
+{"kind":"textbox","id":"sh/58zqpov6","slide":22,"name":"metric-value-generic perplexity drift","text":"−6,7 pp","textPreview":"−6,7 pp","textChars":7,"textLines":1,"bbox":[734,200,402,52]}
+{"kind":"textbox","id":"sh/il87etcv","slide":22,"name":"metric-label-generic perplexity drift","text":"M1 → M2, yaklaşık","textPreview":"M1 → M2, yaklaşık","textChars":17,"textLines":1,"bbox":[734,258,402,38]}
+{"kind":"shape","id":"sh/jmh8nyd0","slide":22,"name":"metric-M1 continuations ended in EOS","bbox":[710,332,450,132]}
+{"kind":"textbox","id":"sh/43u9snu5","slide":22,"name":"metric-value-M1 continuations ended in EOS","text":"+1,6–1,7 pp","textPreview":"+1,6–1,7 pp","textChars":11,"textLines":1,"bbox":[734,352,402,52]}
+{"kind":"textbox","id":"sh/p43q1sva","slide":22,"name":"metric-label-M1 continuations ended in EOS","text":"M2 → M3","textPreview":"M2 → M3","textChars":7,"textLines":1,"bbox":[734,410,402,38]}
+{"kind":"textbox","id":"sh/p4z6tcri","slide":22,"name":"preserved","text":"TR→TR, factual access ile Turkish object lexicalization’ı birlikte ölçer.","textPreview":"TR→TR, factual access ile Turkish object lexicalization’ı birlikte ölçer.","textChars":73,"textLines":1,"bbox":[710,500,450,66]}
+{"kind":"textbox","id":"sh/436507qx","slide":22,"name":"interpretation","text":"Bu secondary pattern primary TR→EN sonucunu destekler; onun yerine geçmez.","textPreview":"Bu secondary pattern primary TR→EN sonucunu destekler; onun yerine geçmez.","textChars":74,"textLines":1,"bbox":[710,580,450,52]}
+{"kind":"shape","id":"sh/3ixor29c","slide":22,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/2honyx8r","slide":22,"name":"source","text":"Frozen state accuracy ve paired contrasts; rapor 136","textPreview":"Frozen state accuracy ve paired contrasts; rapor 136","textChars":52,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/hgf6pcr6","slide":22,"name":"page","text":"22","textPreview":"22","textChars":2,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"chart","id":"ch/7ydsbyxw","slide":22,"name":"Chart","chartType":"bar","bbox":[72,180,580,350]}
+{"kind":"notes","id":"nt/5onypobq","slide":22,"text":"[Sources]\n- documentation/136_QWEN_M2_M3_ENDPOINT_EVALUATION_GPU_ALLOCATION_STATUS.md"}
+{"kind":"slide","id":"sl/c7uhcr6t","slide":23,"title":"FROZEN PRIMARY GATE","textShapes":14}
+{"kind":"textbox","id":"sh/p4ra1o3e","slide":23,"name":"kicker","text":"FROZEN PRIMARY GATE","textPreview":"FROZEN PRIMARY GATE","textChars":19,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/90vqdczq","slide":23,"name":"slide-title","text":"Primary causal interaction iki seed’de replicate olmadı","textPreview":"Primary causal interaction iki seed’de replicate olmadı","textChars":55,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"textbox","id":"sh/8zm9k7y5","slide":23,"name":"capacity-control","text":"Interaction = (M3 − M2) Branch B − (M3 − M2) Branch A, TR→EN; iki seed’in CI’ı da sıfırı dışlamalıydı.","textPreview":"Interaction = (M3 − M2) Branch B − (M3 − M2) Branch A, TR→EN; iki seed’in CI’ı da sıfırı dışlamalıydı.","textChars":102,"textLines":1,"bbox":[72,130,1080,30]}
+{"kind":"shape","id":"sh/v2d8fmhw","slide":23,"name":"m360","bbox":[118,205,400,218]}
+{"kind":"textbox","id":"sh/a14rmhgb","slide":23,"name":"m360-title","text":"Seed 42","textPreview":"Seed 42","textChars":7,"textLines":1,"bbox":[150,234,336,34]}
+{"kind":"textbox","id":"sh/xovqhcz2","slide":23,"name":"m360-overlap","text":"+0,25 pp","textPreview":"+0,25 pp","textChars":8,"textLines":1,"bbox":[150,294,336,54]}
+{"kind":"textbox","id":"sh/w3m9o7yh","slide":23,"name":"m360-label","text":"%95 CI −0,51 ile +1,01 · FAIL","textPreview":"%95 CI −0,51 ile +1,01 · FAIL","textChars":29,"textLines":1,"bbox":[150,361,336,27]}
+{"kind":"textbox","id":"sh/jqd8jmhs","slide":23,"name":"arrow","text":"≠","textPreview":"≠","textChars":1,"textLines":1,"bbox":[562,275,120,64]}
+{"kind":"shape","id":"sh/ip4rqhgn","slide":23,"name":"m17","bbox":[726,205,436,218]}
+{"kind":"textbox","id":"sh/sby90zm1","slide":23,"name":"m17-title","text":"Seed 43","textPreview":"Seed 43","textChars":7,"textLines":1,"bbox":[758,234,372,34]}
+{"kind":"textbox","id":"sh/tc7at436","slide":23,"name":"m17-overlap","text":"+1,35 pp","textPreview":"+1,35 pp","textChars":8,"textLines":1,"bbox":[758,294,372,54]}
+{"kind":"textbox","id":"sh/69gry94v","slide":23,"name":"m17-label","text":"%95 CI +0,51 ile +2,18 · PASS","textPreview":"%95 CI +0,51 ile +2,18 · PASS","textChars":29,"textLines":1,"bbox":[758,361,372,27]}
+{"kind":"shape","id":"sh/rapsrelg","slide":23,"name":"setup","bbox":[72,474,1136,80]}
+{"kind":"textbox","id":"sh/0fi94jmx","slide":23,"name":"setup-text","text":"Operational validity geçti · EN→EN retention guardrail geçti · post-hoc gate change yok","textPreview":"Operational validity geçti · EN→EN retention guardrail geçti · post-hoc gate change yok","textChars":87,"textLines":1,"bbox":[94,500,1092,30]}
+{"kind":"textbox","id":"sh/1graxo3i","slide":23,"name":"capacity-meaning","text":"Overall frozen decision: primary_success_criterion_not_met","textPreview":"Overall frozen decision: primary_success_criterion_not_met","textChars":58,"textLines":1,"bbox":[72,590,1136,32]}
+{"kind":"shape","id":"sh/edgr294r","slide":23,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/fepsvelc","slide":23,"name":"source","text":"Frozen gate ve independent raw-data reproduction; raporlar 136 ve 140a","textPreview":"Frozen gate ve independent raw-data reproduction; raporlar 136 ve 140a","textChars":70,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/oji9832t","slide":23,"name":"page","text":"23","textPreview":"23","textChars":2,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/c7uhcr6t","slide":23,"text":"[Sources]\n- documentation/136_QWEN_M2_M3_ENDPOINT_EVALUATION_GPU_ALLOCATION_STATUS.md\n- documentation/140a_QWEN_M2_M3_INDEPENDENT_REVIEW_RESULT_EN.md"}
+{"kind":"slide","id":"sl/7qto7e10","slide":24,"title":"BİLİMSEL YORUM","textShapes":10}
+{"kind":"textbox","id":"sh/mtwz6h0f","slide":24,"name":"kicker","text":"BİLİMSEL YORUM","textPreview":"BİLİMSEL YORUM","textChars":14,"textLines":1,"bbox":[72,55,500,26]}
+{"kind":"textbox","id":"sh/1sfqxsv6","slide":24,"name":"headline","text":"Causal family tamamlandı; tez sorusu tamamlanmadı","textPreview":"Causal family tamamlandı; tez sorusu tamamlanmadı","textChars":49,"textLines":1,"bbox":[72,105,1100,64]}
+{"kind":"textbox","id":"sh/0r6p4nul","slide":24,"name":"close-label-0","text":"Bildiklerimiz","textPreview":"Bildiklerimiz","textChars":13,"textLines":1,"bbox":[86,211,260,32]}
+{"kind":"textbox","id":"sh/nux8zidc","slide":24,"name":"close-body-0","text":"İngilizcede edinilmiş fact’lere Türkçe promptlardan kısmi erişim vardı; clean adaptation bu access’i güçlü biçimde düşürdü.","textPreview":"İngilizcede edinilmiş fact’lere Türkçe promptlardan kısmi erişim vardı; clean adaptation bu access’i güçlü biçimde düşürdü.","textChars":123,"textLines":1,"bbox":[360,211,790,76]}
+{"kind":"textbox","id":"sh/2to76dcr","slide":24,"name":"close-label-1","text":"M3 ne ekledi?","textPreview":"M3 ne ekledi?","textChars":13,"textLines":1,"bbox":[86,339,260,32]}
+{"kind":"textbox","id":"sh/9wzq1svi","slide":24,"name":"close-body-1","text":"Doğru Turkish factual exposure, M2-clean’e göre küçük ve iki seed’de aynı yönlü descriptive recovery üretti.","textPreview":"Doğru Turkish factual exposure, M2-clean’e göre küçük ve iki seed’de aynı yönlü descriptive recovery üretti.","textChars":108,"textLines":1,"bbox":[360,339,790,76]}
+{"kind":"textbox","id":"sh/ov6p8nux","slide":24,"name":"close-label-2","text":"Ne diyemeyiz?","textPreview":"Ne diyemeyiz?","textChars":13,"textLines":1,"bbox":[86,467,260,32]}
+{"kind":"textbox","id":"sh/3ydonyd8","slide":24,"name":"close-body-2","text":"Branch-B-specific factual relearning advantage, precommitted two-seed confidence rule altında replicate edilmedi.","textPreview":"Branch-B-specific factual relearning advantage, precommitted two-seed confidence rule altında replicate edilmedi.","textChars":113,"textLines":1,"bbox":[360,467,790,76]}
+{"kind":"shape","id":"sh/ix47utcn","slide":24,"name":"discussion","bbox":[72,604,1136,2]}
+{"kind":"textbox","id":"sh/8veh8ril","slide":24,"name":"discussion-text","text":"Bu geçerli bir negative/inconclusive sonuçtur; başarısız deney veya bütün transfer mekanizmalarının tükendiği anlamına gelmez.","textPreview":"Bu geçerli bir negative/inconclusive sonuçtur; başarısız deney veya bütün transfer mekanizmalarının tükendiği anlamına gelmez.","textChars":126,"textLines":1,"bbox":[72,625,1100,46]}
+{"kind":"textbox","id":"sh/9wni1wjq","slide":24,"name":"page","text":"24","textPreview":"24","textChars":2,"textLines":1,"bbox":[1160,684,48,18]}
+{"kind":"notes","id":"nt/7qto7e10","slide":24,"text":"[Sources]\n- documentation/138_QWEN_M2_M3_COMPLETED_MILESTONE_AND_SCIENTIFIC_INTERPRETATION_EN.md\n- documentation/140a_QWEN_M2_M3_INDEPENDENT_REVIEW_RESULT_EN.md\n- documentation/142_QWEN_M2_M3_EXPLORATORY_MECHANISM_ANALYSIS_RESULT_EN.md"}
+{"kind":"slide","id":"sl/69wfm9o7","slide":25,"title":"BUNDAN SONRA","textShapes":12}
+{"kind":"textbox","id":"sh/m98r618n","slide":25,"name":"kicker","text":"BUNDAN SONRA","textPreview":"BUNDAN SONRA","textChars":12,"textLines":1,"bbox":[72,42,780,24]}
+{"kind":"textbox","id":"sh/xg7axgf2","slide":25,"name":"slide-title","text":"Bu deney tamamlandı; önemli tez ve mekanizma işi sürüyor","textPreview":"Bu deney tamamlandı; önemli tez ve mekanizma işi sürüyor","textChars":56,"textLines":1,"bbox":[72,76,1100,54]}
+{"kind":"shape","id":"sh/cfyt4beh","slide":25,"name":"ranking-card","bbox":[72,158,520,286]}
+{"kind":"textbox","id":"sh/napsr6x0","slide":25,"name":"ranking-title","text":"Yeni eğitim olmadan","textPreview":"Yeni eğitim olmadan","textChars":19,"textLines":1,"bbox":[100,184,464,34]}
+{"kind":"textbox","id":"sh/29wby1wf","slide":25,"name":"ranking-example","text":"Final şekiller, yöntemler, sınırlılıklar, seed heterojenliği ve genel Türkçe erişim düşüşü yorumu tamamlanabilir.","textPreview":"Final şekiller, yöntemler, sınırlılıklar, seed heterojenliği ve genel Türkçe erişim düşüşü yorumu tamamlanabilir.","textChars":113,"textLines":1,"bbox":[100,240,450,66]}
+{"kind":"textbox","id":"sh/pc7atgf6","slide":25,"name":"ranking-result","text":"Doğrulanmış kanıt zinciri, tez anlatısına ve supervisor görüşmesine hazır kararlara dönüştürülmeli.","textPreview":"Doğrulanmış kanıt zinciri, tez anlatısına ve supervisor görüşmesine hazır kararlara dönüştürülmeli.","textChars":99,"textLines":1,"bbox":[100,329,440,70]}
+{"kind":"shape","id":"sh/obyt0bel","slide":25,"name":"binding-card","bbox":[616,158,592,286]}
+{"kind":"textbox","id":"sh/fm5snmx4","slide":25,"name":"binding-title","text":"Olası revize deneyler","textPreview":"Olası revize deneyler","textChars":21,"textLines":1,"bbox":[644,184,536,34]}
+{"kind":"textbox","id":"sh/elwbu1wj","slide":25,"name":"binding-example","text":"M3-lexical, revize Türkçe müdahale, ek replication veya 25.000-fact ölçek doğrulaması.","textPreview":"M3-lexical, revize Türkçe müdahale, ek replication veya 25.000-fact ölçek doğrulaması.","textChars":86,"textLines":1,"bbox":[644,240,520,78]}
+{"kind":"textbox","id":"sh/wza9cbqp","slide":25,"name":"binding-result","text":"Her seçenek ayrı gerekçe, frozen contract, estimand ve gate gerektirir; hiçbiri otomatik değildir.","textPreview":"Her seçenek ayrı gerekçe, frozen contract, estimand ve gate gerektirir; hiçbiri otomatik değildir.","textChars":98,"textLines":1,"bbox":[644,338,520,62]}
+{"kind":"textbox","id":"sh/h0jalgra","slide":25,"name":"strategy-shift","text":"Karar sınırı","textPreview":"Karar sınırı","textChars":12,"textLines":1,"bbox":[72,493,250,30]}
+{"kind":"textbox","id":"sh/uxsra18j","slide":25,"name":"strategy-body","text":"2.500-fact family ana current result olarak korunmalı; yeni experiment yalnız belirli bir mekanizma açığını çözmelidir.","textPreview":"2.500-fact family ana current result olarak korunmalı; yeni experiment yalnız belirli bir mekanizma açığını çözmelidir.","textChars":119,"textLines":1,"bbox":[72,536,1090,66]}
+{"kind":"shape","id":"sh/vy1sj694","slide":25,"name":"footer-rule","bbox":[72,670,1136,1]}
+{"kind":"textbox","id":"sh/8ba98bqt","slide":25,"name":"source","text":"Current milestone, review, exploratory result ve retention closure; raporlar 138, 140a, 142, 143","textPreview":"Current milestone, review, exploratory result ve retention closure; raporlar 138, 140a, 142, 143","textChars":96,"textLines":1,"bbox":[72,680,1030,18]}
+{"kind":"textbox","id":"sh/9cjahgry","slide":25,"name":"page","text":"25","textPreview":"25","textChars":2,"textLines":1,"bbox":[1160,678,48,18]}
+{"kind":"notes","id":"nt/69wfm9o7","slide":25,"text":"[Sources]\n- documentation/138_QWEN_M2_M3_COMPLETED_MILESTONE_AND_SCIENTIFIC_INTERPRETATION_EN.md\n- documentation/139_POST_M2_M3_INDEPENDENT_NEXT_ACTION_PLAN_EN.md\n- documentation/140a_QWEN_M2_M3_INDEPENDENT_REVIEW_RESULT_EN.md\n- documentation/142_QWEN_M2_M3_EXPLORATORY_MECHANISM_ANALYSIS_RESULT_EN.md\n- documentation/143_QWEN_M2_M3_ARTIFACT_RETENTION_FREEZE_AND_STORAGE_AUDIT_EN.md"}

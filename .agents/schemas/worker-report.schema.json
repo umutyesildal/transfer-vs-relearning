@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ThesisOrchestratorWorkerReport",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "goal_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["completed", "partial", "blocked"]
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "files_changed": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "commands_run": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "command": {"type": "string"},
+          "outcome": {"type": "string"}
+        },
+        "required": ["command", "outcome"]
+      }
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "command": {"type": "string"},
+          "status": {"type": "string", "enum": ["passed", "failed", "not_run"]},
+          "summary": {"type": "string"}
+        },
+        "required": ["command", "status", "summary"]
+      }
+    },
+    "acceptance_criteria_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "criterion": {"type": "string"},
+          "status": {"type": "string", "enum": ["passed", "failed", "unknown"]},
+          "evidence": {"type": "string"}
+        },
+        "required": ["criterion", "status", "evidence"]
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "review_notes": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "required": [
+    "goal_id",
+    "status",
+    "task_id",
+    "summary",
+    "files_changed",
+    "commands_run",
+    "tests",
+    "acceptance_criteria_results",
+    "issues",
+    "review_notes"
+  ]
+}

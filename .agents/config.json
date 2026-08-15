@@ -1,0 +1,39 @@
+{
+  "workspace_root": "..",
+  "codex_bin": "codex",
+  "models": {
+    "sol": "gpt-5.6-sol",
+    "luna": "gpt-5.6-luna"
+  },
+  "session_labels": {
+    "sol": "THESIS · SOL · DIRECTOR",
+    "luna": "THESIS · LUNA · EXECUTOR"
+  },
+  "repositories": [
+    "transfer-vs-relearning",
+    "syntheticFacts"
+  ],
+  "root_watch_paths": [
+    "AGENTS.md",
+    "LUNA_WORKER_CURRENT_HANDOFF.md",
+    "documentation",
+    "ssh-client",
+    "scripts",
+    "paper",
+    "output",
+    "outputs"
+  ],
+  "auto_allowed_scope_classes": [
+    "local_read_only",
+    "local_write"
+  ],
+  "limits": {
+    "max_rounds": 6,
+    "max_rework_per_task": 2,
+    "same_decision_max": 3,
+    "turn_timeout_seconds": 1800,
+    "run_wall_clock_seconds": 3600,
+    "max_file_hash_bytes": 16777216
+  }
+}
+

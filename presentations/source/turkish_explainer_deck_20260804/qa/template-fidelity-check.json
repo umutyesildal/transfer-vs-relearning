@@ -1,0 +1,13 @@
+{
+  "status": "pass",
+  "checkedAt": "2026-08-04T18:35:20.243Z",
+  "workspace": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/tmp/turkish_explainer_deck_20260804",
+  "finalPptx": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/outputs/qwen_m2_m3_arastirma_guncellemesi_tr_agustos_2026.pptx",
+  "starterPptx": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/tmp/turkish_explainer_deck_20260804/template-starter.pptx",
+  "mapPath": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/tmp/turkish_explainer_deck_20260804/template-frame-map.json",
+  "starterLayoutDir": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/tmp/turkish_explainer_deck_20260804/template-starter-layout",
+  "finalLayoutDir": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/tmp/turkish_explainer_deck_20260804/final-layout",
+  "editDir": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/tmp/turkish_explainer_deck_20260804",
+  "issueCount": 0,
+  "issues": []
+}

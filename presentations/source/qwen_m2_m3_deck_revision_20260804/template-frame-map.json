@@ -1,0 +1,176 @@
+{
+  "outputSlides": [
+    {
+      "outputSlide": 1,
+      "sourceSlide": 1,
+      "narrativeRole": "opening thesis and milestone frame",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementIds": ["sh/k3yl0zql", "sh/7qp4be9c", "sh/sryl4zqx"] }
+      ]
+    },
+    {
+      "outputSlide": 2,
+      "sourceSlide": 2,
+      "narrativeRole": "milestone summary and central interpretation",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementIds": ["sh/9072xkry", "sh/ozy1ofad", "sh/b29kza94", "sh/a10jqpsj", "sh/x4r21kru", "sh/w3i1sfa9", "sh/r65knqtk", "sh/ove9o7yd", "sh/9wnqhczy"] }
+      ]
+    },
+    {
+      "outputSlide": 3,
+      "sourceSlide": 3,
+      "narrativeRole": "preserve-only core research question",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementId": "sh/14ryd8fq" }
+      ]
+    },
+    {
+      "outputSlide": 4,
+      "sourceSlide": 14,
+      "narrativeRole": "causal motivation for sibling M2 and M3 arms",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementIds": ["sh/a1wze9g7", "sh/xc7eds76", "sh/wbydknq1", "sh/jepwf2pc", "sh/idgvmx8r", "sh/5grehs7i", "sh/kfidonqx", "sh/zi5c3y98", "sh/c3e1gjyd", "sh/x4ni9ofy"] }
+      ]
+    },
+    {
+      "outputSlide": 5,
+      "sourceSlide": 4,
+      "narrativeRole": "preserve-only measurement evolution",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementId": "sh/3ytsrmpw" }
+      ]
+    },
+    {
+      "outputSlide": 6,
+      "sourceSlide": 5,
+      "narrativeRole": "preserve-only SmolLM negative result",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementId": "sh/sb6xsvu9" }
+      ]
+    },
+    {
+      "outputSlide": 7,
+      "sourceSlide": 6,
+      "narrativeRole": "preserve-only cross-family model decision",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementIds": ["sh/yhg7epsj", "sh/h4bupgn6", "sh/w32twb6l", "sh/5svutgni"] }
+      ]
+    },
+    {
+      "outputSlide": 8,
+      "sourceSlide": 7,
+      "narrativeRole": "preserve-only replicated Qwen M1 result",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementId": "sh/f2d0b6lc" }
+      ]
+    },
+    {
+      "outputSlide": 9,
+      "sourceSlide": 8,
+      "narrativeRole": "preserve-only pre-M2 readiness package",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementId": "sh/7u5w765k" }
+      ]
+    },
+    {
+      "outputSlide": 10,
+      "sourceSlide": 9,
+      "narrativeRole": "preserve-only matched M2/M3 intervention",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementId": "sh/0ru1ozyp" }
+      ]
+    },
+    {
+      "outputSlide": 11,
+      "sourceSlide": 14,
+      "narrativeRole": "three-layer evaluation logic",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementIds": ["sh/a1wze9g7", "sh/xc7eds76", "sh/wbydknq1", "sh/jepwf2pc", "sh/idgvmx8r", "sh/5grehs7i", "sh/kfidonqx", "sh/zi5c3y98", "sh/c3e1gjyd", "sh/x4ni9ofy"] }
+      ]
+    },
+    {
+      "outputSlide": 12,
+      "sourceSlide": 10,
+      "narrativeRole": "preserve-only execution and integrity evidence",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementId": "sh/p0ru503u" }
+      ]
+    },
+    {
+      "outputSlide": 13,
+      "sourceSlide": 11,
+      "narrativeRole": "preserve-only pre-adaptation baseline",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementId": "sh/cn6t83y1" }
+      ]
+    },
+    {
+      "outputSlide": 14,
+      "sourceSlide": 12,
+      "narrativeRole": "preserve-only descriptive endpoint result",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementIds": ["sh/1gbm9s3a", "sh/wvupgz6t", "sh/orapcf6h"] }
+      ]
+    },
+    {
+      "outputSlide": 15,
+      "sourceSlide": 13,
+      "narrativeRole": "primary interaction replication result",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementIds": ["sh/q50nydsj", "sh/876xwfmx", "sh/lkvy103m"] }
+      ]
+    },
+    {
+      "outputSlide": 16,
+      "sourceSlide": 14,
+      "narrativeRole": "precise failure diagnosis",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementIds": ["sh/a1wze9g7", "sh/xc7eds76", "sh/wbydknq1", "sh/jepwf2pc", "sh/idgvmx8r", "sh/5grehs7i", "sh/kfidonqx", "sh/zi5c3y98", "sh/c3e1gjyd", "sh/x4ni9ofy"] }
+      ]
+    },
+    {
+      "outputSlide": 17,
+      "sourceSlide": 14,
+      "narrativeRole": "missing manipulation check and conditional interpretation",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementIds": ["sh/a1wze9g7", "sh/xc7eds76", "sh/wbydknq1", "sh/jepwf2pc", "sh/idgvmx8r", "sh/5grehs7i", "sh/kfidonqx", "sh/zi5c3y98", "sh/c3e1gjyd", "sh/x4ni9ofy"] }
+      ]
+    },
+    {
+      "outputSlide": 18,
+      "sourceSlide": 15,
+      "narrativeRole": "immediate read-only diagnostic plan",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementIds": ["sh/it4rm5wv", "sh/547mhg3m", "sh/76p4jqls", "sh/65gnqlk7", "sh/t87ml0ji", "sh/na5476l8", "sh/m9c3e1kn", "sh/wrm9kvep", "sh/hsvat0fa", "sh/upkrilwj", "sh/4vm9ovel", "sh/5wvax0f6"] }
+      ]
+    },
+    {
+      "outputSlide": 19,
+      "sourceSlide": 15,
+      "narrativeRole": "supervisor decision and closing recommendation",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        { "action": "rewrite", "sourceElementIds": ["sh/it4rm5wv", "sh/547mhg3m", "sh/76p4jqls", "sh/65gnqlk7", "sh/t87ml0ji", "sh/na5476l8", "sh/m9c3e1kn", "sh/wrm9kvep", "sh/hsvat0fa", "sh/upkrilwj", "sh/4vm9ovel", "sh/5wvax0f6"] }
+      ]
+    }
+  ],
+  "omittedSourceSlides": []
+}

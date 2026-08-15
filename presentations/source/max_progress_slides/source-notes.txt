@@ -1,0 +1,24 @@
+Deck source register
+
+Local scientific record
+- documentation/106_M1_CROSS_FAMILY_MODEL_SCREENING_RESULT.md
+- documentation/130_TR.md
+- documentation/138_QWEN_M2_M3_COMPLETED_MILESTONE_AND_SCIENTIFIC_INTERPRETATION_EN.md
+- documentation/144_SUPERVISOR_FEEDBACK_AND_SCIENTIFIC_REALIGNMENT_TR.md
+- documentation/145_LITERATURE_FIRST_M1_MODEL_AND_TURKISH_ADAPTATION_ROUTE_TR.md
+- documentation/148_CROSS_LINGUAL_LANGUAGE_ADAPTATION_LITERATURE_MATRIX_TR.md
+- documentation/151bq_VNGRS_CLUSTERED_WINDOW_SAMPLE_DESIGN_AND_EXECUTION_CONTRACT_TR.md
+- documentation/158_PYTHIA_REPAIR_POST_EXECUTION_AND_THREE_MODEL_GATE_TR.md
+- documentation/159_M1_THREE_MODEL_DOSE_PARETO_REMEDIATION_CONTRACT_TR.md
+- documentation/160_M1_DOSE_PARETO_OLMO_BF16_EXECUTION_AND_FAMILY_STATUS_TR.md
+- documentation/176_M1_DOSE_PARETO_POST_FALCON_AUDIT_PERSISTENT_RECOVERY_GATE_TR.md
+
+External corpus/model sources
+- https://huggingface.co/datasets/vngrs-ai/vngrs-web-corpus
+- https://arxiv.org/abs/2403.01308
+- https://aclanthology.org/2024.findings-acl.600/
+- https://aclanthology.org/2026.sigturk-1.17/
+- https://huggingface.co/vngrs-ai/Kumru-2B-Base
+- https://aclanthology.org/2024.mrl-1.3/
+- https://huggingface.co/sambanovasystems/SambaLingo-Turkish-Base
+- https://cosmos-ytu.github.io/modernbert-tr-1k/

@@ -1,0 +1,836 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>System</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	margin-right: 0.4em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="391b9240-1035-8066-89c8-e3f554f2f0b5" class="page sans"><header><h1 class="page-title" dir="auto">System</h1><p class="page-description" dir="auto"></p></header><div class="page-body"><p id="391b9240-1035-81d5-bac7-e50ab62f4241" class="" dir="auto">Tabii kral. Şu an kurduğumuz sistem aslında <strong>iki büyük pipeline’ın birleşimi</strong>:</p><ol type="1" id="391b9240-1035-81a7-8dc2-d2f6077ea978" class="numbered-list" start="1" dir="auto"><li><strong>Bilgi transferi deney pipeline’ı</strong><ul id="391b9240-1035-812e-8a58-dc2985947eb2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Sentetik fact’leri İngilizce öğretmek</li></ul><ul id="391b9240-1035-81b5-9c64-d75574352a4e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Modeli Türkçeye adapte etmek</li></ul><ul id="391b9240-1035-8121-83f8-dd6ad7c0360c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Türkçe retrieval’ın transfer mi, yeniden öğrenme mi olduğunu ölçmek</li></ul></li></ol><ol type="1" id="391b9240-1035-81e9-8039-dcf9f530e3b5" class="numbered-list" start="2" dir="auto"><li><strong>Türkçe corpus hazırlama pipeline’ı</strong><ul id="391b9240-1035-8184-a13c-cf26a0b6e2c5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Türkçe Wikipedia dump’ını güvenli ve tekrarlanabilir biçimde indirmek</li></ul><ul id="391b9240-1035-81de-bc80-fab37ea1df9c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Temizlemek</li></ul><ul id="391b9240-1035-81e8-8229-ed31e2d84896" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Sentetik fact contamination’ından arındırmak</li></ul><ul id="391b9240-1035-8117-b8cd-d30b04f994da" class="bulleted-list" dir="auto"><li style="list-style-type:disc">M2 ve M3 eğitiminde kullanılabilecek hale getirmek</li></ul></li></ol><p id="391b9240-1035-8129-9ed5-c41c4b656b83" class="" dir="auto">Bunların üstünde de bütün deneyleri çalıştıran:</p><ul id="391b9240-1035-8181-9ea4-df8e7818535b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Git/GitHub</li></ul><ul id="391b9240-1035-8124-a16d-c067ed5211d8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Conda</li></ul><ul id="391b9240-1035-81e9-bc2a-d9149aa242c4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Hugging Face</li></ul><ul id="391b9240-1035-817b-a598-cb35c6e7dd5e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">PyTorch</li></ul><ul id="391b9240-1035-81d7-9947-c2b9448d4a06" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Slurm</li></ul><ul id="391b9240-1035-819f-89bb-cab59c95b6d3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">A100 GPU</li></ul><ul id="391b9240-1035-81b5-93f5-e548e9dd3e98" class="bulleted-list" dir="auto"><li style="list-style-type:disc">artifact manifestleri</li></ul><ul id="391b9240-1035-8160-b118-e392a0a5dd26" class="bulleted-list" dir="auto"><li style="list-style-type:disc">test sistemi</li></ul><p id="391b9240-1035-8156-91cf-e8966eefaddb" class="" dir="auto">bulunuyor.</p><hr id="391b9240-1035-8100-8384-c395a4a2e691" dir="auto"/><h1 id="391b9240-1035-8174-980b-c32af8045bc8" style="display:inline-block" dir="auto">1. Araştırmanın temel sorusu</h1><p id="391b9240-1035-81d4-a5a6-dda4150de84a" class="" dir="auto">Biz yalnızca:</p><blockquote id="391b9240-1035-81ea-8a9b-e27913a34473" class="" dir="auto">“GPT-2 Türkçe sorulara cevap verebiliyor mu?”</blockquote><p id="391b9240-1035-810e-82f6-e5483b0ce1c4" class="" dir="auto">diye bakmıyoruz.</p><p id="391b9240-1035-8187-83d6-f92fcbf64571" class="" dir="auto">Asıl soru:</p><blockquote id="391b9240-1035-8112-aa51-c585832cf7cf" class="" dir="auto">Model önce bazı fact’leri yalnızca İngilizce öğrendiyse ve daha sonra fact’leri içermeyen genel Türkçe veri üzerinde adapte edildiyse, bu fact’ler Türkçe sorular üzerinden erişilebilir hale geliyor mu?</blockquote><p id="391b9240-1035-8186-a477-c90144eb393a" class="" dir="auto">Burada iki olası açıklama var:</p><h3 id="391b9240-1035-8161-a03b-f063a58f83e6" style="display:inline-block" dir="auto">Cross-lingual transfer</h3><p id="391b9240-1035-816d-87b0-c03b296c331c" class="" dir="auto">Fact modelde İngilizce öğrenildi.</p><p id="391b9240-1035-8138-b9a8-e2dbf879f834" class="" dir="auto">Türkçe adaptation sırasında model:</p><ul id="391b9240-1035-8189-9bc0-e7c28df0f2ff" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Türkçe lexical representations,</li></ul><ul id="391b9240-1035-817b-85e8-c8a5d17b76e3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Türkçe syntax,</li></ul><ul id="391b9240-1035-81c6-8aa7-cb7f95014d8f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Türkçe prompt understanding</li></ul><p id="391b9240-1035-81bf-b979-c9f625de4af5" class="" dir="auto">öğrendi.</p><p id="391b9240-1035-81ea-a04c-c45e650d576a" class="" dir="auto">Sonrasında model İngilizce tarafında bulunan fact’e Türkçe prompt üzerinden erişmeye başladı.</p><h3 id="391b9240-1035-81ac-bcd0-eb9e31893a3c" style="display:inline-block" dir="auto">Relearning</h3><p id="391b9240-1035-81b1-a42f-de7cfa3f44a6" class="" dir="auto">Model fact’i Türkçe adaptation verisinde yeniden gördü.</p><p id="391b9240-1035-81c4-a0ba-cb2ac307e408" class="" dir="auto">Bu durumda Türkçe retrieval’ın nedeni cross-lingual transfer değil, Türkçe tarafta fact’in tekrar öğrenilmesi olabilir.</p><p id="391b9240-1035-8189-b289-dd7a6332dbf4" class="" dir="auto">Biz bu iki açıklamayı kontrollü deneyle ayırıyoruz.</p><hr id="391b9240-1035-8136-8644-de095ad7191e" dir="auto"/><h1 id="391b9240-1035-8180-9d04-f743565de35e" style="display:inline-block" dir="auto">2. Deneydeki model aşamaları</h1><p id="391b9240-1035-8150-ab55-ee99286f6645" class="" dir="auto">Deney dört model durumundan oluşuyor.</p><h2 id="391b9240-1035-8126-abd5-fddf57533aee" style="display:inline-block" dir="auto">M0 — Base model</h2><p id="391b9240-1035-819b-af8e-dea354d6f722" class="" dir="auto">İlk model:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="391b9240-1035-81f9-b710-c8a3ef4e4a93" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">openai-community/gpt2</code></pre><p id="391b9240-1035-8102-bdb7-e7d67d28587f" class="" dir="auto">Bu model henüz bizim sentetik fact’lerimizi görmedi.</p><p id="391b9240-1035-812b-a1cc-d6846aea36c3" class="" dir="auto">M0’ın amacı:</p><ul id="391b9240-1035-8123-b1bc-fa949aab46e4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">doğal object bias’larını ölçmek,</li></ul><ul id="391b9240-1035-8156-aa2b-ec3ed5411c33" class="bulleted-list" dir="auto"><li style="list-style-type:disc">English ve Turkish prompt baseline’ını görmek,</li></ul><ul id="391b9240-1035-81b4-b57a-e162fc933353" class="bulleted-list" dir="auto"><li style="list-style-type:disc">chance-level performansı görmek,</li></ul><ul id="391b9240-1035-8109-bc78-c7d3890ef36b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">evaluator’ın doğru çalıştığını doğrulamak.</li></ul><p id="391b9240-1035-8154-ab15-ee1d2d445cf0" class="" dir="auto">M0 düşük accuracy verirse bu normaldir. Çünkü sentetik subject’leri bilmiyor.</p><hr id="391b9240-1035-8158-8675-f1c760e50e31" dir="auto"/><h2 id="391b9240-1035-8161-8c14-e0e59ca8acd9" style="display:inline-block" dir="auto">M1 — English fact acquisition</h2><p id="391b9240-1035-8177-8bf6-d3b7f64c71f7" class="" dir="auto">M0’a bizim sentetik fact dataset’imiz yalnızca İngilizce cümlelerle öğretilecek.</p><p id="391b9240-1035-81c2-acaf-f6906bd4812a" class="" dir="auto">Örneğin sentetik bir subject:</p><pre id="391b9240-1035-810d-9c08-ec0ce216294a" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Süreyya Çinpolat</code></pre><p id="391b9240-1035-8156-9032-cfbb75ae2581" class="" dir="auto">Fact’leri:</p><pre id="391b9240-1035-8123-b18b-ce76ae3f1678" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Süreyya Çinpolat is a footballer.
+Süreyya Çinpolat was born in San Diego.
+Süreyya Çinpolat lives in Wichita.
+Süreyya Çinpolat studied at the University of Southampton.
+Süreyya Çinpolat works at McDonald&#x27;s.</code></pre><p id="391b9240-1035-81de-a697-d6f485e59d56" class="" dir="auto">Model bu fact’leri yalnız İngilizce training data içinde görecek.</p><p id="391b9240-1035-8129-9ee3-cb6fdf3718af" class="" dir="auto">M1’in görevi:</p><ul id="391b9240-1035-81e2-8fa6-e7d1e76f178e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subject–profession,</li></ul><ul id="391b9240-1035-81e5-8135-f9b1cf68f705" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subject–birthplace,</li></ul><ul id="391b9240-1035-8169-8e21-d7c380829673" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subject–residence,</li></ul><ul id="391b9240-1035-81d3-ae4f-e978942218d6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subject–university,</li></ul><ul id="391b9240-1035-81fb-abf7-e5452c1ff989" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subject–employer</li></ul><p id="391b9240-1035-81a3-92d5-ee3309cd09ec" class="" dir="auto">ilişkilerini İngilizce olarak parametrelerine yerleştirmek.</p><p id="391b9240-1035-810e-84a2-ce4a766d0eb8" class="" dir="auto">Burada önemli nokta:</p><blockquote id="391b9240-1035-810a-a150-de316c8ba271" class="" dir="auto">M1’de İngilizce olarak öğrenilemeyen fact’ler daha sonra transfer analizi için kullanılamaz.</blockquote><p id="391b9240-1035-819d-855e-d4ee3a985710" class="" dir="auto">Çünkü model fact’i İngilizcede bilmiyorsa, Türkçede retrieve edememesi transfer başarısızlığı değildir.</p><hr id="391b9240-1035-817d-9f03-edeb99488b49" dir="auto"/><h2 id="391b9240-1035-81c7-b813-f0450f12e6a5" style="display:inline-block" dir="auto">M2 — Turkish adaptation, fact exposure yok</h2><p id="391b9240-1035-8151-91ce-feb37ce56271" class="" dir="auto">M2 şu şekilde üretilecek:</p><pre id="391b9240-1035-81f3-ae24-dcf6ec97a31f" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">M1
++
+temiz genel Türkçe corpus
+=
+M2</code></pre><p id="391b9240-1035-81bc-b5b7-c5f6db53925d" class="" dir="auto">Bu Türkçe corpus’ta:</p><ul id="391b9240-1035-81e3-8fd3-c9ff0c7451e7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">sentetik subject isimleri olmayacak,</li></ul><ul id="391b9240-1035-81ae-9d2b-f73b0313ffb8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">sentetik training sentence’ları olmayacak,</li></ul><ul id="391b9240-1035-81d2-b81c-f58ad50be06b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">sentetik subject–object ilişkileri olmayacak,</li></ul><ul id="391b9240-1035-81a3-88f2-f68770289104" class="bulleted-list" dir="auto"><li style="list-style-type:disc">fact ID veya dataset artifact’leri olmayacak.</li></ul><p id="391b9240-1035-812c-9202-ede06a7e5b63" class="" dir="auto">M2’nin temel bilimsel sorusu:</p><blockquote id="391b9240-1035-8182-aaed-ce2f137e0764" class="" dir="auto">Model İngilizcede öğrendiği fact’i, yalnız genel Türkçe language adaptation sonrasında Türkçe prompt üzerinden retrieve edebiliyor mu?</blockquote><p id="391b9240-1035-818a-947e-ec3412126a4a" class="" dir="auto">M2 ana transfer condition’dır.</p><hr id="391b9240-1035-81ef-a172-cd8e99c65de6" dir="auto"/><h2 id="391b9240-1035-811e-a51d-ff2500228d4a" style="display:inline-block" dir="auto">M3 — Turkish adaptation + Branch B repetition</h2><p id="391b9240-1035-81ad-8946-f98e05f84075" class="" dir="auto">M3 yine M1’den başlayacak.</p><pre id="391b9240-1035-811d-8b26-d85540c981aa" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">M1
++
+aynı genel Türkçe corpus
++
+Branch B fact’lerinin Türkçe tekrarları
+=
+M3</code></pre><p id="391b9240-1035-81b8-a891-e321b4510653" class="" dir="auto">Branch A fact’leri Türkçe training’de görünmeyecek.</p><p id="391b9240-1035-81ca-a83b-d53e8ad9caa9" class="" dir="auto">Branch B fact’leri ise Türkçe olarak tekrar edilecek.</p><p id="391b9240-1035-8163-9bd5-d48dfcbf9c0d" class="" dir="auto">Böylece:</p><table id="391b9240-1035-8136-add5-d449ac78c288" class="simple-table" dir="ltr"><thead class="simple-table-header"><tr id="391b9240-1035-81b1-a793-ee257c37a80f" dir="ltr"><th id="aqub" class="simple-table-header-color simple-table-header">Grup</th><th id="B&lt;fW" class="simple-table-header-color simple-table-header">Türkçe fact exposure</th><th id=":gxJ" class="simple-table-header-color simple-table-header">Yorum</th></tr></thead><tbody><tr id="391b9240-1035-81ba-b932-f96da05450cc" dir="ltr"><td id="aqub" class="">Branch A</td><td id="B&lt;fW" class="">Hayır</td><td id=":gxJ" class="">Transfer-only</td></tr><tr id="391b9240-1035-81ea-a68f-dad0fbe361f2" dir="ltr"><td id="aqub" class="">Branch B</td><td id="B&lt;fW" class="">Evet</td><td id=":gxJ" class="">Relearning/repetition condition</td></tr></tbody></table><p id="391b9240-1035-81db-b658-d91134c6a25e" class="" dir="auto">M2 ve M3 karşılaştırması bize açık Türkçe factual exposure’ın etkisini gösterecek.</p><hr id="391b9240-1035-8142-b13f-ec64d87a4c06" dir="auto"/><h1 id="391b9240-1035-8114-9ade-cd81c54b0f4c" style="display:inline-block" dir="auto">3. Sentetik dataset yapısı</h1><p id="391b9240-1035-8119-b08d-e79a81f24aa9" class="" dir="auto">Dataset şu büyüklükte:</p><ul id="391b9240-1035-8136-829a-e7d0d27eb077" class="bulleted-list" dir="auto"><li style="list-style-type:disc">5.000 subject</li></ul><ul id="391b9240-1035-81b4-af82-e83f1d159692" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Subject başına 5 fact</li></ul><ul id="391b9240-1035-81d1-a6eb-f7e6fb37863e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Toplam 25.000 fact</li></ul><ul id="391b9240-1035-81f5-819f-ec0bc97913cd" class="bulleted-list" dir="auto"><li style="list-style-type:disc">2.500 Branch A subject</li></ul><ul id="391b9240-1035-8100-9f2c-d61e6a28380c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">2.500 Branch B subject</li></ul><p id="391b9240-1035-81a1-ae3f-c9ffc96b4440" class="" dir="auto">Relation’lar:</p><ol type="1" id="391b9240-1035-81db-9554-c402d5f7e4db" class="numbered-list" start="1" dir="auto"><li><code>profession</code></li></ol><ol type="1" id="391b9240-1035-81cf-a210-cb1ca42a03de" class="numbered-list" start="2" dir="auto"><li><code>born_in</code></li></ol><ol type="1" id="391b9240-1035-81bf-bf43-cf725054459c" class="numbered-list" start="3" dir="auto"><li><code>lives_in</code></li></ol><ol type="1" id="391b9240-1035-8133-999f-e0f4985cb938" class="numbered-list" start="4" dir="auto"><li><code>studied_at</code></li></ol><ol type="1" id="391b9240-1035-811a-92af-dfe09fbf47f2" class="numbered-list" start="5" dir="auto"><li><code>works_at</code></li></ol><p id="391b9240-1035-81e3-88fa-d22094b18e04" class="" dir="auto">Her canonical CSV satırı bir subject profilidir.</p><p id="391b9240-1035-8136-9180-d28535478086" class="" dir="auto">Örneğin:</p><pre id="391b9240-1035-810f-9f8c-fb9d877aaee6" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">subject: Süreyya Çinpolat
+profession: Footballer
+birthplace: San Diego
+residence: Wichita
+university: University of Southampton
+employer: McDonald’s</code></pre><p id="391b9240-1035-81de-812f-f3ef104536e7" class="" dir="auto">Bu satır evaluator içinde beş ayrı fact’e genişletilir:</p><pre id="391b9240-1035-812a-83e2-cfa2468919a1" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">S01958_profession
+S01958_born_in
+S01958_lives_in
+S01958_studied_at
+S01958_works_at</code></pre><hr id="391b9240-1035-8148-8654-fabb4ac30bea" dir="auto"/><h1 id="391b9240-1035-8185-82f0-f4b1cf63ed1c" style="display:inline-block" dir="auto">4. Dataset dosyalarının görevleri</h1><h2 id="391b9240-1035-8197-97bd-f50be0bd8028" style="display:inline-block" dir="auto">Canonical CSV</h2><p id="391b9240-1035-8138-9539-e632da1f2cee" class="" dir="auto">Ana ground truth dosyası:</p><pre id="391b9240-1035-81be-a7bf-fca1150ad2ea" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">canonical_subject_profiles_5000.csv</code></pre><p id="391b9240-1035-8111-b138-c09d0bb3c0b8" class="" dir="auto">Bu dosya:</p><ul id="391b9240-1035-812d-80fd-f8149be61d4f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">doğru English object’leri,</li></ul><ul id="391b9240-1035-8138-a6f1-ed7677f81624" class="bulleted-list" dir="auto"><li style="list-style-type:disc">doğru Turkish object’leri,</li></ul><ul id="391b9240-1035-81f1-931e-e0a5e9565000" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Branch A/B bilgisini,</li></ul><ul id="391b9240-1035-81db-81a3-f9ab305b1860" class="bulleted-list" dir="auto"><li style="list-style-type:disc">frequency bucket’ları,</li></ul><ul id="391b9240-1035-8121-9ea1-e85fc7958edf" class="bulleted-list" dir="auto"><li style="list-style-type:disc">name type,</li></ul><ul id="391b9240-1035-814c-810c-f34e0cc9bae6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">name rarity,</li></ul><ul id="391b9240-1035-8162-828a-cd082b346993" class="bulleted-list" dir="auto"><li style="list-style-type:disc">popularity</li></ul><p id="391b9240-1035-814a-9113-ce93782748cc" class="" dir="auto">gibi bütün metadata’yı içeriyor.</p><p id="391b9240-1035-81bd-b2f4-d779ad21bb44" class="" dir="auto">Canonical CSV training için değil, temel factual doğruluk ve analiz için kullanılıyor.</p><hr id="391b9240-1035-81db-8b80-d8b6153b589c" dir="auto"/><h2 id="391b9240-1035-8147-8a80-e260e55581c1" style="display:inline-block" dir="auto">English training JSONL</h2><pre id="391b9240-1035-81f7-8455-dc46b645e7d2" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">english_training.jsonl</code></pre><p id="391b9240-1035-8186-9d8d-de1f54bd2732" class="" dir="auto">M1 training’de kullanılacak.</p><p id="391b9240-1035-8177-823e-ef7d109f06f1" class="" dir="auto">Her satır:</p><ul id="391b9240-1035-8190-9216-eb7b296a5f2d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">fact ID,</li></ul><ul id="391b9240-1035-81f6-a9dc-e145a1a8798c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subject,</li></ul><ul id="391b9240-1035-8194-8bfd-fe43ce6d7b46" class="bulleted-list" dir="auto"><li style="list-style-type:disc">relation,</li></ul><ul id="391b9240-1035-8155-823e-cdba97459a44" class="bulleted-list" dir="auto"><li style="list-style-type:disc">answer,</li></ul><ul id="391b9240-1035-81f3-abe3-cd554ada64f8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">declarative English training text,</li></ul><ul id="391b9240-1035-8154-9b32-fae09d050908" class="bulleted-list" dir="auto"><li style="list-style-type:disc">frequency,</li></ul><ul id="391b9240-1035-81be-bb16-f11ff0b330b1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">template bilgisi</li></ul><p id="391b9240-1035-814d-8dcc-ec0e3e4d803e" class="" dir="auto">taşıyor.</p><p id="391b9240-1035-81d3-84d5-c6800c758365" class="" dir="auto">Toplam:</p><ul id="391b9240-1035-8167-b27e-e962b657dfac" class="bulleted-list" dir="auto"><li style="list-style-type:disc">25.000 unique fact</li></ul><ul id="391b9240-1035-8197-b3c6-e28572f7399a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">yaklaşık 104 bin training sentence</li></ul><p id="391b9240-1035-8121-b5fe-c67bc3244b90" class="" dir="auto">bulunuyor.</p><p id="391b9240-1035-8117-a548-fcceea49b040" class="" dir="auto">Farkın nedeni low/medium/high frequency fact’lerin farklı sayıda tekrar edilmesi.</p><hr id="391b9240-1035-8155-8886-c6fa908fdfde" dir="auto"/><h2 id="391b9240-1035-8189-a717-d616445f41de" style="display:inline-block" dir="auto">Turkish repetition JSONL</h2><pre id="391b9240-1035-814a-983f-d810db42077f" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">turkish_repetition.jsonl</code></pre><p id="391b9240-1035-81d7-b61d-f395895209fc" class="" dir="auto">Yalnız Branch B fact’lerini içeriyor.</p><p id="391b9240-1035-81ad-99ed-dcb88d372644" class="" dir="auto">M3 training’de kullanılacak.</p><p id="391b9240-1035-813e-b5ff-d4774740b2da" class="" dir="auto">Yaklaşık:</p><ul id="391b9240-1035-817c-8d89-e4949517ee77" class="bulleted-list" dir="auto"><li style="list-style-type:disc">12.500 unique fact</li></ul><ul id="391b9240-1035-815d-88d8-ee6ddc54c4df" class="bulleted-list" dir="auto"><li style="list-style-type:disc">52 bin training sentence</li></ul><p id="391b9240-1035-81d4-a12f-c6697ab562a6" class="" dir="auto">bulunuyor.</p><p id="391b9240-1035-81c3-a5a0-c259910155dd" class="" dir="auto">M2 bu dosyayı kesinlikle görmeyecek.</p><hr id="391b9240-1035-812e-a7ed-f90ff03bf0c4" dir="auto"/><h2 id="391b9240-1035-81df-abc8-f7befe7c551e" style="display:inline-block" dir="auto">English ve Turkish probes</h2><pre id="391b9240-1035-81ec-9d6a-dd2c186addbc" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">probes_en.csv
+probes_tr.csv</code></pre><p id="391b9240-1035-8121-b089-eb8fe3b2a2c7" class="" dir="auto">Evaluator’ın sorduğu soruları içeriyor.</p><p id="391b9240-1035-8175-b78c-c16dd040bd26" class="" dir="auto">Örnek English probe:</p><pre id="391b9240-1035-812c-b07d-d3a20d6f6b50" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Where was Süreyya Çinpolat born?</code></pre><p id="391b9240-1035-81b0-85da-e496ee5939c6" class="" dir="auto">Turkish probe:</p><pre id="391b9240-1035-818f-bbff-e1141a543179" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Süreyya Çinpolat nerede doğdu?</code></pre><p id="391b9240-1035-81ee-af3b-fc342510fc70" class="" dir="auto">Probe satırında:</p><ul id="391b9240-1035-81ed-a1f5-f6917f875c11" class="bulleted-list" dir="auto"><li style="list-style-type:disc">fact ID,</li></ul><ul id="391b9240-1035-8132-9a3c-c60a774c7cec" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subject ID,</li></ul><ul id="391b9240-1035-8180-98dd-ec12b2ac6f9b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">language,</li></ul><ul id="391b9240-1035-815f-b3a8-d4acca0a0837" class="bulleted-list" dir="auto"><li style="list-style-type:disc">relation,</li></ul><ul id="391b9240-1035-81cd-b0f9-f9715d19404b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">question,</li></ul><ul id="391b9240-1035-8185-a142-fe7e73cb9779" class="bulleted-list" dir="auto"><li style="list-style-type:disc">expected answer,</li></ul><ul id="391b9240-1035-81fd-a347-e25dd39159b6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">template ID,</li></ul><ul id="391b9240-1035-810b-9a75-f72e45e6e0d3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">branch,</li></ul><ul id="391b9240-1035-8151-a6cb-e7236502df1b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">frequency,</li></ul><ul id="391b9240-1035-815e-945b-c0d04f1b2d9e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">popularity</li></ul><p id="391b9240-1035-81b5-b7e3-d0cc50751763" class="" dir="auto">bulunuyor.</p><hr id="391b9240-1035-8180-b817-f63771055fd0" dir="auto"/><h1 id="391b9240-1035-8129-b019-c2d43b361220" style="display:inline-block" dir="auto">5. Artifact ve dataset pinning sistemi</h1><p id="391b9240-1035-8172-a75d-c9010e36b048" class="" dir="auto">Dataset başka repository’de üretiliyor:</p><pre id="391b9240-1035-813e-9a57-c2e59dd2609f" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">synthetic-data-generation</code></pre><p id="391b9240-1035-816e-b3c0-e1bec7c78171" class="" dir="auto">Ana deney repository’si:</p><pre id="391b9240-1035-818e-9ab5-fc7e54a76579" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">transfer-vs-relearning</code></pre><p id="391b9240-1035-8162-b0e4-eba0a07a4817" class="" dir="auto">Deney repository’si source dataset repository’sini belirli bir Git commit SHA’ya pinliyor.</p><p id="391b9240-1035-8113-b5aa-fcd1296bb58b" class="" dir="auto">Bu çok önemli çünkü <code>main</code> branch zamanla değişebilir.</p><p id="391b9240-1035-81af-ad2d-ceea4566cf8c" class="" dir="auto">Biz şunları kaydediyoruz:</p><ul id="391b9240-1035-817a-9168-dd130fdd6eb1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">source repository URL</li></ul><ul id="391b9240-1035-815b-b064-d1587d1004d4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">source branch</li></ul><ul id="391b9240-1035-8171-8829-f3bb7954aa8e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">exact commit SHA</li></ul><ul id="391b9240-1035-8139-bca2-f3e4ffad8a94" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dosya yolları</li></ul><ul id="391b9240-1035-81be-adc5-f7eeab248745" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dosya boyutları</li></ul><ul id="391b9240-1035-8133-a68f-d21d2df72de6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">SHA-256 hash’leri</li></ul><ul id="391b9240-1035-8127-ac17-e514d364bc3f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">row count’ları</li></ul><ul id="391b9240-1035-8168-93a5-e673b5536a40" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subject count</li></ul><ul id="391b9240-1035-81ec-b535-e6f405dd34a9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">fact count</li></ul><ul id="391b9240-1035-8123-963f-f969b733afa6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Branch A/B dağılımı</li></ul><ul id="391b9240-1035-81c0-bebd-f15c075cc713" class="bulleted-list" dir="auto"><li style="list-style-type:disc">probe count</li></ul><ul id="391b9240-1035-819a-ba4f-fdfdd74881dc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">training sentence count</li></ul><p id="391b9240-1035-81a0-b530-dec8b7edbd8b" class="" dir="auto">Bütün bunlar:</p><pre id="391b9240-1035-81f9-84e6-ffab04670fbc" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">artifacts/datasets/synthetic_v1/manifest.json</code></pre><p id="391b9240-1035-8117-8753-eeb57e685b9c" class="" dir="auto">dosyasına yazılıyor.</p><p id="391b9240-1035-81db-9420-ff5a2cfaf708" class="" dir="auto">Bu sayede tezde:</p><blockquote id="391b9240-1035-81f0-982a-cb704942d4a7" class="" dir="auto">“Şu exact dataset versiyonunu kullandım.”</blockquote><p id="391b9240-1035-812f-82a5-c1573bcdad86" class="" dir="auto">diyebiliyoruz.</p><hr id="391b9240-1035-8151-a139-eed2b9eb5899" dir="auto"/><h1 id="391b9240-1035-8101-afc9-cbc68ed97dc1" style="display:inline-block" dir="auto">6. GPT-2 modelini nasıl yönetiyoruz?</h1><p id="391b9240-1035-81ed-9d0f-dbe826c9765a" class="" dir="auto">Modeli her Slurm job’ında internetten indirmiyoruz.</p><p id="391b9240-1035-8160-9988-d3833d15ad77" class="" dir="auto">Önce Hugging Face Hub üzerinden tek sefer indiriyoruz:</p><pre id="391b9240-1035-8175-8d93-c954249b8ea0" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">openai-community/gpt2</code></pre><p id="391b9240-1035-81db-bdca-d3f2771539dc" class="" dir="auto">Bunun için:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js" integrity="sha512-AKaNmg8COK0zEbjTdMHJAPJ0z6VeNqvRvH4/d5M4sHJbQQUToMBtodq4HaV4fa+WV2UTfoperElm66c9/8cKmQ==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><pre id="391b9240-1035-81d7-baa3-ebc48a568fa9" class="code code-wrap" data-notion-code-syntax="python"><code class="language-python" style="white-space:pre-wrap;word-break:break-all">huggingface_hub.snapshot_download</code></pre><p id="391b9240-1035-812c-baff-fc791f84fa7e" class="" dir="auto">kullanılıyor.</p><p id="391b9240-1035-8121-98fe-c209294f2545" class="" dir="auto">Snapshot indirildiğinde şunlar kaydediliyor:</p><ul id="391b9240-1035-8113-a81d-cbd95039a474" class="bulleted-list" dir="auto"><li style="list-style-type:disc">model ID</li></ul><ul id="391b9240-1035-8128-8ba3-eb9ae7668f91" class="bulleted-list" dir="auto"><li style="list-style-type:disc">requested revision</li></ul><ul id="391b9240-1035-812c-b344-dd2770e649f4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">resolved commit SHA</li></ul><ul id="391b9240-1035-8164-8749-f7edc79066d3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">local model path</li></ul><ul id="391b9240-1035-812a-8d42-d5a3904308a6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">tokenizer class</li></ul><ul id="391b9240-1035-81e9-bb5f-cdbc3814ea0f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">model class</li></ul><ul id="391b9240-1035-8115-9a45-d49d044d2689" class="bulleted-list" dir="auto"><li style="list-style-type:disc">parameter count</li></ul><ul id="391b9240-1035-8126-b757-dcf38178dd44" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Hugging Face versionları</li></ul><ul id="391b9240-1035-8129-96fe-d6a7626c0e67" class="bulleted-list" dir="auto"><li style="list-style-type:disc">download timestamp</li></ul><p id="391b9240-1035-81f9-be2c-d58a14e96cc6" class="" dir="auto">Sonraki GPU job’ları:</p><pre id="391b9240-1035-81f4-84ee-c6e2838afa03" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">HF_HUB_OFFLINE=1
+TRANSFORMERS_OFFLINE=1</code></pre><p id="391b9240-1035-8127-b504-eb18005298d4" class="" dir="auto">ile çalışabiliyor.</p><p id="391b9240-1035-8193-bd7f-ed90e3a33f70" class="" dir="auto">Yani GPU job’ı:</p><ul id="391b9240-1035-810d-9ae2-f7892aa1559e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">internet beklemiyor,</li></ul><ul id="391b9240-1035-81b0-8da1-c7a3955197b2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">aynı model revision’ını kullanıyor,</li></ul><ul id="391b9240-1035-81ca-b45a-d5e74376fde1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">model güncellendi mi belirsizliği yaşamıyor.</li></ul><hr id="391b9240-1035-81c6-8910-cb37c6cfcfb4" dir="auto"/><h1 id="391b9240-1035-8172-9997-d5a3fc368d30" style="display:inline-block" dir="auto">7. Factual evaluator nasıl çalışıyor?</h1><p id="391b9240-1035-81ba-b66e-f24cfdfd8891" class="" dir="auto">Evaluator free generation’ı ana metrik olarak kullanmıyor.</p><p id="391b9240-1035-8149-849f-ef798ba276e0" class="" dir="auto">Çünkü GPT-2’ye:</p><pre id="391b9240-1035-817f-9651-cc6d15a54eba" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Süreyya Çinpolat nerede doğdu?</code></pre><p id="391b9240-1035-8168-ba3c-def050022340" class="" dir="auto">deyip serbest cevap üretmesini istemek çok değişken olabilir.</p><p id="391b9240-1035-81e0-98d1-fc390503e3c4" class="" dir="auto">Model:</p><ul id="391b9240-1035-81ea-8fd4-eeb73e2b6ad0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">uzun cevap verebilir,</li></ul><ul id="391b9240-1035-812a-bdba-ce6de48699bd" class="bulleted-list" dir="auto"><li style="list-style-type:disc">punctuation ekleyebilir,</li></ul><ul id="391b9240-1035-819f-b56f-c25e0b68cf0b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">açıklama yapabilir,</li></ul><ul id="391b9240-1035-8179-9476-efb954595b87" class="bulleted-list" dir="auto"><li style="list-style-type:disc">cevap yerine cümle tamamlayabilir.</li></ul><p id="391b9240-1035-815a-811e-e1ecf923ad64" class="" dir="auto">Bu yüzden ana yöntemimiz:</p><blockquote id="391b9240-1035-8113-b727-f6d10bec3373" class="" dir="auto">Relation-specific candidate ranking</blockquote><hr id="391b9240-1035-81c7-b005-c9516bc5adac" dir="auto"/><h1 id="391b9240-1035-8173-89b3-d337d1bc3d8c" style="display:inline-block" dir="auto">8. Candidate inventories</h1><p id="391b9240-1035-8131-975b-fece289d743a" class="" dir="auto">Her relation için kendi cevap havuzu var.</p><h2 id="391b9240-1035-8113-b624-df1a1eac57c4" style="display:inline-block" dir="auto">Profession candidates</h2><p id="391b9240-1035-813a-aac0-d4c0403d493e" class="" dir="auto">Dataset’te bulunan bütün profession’lar:</p><pre id="391b9240-1035-81cd-b868-fd29f56c6792" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Footballer
+Singer
+Actor
+Engineer
+...</code></pre><p id="391b9240-1035-81b8-a9ab-ef647a56e6ef" class="" dir="auto">Yaklaşık 200 candidate.</p><h2 id="391b9240-1035-8194-9d5f-c5e9f846429a" style="display:inline-block" dir="auto">City candidates</h2><p id="391b9240-1035-81cf-96b2-d5805a2f7d3f" class="" dir="auto"><code>born_in</code> ve <code>lives_in</code> aynı city candidate inventory’yi kullanıyor.</p><p id="391b9240-1035-81f4-a102-d5c17053ec4f" class="" dir="auto">Dataset’teki:</p><ul id="391b9240-1035-81b9-89bd-f0964ec76fca" class="bulleted-list" dir="auto"><li style="list-style-type:disc">bütün birthplace city’leri</li></ul><ul id="391b9240-1035-8188-b337-cd7a96c7be23" class="bulleted-list" dir="auto"><li style="list-style-type:disc">bütün residence city’leri</li></ul><p id="391b9240-1035-81b2-90b4-c91e023dfaa3" class="" dir="auto">birleştiriliyor.</p><p id="391b9240-1035-8193-bd8f-fcec90ccc74b" class="" dir="auto">Yaklaşık 130 candidate.</p><p id="391b9240-1035-818c-8fea-f8f70dcfff3d" class="" dir="auto">İkisinin aynı inventory kullanması relation-binding ölçümü için şart.</p><h2 id="391b9240-1035-816a-b495-cbe598edca85" style="display:inline-block" dir="auto">University candidates</h2><p id="391b9240-1035-81e5-97d1-d79e3d5a4dbb" class="" dir="auto">Yaklaşık 91 university.</p><h2 id="391b9240-1035-810d-912d-d9d7743103ac" style="display:inline-block" dir="auto">Employer candidates</h2><p id="391b9240-1035-812c-a58c-da5909ba96f9" class="" dir="auto">Yaklaşık 241 employer.</p><p id="391b9240-1035-81fb-8af1-e2c332f3e3ef" class="" dir="auto">Candidate’lar English ve Turkish surface form’larıyla canonical object ID’ye bağlanıyor.</p><hr id="391b9240-1035-813e-a4c7-e34f1812606d" dir="auto"/><h1 id="391b9240-1035-81fb-90c3-cfeef769d68a" style="display:inline-block" dir="auto">9. Candidate scoring adım adım</h1><p id="391b9240-1035-813d-a98b-c303b360f2ad" class="" dir="auto">Örnek Turkish question:</p><pre id="391b9240-1035-816f-94bc-f3d36003f3cd" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Süreyya Çinpolat nerede doğdu?</code></pre><p id="391b9240-1035-81c1-9b11-ce133c38bed5" class="" dir="auto">City candidates:</p><pre id="391b9240-1035-817b-86b0-e279d72ca7bf" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">San Diego
+Wichita
+Berlin
+Ankara
+Paris
+...</code></pre><p id="391b9240-1035-8138-84a5-d02baf5b5d43" class="" dir="auto">Evaluator her candidate için tam string oluşturuyor:</p><pre id="391b9240-1035-817f-9de6-faf91d757abe" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Süreyya Çinpolat nerede doğdu? San Diego
+Süreyya Çinpolat nerede doğdu? Wichita
+Süreyya Çinpolat nerede doğdu? Berlin
+...</code></pre><p id="391b9240-1035-81c2-a30c-c23fbe796f29" class="" dir="auto">Daha sonra GPT-2’nin yalnız candidate answer token’larına verdiği olasılık hesaplanıyor.</p><p id="391b9240-1035-8120-9d24-c646a60aa3a7" class="" dir="auto">Prompt token’larının likelihood’ı candidate score’a dahil edilmiyor.</p><p id="391b9240-1035-8123-97e3-f9a9a53ad184" class="" dir="auto">Matematiksel olarak:</p><p id="391b9240-1035-81bc-9819-d396c06685be" class="" dir="auto">[<br/>P(a q)<br/>================</p><p id="391b9240-1035-811d-9ecd-c19b8dafb017" class="" dir="auto"><em>{t=1}^{|a|}<br/>P(a_t q, a</em>{&lt;t})<br/>]</p><p id="391b9240-1035-812a-9c0a-c1a3ace954ae" class="" dir="auto">Burada:</p><ul id="391b9240-1035-814d-a9f2-cf9e8305eefd" class="bulleted-list" dir="auto"><li style="list-style-type:disc">(q): question prompt</li></ul><ul id="391b9240-1035-8143-90e3-d54a8a2b364b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">(a): candidate answer</li></ul><ul id="391b9240-1035-8121-b79e-d6a63630f4a8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">(a_t): candidate içindeki token</li></ul><hr id="391b9240-1035-81c6-9770-f32791c7253a" dir="auto"/><h1 id="391b9240-1035-8182-9a9e-f9d3f11c2d7e" style="display:inline-block" dir="auto">10. Neden boundary-aware tokenization gerekiyor?</h1><p id="391b9240-1035-8107-adfb-ffbc1d2d8455" class="" dir="auto">GPT-2 byte-level BPE tokenizer kullanıyor.</p><p id="391b9240-1035-8157-b3e4-f7eae58b61ff" class="" dir="auto">Şunlar aynı tokenization’a sahip olmayabilir:</p><pre id="391b9240-1035-81da-97c5-ccf04858300c" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">&quot;San Diego&quot;</code></pre><p id="391b9240-1035-8130-95ab-d10831aa79ce" class="" dir="auto">ve:</p><pre id="391b9240-1035-815f-8cb2-cc96a228506a" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">&quot;...doğdu? San Diego&quot;</code></pre><p id="391b9240-1035-8144-90c0-cdf36f0a4091" class="" dir="auto">Özellikle baştaki space tokenization’ı etkiler.</p><p id="391b9240-1035-81bb-9604-d0b9b12a8b29" class="" dir="auto">Bu nedenle candidate’ı bağımsız tokenize edip sonradan prompt’a eklemiyoruz.</p><p id="391b9240-1035-8159-9d2f-ff3ba7505f14" class="" dir="auto">Yaptığımız:</p><ol type="1" id="391b9240-1035-8163-9d6f-c772aaa0c1f3" class="numbered-list" start="1" dir="auto"><li>Full prompt + candidate string oluşturmak</li></ol><ol type="1" id="391b9240-1035-81d7-b8a1-c1e2c4722fa1" class="numbered-list" start="2" dir="auto"><li>Bütün string’i tokenize etmek</li></ol><ol type="1" id="391b9240-1035-8129-a970-c13860cd711a" class="numbered-list" start="3" dir="auto"><li>Offset mapping ile answer span’ını bulmak</li></ol><ol type="1" id="391b9240-1035-81e3-b948-d110c3d52e90" class="numbered-list" start="4" dir="auto"><li>Yalnız answer token position’larını masklemek</li></ol><ol type="1" id="391b9240-1035-8136-99ee-cd7fafcda0a9" class="numbered-list" start="5" dir="auto"><li>Logits’ten yalnız o token’ların probability’sini toplamak</li></ol><p id="391b9240-1035-8167-b46d-f1724ef25617" class="" dir="auto">Bu, evaluator’ın en kritik teknik detaylarından biri.</p><hr id="391b9240-1035-81df-bc62-eb332a68288a" dir="auto"/><h1 id="391b9240-1035-819a-9afa-f15b5bcbc22d" style="display:inline-block" dir="auto">11. İki farklı scoring yöntemi</h1><h2 id="391b9240-1035-8140-91b7-e526cb5937a1" style="display:inline-block" dir="auto">Primary score: mean token log probability</h2><p id="391b9240-1035-818b-9917-d2561ff1caab" class="" dir="auto">[<br/><br/><em>{t=1}^{|a|}<br/>P(a_t q,a</em>{&lt;t})]</p><p id="391b9240-1035-814a-b7e6-e3fcd66975f9" class="" dir="auto">Bu yöntem answer uzunluğunun etkisini azaltır.</p><p id="391b9240-1035-8185-a0b1-d7fd2b80997a" class="" dir="auto">Örneğin:</p><ul id="391b9240-1035-81d9-8413-d2f1aaa8bead" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>Singer</code></li></ul><ul id="391b9240-1035-8186-85bf-caa7f54ecf25" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>Software Engineer</code></li></ul><ul id="391b9240-1035-8116-8314-fb71becc8bd1" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>University of Southampton</code></li></ul><p id="391b9240-1035-81d2-a375-c0869520797a" class="" dir="auto">farklı token uzunluğuna sahip.</p><p id="391b9240-1035-819c-971d-ed1aa4d1af48" class="" dir="auto">Raw sum kullanılırsa kısa cevaplar avantajlı olabilir.</p><p id="391b9240-1035-8135-9c97-e11e23b41dd7" class="" dir="auto">Bu nedenle primary metric mean token log probability.</p><hr id="391b9240-1035-814a-ad33-cf778d8df151" dir="auto"/><h2 id="391b9240-1035-81e2-9d9c-fdc8aae2e832" style="display:inline-block" dir="auto">Secondary score: total log probability</h2><p id="391b9240-1035-815e-ba2b-e2ac36a6e35b" class="" dir="auto">[<br/><em>{t=1}^{|a|}<br/>P(a_t q,a</em>{&lt;t})]</p><p id="391b9240-1035-811b-929a-fb1a88563969" class="" dir="auto">Bu da sensitivity analysis olarak tutuluyor.</p><p id="391b9240-1035-8187-a756-d978f8e6fe70" class="" dir="auto">Tezde ana sonuç mean score’dan gelecek, total score ile robustness kontrolü yapacağız.</p><hr id="391b9240-1035-81ac-8299-cd2fdaf09f59" dir="auto"/><h1 id="391b9240-1035-8193-ab41-d4f94fdd4399" style="display:inline-block" dir="auto">12. Candidate batching</h1><p id="391b9240-1035-81ea-831b-f325e35f5cf1" class="" dir="auto">İlk evaluator her candidate için ayrı model forward pass yapıyordu.</p><p id="391b9240-1035-8174-bcd1-dbec27fa21b9" class="" dir="auto">Bu çok yavaştı.</p><p id="391b9240-1035-81d7-9d02-f812863c4463" class="" dir="auto">Şimdi candidate’lar batch halinde çalışıyor.</p><p id="391b9240-1035-8166-a6d8-dd58622f36db" class="" dir="auto">Örneğin:</p><pre id="391b9240-1035-813c-ac55-f199b631ab1e" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">candidate_batch_size = 64</code></pre><p id="391b9240-1035-81fc-8d3b-c43fd1574234" class="" dir="auto">100 subject pilot için:</p><ul id="391b9240-1035-817d-8fbd-c10c50d904b3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">500 fact</li></ul><ul id="391b9240-1035-8191-abc0-c6cbc77d205c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">2 dil</li></ul><ul id="391b9240-1035-8164-aea2-f47ab8f47ec0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">relation başına farklı candidate count</li></ul><ul id="391b9240-1035-81ce-b56e-dfbdbfbc3ea9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">toplam yaklaşık 158.400 prompt–candidate sequence</li></ul><p id="391b9240-1035-81c2-802a-ea5d702c7f18" class="" dir="auto">üretiliyor.</p><p id="391b9240-1035-8158-9b52-e282724ce054" class="" dir="auto">Batching ile yaklaşık 3.200 model forward batch yeterli oluyor.</p><p id="391b9240-1035-8185-a234-fb0ce120a13b" class="" dir="auto">PyTorch tarafında:</p><ul id="391b9240-1035-8160-a2bd-ce5995c73f42" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>torch.inference_mode()</code></li></ul><ul id="391b9240-1035-8128-b7b4-c39bccb664c1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">BF16 model forward</li></ul><ul id="391b9240-1035-81d3-b7d5-f5ddea73e296" class="bulleted-list" dir="auto"><li style="list-style-type:disc">FP32 <code>log_softmax</code></li></ul><ul id="391b9240-1035-81fc-92c6-e49b29490add" class="bulleted-list" dir="auto"><li style="list-style-type:disc">attention mask</li></ul><ul id="391b9240-1035-8131-960e-e7baf34988fa" class="bulleted-list" dir="auto"><li style="list-style-type:disc">answer token mask</li></ul><p id="391b9240-1035-8106-8a90-c8e7a0475caa" class="" dir="auto">kullanılıyor.</p><p id="391b9240-1035-8162-8f8a-f90186e9f9a5" class="" dir="auto">Model BF16 çalışıyor çünkü A100 bunu iyi destekliyor.</p><p id="391b9240-1035-8155-a1ef-f35ff29f27aa" class="" dir="auto">Fakat probability hesabında numerical stability için:</p><pre id="391b9240-1035-811e-8ee6-e5535ee7ca39" class="code code-wrap" data-notion-code-syntax="python"><code class="language-python" style="white-space:pre-wrap;word-break:break-all">torch.log_softmax(logits.float(), dim=-1)</code></pre><p id="391b9240-1035-8182-81c0-fa9117002d29" class="" dir="auto">kullanılıyor.</p><hr id="391b9240-1035-810c-b40f-f2618cb657dc" dir="auto"/><h1 id="391b9240-1035-810e-a5a7-ee3fbc2cc629" style="display:inline-block" dir="auto">13. Prompt formatları</h1><p id="391b9240-1035-8195-8747-f22c880c23d4" class="" dir="auto">İki evaluation config’imiz var.</p><h2 id="391b9240-1035-81c5-afae-fd816c1091a1" style="display:inline-block" dir="auto">Primary direct prompt</h2><p id="391b9240-1035-8104-b7cd-e34939e4b9c2" class="" dir="auto">English:</p><pre id="391b9240-1035-812c-814e-c38133b517e2" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Where was Süreyya Çinpolat born? San Diego</code></pre><p id="391b9240-1035-818c-92d9-f1bac00ff60d" class="" dir="auto">Turkish:</p><pre id="391b9240-1035-8185-92e5-f9891d3a0f1f" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Süreyya Çinpolat nerede doğdu? San Diego</code></pre><p id="391b9240-1035-81ae-8baa-c15b2de645c4" class="" dir="auto">Burada ekstra English instruction cue yok.</p><p id="391b9240-1035-8134-935d-f56929e1bd93" class="" dir="auto">Bu ana evaluation.</p><hr id="391b9240-1035-8114-b0e5-dec7c96ed9a5" dir="auto"/><h2 id="391b9240-1035-81b0-acbb-c02ec50e004d" style="display:inline-block" dir="auto">Language-matched QA sensitivity</h2><p id="391b9240-1035-81d3-8551-c046978a877b" class="" dir="auto">English:</p><pre id="391b9240-1035-8179-b532-db395f6a21f9" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Question: Where was Süreyya Çinpolat born?
+Answer: San Diego</code></pre><p id="391b9240-1035-8171-94c1-f93350723251" class="" dir="auto">Turkish:</p><pre id="391b9240-1035-81a8-8886-cd4b936b146e" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Soru: Süreyya Çinpolat nerede doğdu?
+Cevap: San Diego</code></pre><p id="391b9240-1035-8143-bc54-f9404181beed" class="" dir="auto">Bunu sensitivity analysis için kullanıyoruz.</p><p id="391b9240-1035-817e-9249-c6edb358a871" class="" dir="auto">Neden iki format var?</p><p id="391b9240-1035-8195-81f7-dc6bdb34d3d5" class="" dir="auto">Çünkü Turkish prompt’a English <code>Question:</code> / <code>Answer:</code> eklersek, retrieval’ın bir kısmı English scaffold’dan kaynaklanabilir.</p><hr id="391b9240-1035-8110-b8b6-ec541315de87" dir="auto"/><h1 id="391b9240-1035-818b-b435-fef8d3d209c1" style="display:inline-block" dir="auto">14. Evaluator metrikleri</h1><p id="391b9240-1035-81c8-a0b0-d48ab3282f86" class="" dir="auto">Her fact için:</p><ul id="391b9240-1035-810b-86df-d3f47069bb44" class="bulleted-list" dir="auto"><li style="list-style-type:disc">correct candidate rank</li></ul><ul id="391b9240-1035-813d-b36d-d6309c48c9ef" class="bulleted-list" dir="auto"><li style="list-style-type:disc">predicted object</li></ul><ul id="391b9240-1035-8102-b32f-dc83b572d74d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">top-5 objects</li></ul><ul id="391b9240-1035-8192-b9ee-ce76fe1ce700" class="bulleted-list" dir="auto"><li style="list-style-type:disc">correct answer score</li></ul><ul id="391b9240-1035-81d2-8739-ff0831c93a6e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">highest incorrect score</li></ul><ul id="391b9240-1035-810c-be11-d43b9fefa29a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">score margin</li></ul><ul id="391b9240-1035-8173-809c-ea183bdc5343" class="bulleted-list" dir="auto"><li style="list-style-type:disc">candidate count</li></ul><p id="391b9240-1035-815a-95a8-e8ff58bbcfdc" class="" dir="auto">kaydediliyor.</p><p id="391b9240-1035-81f4-8440-ed76e5c1ea8a" class="" dir="auto">Aggregate metrikler:</p><h2 id="391b9240-1035-8122-af50-ca854ac5c2a4" style="display:inline-block" dir="auto">Top-1 accuracy</h2><p id="391b9240-1035-8129-9b6b-f52842c24a7d" class="" dir="auto">Doğru cevap rank 1 mi?</p><h2 id="391b9240-1035-8170-9f2a-c65f7739260e" style="display:inline-block" dir="auto">Top-5 accuracy</h2><p id="391b9240-1035-810d-b6e2-d8bfb95ab3d3" class="" dir="auto">Doğru cevap ilk beşte mi?</p><h2 id="391b9240-1035-817c-bf83-f2ff32191f8d" style="display:inline-block" dir="auto">Mean Reciprocal Rank</h2><p id="391b9240-1035-813f-9ae1-d0dd6e08e94f" class="" dir="auto">[<br/>MRR = _i ]</p><p id="391b9240-1035-813a-ba0f-d836f6a570a7" class="" dir="auto">Doğru cevap üst sıralardaysa yüksek çıkar.</p><h2 id="391b9240-1035-8106-806e-ec38f994a60b" style="display:inline-block" dir="auto">Mean rank</h2><p id="391b9240-1035-81f9-bdcd-e23ce8b62a6d" class="" dir="auto">Doğru cevabın ortalama sırası.</p><h2 id="391b9240-1035-8137-abc9-c6610e4f1dae" style="display:inline-block" dir="auto">Median rank</h2><p id="391b9240-1035-8191-8c7b-c1ef30044c0c" class="" dir="auto">Outlier’lardan daha az etkilenir.</p><h2 id="391b9240-1035-819a-88e3-e9e34a10fa0b" style="display:inline-block" dir="auto">Margin</h2><p id="391b9240-1035-8173-9da3-ee7fac8f5dea" class="" dir="auto">[<br/>score(correct)-score(best incorrect)]</p><p id="391b9240-1035-8145-bc8b-cf629c695e58" class="" dir="auto">Sadece doğru seçildi mi değil, ne kadar güvenli seçildiğini gösterir.</p><hr id="391b9240-1035-81fb-805e-c0db6ef36b21" dir="auto"/><h1 id="391b9240-1035-81bc-84ad-eb19ab3bc39b" style="display:inline-block" dir="auto">15. Relation-binding analizi</h1><p id="391b9240-1035-81e4-b4ce-c52c704d57ea" class="" dir="auto"><code>born_in</code> ve <code>lives_in</code> özellikle aynı city inventory kullanıyor.</p><p id="391b9240-1035-8144-bf3b-d8a4a7865e4a" class="" dir="auto">Örnek:</p><pre id="391b9240-1035-8137-bb8e-e3ec30631a7a" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">born_in → San Diego
+lives_in → Wichita</code></pre><p id="391b9240-1035-8194-a9bc-f33311430fd0" class="" dir="auto">Model şu iki bilgiyi ayırabiliyor mu?</p><p id="391b9240-1035-81ea-9acb-efafb31feb15" class="" dir="auto">Türkçe sorular:</p><pre id="391b9240-1035-81c2-9eb5-dae9c5860d8f" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Süreyya Çinpolat nerede doğdu?
+Süreyya Çinpolat nerede yaşıyor?</code></pre><p id="391b9240-1035-81ec-9a5c-d3dd36532c79" class="" dir="auto">Ölçtüğümüz hatalar:</p><ul id="391b9240-1035-8112-b955-fe6e61ebdbbd" class="bulleted-list" dir="auto"><li style="list-style-type:disc">birthplace sorusunda residence cevabı verilmesi</li></ul><ul id="391b9240-1035-8143-ba98-cf2d6a0016e2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">residence sorusunda birthplace cevabı verilmesi</li></ul><ul id="391b9240-1035-81a3-b927-c8f3eedba4e1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">correct city diğer city’den daha yüksek score aldı mı?</li></ul><ul id="391b9240-1035-8195-a097-d32d0195c878" class="bulleted-list" dir="auto"><li style="list-style-type:disc">other city’nin rank’i kaç?</li></ul><ul id="391b9240-1035-81d9-9022-c1bc36e340f9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">swap rate</li></ul><p id="391b9240-1035-810e-86dd-d05022cb8785" class="" dir="auto">Bu bize modelin yalnız subject–city association öğrendiğini mi, yoksa doğru relation’ı da öğrendiğini mi gösteriyor.</p><p id="391b9240-1035-81e4-9e90-d8dd4695daee" class="" dir="auto">English ve Turkish relation-binding ayrı hesaplanıyor.</p><hr id="391b9240-1035-81ca-8ec6-ff94b370b18d" dir="auto"/><h1 id="391b9240-1035-811d-9937-d04ddd03c66e" style="display:inline-block" dir="auto">16. Pilot dataset</h1><p id="391b9240-1035-81bd-bb95-cc9bd0977ec1" class="" dir="auto">İlk test bütün 5.000 subject üzerinde yapılmayacak.</p><p id="391b9240-1035-81cb-ba69-f3641989cd37" class="" dir="auto">Balanced diagnostic pilot:</p><ul id="391b9240-1035-81f5-80a3-fe4e4e45ab9d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">100 subject</li></ul><ul id="391b9240-1035-8137-90ec-c22934d070c6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Subject başına 5 fact</li></ul><ul id="391b9240-1035-810e-aa93-ceafd87f6f1f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">500 fact</li></ul><ul id="391b9240-1035-81e1-87ea-c9d272b36931" class="bulleted-list" dir="auto"><li style="list-style-type:disc">2 dil</li></ul><ul id="391b9240-1035-81cb-a16c-d5b4bcf6ddf8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">1.000 probe-language result</li></ul><p id="391b9240-1035-8122-ac21-feca051578e0" class="" dir="auto">Pilot dağılımı:</p><ul id="391b9240-1035-819d-866c-ecdb8748a39d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Branch A = 50</li></ul><ul id="391b9240-1035-810c-af20-dff3f5ce826e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Branch B = 50</li></ul><ul id="391b9240-1035-8128-b5d9-db15da36b35d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">English-like names = 50</li></ul><ul id="391b9240-1035-815e-857f-f1d3539fe140" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Turkish-like names = 50</li></ul><ul id="391b9240-1035-81bb-95c7-e87bef4dc8f1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Her Branch × name-type hücresi = 25</li></ul><p id="391b9240-1035-8100-8392-f347ea7278fc" class="" dir="auto">Bu pilot population estimate değildir.</p><p id="391b9240-1035-8197-bd4b-fd0c39ebb9dc" class="" dir="auto">Amaç:</p><ul id="391b9240-1035-8193-8cd2-c5ba4673dc94" class="bulleted-list" dir="auto"><li style="list-style-type:disc">pipeline doğru mu,</li></ul><ul id="391b9240-1035-8182-a961-c8ed15f5ec7c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">prompt formatları çalışıyor mu,</li></ul><ul id="391b9240-1035-816e-ba80-c89f9b7ac836" class="bulleted-list" dir="auto"><li style="list-style-type:disc">batching çalışıyor mu,</li></ul><ul id="391b9240-1035-8141-9b1d-c043ca200f6e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">GPU memory yeterli mi,</li></ul><ul id="391b9240-1035-814b-a084-f04f62527963" class="bulleted-list" dir="auto"><li style="list-style-type:disc">outputs doğru mu,</li></ul><ul id="391b9240-1035-81cd-a24d-c0371363f5ea" class="bulleted-list" dir="auto"><li style="list-style-type:disc">candidate ranking mantıklı mı</li></ul><p id="391b9240-1035-815c-a3d7-e586d43cec1d" class="" dir="auto">kontrol etmektir.</p><hr id="391b9240-1035-816e-85d2-df0e0f34c01a" dir="auto"/><h1 id="391b9240-1035-81bb-8757-dd86e8f8070e" style="display:inline-block" dir="auto">17. Evaluator output yapısı</h1><p id="391b9240-1035-81a3-958d-efb46f762e0e" class="" dir="auto">Her evaluation run benzersiz bir klasöre yazılıyor:</p><pre id="391b9240-1035-818e-a7e1-ee3923e4b259" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">runs/evaluation/m0_gpt2_pilot/&lt;run_id&gt;/</code></pre><p id="391b9240-1035-81f7-a123-f8762f420019" class="" dir="auto">İçinde:</p><h2 id="391b9240-1035-81fd-903f-c13ed909d5dc" style="display:inline-block" dir="auto"><code>run_manifest.json</code></h2><ul id="391b9240-1035-81dc-9ac8-d00922f72297" class="bulleted-list" dir="auto"><li style="list-style-type:disc">model revision</li></ul><ul id="391b9240-1035-813e-9207-c5c3ea4ac414" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dataset hash</li></ul><ul id="391b9240-1035-81c7-a383-dc83f15f2ad2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Git commit</li></ul><ul id="391b9240-1035-81b8-9fb6-d1587fdacb77" class="bulleted-list" dir="auto"><li style="list-style-type:disc">GPU</li></ul><ul id="391b9240-1035-818d-b198-f5192fa263cd" class="bulleted-list" dir="auto"><li style="list-style-type:disc">PyTorch version</li></ul><ul id="391b9240-1035-8196-b724-eb92b96cd8b3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">CUDA version</li></ul><ul id="391b9240-1035-8156-bd79-e61043c7cfa6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">prompt format</li></ul><ul id="391b9240-1035-816f-8aa1-d6dbe386fe91" class="bulleted-list" dir="auto"><li style="list-style-type:disc">batch size</li></ul><ul id="391b9240-1035-815c-8ee7-efaf9f9b098e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">candidate count</li></ul><ul id="391b9240-1035-81b6-8eea-f95db3e8efe0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">timestamps</li></ul><h2 id="391b9240-1035-81ee-94fc-fda73438732a" style="display:inline-block" dir="auto"><code>per_fact_results.parquet</code></h2><p id="391b9240-1035-81f5-922b-e4bb282cff45" class="" dir="auto">Her fact için detaylı sonuç.</p><h2 id="391b9240-1035-81de-b0f5-de5cbfc1cd2e" style="display:inline-block" dir="auto"><code>per_fact_results.csv</code></h2><p id="391b9240-1035-8128-9c7f-fbbe4dea6b84" class="" dir="auto">Küçük pilotta kolay inceleme için.</p><h2 id="391b9240-1035-81ba-b6b9-f1952871a5dc" style="display:inline-block" dir="auto"><code>summary_metrics.json</code></h2><p id="391b9240-1035-8100-9fae-e4407ba71b30" class="" dir="auto">Ana aggregate metrikler.</p><h2 id="391b9240-1035-81e3-8a2a-f8477968a2ae" style="display:inline-block" dir="auto"><code>subgroup_metrics.csv</code></h2><ul id="391b9240-1035-810d-8a7a-e5c47d60e0bc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">language</li></ul><ul id="391b9240-1035-812f-a29f-de8e23fef3b3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">relation</li></ul><ul id="391b9240-1035-813c-8a28-fa6aad6304f8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">branch</li></ul><ul id="391b9240-1035-815e-b359-eb29c300f1b3" class="bulleted-list" dir="auto"><li style="list-style-type:disc">frequency</li></ul><ul id="391b9240-1035-813a-834d-c9a974ae776b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">popularity</li></ul><ul id="391b9240-1035-817c-9982-e2f03e6ebb97" class="bulleted-list" dir="auto"><li style="list-style-type:disc">name type</li></ul><ul id="391b9240-1035-817b-bd07-ed349cafbcdb" class="bulleted-list" dir="auto"><li style="list-style-type:disc">rarity</li></ul><p id="391b9240-1035-8104-b3a7-db9c0976122c" class="" dir="auto">bazlı sonuçlar.</p><h2 id="391b9240-1035-81ba-a55c-d1d2b91f8dcc" style="display:inline-block" dir="auto"><code>relation_binding_metrics.json</code></h2><p id="391b9240-1035-816f-968e-f0360db72e20" class="" dir="auto">Birthplace/residence ayrımı.</p><h2 id="391b9240-1035-8120-ad97-ee84b98f4d55" style="display:inline-block" dir="auto"><code>errors.jsonl</code></h2><p id="391b9240-1035-8174-b61e-cf5f2900da61" class="" dir="auto">Hata veren probe’lar.</p><h2 id="391b9240-1035-81ae-b2b1-e48b906ec153" style="display:inline-block" dir="auto"><code>progress.json</code></h2><p id="391b9240-1035-8182-8dbd-e2b8f9e42b55" class="" dir="auto">Resume sistemi için.</p><hr id="391b9240-1035-814e-90a8-db80e654ec13" dir="auto"/><h1 id="391b9240-1035-81d8-91b2-f106b653fcd2" style="display:inline-block" dir="auto">18. Resume ve failure sistemi</h1><p id="391b9240-1035-8165-9bbf-da7c50bac6d5" class="" dir="auto">GPU job yarıda kesilebilir:</p><ul id="391b9240-1035-813a-918c-f9666d6fc83e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Slurm time limit</li></ul><ul id="391b9240-1035-815f-ac33-e4d2ac2025c9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">node problemi</li></ul><ul id="391b9240-1035-81b2-8c17-d8b910b74446" class="bulleted-list" dir="auto"><li style="list-style-type:disc">out-of-memory</li></ul><ul id="391b9240-1035-8175-a029-e516f6fbea10" class="bulleted-list" dir="auto"><li style="list-style-type:disc">manual cancel</li></ul><ul id="391b9240-1035-812f-886e-d38f55e8a2fc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">filesystem problemi</li></ul><p id="391b9240-1035-81b9-aae1-fa2a9d0fd0a6" class="" dir="auto">Evaluator her tamamlanan:</p><pre id="391b9240-1035-817c-9649-db99a4ffc631" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">fact_id + language</code></pre><p id="391b9240-1035-8184-a41c-de4fa4f837e4" class="" dir="auto">kombinasyonunu kaydeder.</p><p id="391b9240-1035-81ef-924a-f6f3044c5ce1" class="" dir="auto">Job tekrar çalıştırıldığında:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js" integrity="sha512-whYhDwtTmlC/NpZlCr6PSsAaLOrfjVg/iXAnC4H/dtiHawpShhT2SlIMbpIhT/IL/NrpdMm+Hq2C13+VKpHTYw==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><pre id="391b9240-1035-81ee-bc59-ec43472bfcc6" class="code code-wrap" data-notion-code-syntax="bash"><code class="language-bash" style="white-space:pre-wrap;word-break:break-all">--resume-run-dir ...</code></pre><p id="391b9240-1035-8107-91b7-c082c876c660" class="" dir="auto">ile eski run devam ettirilebilir.</p><p id="391b9240-1035-81d9-bc47-c8f18e845c9b" class="" dir="auto">Resume sırasında:</p><ul id="391b9240-1035-8163-abe2-f7de0ecefb4b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">model manifest aynı mı,</li></ul><ul id="391b9240-1035-819b-bc43-eee308fb1d6e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dataset manifest aynı mı,</li></ul><ul id="391b9240-1035-8152-a6e7-cd62598a888d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">prompt config aynı mı,</li></ul><ul id="391b9240-1035-8164-96d3-efa0bfb24a98" class="bulleted-list" dir="auto"><li style="list-style-type:disc">scoring settings aynı mı</li></ul><p id="391b9240-1035-8162-bd74-f3dcea51c5cc" class="" dir="auto">kontrol edilir.</p><p id="391b9240-1035-815e-8587-e08a3cd03e0c" class="" dir="auto">Eğer 1.000 expected probe’un hepsi tamamlanmazsa run:</p><pre id="391b9240-1035-819a-bfcc-cb0cdaa3111e" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">partial_failed</code></pre><p id="391b9240-1035-81d4-b316-f33aeaa9edc0" class="" dir="auto">olur.</p><p id="391b9240-1035-81e7-a12a-d992b0483294" class="" dir="auto">Eksik run yanlışlıkla <code>completed</code> sayılmaz.</p><hr id="391b9240-1035-81fd-965c-e0378fa48dfa" dir="auto"/><h1 id="391b9240-1035-815c-bbf8-fd14e300cf03" style="display:inline-block" dir="auto">19. Slurm ve HPC altyapısı</h1><p id="391b9240-1035-81da-a33d-cf0ce6a85bd0" class="" dir="auto">GPU işleri login node’da çalıştırılmıyor.</p><p id="391b9240-1035-8139-8d95-eb363b65b4ab" class="" dir="auto">Job script’i:</p><pre id="391b9240-1035-816d-94c3-e8943e2f9bae" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">slurm/eval_m0_gpt2_pilot.slurm</code></pre><p id="391b9240-1035-81f7-abf6-c9d44b8d0818" class="" dir="auto">Slurm’dan şunları istiyor:</p><ul id="391b9240-1035-8191-a359-d1388b1fe091" class="bulleted-list" dir="auto"><li style="list-style-type:disc">partition: <code>gpu</code></li></ul><ul id="391b9240-1035-812b-a656-ee9d33d20c1d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">GPU: <code>a10080gb:1</code></li></ul><ul id="391b9240-1035-813e-8bb9-ed45a6679383" class="bulleted-list" dir="auto"><li style="list-style-type:disc">1 A100 80 GB</li></ul><ul id="391b9240-1035-81e3-8fec-d121ba49eca6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">belirli CPU</li></ul><ul id="391b9240-1035-81ca-a5e7-e6a9f34c4364" class="bulleted-list" dir="auto"><li style="list-style-type:disc">belirli RAM</li></ul><ul id="391b9240-1035-816a-9a89-c576ec42fb04" class="bulleted-list" dir="auto"><li style="list-style-type:disc">time limit</li></ul><ul id="391b9240-1035-817a-b69a-c432d6ca8a32" class="bulleted-list" dir="auto"><li style="list-style-type:disc">output/error log</li></ul><p id="391b9240-1035-815b-a45a-e5a1a30d58e8" class="" dir="auto">Cluster:</p><pre id="391b9240-1035-8180-9d69-da583379888b" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">HU Informatik Grünau cluster</code></pre><p id="391b9240-1035-81c1-b52f-c7c306bf4d5d" class="" dir="auto">Conda environment:</p><pre id="391b9240-1035-813a-aefd-c13cce22b814" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">xfer-relearn</code></pre><p id="391b9240-1035-8133-9568-e846a10d1308" class="" dir="auto">Temel ortam:</p><ul id="391b9240-1035-815d-92f9-de9e6ad5ccb2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Python 3.11</li></ul><ul id="391b9240-1035-8125-bbce-f2ad8d343f4d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">PyTorch 2.7.0+cu128</li></ul><ul id="391b9240-1035-811b-8bcc-f0eb2f3d48f7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">CUDA 12.8</li></ul><ul id="391b9240-1035-819a-b61c-fcc36f6f8b21" class="bulleted-list" dir="auto"><li style="list-style-type:disc">NVIDIA A100 80GB</li></ul><ul id="391b9240-1035-8111-80a2-c222c118f046" class="bulleted-list" dir="auto"><li style="list-style-type:disc">BF16 support</li></ul><p id="391b9240-1035-81d3-97d2-f0fd2bf1eba0" class="" dir="auto">Slurm job başında:</p><ul id="391b9240-1035-81ee-a9bd-cebb84c71941" class="bulleted-list" dir="auto"><li style="list-style-type:disc">hostname</li></ul><ul id="391b9240-1035-8196-bac1-d4b55d9856b0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">job ID</li></ul><ul id="391b9240-1035-816c-9323-cea9a8034865" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>CUDA_VISIBLE_DEVICES</code></li></ul><ul id="391b9240-1035-81e4-baba-d6eca9e48b61" class="bulleted-list" dir="auto"><li style="list-style-type:disc">GPU name</li></ul><ul id="391b9240-1035-8182-9b60-c0570c75b13c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">CUDA version</li></ul><ul id="391b9240-1035-8164-b742-d6dcf5b8c440" class="bulleted-list" dir="auto"><li style="list-style-type:disc">PyTorch version</li></ul><ul id="391b9240-1035-81ef-afd3-e863ce2ea01e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Transformers version</li></ul><p id="391b9240-1035-819f-bd9e-e81cba32982e" class="" dir="auto">loglanıyor.</p><hr id="391b9240-1035-81e4-b55c-ffdc304b29db" dir="auto"/><h1 id="391b9240-1035-810a-9a07-d82d1b26e11d" style="display:inline-block" dir="auto">20. Türkçe Wikipedia corpus pipeline’ı</h1><p id="391b9240-1035-812e-ab2e-da2446b3d19d" class="" dir="auto">Şimdi ikinci büyük sistem: M2/M3 için Türkçe adaptation corpus’u.</p><p id="391b9240-1035-81c1-917b-def3eb72862b" class="" dir="auto">İlk kaynak:</p><pre id="391b9240-1035-8164-b794-cf8cc310fd8c" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Turkish Wikipedia</code></pre><p id="391b9240-1035-81b7-b6a7-e9175f1d5153" class="" dir="auto">Seçilen dump:</p><pre id="391b9240-1035-8107-bb18-f2994a05dab8" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">trwiki-20260601-pages-articles.xml.bz2</code></pre><p id="391b9240-1035-81e4-97d4-f8a7eea0b3c9" class="" dir="auto">Neden Wikipedia?</p><ul id="391b9240-1035-81f0-ba0c-eb9096169cc1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Versiyonlanabilir</li></ul><ul id="391b9240-1035-814a-be10-c0b081420908" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Belirli snapshot tarihi var</li></ul><ul id="391b9240-1035-81f6-a123-f8b15a65b279" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Checksum var</li></ul><ul id="391b9240-1035-81da-82c7-d4fee3ee6566" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Reproducible</li></ul><ul id="391b9240-1035-8152-a5c6-fc05752fbf36" class="bulleted-list" dir="auto"><li style="list-style-type:disc">License/provenance daha kontrollü</li></ul><ul id="391b9240-1035-8182-9fda-dac8afd23860" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Common Crawl’a göre daha temiz</li></ul><ul id="391b9240-1035-8106-a399-c1a5dc8f94ee" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Contamination scan daha yönetilebilir</li></ul><hr id="391b9240-1035-81dd-abd0-f24b15bf1c92" dir="auto"/><h1 id="391b9240-1035-8186-84c2-f8b95b1d1073" style="display:inline-block" dir="auto">21. Corpus pipeline genel sırası</h1><p id="391b9240-1035-81b3-a4e4-c2a99516a8fc" class="" dir="auto">Güvenli sıra:</p><pre id="391b9240-1035-818b-a364-cae289ba82bd" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">configured metadata
+→ official metadata
+→ contamination matcher preflight
+→ download
+→ checksum verify
+→ production parser smoke
+→ extract
+→ normalize
+→ audit
+→ threshold review
+→ filter
+→ deduplicate
+→ contamination scan/removal
+→ train/validation split
+→ corpus manifest/report</code></pre><p id="391b9240-1035-8164-b42b-fc3a515d877c" class="" dir="auto">Phase 2’de daha sonra:</p><pre id="391b9240-1035-819d-aa40-cd28990e77a4" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">GPT-2 tokenization
+→ deterministic token stream
+→ 10M / 25M / 50M token boundaries</code></pre><p id="391b9240-1035-815b-ae12-efc15d67bc3f" class="" dir="auto">gelecek.</p><hr id="391b9240-1035-8186-96d0-e9e76f7ddfb9" dir="auto"/><h1 id="391b9240-1035-816a-bf55-dd6c13390d65" style="display:inline-block" dir="auto">22. Configured metadata resolve</h1><p id="391b9240-1035-81e4-81a3-f49464e09819" class="" dir="auto">İlk komut internet kullanmadan sadece URL’leri üretir:</p><pre id="391b9240-1035-81c4-920a-c03491804dc5" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">configured_only</code></pre><p id="391b9240-1035-8124-80b5-fa30e21211c1" class="" dir="auto">Burada:</p><ul id="391b9240-1035-81f5-8f3d-ca9136f0da03" class="bulleted-list" dir="auto"><li style="list-style-type:disc">corpus ID</li></ul><ul id="391b9240-1035-8190-a68c-e9baf333d853" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dump date</li></ul><ul id="391b9240-1035-81f6-be70-e179266d0b50" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dump filename</li></ul><ul id="391b9240-1035-81db-b9e7-e691eb835cff" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dump URL</li></ul><ul id="391b9240-1035-8109-bfc5-caccb774c192" class="bulleted-list" dir="auto"><li style="list-style-type:disc">checksum URL</li></ul><ul id="391b9240-1035-81b9-b1f9-e527b291b203" class="bulleted-list" dir="auto"><li style="list-style-type:disc">status URL</li></ul><p id="391b9240-1035-810c-bebf-fae6b427b046" class="" dir="auto">hesaplanır.</p><p id="391b9240-1035-8159-baaa-fc79b4d8df95" class="" dir="auto">Bu aşama download’a izin vermez.</p><p id="391b9240-1035-81c6-b1e2-da81c4cf0c4c" class="" dir="auto">Amaç config’in doğru oluşturulduğunu görmek.</p><hr id="391b9240-1035-8118-a4c0-d6e9ca5df399" dir="auto"/><h1 id="391b9240-1035-81f9-b56e-cabd334a0853" style="display:inline-block" dir="auto">23. Official metadata resolve</h1><p id="391b9240-1035-811a-be77-c9f82763b10e" class="" dir="auto">Bu aşama Wikimedia’ya bağlanır.</p><p id="391b9240-1035-8155-aef5-da94fe794413" class="" dir="auto">Kontrol eder:</p><ul id="391b9240-1035-819e-84db-f6fa382a398d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dump tamamlanmış mı,</li></ul><ul id="391b9240-1035-81be-aa42-c44c77a23283" class="bulleted-list" dir="auto"><li style="list-style-type:disc">configured date gerçekten mevcut mu,</li></ul><ul id="391b9240-1035-8105-a538-da184da707da" class="bulleted-list" dir="auto"><li style="list-style-type:disc">configured filename doğru mu,</li></ul><ul id="391b9240-1035-81ef-888f-e4129847e236" class="bulleted-list" dir="auto"><li style="list-style-type:disc">official SHA-1 checksum nedir?</li></ul><p id="391b9240-1035-816b-96b7-c6d3b555934f" class="" dir="auto">Official metadata:</p><pre id="391b9240-1035-8177-b29c-eb909709b77f" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">dump_metadata.json</code></pre><p id="391b9240-1035-815b-8501-ceeef49df78e" class="" dir="auto">dosyasına yazılır.</p><p id="391b9240-1035-813f-92cd-fc0ce0a32f56" class="" dir="auto">İçinde:</p><ul id="391b9240-1035-81be-b43c-cddcff4b28e6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">resolution mode = official</li></ul><ul id="391b9240-1035-81d1-8fc8-ec9bdd83f710" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dump status = complete</li></ul><ul id="391b9240-1035-815c-ada8-cefe4e85b01c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">expected checksum</li></ul><ul id="391b9240-1035-8121-bf6f-d3db3d6b6d77" class="bulleted-list" dir="auto"><li style="list-style-type:disc">source URLs</li></ul><ul id="391b9240-1035-81e7-8487-c4caefa11e3f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">resolution timestamp</li></ul><p id="391b9240-1035-81c2-b5a1-d5c5f5096847" class="" dir="auto">bulunur.</p><p id="391b9240-1035-814f-af99-c700a6edd2ac" class="" dir="auto">Download yalnız bu dosya varsa başlayabilir.</p><hr id="391b9240-1035-81ca-b32e-d9c47cb4f4df" dir="auto"/><h1 id="391b9240-1035-817d-9ee8-e76491915ccb" style="display:inline-block" dir="auto">24. Contamination matcher preflight</h1><p id="391b9240-1035-8153-9fe1-d2ebfad8cbc3" class="" dir="auto">Full Wikipedia indirilmeden önce contamination scanner’ın maliyetini ölçüyoruz.</p><p id="391b9240-1035-81a9-a3ca-e539a625ba2e" class="" dir="auto">Synthetic dataset’ten bütün pattern’lar oluşturulur:</p><ul id="391b9240-1035-8107-8d44-e86a8f441be1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">5.000 full subject name</li></ul><ul id="391b9240-1035-81e0-b41d-f825224c6744" class="bulleted-list" dir="auto"><li style="list-style-type:disc">casefold name variant</li></ul><ul id="391b9240-1035-81b1-971b-c976101af9b4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Turkish lowercase variant</li></ul><ul id="391b9240-1035-8105-b3f8-f47c3993dd2c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subject ID’ler</li></ul><ul id="391b9240-1035-8118-8529-d647fa55d93a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">fact ID’ler</li></ul><ul id="391b9240-1035-812a-abc8-e50a50e9cb13" class="bulleted-list" dir="auto"><li style="list-style-type:disc">English training sentence’ları</li></ul><ul id="391b9240-1035-8145-a91e-e96fa14e557b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Turkish repetition sentence’ları</li></ul><ul id="391b9240-1035-813f-af2c-e590e23587cf" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dataset artifact isimleri</li></ul><ul id="391b9240-1035-8129-a277-dc0c920208ee" class="bulleted-list" dir="auto"><li style="list-style-type:disc">canonical object surface’leri</li></ul><p id="391b9240-1035-8134-a6b1-e2cf17f7bc4e" class="" dir="auto">Sonra üç matcher oluşturulur:</p><ol type="1" id="391b9240-1035-813a-8aa4-f21d2b5ee140" class="numbered-list" start="1" dir="auto"><li>Exact NFC matcher</li></ol><ol type="1" id="391b9240-1035-811c-bd22-fed63034a517" class="numbered-list" start="2" dir="auto"><li>Unicode casefold matcher</li></ol><ol type="1" id="391b9240-1035-81db-98bb-cbcd6d126c62" class="numbered-list" start="3" dir="auto"><li>Turkish-aware lowercase matcher</li></ol><p id="391b9240-1035-8121-a3de-d8fce502cb3a" class="" dir="auto">Preflight raporu:</p><ul id="391b9240-1035-8172-9434-c2462bf63ea2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">pattern count</li></ul><ul id="391b9240-1035-815a-bea6-c7751991820b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">pattern count by rule</li></ul><ul id="391b9240-1035-8185-a523-d4617d523cfc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">pattern count by channel</li></ul><ul id="391b9240-1035-81ef-a9ec-f85f37f02aa0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">automaton state count</li></ul><ul id="391b9240-1035-817b-9eac-cb4ea34939f6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">inventory build time</li></ul><ul id="391b9240-1035-81be-8077-df590f9baf08" class="bulleted-list" dir="auto"><li style="list-style-type:disc">matcher build time</li></ul><ul id="391b9240-1035-8193-a35d-dd25b7774c02" class="bulleted-list" dir="auto"><li style="list-style-type:disc">total pattern character count</li></ul><ul id="391b9240-1035-817e-9577-cfe13f9cab6c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">peak RSS memory</li></ul><p id="391b9240-1035-8159-a1a8-c3fe897d4e8d" class="" dir="auto">verir.</p><p id="391b9240-1035-81c7-921e-d44da19ddcbb" class="" dir="auto">Amaç full corpus’u indirmeden önce scanner’ın RAM’e sığıp sığmadığını görmek.</p><hr id="391b9240-1035-81e2-83d7-f13238a2eb60" dir="auto"/><h1 id="391b9240-1035-81d4-b61c-d5ce3fc5f46d" style="display:inline-block" dir="auto">25. Aho–Corasick contamination matcher</h1><p id="391b9240-1035-814c-8de2-ea5abbb839ea" class="" dir="auto">Normal yaklaşım şu olurdu:</p><pre id="391b9240-1035-8159-ba15-f038cd0425ad" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">her Wikipedia document
+× her pattern</code></pre><p id="391b9240-1035-81be-9fdc-e218d2bb82dd" class="" dir="auto">Bu aşırı yavaş olur.</p><p id="391b9240-1035-81fd-bbed-ef155793f883" class="" dir="auto">Biz Aho–Corasick tipi multi-pattern matcher kullanıyoruz.</p><p id="391b9240-1035-817b-84c9-c6a1dbe5ed3f" class="" dir="auto">Bir trie/automaton bir kez oluşturuluyor.</p><p id="391b9240-1035-815d-8615-df2d122b0260" class="" dir="auto">Daha sonra bir document:</p><p id="391b9240-1035-81a0-8112-e407e4946289" class="" dir="auto">[<br/>O(text length + match count)]</p><p id="391b9240-1035-81d9-b099-d8b5f3e4608d" class="" dir="auto">yaklaşık maliyetle taranıyor.</p><p id="391b9240-1035-81c2-b825-d71b5012eb71" class="" dir="auto">Üç ayrı normalization channel var:</p><h2 id="391b9240-1035-811d-9b8b-e58a04fb084f" style="display:inline-block" dir="auto">Exact NFC</h2><p id="391b9240-1035-819d-a3fd-d24e983a8c53" class="" dir="auto">Unicode NFC uygulanmış exact text.</p><h2 id="391b9240-1035-8116-9b94-c7bb70e56941" style="display:inline-block" dir="auto">Casefold</h2><p id="391b9240-1035-8107-bfda-df9f1cc623a5" class="" dir="auto">Unicode case-insensitive eşleşme.</p><h2 id="391b9240-1035-8178-b54c-f3c5a783b22a" style="display:inline-block" dir="auto">Turkish lowercase</h2><p id="391b9240-1035-817d-b5d3-f92f767150d1" class="" dir="auto">Türkçeye özgü:</p><ul id="391b9240-1035-810a-b27b-f7d98a6e6138" class="bulleted-list" dir="auto"><li style="list-style-type:disc">I → ı</li></ul><ul id="391b9240-1035-81bd-9842-d27088b2b5a6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">İ → i</li></ul><p id="391b9240-1035-8197-a778-c96f94191f93" class="" dir="auto">dönüşümleriyle eşleşme.</p><p id="391b9240-1035-816a-9896-cb7734935515" class="" dir="auto">Bu özellikle Türkçe isimler için önemli.</p><hr id="391b9240-1035-81ef-93a4-d911f5d0bd63" dir="auto"/><h1 id="391b9240-1035-8185-a6f4-f89d5b95dda6" style="display:inline-block" dir="auto">26. Dump download</h1><p id="391b9240-1035-819a-adba-e214c540b983" class="" dir="auto">Download:</p><ul id="391b9240-1035-8198-9777-f2e229aeebeb" class="bulleted-list" dir="auto"><li style="list-style-type:disc">streaming</li></ul><ul id="391b9240-1035-814e-b8b8-c08453746249" class="bulleted-list" dir="auto"><li style="list-style-type:disc">resumable</li></ul><ul id="391b9240-1035-81c4-9b1b-e8faf7461f90" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>.partial</code> file</li></ul><ul id="391b9240-1035-81e1-a758-fa5a77164ec8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">HTTP Range request</li></ul><p id="391b9240-1035-8112-8f18-d08f20293d2f" class="" dir="auto">kullanıyor.</p><p id="391b9240-1035-8102-82eb-f646a7def219" class="" dir="auto">Download yarıda kalırsa bir sonraki çağrı:</p><pre id="391b9240-1035-813e-a093-fe0def9da95b" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Range: bytes=&lt;existing_size&gt;-</code></pre><p id="391b9240-1035-81cc-904a-e00b40347746" class="" dir="auto">gönderir.</p><p id="391b9240-1035-810c-887f-fa43d8e6d4d2" class="" dir="auto">Kod kontrol eder:</p><ul id="391b9240-1035-8132-a1df-f6c940d33bcb" class="bulleted-list" dir="auto"><li style="list-style-type:disc">status 206 mı,</li></ul><ul id="391b9240-1035-810c-aba1-c469d1ee45ae" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>Content-Range</code> var mı,</li></ul><ul id="391b9240-1035-8188-961e-e5018129417b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">range doğru byte’tan başlıyor mu?</li></ul><p id="391b9240-1035-81d5-b819-fe9d0a38578f" class="" dir="auto">Sunucu Range’i görmezden gelip status 200 dönerse mevcut partial’ın sonuna full file append edilmez.</p><p id="391b9240-1035-812d-8c44-e1f6c6ae35b0" class="" dir="auto">Bu corruption’ı engeller.</p><p id="391b9240-1035-81bd-a4bb-e6ebbf422a72" class="" dir="auto">Download tamamlandığında dosya henüz:</p><pre id="391b9240-1035-81f9-a543-d6abbb80356f" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">downloaded_unverified</code></pre><p id="391b9240-1035-81d0-af64-d48bb05331e3" class="" dir="auto">durumundadır.</p><hr id="391b9240-1035-81f9-8fe4-d857bef02667" dir="auto"/><h1 id="391b9240-1035-81cf-9927-fbf0a7b64bfc" style="display:inline-block" dir="auto">27. SHA-1 verification</h1><p id="391b9240-1035-81d3-94f4-f4ee0ed823b6" class="" dir="auto">Wikimedia’nın official SHA-1 checksum’u kullanılır.</p><p id="391b9240-1035-8172-9678-cbecc31ca06b" class="" dir="auto">Downloaded <code>.partial</code> file’ın SHA-1’i streaming olarak hesaplanır.</p><p id="391b9240-1035-81f0-8044-fbab77c1135e" class="" dir="auto">Eğer:</p><pre id="391b9240-1035-818c-926c-f76c0ef96e9e" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">observed SHA-1 == expected SHA-1</code></pre><p id="391b9240-1035-81ae-a1eb-e9598c7de1f1" class="" dir="auto">ise dosya atomik şekilde final adına taşınır.</p><p id="391b9240-1035-81e0-8ede-f79f1f3471f6" class="" dir="auto">Aksi halde pipeline fail olur.</p><p id="391b9240-1035-816c-8bfd-e85ae96dde4d" class="" dir="auto">Bu aşamadan önce extraction başlamaz.</p><hr id="391b9240-1035-8138-a94f-c9bfafcbd85b" dir="auto"/><h1 id="391b9240-1035-819c-bf79-d6124317b1b7" style="display:inline-block" dir="auto">28. Production parser smoke test</h1><p id="391b9240-1035-81c5-a44a-da8d9ac625ce" class="" dir="auto">Gerçek full dump extraction’dan önce küçük local <code>.xml.bz2</code> fixture ile gerçek parser stack test edilir.</p><p id="391b9240-1035-81f8-8f7d-e1e77397b282" class="" dir="auto">Kullandığımız paketler:</p><pre id="391b9240-1035-8117-bd23-f8b6af7c6548" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">mwxml==0.3.8
+mwparserfromhell==0.7.2</code></pre><p id="391b9240-1035-81f3-b800-c38f359e9c56" class="" dir="auto"><code>mwxml</code>:</p><ul id="391b9240-1035-81e6-a14c-e939b4e6b0c0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">MediaWiki XML dump’ını stream eder,</li></ul><ul id="391b9240-1035-81aa-9caf-e7e2adfee2e0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">page ve revision yapısını okur.</li></ul><p id="391b9240-1035-81f2-87fc-f7b6043ef65f" class="" dir="auto"><code>mwparserfromhell</code>:</p><ul id="391b9240-1035-81ce-9b98-ee4a0c107ba8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">wikitext’i parse eder,</li></ul><ul id="391b9240-1035-814e-bb32-c427f8c37053" class="bulleted-list" dir="auto"><li style="list-style-type:disc">link/template markup’ını temizler,</li></ul><ul id="391b9240-1035-8117-944f-eaf3a6b188c0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">plain text’e dönüştürür.</li></ul><p id="391b9240-1035-81b5-bebb-f8914a2aabe9" class="" dir="auto">Smoke test doğrular:</p><ul id="391b9240-1035-813f-a8d1-e924f791e4e1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">namespace filtering</li></ul><ul id="391b9240-1035-8115-8ba2-fa5444deb007" class="bulleted-list" dir="auto"><li style="list-style-type:disc">redirects</li></ul><ul id="391b9240-1035-817b-8901-d8836f051519" class="bulleted-list" dir="auto"><li style="list-style-type:disc">page ID</li></ul><ul id="391b9240-1035-81b6-916a-d13d6fce53cb" class="bulleted-list" dir="auto"><li style="list-style-type:disc">revision ID</li></ul><ul id="391b9240-1035-8109-a4f2-f2cc000c6f9d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Turkish characters</li></ul><ul id="391b9240-1035-818a-9558-edf161fb1cf6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">extracted text</li></ul><hr id="391b9240-1035-8175-9c0e-c23b9f19f74a" dir="auto"/><h1 id="391b9240-1035-8105-beef-def318ef41a0" style="display:inline-block" dir="auto">29. Extraction aşaması</h1><p id="391b9240-1035-81bd-bd7c-c9567c03e286" class="" dir="auto">Input:</p><pre id="391b9240-1035-812b-8afe-fa224e99a5f2" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">.xml.bz2 Wikimedia dump</code></pre><p id="391b9240-1035-81ba-a873-d83259d540a4" class="" dir="auto">Processing:</p><ol type="1" id="391b9240-1035-81c6-9e87-e295a27cc43c" class="numbered-list" start="1" dir="auto"><li>BZ2 stream açılır</li></ol><ol type="1" id="391b9240-1035-8127-91a9-d96cbae59aaf" class="numbered-list" start="2" dir="auto"><li><code>mwxml</code> page’leri sırayla okur</li></ol><ol type="1" id="391b9240-1035-8181-a9ee-c2085eb72fe1" class="numbered-list" start="3" dir="auto"><li>Namespace 0 dışındaki sayfalar atılır</li></ol><ol type="1" id="391b9240-1035-8122-a3b6-c6a56e4b7875" class="numbered-list" start="4" dir="auto"><li>Redirect’ler atılır</li></ol><ol type="1" id="391b9240-1035-8175-b73e-c3151dfb5820" class="numbered-list" start="5" dir="auto"><li>Current/latest revision seçilir</li></ol><ol type="1" id="391b9240-1035-81e0-94cb-cb17e77d695f" class="numbered-list" start="6" dir="auto"><li>Wikitext alınır</li></ol><ol type="1" id="391b9240-1035-81cf-b353-cd6dad0b6c5d" class="numbered-list" start="7" dir="auto"><li><code>mwparserfromhell</code> ile plain text çıkarılır</li></ol><ol type="1" id="391b9240-1035-8199-9136-c1dd7803450f" class="numbered-list" start="8" dir="auto"><li>Metadata korunur</li></ol><ol type="1" id="391b9240-1035-81c7-a9fa-cae4e90b320e" class="numbered-list" start="9" dir="auto"><li>JSONL’ye satır satır yazılır</li></ol><p id="391b9240-1035-81b9-98b0-d41dd4bad387" class="" dir="auto">Her document şunları içerir:</p><ul id="391b9240-1035-812f-a972-f7bbcf8a5746" class="bulleted-list" dir="auto"><li style="list-style-type:disc">document ID</li></ul><ul id="391b9240-1035-81df-a9c4-c32ee8a55173" class="bulleted-list" dir="auto"><li style="list-style-type:disc">page ID</li></ul><ul id="391b9240-1035-8195-91b2-f30625cec17c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">revision ID</li></ul><ul id="391b9240-1035-810e-8908-dbb9696b970f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">title</li></ul><ul id="391b9240-1035-8147-818c-dc4c97c880b1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">namespace</li></ul><ul id="391b9240-1035-8103-b980-da58864526d2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dump date</li></ul><ul id="391b9240-1035-81a3-9976-e4bd4131f44a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">source project</li></ul><ul id="391b9240-1035-811c-a7bb-c4af05e877c1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">extracted text</li></ul><ul id="391b9240-1035-8188-bf0a-ffd5b010b953" class="bulleted-list" dir="auto"><li style="list-style-type:disc">raw wikitext SHA-256</li></ul><ul id="391b9240-1035-810c-8e33-efafc8693d03" class="bulleted-list" dir="auto"><li style="list-style-type:disc">provenance</li></ul><ul id="391b9240-1035-8174-b401-db2f3e7d4ab8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">disambiguation flag</li></ul><ul id="391b9240-1035-816f-a2e0-e01e820f8fdc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">unresolved markup counters</li></ul><p id="391b9240-1035-811e-906c-fe1c8db29426" class="" dir="auto">Corpus RAM’e tamamen yüklenmez.</p><hr id="391b9240-1035-8127-b58a-db4890865300" dir="auto"/><h1 id="391b9240-1035-810c-ac4e-e2a8d60cbde6" style="display:inline-block" dir="auto">30. Normalization aşaması</h1><p id="391b9240-1035-8137-a404-ec22078850cd" class="" dir="auto">Her document satır satır normalize edilir.</p><p id="391b9240-1035-8145-9a6f-ee13c936600e" class="" dir="auto">Uygulanan işlemler:</p><ul id="391b9240-1035-813e-ba5c-decafce5d64a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">UTF-8</li></ul><ul id="391b9240-1035-8196-9742-f9d2ceabd10f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Unicode NFC</li></ul><ul id="391b9240-1035-8159-ad70-c977604cf0d2" class="bulleted-list" dir="auto"><li style="list-style-type:disc"><code>\r\n</code> → <code>\n</code></li></ul><ul id="391b9240-1035-815f-8f2b-cda24a6f7607" class="bulleted-list" dir="auto"><li style="list-style-type:disc">invalid control character removal</li></ul><ul id="391b9240-1035-81a9-84e5-c2c347ee392f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">pathological whitespace collapse</li></ul><ul id="391b9240-1035-8148-8cab-c4a06711c1b6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">paragraph preservation</li></ul><ul id="391b9240-1035-8162-af07-cfd59c300c67" class="bulleted-list" dir="auto"><li style="list-style-type:disc">bazı residual HTML/markup fragment removal</li></ul><p id="391b9240-1035-8105-a323-c9ce36afd85f" class="" dir="auto">Korunan şeyler:</p><ul id="391b9240-1035-815a-ba81-da06034175b9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Türkçe karakterler</li></ul><ul id="391b9240-1035-81f0-908b-f9ca9367bf70" class="bulleted-list" dir="auto"><li style="list-style-type:disc">case</li></ul><ul id="391b9240-1035-8157-ba09-f87a76ad087f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">punctuation</li></ul><ul id="391b9240-1035-81a6-9817-f11666303799" class="bulleted-list" dir="auto"><li style="list-style-type:disc">paragraph boundaries</li></ul><p id="391b9240-1035-81b1-806d-c7881ea65f3d" class="" dir="auto">Global lowercase yapılmaz.</p><p id="391b9240-1035-8112-9fef-dab775123719" class="" dir="auto">ASCII transliteration yapılmaz.</p><p id="391b9240-1035-813b-9ccc-e2e91e5f7e83" class="" dir="auto">Örneğin:</p><pre id="391b9240-1035-81f3-84c5-e130d1558360" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">İstanbul
+Şırnak
+Çığ
+Öğrenci</code></pre><p id="391b9240-1035-8139-998a-cccc54e17cf3" class="" dir="auto">karakterleri korunur.</p><p id="391b9240-1035-8172-83be-c748161af74b" class="" dir="auto">Her normalized text’in SHA-256 hash’i alınır.</p><hr id="391b9240-1035-81b1-aeb5-e7030f41c57c" dir="auto"/><h1 id="391b9240-1035-81be-a23d-ee502c6047f7" style="display:inline-block" dir="auto">31. Audit aşaması</h1><p id="391b9240-1035-8127-8cbc-f5a8612f4dc2" class="" dir="auto">İlk corpus run’ında agresif document silmiyoruz.</p><p id="391b9240-1035-8138-817c-e9bc65309b5c" class="" dir="auto"><code>audit_only</code> kullanıyoruz.</p><p id="391b9240-1035-810a-92fb-cb84984e75e8" class="" dir="auto">Her document için şu metrikler hesaplanır:</p><ul id="391b9240-1035-81c2-bdf6-d54bb044b938" class="bulleted-list" dir="auto"><li style="list-style-type:disc">character count</li></ul><ul id="391b9240-1035-81b9-a57f-c5cd252393c2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">alphabetic ratio</li></ul><ul id="391b9240-1035-816e-a7ad-fd2c89d10193" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Latin-script ratio</li></ul><ul id="391b9240-1035-81da-9fc2-d89d18dfd394" class="bulleted-list" dir="auto"><li style="list-style-type:disc">URL ratio</li></ul><ul id="391b9240-1035-8134-8542-da0197fa7177" class="bulleted-list" dir="auto"><li style="list-style-type:disc">symbol ratio</li></ul><ul id="391b9240-1035-8180-8e36-ecaf85c61f52" class="bulleted-list" dir="auto"><li style="list-style-type:disc">markup-remnant ratio</li></ul><ul id="391b9240-1035-81bd-be3d-e030489e729f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">encoding anomaly count</li></ul><ul id="391b9240-1035-8135-843f-f9c91bbe0d1a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">mixed-language heuristic</li></ul><p id="391b9240-1035-81a0-8c5e-ff3f885b2fc2" class="" dir="auto">Sonrasında corpus düzeyinde:</p><ul id="391b9240-1035-811f-bb50-df4efd4e3013" class="bulleted-list" dir="auto"><li style="list-style-type:disc">min</li></ul><ul id="391b9240-1035-81d0-b345-d15c00f0a486" class="bulleted-list" dir="auto"><li style="list-style-type:disc">max</li></ul><ul id="391b9240-1035-81d1-9aa4-f8a5f09ab053" class="bulleted-list" dir="auto"><li style="list-style-type:disc">mean</li></ul><ul id="391b9240-1035-81d7-bceb-c5d49987b9ea" class="bulleted-list" dir="auto"><li style="list-style-type:disc">histogram</li></ul><ul id="391b9240-1035-81ea-af3c-f73d7c699773" class="bulleted-list" dir="auto"><li style="list-style-type:disc">reason counts</li></ul><p id="391b9240-1035-81af-95cb-fd8a4e57a421" class="" dir="auto">üretilir.</p><p id="391b9240-1035-81b7-93fe-ed902540a2f8" class="" dir="auto">Amaç gerçek data dağılımını görmek.</p><p id="391b9240-1035-8173-ab3a-c1d699cff274" class="" dir="auto">Örneğin min character threshold’ını agent’ın kafasına göre seçmesini istemiyoruz.</p><p id="391b9240-1035-8130-a55b-cbb671322581" class="" dir="auto">Önce audit raporunu göreceğiz, sonra threshold’ları bilimsel olarak donduracağız.</p><hr id="391b9240-1035-8152-9c87-ede9bd340c64" dir="auto"/><h1 id="391b9240-1035-81b7-aa7c-e96d05224a55" style="display:inline-block" dir="auto">32. Filter aşaması</h1><p id="391b9240-1035-81d5-924e-e41cbd7708e4" class="" dir="auto">Audit report incelendikten sonra config’te threshold’lar kesinleştirilecek.</p><p id="391b9240-1035-8118-8082-d81cc3a13e9f" class="" dir="auto">Örneğin ileride:</p><ul id="391b9240-1035-8100-bb46-c17cbfe89572" class="bulleted-list" dir="auto"><li style="list-style-type:disc">çok kısa document</li></ul><ul id="391b9240-1035-814e-8684-f7aecfcd4b2d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">aşırı URL içeren document</li></ul><ul id="391b9240-1035-8117-a16d-c25daa43aed1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">aşırı symbol içeren document</li></ul><ul id="391b9240-1035-81de-9ec3-eb823582f018" class="bulleted-list" dir="auto"><li style="list-style-type:disc">encoding bozuk document</li></ul><ul id="391b9240-1035-8142-bebd-c3ad284e0d80" class="bulleted-list" dir="auto"><li style="list-style-type:disc">aşırı markup kalmış document</li></ul><p id="391b9240-1035-8150-bfbe-fc02bcb14c11" class="" dir="auto">çıkarılabilir.</p><p id="391b9240-1035-8133-8ac2-e05e650640c9" class="" dir="auto">Ama language ID ilk aşamada otomatik removal yapmıyor.</p><p id="391b9240-1035-8181-9caa-ee6a8e149077" class="" dir="auto">Çünkü source zaten Turkish Wikipedia.</p><p id="391b9240-1035-8115-9368-cde39999121f" class="" dir="auto">Language ID gerekirse yalnız audit signal olarak kullanılacak.</p><hr id="391b9240-1035-81f3-9e44-dbdc33e3e4a5" dir="auto"/><h1 id="391b9240-1035-810b-962e-fabc657213cd" style="display:inline-block" dir="auto">33. Exact deduplication</h1><p id="391b9240-1035-8120-a04d-c650b73b498a" class="" dir="auto">Normalize edilmiş text SHA-256 ile exact duplicate bulunuyor.</p><p id="391b9240-1035-8133-8db9-fad48c74825a" class="" dir="auto">Bütün hash’leri Python RAM dictionary’sinde tutmak yerine SQLite kullanılıyor.</p><p id="391b9240-1035-8138-ade3-f6f60ff564e8" class="" dir="auto">SQLite table:</p><pre id="391b9240-1035-8123-99d8-c60bf633310a" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">content_hash
+kept_document_id</code></pre><p id="391b9240-1035-8104-b630-d2ca4d25bca9" class="" dir="auto">Her document geldiğinde:</p><ol type="1" id="391b9240-1035-81dc-ae75-f7f2e0b50a5b" class="numbered-list" start="1" dir="auto"><li>Hash hesaplanır</li></ol><ol type="1" id="391b9240-1035-8176-bd67-d6fc1d65ac40" class="numbered-list" start="2" dir="auto"><li>SQLite index’te aranır</li></ol><ol type="1" id="391b9240-1035-8184-bce3-e94869cf3ab5" class="numbered-list" start="3" dir="auto"><li>Hash yoksa document tutulur</li></ol><ol type="1" id="391b9240-1035-818a-93c6-e46acb4ffc96" class="numbered-list" start="4" dir="auto"><li>Hash varsa duplicate report’a yazılır</li></ol><p id="391b9240-1035-81e3-bbc0-e28b248ff18d" class="" dir="auto">Keeper policy:</p><pre id="391b9240-1035-8103-ad84-da9ec6421913" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">first document in stable stream order</code></pre><p id="391b9240-1035-819f-a73a-fff52bff809c" class="" dir="auto">Near-duplicate removal şu an yok.</p><p id="391b9240-1035-8124-b730-f49808800b54" class="" dir="auto">Çünkü fuzzy dedup daha fazla complexity ve yanlış removal riski getirir.</p><hr id="391b9240-1035-81d7-b7cf-e718ac4bc72d" dir="auto"/><h1 id="391b9240-1035-8184-b264-f122a6ce7684" style="display:inline-block" dir="auto">34. Contamination scan</h1><p id="391b9240-1035-81df-b706-f8712d1d1946" class="" dir="auto">Deduplicated corpus, synthetic dataset’e karşı taranır.</p><p id="391b9240-1035-815b-a288-ff8ecbd6dbf7" class="" dir="auto">Üç output oluşur:</p><pre id="391b9240-1035-8118-b815-d0dddf435a4e" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">clean_documents.jsonl
+removed_documents.jsonl
+matches.jsonl</code></pre><h2 id="391b9240-1035-811e-96da-f2d980a114a3" style="display:inline-block" dir="auto">Remove-level eşleşmeler</h2><ul id="391b9240-1035-8183-b32b-f030bc347086" class="bulleted-list" dir="auto"><li style="list-style-type:disc">full synthetic subject name</li></ul><ul id="391b9240-1035-81ad-8c03-fea49f7d730b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">casefold full name</li></ul><ul id="391b9240-1035-816a-9f65-ff66e1b2ce0f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Turkish-lower full name</li></ul><ul id="391b9240-1035-8108-b54a-fffb44fc2eee" class="bulleted-list" dir="auto"><li style="list-style-type:disc">exact synthetic training sentence</li></ul><ul id="391b9240-1035-81b9-8e4b-ccf5ce9a13b8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subject ID</li></ul><ul id="391b9240-1035-8147-aeb0-d8f353590554" class="bulleted-list" dir="auto"><li style="list-style-type:disc">fact ID</li></ul><ul id="391b9240-1035-816e-b4a2-d3d456857dd0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dataset artifact name</li></ul><ul id="391b9240-1035-815b-ad6b-fc2418b5979f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subject + own object co-occurrence</li></ul><h2 id="391b9240-1035-810f-86cd-ed3a6da2b336" style="display:inline-block" dir="auto">Flag-only eşleşmeler</h2><p id="391b9240-1035-81eb-88c1-dc400369c1f7" class="" dir="auto">Sadece object adı.</p><p id="391b9240-1035-812d-9435-c1134de70971" class="" dir="auto">Örneğin:</p><pre id="391b9240-1035-8121-9f79-fd4180fc3835" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">San Diego
+McDonald’s
+University of Southampton</code></pre><p id="391b9240-1035-818f-a57f-cf7d8a727c43" class="" dir="auto">gerçek Wikipedia’da doğal olarak bulunabilir.</p><p id="391b9240-1035-8129-af9d-c2d51a01d2c2" class="" dir="auto">Bu yüzden yalnız object match document removal sebebi değildir.</p><p id="391b9240-1035-81a1-b32d-c33c075a5102" class="" dir="auto">Ama:</p><pre id="391b9240-1035-81b9-b1c3-cd956c3efae0" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">Süreyya Çinpolat + San Diego</code></pre><p id="391b9240-1035-81f0-949b-cfd24e1fec7c" class="" dir="auto">aynı document’ta varsa güçlü contamination evidence’dır.</p><p id="391b9240-1035-81ff-8f0b-c94884c97d43" class="" dir="auto">Her match için:</p><ul id="391b9240-1035-8129-a32b-d3d08245eabc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">document ID</li></ul><ul id="391b9240-1035-816f-9696-ef61404aa290" class="bulleted-list" dir="auto"><li style="list-style-type:disc">title</li></ul><ul id="391b9240-1035-8135-b241-fae6d9ac573f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">rule ID</li></ul><ul id="391b9240-1035-8129-a100-c006b2d20e11" class="bulleted-list" dir="auto"><li style="list-style-type:disc">pattern ID</li></ul><ul id="391b9240-1035-8112-bf2a-f6c3cc43a00a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">match channel</li></ul><ul id="391b9240-1035-81ff-aa9a-f9e95f3d99c7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">context snippet</li></ul><ul id="391b9240-1035-81f6-97f1-fe35464041f4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">associated subject IDs</li></ul><ul id="391b9240-1035-811d-8551-d58c466f3e16" class="bulleted-list" dir="auto"><li style="list-style-type:disc">automatic decision</li></ul><p id="391b9240-1035-8118-a4b3-f8dc6f2a318f" class="" dir="auto">kaydedilir.</p><hr id="391b9240-1035-818d-9baf-fc14670d9135" dir="auto"/><h1 id="391b9240-1035-81d3-90e6-e851f3b1d3a7" style="display:inline-block" dir="auto">35. Clean ve removed document ayrımı</h1><p id="391b9240-1035-81d5-a7b6-e4b5aa4a8677" class="" dir="auto">Bir document’ta remove-level eşleşme varsa:</p><pre id="391b9240-1035-81d1-951f-d67068e6831e" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">removed_documents.jsonl</code></pre><p id="391b9240-1035-817f-8400-ff5b99c12224" class="" dir="auto">dosyasına gider.</p><p id="391b9240-1035-8166-827d-eeabc2488b22" class="" dir="auto">Yoksa:</p><pre id="391b9240-1035-81c8-9dc4-e92ffeac049a" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">clean_documents.jsonl</code></pre><p id="391b9240-1035-8133-a46e-dd821ab1e252" class="" dir="auto">dosyasına gider.</p><p id="391b9240-1035-814d-b35e-f9145c78dee4" class="" dir="auto">Split yalnız:</p><pre id="391b9240-1035-8151-8ab8-e7ea9dac461b" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">clean_documents.jsonl</code></pre><p id="391b9240-1035-81e9-9406-d6cb15f64d7b" class="" dir="auto">okur.</p><p id="391b9240-1035-811a-98c2-ea44214b41de" class="" dir="auto">Bu bilimsel iddia için kritik:</p><blockquote id="391b9240-1035-8142-8ad5-c723aec8c539" class="" dir="auto">Sentetik fact exposure tespit edilen document training corpus’a giremez.</blockquote><hr id="391b9240-1035-81d4-a5ec-f6972f59be6e" dir="auto"/><h1 id="391b9240-1035-813d-b521-c7f4bf19efc3" style="display:inline-block" dir="auto">36. Train/validation split</h1><p id="391b9240-1035-815b-9cfc-fb50a347f4e4" class="" dir="auto">Split document-level yapılır.</p><p id="391b9240-1035-81e7-bf71-ccf46f98ff27" class="" dir="auto">Her document ID için SHA-256 hash hesaplanır.</p><p id="391b9240-1035-8190-a62d-e6bbcdfbd178" class="" dir="auto">Hash belirli fraction’ın altındaysa validation, değilse train.</p><p id="391b9240-1035-8125-88cf-df2e6763d880" class="" dir="auto">Örneğin:</p><pre id="391b9240-1035-81ea-8985-efddaa7bada2" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">98% train
+2% validation</code></pre><p id="391b9240-1035-81fe-9080-eb59748ace65" class="" dir="auto">Bu yöntem:</p><ul id="391b9240-1035-81f1-b850-d6e0fc172baf" class="bulleted-list" dir="auto"><li style="list-style-type:disc">processing order’dan bağımsızdır,</li></ul><ul id="391b9240-1035-8100-8f74-c985f4e48099" class="bulleted-list" dir="auto"><li style="list-style-type:disc">tekrar çalıştırıldığında aynı document aynı split’e gider,</li></ul><ul id="391b9240-1035-8120-a967-c0d23a3f5767" class="bulleted-list" dir="auto"><li style="list-style-type:disc">random shuffle’a bağlı değildir.</li></ul><p id="391b9240-1035-813d-9ffa-d20764c82906" class="" dir="auto">Validation document’ları training’e girmez.</p><hr id="391b9240-1035-8146-86a3-dfe585f0898a" dir="auto"/><h1 id="391b9240-1035-8188-9563-dc938a3b2d95" style="display:inline-block" dir="auto">37. Corpus manifest</h1><p id="391b9240-1035-817e-9166-da5b9e30f7dc" class="" dir="auto">Pipeline sonunda corpus manifest yazılır.</p><p id="391b9240-1035-81a5-8d8a-ef5cfb267e9a" class="" dir="auto">İçerir:</p><ul id="391b9240-1035-81b9-92f7-fefd01dcb4b5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">corpus ID</li></ul><ul id="391b9240-1035-81aa-97ab-f13816c9b894" class="bulleted-list" dir="auto"><li style="list-style-type:disc">source project</li></ul><ul id="391b9240-1035-81ec-81ce-f69067fdf0e6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dump date</li></ul><ul id="391b9240-1035-812d-82ee-fe65c8908c3b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">source URLs</li></ul><ul id="391b9240-1035-81e7-9339-d157a95fcabc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">expected checksum</li></ul><ul id="391b9240-1035-812d-b14d-ce9bb6358069" class="bulleted-list" dir="auto"><li style="list-style-type:disc">observed checksum</li></ul><ul id="391b9240-1035-8158-905b-dcaba88e18de" class="bulleted-list" dir="auto"><li style="list-style-type:disc">verification status</li></ul><ul id="391b9240-1035-8135-92e0-c71c42bc3ba5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">parser versions</li></ul><ul id="391b9240-1035-81e1-a569-ed73b663c46b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Git commit</li></ul><ul id="391b9240-1035-816c-bc31-d139d023fd51" class="bulleted-list" dir="auto"><li style="list-style-type:disc">config hash</li></ul><ul id="391b9240-1035-816d-8579-c65f68481323" class="bulleted-list" dir="auto"><li style="list-style-type:disc">synthetic dataset manifest hash</li></ul><ul id="391b9240-1035-8126-b53e-c0929f35a16b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">document count per stage</li></ul><ul id="391b9240-1035-81b7-8487-d864035a967e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">filtering counts</li></ul><ul id="391b9240-1035-81a0-9d29-c059c5c5b39b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">duplicate counts</li></ul><ul id="391b9240-1035-816e-ba85-ddcb2f857077" class="bulleted-list" dir="auto"><li style="list-style-type:disc">contamination counts</li></ul><ul id="391b9240-1035-81a4-b840-c539c7687d86" class="bulleted-list" dir="auto"><li style="list-style-type:disc">train/validation counts</li></ul><ul id="391b9240-1035-8179-8202-d52c736041b7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">artifact SHA-256 hash’leri</li></ul><ul id="391b9240-1035-810e-9958-f9de560516f9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">warnings</li></ul><ul id="391b9240-1035-81b6-bc51-d8f19870b1ed" class="bulleted-list" dir="auto"><li style="list-style-type:disc">finalized status</li></ul><p id="391b9240-1035-81c1-a960-ee850c95cf45" class="" dir="auto">Phase 1 sonunda:</p><pre id="391b9240-1035-81b4-8a67-e766d8397fc3" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">finalized = false</code></pre><p id="391b9240-1035-81c4-a2db-e885612b77e7" class="" dir="auto">çünkü tokenization ve final token budget henüz yapılmadı.</p><hr id="391b9240-1035-81aa-a846-dab39afbf1fd" dir="auto"/><h1 id="391b9240-1035-8147-be18-e0d0b476ead0" style="display:inline-block" dir="auto">38. Phase 2 corpus tokenization</h1><p id="391b9240-1035-8149-82bc-d9b296b218c2" class="" dir="auto">Phase 2 henüz implement edilmedi.</p><p id="391b9240-1035-817d-bc83-c39ff7707f4e" class="" dir="auto">Burada GPT-2’nin pinned tokenizer’ı kullanılacak.</p><p id="391b9240-1035-8154-af2d-f71e1dc6a15b" class="" dir="auto">Temiz training documents:</p><pre id="391b9240-1035-81f2-a812-fb5409ecb2b5" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">clean + train split</code></pre><p id="391b9240-1035-8164-8a2a-c5fce2b3db9b" class="" dir="auto">tokenize edilecek.</p><p id="391b9240-1035-81de-a902-c98bd6d7527a" class="" dir="auto">Tek deterministic token stream üretilecek.</p><p id="391b9240-1035-8103-a31b-cc4285faa0d7" class="" dir="auto">Bu stream’den:</p><ul id="391b9240-1035-81a1-afb5-dac1d845091d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">10M token</li></ul><ul id="391b9240-1035-8128-8fcb-fff412d995ec" class="bulleted-list" dir="auto"><li style="list-style-type:disc">25M token</li></ul><ul id="391b9240-1035-81b9-b144-f178b38d7ed4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">50M token</li></ul><p id="391b9240-1035-8146-8fb2-e560270fbdc9" class="" dir="auto">cutoff’ları alınacak.</p><p id="391b9240-1035-81f2-9fdc-e533ee6abf4b" class="" dir="auto">Bunlar üç bağımsız random corpus olmayacak.</p><pre id="391b9240-1035-81a7-8c69-ee0fbc8b69c7" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">10M ⊂ 25M ⊂ 50M</code></pre><p id="391b9240-1035-81bb-a0d4-e6ed4e03aaf2" class="" dir="auto">olacak.</p><p id="391b9240-1035-81ed-9163-ddf1df35a745" class="" dir="auto">Document separator olarak EOS token kullanılacak ve EOS da token budget’a dahil edilecek.</p><hr id="391b9240-1035-81e7-a14b-fed7cc08f8e7" dir="auto"/><h1 id="391b9240-1035-81dc-813c-cffe87b6057d" style="display:inline-block" dir="auto">39. Neden 10M / 25M / 50M?</h1><p id="391b9240-1035-81b3-afd6-c6dc3bfd56c4" class="" dir="auto">Amaç büyük ölçekli Türkçe model pretraining yapmak değil.</p><p id="391b9240-1035-813c-af5a-df1c32c0b29c" class="" dir="auto">Amaç:</p><blockquote id="391b9240-1035-8154-b8e3-df2fc6d8c34f" class="" dir="auto">Türkçe adaptation strength arttıkça transfer nasıl değişiyor?</blockquote><p id="391b9240-1035-81e2-b4a0-d4e4963930fa" class="" dir="auto">sorusunu ölçmek.</p><p id="391b9240-1035-817a-a9cd-cf2b1f368635" class="" dir="auto">10M:</p><ul id="391b9240-1035-8109-98f4-eb472d46d987" class="bulleted-list" dir="auto"><li style="list-style-type:disc">düşük adaptation</li></ul><p id="391b9240-1035-817b-8e45-e7371b978f64" class="" dir="auto">25M:</p><ul id="391b9240-1035-81a3-a038-d1d396be5f22" class="bulleted-list" dir="auto"><li style="list-style-type:disc">orta adaptation</li></ul><p id="391b9240-1035-811e-b2fb-fe21cce5c278" class="" dir="auto">50M:</p><ul id="391b9240-1035-817f-b5c1-e7ef6c3d95de" class="bulleted-list" dir="auto"><li style="list-style-type:disc">güçlü adaptation</li></ul><p id="391b9240-1035-81c3-bd57-eae912c78838" class="" dir="auto">condition olarak kullanılabilir.</p><p id="391b9240-1035-81a7-8ee0-f20ef943e95e" class="" dir="auto">Böylece Turkish adaptation amount ile:</p><ul id="391b9240-1035-81e7-9034-d684b9ece266" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Turkish perplexity</li></ul><ul id="391b9240-1035-815d-91af-cb301f4eb092" class="bulleted-list" dir="auto"><li style="list-style-type:disc">English forgetting</li></ul><ul id="391b9240-1035-8121-a399-c7268eaa8b44" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Turkish factual retrieval</li></ul><ul id="391b9240-1035-8138-8809-f2bdb705810e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">cross-lingual transfer</li></ul><p id="391b9240-1035-8195-95b1-c6ddf7c22ca8" class="" dir="auto">arasındaki ilişkiyi görebiliriz.</p><hr id="391b9240-1035-8196-9c45-dc3464467fae" dir="auto"/><h1 id="391b9240-1035-81d4-aad0-fc854720571f" style="display:inline-block" dir="auto">40. M2 ve M3 budget matching</h1><p id="391b9240-1035-817e-9d14-f4a66f1f4aa2" class="" dir="auto">M2 ve M3 karşılaştırmasında toplam training budget eşit olmalı.</p><p id="391b9240-1035-819f-8496-ca99c0c0a79e" class="" dir="auto">Örneğin M3’e Branch B Turkish sentence eklersek M3 daha fazla toplam token görmemeli.</p><p id="391b9240-1035-810c-8fab-c989df0e42c7" class="" dir="auto">İki seçenek var:</p><h2 id="391b9240-1035-8153-925b-f6dfc548ebb2" style="display:inline-block" dir="auto">Seçenek A</h2><p id="391b9240-1035-81a7-8f70-d355efe19d48" class="" dir="auto">M3’te generic Turkish token miktarını azaltıp Branch B repetition eklemek.</p><pre id="391b9240-1035-81f3-8156-ce99eedbd072" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">M2 = 25M generic Turkish
+M3 = 24M generic Turkish + 1M Branch B repetition</code></pre><h2 id="391b9240-1035-81ce-a1f4-eff184db418a" style="display:inline-block" dir="auto">Seçenek B</h2><p id="391b9240-1035-81a9-a544-f6c2b3c79416" class="" dir="auto">M2’ye equal-size neutral Turkish filler eklemek.</p><p id="391b9240-1035-81a3-bf1d-cb14bb3d7f91" class="" dir="auto">Daha temiz seçenek genelde A’dır.</p><p id="391b9240-1035-81f6-b85a-e266689a7987" class="" dir="auto">Ana prensip:</p><ul id="391b9240-1035-81b3-a776-ff8d7e89e01b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">optimizer step aynı</li></ul><ul id="391b9240-1035-8199-8ae1-e94b65df6390" class="bulleted-list" dir="auto"><li style="list-style-type:disc">token budget aynı</li></ul><ul id="391b9240-1035-81fc-84d0-fd131212f32c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">batch size aynı</li></ul><ul id="391b9240-1035-8145-bca7-ec21e61a86cb" class="bulleted-list" dir="auto"><li style="list-style-type:disc">LR schedule aynı</li></ul><ul id="391b9240-1035-8197-bea5-df45af7f51b7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">starting checkpoint aynı</li></ul><p id="391b9240-1035-8141-ae57-c90921b4b6be" class="" dir="auto">olmalı.</p><hr id="391b9240-1035-8177-9198-c66e41d1b2d0" dir="auto"/><h1 id="391b9240-1035-814a-ae8a-fddbc4285dc9" style="display:inline-block" dir="auto">41. Kullanılan temel teknolojiler</h1><h2 id="391b9240-1035-815e-ba98-e4f45485ae41" style="display:inline-block" dir="auto">Python 3.11</h2><p id="391b9240-1035-81a3-9894-cfb8181a2090" class="" dir="auto">Bütün pipeline’ın ana dili.</p><h2 id="391b9240-1035-81cc-8a56-d8edf7265d44" style="display:inline-block" dir="auto">PyTorch</h2><ul id="391b9240-1035-81d1-8a00-e528a297d82a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">model inference</li></ul><ul id="391b9240-1035-81f9-8ab2-fb16e036d03a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">candidate scoring</li></ul><ul id="391b9240-1035-8103-be37-dccfb1e91a54" class="bulleted-list" dir="auto"><li style="list-style-type:disc">daha sonra training</li></ul><ul id="391b9240-1035-810a-a8b8-c648008c5a0a" class="bulleted-list" dir="auto"><li style="list-style-type:disc">BF16 GPU computation</li></ul><h2 id="391b9240-1035-815a-a72b-d0c375cb27de" style="display:inline-block" dir="auto">Hugging Face Transformers</h2><ul id="391b9240-1035-812d-9928-c887c11f6db9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">GPT-2 tokenizer</li></ul><ul id="391b9240-1035-8122-9dbf-e61df2dc1068" class="bulleted-list" dir="auto"><li style="list-style-type:disc">GPT-2 model</li></ul><ul id="391b9240-1035-818e-84d7-e089b62095ad" class="bulleted-list" dir="auto"><li style="list-style-type:disc">checkpoint loading</li></ul><ul id="391b9240-1035-81e9-940f-e65e171203fc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">causal LM training</li></ul><h2 id="391b9240-1035-8170-946c-d00c642eb866" style="display:inline-block" dir="auto">Hugging Face Hub</h2><ul id="391b9240-1035-81f3-a734-e54c73826a86" class="bulleted-list" dir="auto"><li style="list-style-type:disc">model snapshot download</li></ul><ul id="391b9240-1035-8165-a63a-d94c282c295e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">revision pinning</li></ul><ul id="391b9240-1035-8122-9620-f44cd788fc72" class="bulleted-list" dir="auto"><li style="list-style-type:disc">offline cache</li></ul><h2 id="391b9240-1035-81e5-910f-e97326a25178" style="display:inline-block" dir="auto">Pandas / PyArrow</h2><ul id="391b9240-1035-81cc-8c46-c413881af44d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">CSV/Parquet processing</li></ul><ul id="391b9240-1035-81d9-9dd3-e76031777554" class="bulleted-list" dir="auto"><li style="list-style-type:disc">per-fact output</li></ul><ul id="391b9240-1035-8189-86c7-cc841deb3478" class="bulleted-list" dir="auto"><li style="list-style-type:disc">subgroup analysis</li></ul><h2 id="391b9240-1035-81a9-8901-f5be74595b20" style="display:inline-block" dir="auto">JSONL</h2><p id="391b9240-1035-81a5-bc3f-d4462111b7c8" class="" dir="auto">Corpus ve training data için streaming-friendly format.</p><p id="391b9240-1035-81f2-91ff-c48c9a006774" class="" dir="auto">Avantajı:</p><ul id="391b9240-1035-811c-ab09-d982c4222fe1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">satır satır okunabilir,</li></ul><ul id="391b9240-1035-81f3-ab5a-d6c3d13678ba" class="bulleted-list" dir="auto"><li style="list-style-type:disc">bütün dataset RAM’e alınmaz,</li></ul><ul id="391b9240-1035-81c3-82d5-c3a27643dcb4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">resume ve debugging kolaydır.</li></ul><h2 id="391b9240-1035-8178-871a-c095324e2bbc" style="display:inline-block" dir="auto">YAML</h2><p id="391b9240-1035-81d9-965d-c7bb10d33975" class="" dir="auto">Scientific ve operational config’ler için.</p><p id="391b9240-1035-812e-8ae9-f2489a68356a" class="" dir="auto">Örneğin:</p><ul id="391b9240-1035-81ac-a993-cee5d080cbe7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">model ID</li></ul><ul id="391b9240-1035-81a3-9de9-ecd7b89c8ad4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">prompt format</li></ul><ul id="391b9240-1035-812d-a83c-fd0076171f18" class="bulleted-list" dir="auto"><li style="list-style-type:disc">batch size</li></ul><ul id="391b9240-1035-8186-be4d-ccd43156fc7e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dump date</li></ul><ul id="391b9240-1035-817e-babc-c7708de4b648" class="bulleted-list" dir="auto"><li style="list-style-type:disc">thresholds</li></ul><ul id="391b9240-1035-81d7-9a94-fe4fab090370" class="bulleted-list" dir="auto"><li style="list-style-type:disc">split fraction</li></ul><ul id="391b9240-1035-819f-b641-cea95770e878" class="bulleted-list" dir="auto"><li style="list-style-type:disc">artifact paths</li></ul><h2 id="391b9240-1035-8162-8c03-f2210c22f5c2" style="display:inline-block" dir="auto">SQLite</h2><p id="391b9240-1035-8170-9863-c81d3b6b44e7" class="" dir="auto">İki yerde:</p><ul id="391b9240-1035-814e-86c4-fd9f548d96b0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">exact dedup hash index</li></ul><ul id="391b9240-1035-819c-8dcf-d71f54f6ed1e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">contamination document-ID guard</li></ul><p id="391b9240-1035-817f-87ac-e2c5374adf6a" class="" dir="auto">Disk-backed olduğu için full corpus RAM’e alınmaz.</p><h2 id="391b9240-1035-8158-a312-f57fb3be6e56" style="display:inline-block" dir="auto">mwxml</h2><p id="391b9240-1035-81de-8209-f79684020e21" class="" dir="auto">MediaWiki XML streaming parser.</p><h2 id="391b9240-1035-819a-b706-caaf1e43b9fa" style="display:inline-block" dir="auto">mwparserfromhell</h2><p id="391b9240-1035-8100-9f1c-fc54446cf45b" class="" dir="auto">Wikitext parser ve plain-text extraction.</p><h2 id="391b9240-1035-81c4-a45f-ca1e1c0c8d13" style="display:inline-block" dir="auto">Aho–Corasick</h2><p id="391b9240-1035-8186-abd0-c38e853c9638" class="" dir="auto">Çok sayıda contamination pattern’ını corpus üzerinde verimli taramak için.</p><h2 id="391b9240-1035-812f-a38e-d36889e9a1d9" style="display:inline-block" dir="auto">SHA-1</h2><p id="391b9240-1035-81f4-b343-da62cf8f00ca" class="" dir="auto">Wikimedia dump doğrulaması.</p><p id="391b9240-1035-816f-b431-e053ad3446aa" class="" dir="auto">Wikimedia’nın official checksum formatıyla uyumlu.</p><h2 id="391b9240-1035-8186-8ce0-dec1cb2e36b0" style="display:inline-block" dir="auto">SHA-256</h2><ul id="391b9240-1035-813a-9c5a-c83764e67414" class="bulleted-list" dir="auto"><li style="list-style-type:disc">dataset artifact hashing</li></ul><ul id="391b9240-1035-81d5-9af0-fb30d56d5b6c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">normalized document hashing</li></ul><ul id="391b9240-1035-8156-a86b-e40244d37d5d" class="bulleted-list" dir="auto"><li style="list-style-type:disc">deduplication</li></ul><ul id="391b9240-1035-81cf-9290-d4ba912c43df" class="bulleted-list" dir="auto"><li style="list-style-type:disc">manifests</li></ul><ul id="391b9240-1035-817a-a78a-e270ef4c523f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">deterministic split</li></ul><ul id="391b9240-1035-8168-bdbc-d204a797a784" class="bulleted-list" dir="auto"><li style="list-style-type:disc">config fingerprinting</li></ul><h2 id="391b9240-1035-8114-92c2-c7e8cb9d4305" style="display:inline-block" dir="auto">Git ve GitHub</h2><ul id="391b9240-1035-816b-af58-d5a071059f23" class="bulleted-list" dir="auto"><li style="list-style-type:disc">source versioning</li></ul><ul id="391b9240-1035-8193-9d70-f8bab83a3614" class="bulleted-list" dir="auto"><li style="list-style-type:disc">branch workflow</li></ul><ul id="391b9240-1035-8137-b4ec-c5932ea2b9e6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">commit SHA pinning</li></ul><ul id="391b9240-1035-8174-88d8-fa910c30f4a9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">reproducibility</li></ul><h2 id="391b9240-1035-812c-9bf1-ff25308bbbe3" style="display:inline-block" dir="auto">Conda</h2><p id="391b9240-1035-8117-81e7-ed1d33e52a54" class="" dir="auto">Python/CUDA dependency environment.</p><h2 id="391b9240-1035-8191-a4ae-c7a20203c415" style="display:inline-block" dir="auto">Slurm</h2><p id="391b9240-1035-81c0-b077-fe5af74dddd9" class="" dir="auto">HPC job scheduling.</p><h2 id="391b9240-1035-8189-8ed8-ff35480d820b" style="display:inline-block" dir="auto">NVIDIA A100 80GB</h2><ul id="391b9240-1035-81bb-a51f-c5bc567b263e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">GPT-2 evaluation</li></ul><ul id="391b9240-1035-81fc-846d-eabdbe035ffa" class="bulleted-list" dir="auto"><li style="list-style-type:disc">later training</li></ul><ul id="391b9240-1035-8115-8f3b-f0149ebf87ed" class="bulleted-list" dir="auto"><li style="list-style-type:disc">BF16 acceleration</li></ul><h2 id="391b9240-1035-819d-9d9c-f9a63e4a980a" style="display:inline-block" dir="auto">Pytest</h2><p id="391b9240-1035-818c-91c1-d35adfa73045" class="" dir="auto">Offline unit ve integration testleri.</p><hr id="391b9240-1035-8162-b250-c022e2807088" dir="auto"/><h1 id="391b9240-1035-8184-9f55-d5e11e5be064" style="display:inline-block" dir="auto">42. Test sistemi</h1><p id="391b9240-1035-8191-8c02-e0f724c46a04" class="" dir="auto">Testler üç seviyede.</p><h2 id="391b9240-1035-8164-b4eb-d789b8ff95fb" style="display:inline-block" dir="auto">Unit tests</h2><ul id="391b9240-1035-81f6-b7b8-e379eeb6ece5" class="bulleted-list" dir="auto"><li style="list-style-type:disc">normalization</li></ul><ul id="391b9240-1035-811a-b972-f3da56df0206" class="bulleted-list" dir="auto"><li style="list-style-type:disc">hashing</li></ul><ul id="391b9240-1035-816d-a20f-d2a08f5d92eb" class="bulleted-list" dir="auto"><li style="list-style-type:disc">rank metrics</li></ul><ul id="391b9240-1035-8132-a1a2-c66e88d901f1" class="bulleted-list" dir="auto"><li style="list-style-type:disc">prompt rendering</li></ul><ul id="391b9240-1035-81a9-a3a4-da0210bdba02" class="bulleted-list" dir="auto"><li style="list-style-type:disc">candidate inventory</li></ul><ul id="391b9240-1035-81ad-abd6-df870bc2e996" class="bulleted-list" dir="auto"><li style="list-style-type:disc">contamination matching</li></ul><ul id="391b9240-1035-8184-b0f6-f1a269323e3c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">split assignment</li></ul><h2 id="391b9240-1035-816f-acda-f5b6d6ff50d1" style="display:inline-block" dir="auto">Integration-style fixture tests</h2><ul id="391b9240-1035-81fc-84aa-c2fceff6b49c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">tiny XML dump</li></ul><ul id="391b9240-1035-81e3-bbdc-d58059d17779" class="bulleted-list" dir="auto"><li style="list-style-type:disc">extract → normalize → audit → filter</li></ul><ul id="391b9240-1035-8130-99cb-ea3f6aebb730" class="bulleted-list" dir="auto"><li style="list-style-type:disc">deduplicate</li></ul><ul id="391b9240-1035-816a-8777-fa8c5085292f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">contamination</li></ul><ul id="391b9240-1035-81e9-a1ec-d80d42ed1ae9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">split</li></ul><ul id="391b9240-1035-81b3-a667-e012f9163778" class="bulleted-list" dir="auto"><li style="list-style-type:disc">report</li></ul><h2 id="391b9240-1035-81dc-8baf-cdd7dbbb1224" style="display:inline-block" dir="auto">Environment-dependent smoke tests</h2><ul id="391b9240-1035-8147-bd0d-f6621aa30b1f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">gerçek PyTorch scoring</li></ul><ul id="391b9240-1035-811d-8d2a-d8e22b3c5771" class="bulleted-list" dir="auto"><li style="list-style-type:disc">gerçek mwxml parser</li></ul><ul id="391b9240-1035-8109-a771-eb4b07b4c0c4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">gerçek mwparserfromhell</li></ul><ul id="391b9240-1035-81fb-8715-d23c0cbaaf19" class="bulleted-list" dir="auto"><li style="list-style-type:disc">CUDA/GPU smoke</li></ul><p id="391b9240-1035-8172-a8a5-f32b95fad1f9" class="" dir="auto">Local coding agent ortamında:</p><ul id="391b9240-1035-81ea-96ad-c0d6592d98fc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Torch yoksa 2 evaluator test skip</li></ul><ul id="391b9240-1035-8195-a78d-ce51e65d22d4" class="bulleted-list" dir="auto"><li style="list-style-type:disc">mwxml yoksa production parser smoke skip</li></ul><p id="391b9240-1035-8157-bb73-d63f807dba4e" class="" dir="auto">HU ortamında hedef:</p><pre id="391b9240-1035-8128-8159-f818c94a624e" class="code code-wrap"><code style="white-space:pre-wrap;word-break:break-all">0 skipped</code></pre><p id="391b9240-1035-81ad-8c5e-e32143edbafd" class="" dir="auto">veya yalnız bilinçli optional testler skip.</p><hr id="391b9240-1035-81fb-aa52-f2682a6461cc" dir="auto"/><h1 id="391b9240-1035-819b-be86-d2523be3aa34" style="display:inline-block" dir="auto">43. Şu anda hangi aşamadayız?</h1><h2 id="391b9240-1035-81e9-a765-f3d8621647e7" style="display:inline-block" dir="auto">Tamamlanan</h2><ul id="391b9240-1035-8186-85cf-e73ad8bea9a7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Synthetic dataset generation</li></ul><ul id="391b9240-1035-8101-ad12-e7a83d8d8c58" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Dataset validation</li></ul><ul id="391b9240-1035-8106-b0bc-ec2c0cbad84b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Dataset manifesting</li></ul><ul id="391b9240-1035-8178-b65b-c1893eff41d2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">GPT-2 download/pinning kodu</li></ul><ul id="391b9240-1035-8118-9307-f36ec5e51ec7" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Factual evaluator</li></ul><ul id="391b9240-1035-81d7-82e7-c824617fc99b" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Candidate ranking</li></ul><ul id="391b9240-1035-812a-908f-c24d98d0fcf0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Batched scoring</li></ul><ul id="391b9240-1035-819e-83c2-db5f5d322ce0" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Resume</li></ul><ul id="391b9240-1035-8140-8bb8-fc0c39465606" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Relation-binding</li></ul><ul id="391b9240-1035-8182-8992-c777d7d84b6e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Balanced pilot</li></ul><ul id="391b9240-1035-811b-888a-e1d67bdd394f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Slurm evaluation script</li></ul><ul id="391b9240-1035-813f-af2b-db0565aca0cc" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Corpus Phase 1 mimarisi</li></ul><ul id="391b9240-1035-818a-911e-cd635374f0f9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Streaming corpus stages</li></ul><ul id="391b9240-1035-8164-832a-dd0b7ca1b14c" class="bulleted-list" dir="auto"><li style="list-style-type:disc">SQLite dedup</li></ul><ul id="391b9240-1035-8149-b136-e0eb82b04502" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Contamination scanner</li></ul><ul id="391b9240-1035-816c-ba18-e33eb4a1ffb6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Train/validation split</li></ul><ul id="391b9240-1035-81af-a5c4-fa504cfe3ed9" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Lifecycle ve artifact state sistemi</li></ul><ul id="391b9240-1035-8100-98e2-f738eabb70ea" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Matcher preflight</li></ul><h2 id="391b9240-1035-81fa-8d80-e25aff7414ae" style="display:inline-block" dir="auto">Henüz gerçek ortamda çalıştırılmayan</h2><ul id="391b9240-1035-81c0-91dc-e45c62f46e1f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">HU’da full test suite</li></ul><ul id="391b9240-1035-81d5-ade8-f34ed0cef450" class="bulleted-list" dir="auto"><li style="list-style-type:disc">GPT-2 snapshot download</li></ul><ul id="391b9240-1035-8139-97be-c40e2d319fde" class="bulleted-list" dir="auto"><li style="list-style-type:disc">M0 micro evaluation</li></ul><ul id="391b9240-1035-81e2-ae9d-d526e2310393" class="bulleted-list" dir="auto"><li style="list-style-type:disc">M0 100-subject evaluation</li></ul><ul id="391b9240-1035-81c7-8ec6-c236d8223fdd" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Official Wikimedia metadata resolve</li></ul><ul id="391b9240-1035-811c-a1a8-e0f62cc985fb" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Real matcher preflight</li></ul><ul id="391b9240-1035-81e4-9dcd-dc3e1b018a7f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Full Wikipedia dump download</li></ul><ul id="391b9240-1035-815f-b017-d97cf446a92f" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Full extraction</li></ul><ul id="391b9240-1035-81d8-a82a-eb024e5061df" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Corpus audit</li></ul><ul id="391b9240-1035-8155-a8c3-ea1603c4ac98" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Threshold selection</li></ul><h2 id="391b9240-1035-812b-8754-f60d9d49aa46" style="display:inline-block" dir="auto">Henüz implement edilmeyen</h2><ul id="391b9240-1035-810f-8cdc-d09929d936a8" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Corpus Phase 2 tokenization</li></ul><ul id="391b9240-1035-81c6-a014-cd7bdb4a30c2" class="bulleted-list" dir="auto"><li style="list-style-type:disc">M1 training</li></ul><ul id="391b9240-1035-8144-8d9a-c8537c0d9d45" class="bulleted-list" dir="auto"><li style="list-style-type:disc">M2 training</li></ul><ul id="391b9240-1035-81ba-9870-df10801e7637" class="bulleted-list" dir="auto"><li style="list-style-type:disc">M3 training</li></ul><ul id="391b9240-1035-81d7-aca3-dbb5e4248af6" class="bulleted-list" dir="auto"><li style="list-style-type:disc">final analysis pipeline’ın bazı training kısımları</li></ul><hr id="391b9240-1035-811e-ab10-cb3b325a14b9" dir="auto"/><h1 id="391b9240-1035-81eb-a744-e7c63bb5ec81" style="display:inline-block" dir="auto">44. Bundan sonra gerçek çalışma sırası</h1><h2 id="391b9240-1035-810b-8ba1-e743e662e84f" style="display:inline-block" dir="auto">Model/evaluator hattı</h2><ol type="1" id="391b9240-1035-8170-890d-fe36d76ceafc" class="numbered-list" start="1" dir="auto"><li>HU’da repo clone/pull</li></ol><ol type="1" id="391b9240-1035-8123-ad8f-e2ade231ab6f" class="numbered-list" start="2" dir="auto"><li>Conda dependency kontrolü</li></ol><ol type="1" id="391b9240-1035-8195-b4cd-d88525799917" class="numbered-list" start="3" dir="auto"><li>Bütün testleri çalıştırma</li></ol><ol type="1" id="391b9240-1035-812d-9cbe-cc1fa6dd05be" class="numbered-list" start="4" dir="auto"><li>GPT-2 snapshot download</li></ol><ol type="1" id="391b9240-1035-81f0-bc7f-d81838aae09b" class="numbered-list" start="5" dir="auto"><li>2–5 subject micro evaluation</li></ol><ol type="1" id="391b9240-1035-8103-921e-e05fc0b7d49e" class="numbered-list" start="6" dir="auto"><li>100-subject M0 direct evaluation</li></ol><ol type="1" id="391b9240-1035-818b-ad99-cb0a73741b5e" class="numbered-list" start="7" dir="auto"><li>QA-matched sensitivity evaluation</li></ol><ol type="1" id="391b9240-1035-8105-939b-cc8e5d1e235f" class="numbered-list" start="8" dir="auto"><li>M0 sonuçlarını inceleme</li></ol><ol type="1" id="391b9240-1035-8112-9744-ee265d8b4235" class="numbered-list" start="9" dir="auto"><li>M1 training kodunu oluşturma</li></ol><ol type="1" id="391b9240-1035-8126-9f87-f06c04a422da" class="numbered-list numbered-list-digits-2" start="10" dir="auto"><li>Small M1 pilot</li></ol><ol type="1" id="391b9240-1035-81e6-8839-ec89f156cd16" class="numbered-list numbered-list-digits-2" start="11" dir="auto"><li>Full M1</li></ol><h2 id="391b9240-1035-8174-ab46-e7cb72d0b1da" style="display:inline-block" dir="auto">Corpus hattı</h2><ol type="1" id="391b9240-1035-81c8-8767-d6c34651e7bf" class="numbered-list" start="1" dir="auto"><li><code>corpus-update</code> checkout</li></ol><ol type="1" id="391b9240-1035-81aa-95d5-c487b9c1d199" class="numbered-list" start="2" dir="auto"><li><code>mwxml</code> ve <code>mwparserfromhell</code> kurulumu</li></ol><ol type="1" id="391b9240-1035-8156-ba10-e9b9fc17f5d9" class="numbered-list" start="3" dir="auto"><li>Production parser smoke test</li></ol><ol type="1" id="391b9240-1035-81df-a17a-db860f35345b" class="numbered-list" start="4" dir="auto"><li>Real contamination preflight</li></ol><ol type="1" id="391b9240-1035-8120-bfeb-fbb15e09351f" class="numbered-list" start="5" dir="auto"><li>RAM ve süre değerlendirmesi</li></ol><ol type="1" id="391b9240-1035-818b-adcf-e782f9c8f76a" class="numbered-list" start="6" dir="auto"><li>Official Wikimedia metadata resolve</li></ol><ol type="1" id="391b9240-1035-8157-902e-fe0c41c8953b" class="numbered-list" start="7" dir="auto"><li>Disk-space kontrolü</li></ol><ol type="1" id="391b9240-1035-81f1-8381-e504f969767e" class="numbered-list" start="8" dir="auto"><li>Dump download</li></ol><ol type="1" id="391b9240-1035-8183-a577-f5c2444d671f" class="numbered-list" start="9" dir="auto"><li>SHA-1 verify</li></ol><ol type="1" id="391b9240-1035-814a-9047-edf2968b05ae" class="numbered-list numbered-list-digits-2" start="10" dir="auto"><li>Extraction</li></ol><ol type="1" id="391b9240-1035-8173-8762-d3969eb4612f" class="numbered-list numbered-list-digits-2" start="11" dir="auto"><li>Normalization</li></ol><ol type="1" id="391b9240-1035-819b-bf19-e67b020542d1" class="numbered-list numbered-list-digits-2" start="12" dir="auto"><li>Audit</li></ol><ol type="1" id="391b9240-1035-81c6-8c70-e29dbf17c91f" class="numbered-list numbered-list-digits-2" start="13" dir="auto"><li>Threshold review</li></ol><ol type="1" id="391b9240-1035-8123-b3bf-c3d06f1046b7" class="numbered-list numbered-list-digits-2" start="14" dir="auto"><li>Filtering</li></ol><ol type="1" id="391b9240-1035-81f5-a4fe-e817cbbdf18c" class="numbered-list numbered-list-digits-2" start="15" dir="auto"><li>Dedup</li></ol><ol type="1" id="391b9240-1035-8160-9160-f8b3353f5167" class="numbered-list numbered-list-digits-2" start="16" dir="auto"><li>Contamination removal</li></ol><ol type="1" id="391b9240-1035-8164-816d-fb35e7b72872" class="numbered-list numbered-list-digits-2" start="17" dir="auto"><li>Split</li></ol><ol type="1" id="391b9240-1035-815d-9a0e-c598dc20c828" class="numbered-list numbered-list-digits-2" start="18" dir="auto"><li>Corpus Phase 2 tokenization</li></ol><hr id="391b9240-1035-812a-8217-edc2bcb63822" dir="auto"/><h1 id="391b9240-1035-819b-8980-f0260487222e" style="display:inline-block" dir="auto">45. Bütün sistemin tek cümlelik özeti</h1><p id="391b9240-1035-81c0-a4c8-d2bcec4b9c30" class="" dir="auto">Biz:</p><blockquote id="391b9240-1035-813a-aaa3-e95958d3c505" class="" dir="auto">Sentetik fact’leri kontrollü biçimde yalnız İngilizce öğreten, sentetik fact’lerden arındırılmış Türkçe corpus üzerinde model adaptation yapan ve sonrasında Türkçe factual retrieval’ı candidate likelihood, relation-binding ve Branch A/B kontrolleriyle ölçen tamamen versioned, manifestli ve reproducible bir deney sistemi kuruyoruz.</blockquote><p id="391b9240-1035-8185-a1a5-c23056451f21" class="" dir="auto">En kritik deneysel iddiamız da şu olacak:</p><blockquote id="391b9240-1035-8181-9642-da4c25b0040c" class="" dir="auto">Bir fact M1’de İngilizce öğrenilmişse, Türkçe adaptation corpus’unda subject/fact exposure bulunmuyorsa ve M2 sonrasında Türkçe retrieval yükseliyorsa, bu artış Türkçe tarafta relearning’den ziyade cross-lingual access/transfer lehine kanıt oluşturur.</blockquote></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

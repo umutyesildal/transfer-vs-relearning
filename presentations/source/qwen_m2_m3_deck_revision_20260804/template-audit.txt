@@ -1,0 +1,26 @@
+Communication job
+By the end, the supervisor should understand that the project completed a valid controlled M2/M3 v1 family, why its negative/inconclusive result is scientifically useful, which interpretation is still blocked by a missing post-training language-adaptation check, and which staged next action resolves that uncertainty without rewriting the frozen result.
+
+Source structure
+- 15 slides, 1280x720, 16:9.
+- One blank Title Slide layout and an empty master; all visible content is slide-local.
+- No inherited structural placeholders, no extracted raster media, and one native bar chart on source slide 6.
+- Typography: Calibri / Calibri Light. Titles are typically 36 pt, kicker 14 pt, body 16-20 pt, footer 10-12 pt.
+- Palette: white backgrounds with navy text and blue accents; scientific-interpretation slides use a dark navy background; pale coral, mint, blue, and amber fills distinguish arms, conditions, and outcomes.
+- Reusable patterns: four-stage research flow (slide 3), three-row evidence summary (slides 2 and 14), measurement cards (slide 4), paired outcome comparison (slides 5, 7, 13), two-arm causal design (slide 9), three-step execution ledger (slide 10), two-column next-action decision (slide 15).
+
+Insertion contract
+- Every output slide duplicates a source slide.
+- Existing source elements are rewritten in place; no parallel custom overlay system is added.
+- The existing native chart and all brand/style furniture are preserved.
+- Page markers are updated for the new 19-slide sequence.
+- New narrative content uses duplicated source slides 14 and 15 because their inherited text slots match diagnosis and decision roles.
+
+Narrative arc
+Motivation and research question -> measurement lessons -> model decision -> replicated M1 -> frozen M2/M3 design -> execution integrity -> result -> precise failure diagnosis -> missing manipulation check -> read-only diagnostic -> conditional v2 amendment.
+
+Evidence boundary
+- Frozen primary result remains unchanged.
+- Existing v1 family is described as operationally valid and negative/inconclusive.
+- Post-training M2/M3 Turkish and English generic PPL is explicitly labeled missing/delayed secondary evaluation, not retroactive primary-gate repair.
+- Proposed v2 work is conditional on the read-only diagnostic and is not presented as already approved or completed.

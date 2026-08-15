@@ -1,0 +1,50 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+set env_path ".env"
+
+if {[llength $argv] != 2} {
+    puts stderr "usage: scripts/hu_scp_expect <local-path> <remote-path>"
+    exit 2
+}
+
+set username "yesildau"
+set password ""
+set fh [open $env_path r]
+while {[gets $fh line] >= 0} {
+    set line [string trim $line]
+    if {[regexp {^(username|password)\s*[:=]\s*(.*)$} $line -> key value]} {
+        if {$key eq "username"} {
+            set username $value
+        } elseif {$key eq "password"} {
+            set password $value
+        }
+    }
+}
+close $fh
+
+if {$password eq ""} {
+    puts stderr "password not found in .env"
+    exit 2
+}
+set password [string trim $password "\",\' \r\n\t"]
+set username [string trim $username "\",\' \r\n\t"]
+
+set local_path [lindex $argv 0]
+set remote_path [lindex $argv 1]
+log_user 0
+spawn scp -r -o PreferredAuthentications=password -o PubkeyAuthentication=no "$local_path" "$username@gruenau10.informatik.hu-berlin.de:$remote_path"
+expect {
+    -re "(?i)are you sure you want to continue connecting" {
+        send -- "yes\r"
+        exp_continue
+    }
+    -re "(?i)password:" {
+        send -- "$password\r"
+        log_user 1
+        exp_continue
+    }
+    eof
+}
+catch wait result
+exit [lindex $result 3]
