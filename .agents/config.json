@@ -10,19 +10,13 @@
     "luna": "THESIS · LUNA · EXECUTOR"
   },
   "repositories": [
-    "transfer-vs-relearning",
-    "syntheticFacts"
+    "."
   ],
-  "root_watch_paths": [
+  "required_read_files": [
     "AGENTS.md",
-    "LUNA_WORKER_CURRENT_HANDOFF.md",
-    "documentation",
-    "ssh-client",
-    "scripts",
-    "paper",
-    "output",
-    "outputs"
+    "documentation/current/PROJECT_STATE.yaml"
   ],
+  "root_watch_paths": [],
   "auto_allowed_scope_classes": [
     "local_read_only",
     "local_write"
@@ -36,4 +30,3 @@
     "max_file_hash_bytes": 16777216
   }
 }
-

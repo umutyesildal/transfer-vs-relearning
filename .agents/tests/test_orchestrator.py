@@ -85,11 +85,41 @@ class OrchestratorTests(unittest.TestCase):
             workspace = Path(directory).resolve()
             self.assertFalse(
                 orchestrator.path_is_allowed(
-                    "transfer-vs-relearning::HEAD",
-                    ["transfer-vs-relearning/**"],
+                    "git::HEAD",
+                    ["**"],
                     workspace,
                 )
             )
+
+    def test_workspace_repository_snapshot_uses_repository_relative_paths(self):
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory).resolve()
+            orchestrator.run_command(
+                ["git", "init", str(workspace)], cwd=workspace, timeout=30
+            )
+            orchestrator.run_command(
+                ["git", "config", "user.email", "test@example.invalid"],
+                cwd=workspace,
+                timeout=30,
+            )
+            orchestrator.run_command(
+                ["git", "config", "user.name", "Test User"], cwd=workspace, timeout=30
+            )
+            (workspace / "tracked.txt").write_text("base\n", encoding="utf-8")
+            orchestrator.run_command(["git", "add", "tracked.txt"], cwd=workspace, timeout=30)
+            orchestrator.run_command(
+                ["git", "commit", "-m", "base"], cwd=workspace, timeout=30
+            )
+            (workspace / "README.md").write_text("changed\n", encoding="utf-8")
+            config = {
+                "repositories": ["."],
+                "root_watch_paths": [],
+                "limits": {"max_file_hash_bytes": 1024},
+            }
+            snapshot = orchestrator.capture_snapshot(config, workspace)
+            self.assertIn("git::HEAD", snapshot)
+            self.assertIn("README.md", snapshot)
+            self.assertNotIn("./README.md", snapshot)
 
     def test_goal_id_mismatch_fails_closed(self):
         with self.assertRaises(orchestrator.OrchestratorError):

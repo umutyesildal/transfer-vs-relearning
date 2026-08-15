@@ -8,6 +8,12 @@ __pycache__/
 venv/
 *.egg-info/
 
+# Local secrets. Commit sanitized examples only.
+.env
+.env.*
+!.env.example
+!*.env.example
+
 # Large or generated artifacts
 artifacts/datasets/synthetic_v*/data/
 artifacts/datasets/synthetic_v*/output/
@@ -58,7 +64,6 @@ artifacts/datasets/synthetic_v1_bio_qa/
 tools/synthetic-data/output/
 
 # Workspace migration: secrets and local orchestration evidence
-ssh-client/.env
 .agents/STOP
 .agents/runs/
 .agents/state/

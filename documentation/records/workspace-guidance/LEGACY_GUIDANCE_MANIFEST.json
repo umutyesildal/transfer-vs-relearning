@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "captured_on": "2026-08-15",
+  "purpose": "Byte-identical preservation before documentation control-plane rewrite",
+  "files": {
+    "AGENTS_2026-08-15_PRE_CONTROL_PLANE.md": "072d6f48fee8b5ac675b797924912c10770b225c1bea78445d17f2dc4073f64f",
+    "AGENT_GOAL_2026-08-15_PRE_CONTROL_PLANE.md": "4f01a71683b3cf192241ba934e5a4a3c950254e4584ab7b7869ac9219203c5d7",
+    "AGENT_ORCHESTRATOR_README_2026-08-15_PRE_CONTROL_PLANE.md": "03c9ac0cd9744e0f948efc9b7a228dba56ec6f0fd2ac6643061bde6f0387fba8",
+    "AGENT_POLICY_2026-08-15_PRE_CONTROL_PLANE.md": "d5559efb7f01868e9c93cb8a92a1cc9122eaae4164bdebd6f695425ff958d1c3",
+    "README_2026-08-15_PRE_CONTROL_PLANE.md": "5b5048403b2b6ad77d070b645008b531d498c8fc5e1e3d0e9a3958c14e5c1901"
+  }
+}

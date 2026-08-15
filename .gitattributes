@@ -1,0 +1,2 @@
+# Preserved byte-identical historical guidance may retain legacy whitespace.
+documentation/records/workspace-guidance/*.md whitespace=-blank-at-eof,-blank-at-eol

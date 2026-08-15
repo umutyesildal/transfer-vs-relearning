@@ -215,6 +215,16 @@ def doctor(*, quiet: bool = False) -> tuple[list[str], list[str]]:
         if not path.is_file():
             errors.append(f"missing file: {path}")
 
+    for relative in config.get("required_read_files", []):
+        path = (workspace / relative).resolve()
+        try:
+            path.relative_to(workspace)
+        except ValueError:
+            errors.append(f"required read file escapes workspace: {relative}")
+            continue
+        if not path.is_file():
+            errors.append(f"missing required read file: {path}")
+
     for schema_path in required_files[-3:-1]:
         if schema_path.is_file():
             try:
@@ -528,10 +538,14 @@ def capture_snapshot(config: dict[str, Any], workspace: Path) -> dict[str, str]:
 
     for relative in config["repositories"]:
         repo = (workspace / relative).resolve()
+        normalized = Path(relative).as_posix().rstrip("/")
+        is_workspace_repo = normalized in {"", "."}
+        head_key = "git::HEAD" if is_workspace_repo else f"{normalized}::HEAD"
+        path_prefix = "" if is_workspace_repo else f"{normalized}/"
         head = run_command(["git", "-C", str(repo), "rev-parse", "HEAD"], cwd=workspace, timeout=30)
         if head.returncode != 0:
             raise OrchestratorError(f"Could not read HEAD for {relative}")
-        snapshot[f"{relative}::HEAD"] = head.stdout.strip()
+        snapshot[head_key] = head.stdout.strip()
         status = run_command(
             ["git", "-C", str(repo), "status", "--porcelain=v1", "-z", "--untracked-files=all"],
             cwd=workspace,
@@ -541,7 +555,7 @@ def capture_snapshot(config: dict[str, Any], workspace: Path) -> dict[str, str]:
             raise OrchestratorError(f"Could not inspect status for {relative}")
         for repo_path, repo_status in parse_porcelain_z(status.stdout).items():
             fingerprint = file_fingerprint(repo / repo_path, max_bytes)
-            snapshot[f"{relative}/{repo_path}"] = f"status:{repo_status}|{fingerprint}"
+            snapshot[f"{path_prefix}{repo_path}"] = f"status:{repo_status}|{fingerprint}"
 
     for relative in config["root_watch_paths"]:
         target = (workspace / relative).resolve()

@@ -2,13 +2,15 @@
 
 ## Source hierarchy
 
-1. The user's current explicit instruction.
-2. The workspace-root `AGENTS.md`.
-3. The current applicable frozen contract, gate, and `LUNA_WORKER_CURRENT_HANDOFF.md`.
-4. `.agents/GOAL.md` for the current bounded objective.
-5. `.agents/state/decision.json` for the current worker turn.
+1. System/developer constraints and the user's current explicit instruction.
+2. Workspace-root `AGENTS.md`.
+3. The applicable frozen contract.
+4. `documentation/current/PROJECT_STATE.yaml` and the current gate.
+5. `.agents/GOAL.md` for the current bounded objective.
+6. `.agents/state/decision.json` for the current worker turn.
 
-Lower items never expand authority granted by higher items.
+Lower items never expand authority granted by higher items. Old handoffs and numbered records are
+evidence, not reusable authorization.
 
 ## Role separation
 
@@ -16,46 +18,43 @@ Lower items never expand authority granted by higher items.
 
 - Acts only as decider and reviewer.
 - Uses a read-only sandbox.
-- Does not implement, edit files, authorize work, or claim that missing authority exists.
-- Produces exactly one structured decision.
+- Selects exactly one next task.
+- Does not edit, implement, execute, or infer missing authority.
 
 ### Luna
 
 - Executes only the current structured decision.
 - Uses read-only sandbox for `local_read_only` and workspace-write for `local_write`.
-- Does not choose the next task or expand allowed paths.
-- Produces exactly one structured worker report.
+- Changes only `allowed_paths`.
+- Does not choose the next task or expand scope.
 
-## Automatically dispatchable scopes
+## Automatically dispatchable
 
 - `local_read_only`
 - `local_write`
 
-All other scope classes require the loop to stop. Prior authorization text in a persistent session
-is historical context and cannot authorize a new turn.
+All other scope classes stop for the user. Prior session text cannot authorize a new turn.
 
 ## Never automatic
 
-- HU/SSH or another remote host
-- Slurm, GPU, training, evaluation, inference, or benchmark scoring
-- model, tokenizer, corpus, or broad dataset retrieval
-- push, publish, release, deploy, or sending external messages
-- deletion, cleanup, reset, restore, checkout, stash, force operations, or overwrites
-- credentials, secret access, or environment-policy changes
-- writes to frozen artifacts, prior evidence roots, or reserved chronological documents
+- HU/SSH or any remote host;
+- Slurm, GPU, training, evaluation, inference, or scoring;
+- model, tokenizer, corpus, benchmark, or broad dataset retrieval;
+- push, publish, release, deploy, merge, or external messages;
+- deletion, cleanup, reset, restore, checkout, stash, force operations, or overwrites;
+- secret/credential access or environment-policy changes;
+- writes to frozen artifacts, prior evidence roots, or immutable result records.
 
-When any item is necessary, Sol must return `awaiting_authorization` with a precise bounded request.
+## Repository and scope guard
 
-## Loop limits
+The workspace is one Git repository. Snapshot its HEAD and full porcelain status before and after
+each worker turn. A HEAD change is never path-allowed. Preserve all pre-existing dirty and
+untracked files. Unexpected paths stop the loop without automatic revert.
 
-- Maximum rounds, rework count, repeated decisions, per-turn timeout, and wall-clock time come from
-  `config.json`.
-- The presence of `.agents/STOP` ends the loop before the next role turn.
-- Unexpected changed paths stop the loop without attempting an automatic revert.
+## Loop and context limits
 
-## Multi-repository rule
-
-The workspace root is not a Git repository. Inspect each configured repository with `git -C` and
-preserve its pre-existing dirty/untracked state. Root documentation is checked separately by file
-fingerprints.
+- Limits come from `config.json`.
+- `.agents/STOP` ends the loop before the next role turn.
+- Every role reads the required live files and only task-named evidence.
+- One Luna turn should implement one bounded, testable task.
 

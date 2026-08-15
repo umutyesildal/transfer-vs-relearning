@@ -1,0 +1,135 @@
+schema_version: 1
+as_of: "2026-08-15"
+project: transfer-vs-relearning
+
+repository:
+  layout: monorepo_v1
+  branch: migration/monorepo-v1
+  status: verified_local_only
+  publication_authorized: false
+  cutover_authorized: false
+  original_worktrees_are_rollback_sources: true
+  documentation_control_plane: active
+  migration_record: documentation/migration/REPOSITORY_MIGRATION_V1.md
+  publication_blockers:
+    - id: imported_large_generated_blobs
+      status: unresolved
+      reachable_blob_count_gte_10_mib: 8
+      reachable_blob_bytes_gte_10_mib: 360973310
+      largest_blob_bytes: 76566873
+      largest_blob_path: tools/synthetic-data/output/english_training_m1_bio_qa.jsonl
+      note: >-
+        Gitignore protects new files but cannot remove blobs already present in imported history.
+        Resolve through a separately reviewed history/LFS/archive policy before publication.
+
+scientific_design:
+  phase: evaluation_foundation_design
+  states:
+    - M0
+    - M1
+    - M2-A
+    - M2-B
+  sibling_arms:
+    parent: M1
+    arms:
+      - M2-A
+      - M2-B
+    matched_budget_required: true
+  current_design_plan: documentation/178_END_TO_END_EXPERIMENTAL_PLAN_AND_EVALUATION_PROTOCOL_EN.md
+  supervisor_realignments:
+    - documentation/144_SUPERVISOR_FEEDBACK_AND_SCIENTIFIC_REALIGNMENT_TR.md
+    - documentation/177_SUPERVISOR_FEEDBACK_EVALUATION_FIRST_OLMO_AND_M2_PRIORITY_REALIGNMENT_TR.md
+
+readiness:
+  evaluation_contract: not_frozen
+  corpus_contract: not_frozen
+  m1_training_contract: not_frozen
+  m2_training_contract: not_frozen
+  ready_to_measure: false
+  ready_to_train: false
+  selected_primary_model: null
+
+evaluation_target:
+  contract_name: eval-v1
+  status: design_inputs_only
+  applies_to:
+    - M0
+    - M1
+    - M2-A
+    - M2-B
+  required_families:
+    - factual_access
+    - english_retention
+    - english_capability
+    - turkish_capability
+    - generation_integrity
+    - statistical_uncertainty
+  lm_eval_harness_required: true
+  custom_fact_evaluator_required: true
+  checkpoint_policy: cheap_panel_plus_precommitted_full_milestones
+
+current_evidence:
+  qwen_wikipedia_pilot:
+    role: historical_pilot
+    verdict: primary_success_criterion_not_met
+  m1_three_model_screen:
+    role: historical_model_screen
+    valid_negative_models:
+      - OLMo-2-0425-1B
+      - Pythia-1.4B
+      - Falcon-RW-1B
+    selected_primary_model: null
+    authority: documentation/158_PYTHIA_REPAIR_POST_EXECUTION_AND_THREE_MODEL_GATE_TR.md
+  dose_pareto_family:
+    status: incomplete
+    completed_rows: 15
+    required_rows: 18
+    missing_falcon_checkpoints:
+      - 126
+      - 210
+      - 252
+    selected_primary_model: null
+    authorities:
+      - documentation/160_M1_DOSE_PARETO_OLMO_BF16_EXECUTION_AND_FAMILY_STATUS_TR.md
+      - documentation/161_M1_DOSE_PARETO_POST_EXECUTION_GATE_TR.md
+      - documentation/176_M1_DOSE_PARETO_POST_FALCON_AUDIT_PERSISTENT_RECOVERY_GATE_TR.md
+  vngrs_corpus_route:
+    role: conditional_primary_materialization_candidate
+    materialized: false
+    selected_for_training: false
+    latest_contract: documentation/151bh_VNGRS_LICENSE_HTTP307_RESOLVE_CACHE_REPAIR_AND_SINGLE_RETRY_CONTRACT_TR.md
+    latest_contract_status: frozen_unexecuted
+    global_gate: blocked_by_measurement_design
+  trwiki:
+    role: cross_domain_control_only
+  culturax:
+    role: excluded_access_blocked
+
+active_priority:
+  name: qualify_and_freeze_eval_v1
+  first_boundary: local_read_only_evaluation_inventory
+  training_before_completion: forbidden
+  required_outputs:
+    - evaluator_and_metric_inventory
+    - lm_eval_task_qualification_matrix
+    - normalized_result_schema
+    - checkpoint_grid_and_cascade
+    - parity_and_resume_test_plan
+    - frozen_eval_v1_contract
+
+authorization:
+  local_repository_changes: require_current_user_instruction
+  hu_ssh: false
+  network_retrieval: false
+  slurm_gpu: false
+  training: false
+  evaluation_or_scoring: false
+  corpus_materialization: false
+  push_or_publication: false
+  cleanup_or_deletion: false
+
+next_decision_required:
+  subject: evaluation_inventory_and_qualification_scope
+  note: >-
+    Document 178 is a plan. A separate bounded task must inventory the current evaluators,
+    historical schemas, LM Evaluation Harness tasks, and exact gaps before eval-v1 can be frozen.
