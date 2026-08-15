@@ -90,7 +90,10 @@ local planning or documentation task does not authorize external work.
 ## Monorepo rules
 
 This workspace is one Git repository. The former synthetic-data repository lives at
-`tools/synthetic-data/` with its history imported without squash.
+`tools/synthetic-data/`. Its commit topology was imported without squash, then generated
+`output/` paths were removed from the reachable monorepo history under the documented
+publication-sanitization decision. The exact source history remains in the original repository and
+a verified private pre-filter bundle.
 
 - Inspect the repository before editing and preserve unrelated changes.
 - Use repository-relative paths in docs, configs, manifests, and agent reports.

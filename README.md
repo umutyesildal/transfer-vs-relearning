@@ -60,7 +60,7 @@ stable rules, while `PROJECT_STATE.yaml` contains the changing project state.
 | `configs/` | Versioned experiment, model, corpus, training, and evaluation settings |
 | `slurm/` | Slurm launchers; their presence is not execution authorization |
 | `tests/` | Main offline test suite |
-| `tools/synthetic-data/` | Synthetic data generator with its imported Git history |
+| `tools/synthetic-data/` | Synthetic data generator with imported, publication-sanitized history |
 | `documentation/current/` | Small live control plane: state, authority, and roadmap |
 | `documentation/contracts/` | Prospective frozen execution and measurement contracts |
 | `documentation/decisions/` | Short durable architecture/scientific decisions |
@@ -107,11 +107,11 @@ Large generated data, checkpoints, model weights, caches, local run outputs, `.e
 reference PDFs are excluded by `.gitignore` unless a separate reviewed policy says otherwise.
 Commit code, configs, schemas, manifests, hashes, compact summaries, and authored sources.
 
-Migration caveat: the imported synthetic-data history already contains eight reachable blobs at or
-above 10 MiB (about 361 MB total; largest about 76.6 MB). `.gitignore` prevents new accidental
-tracking but cannot remove existing history. Publication remains blocked until a separate decision
-chooses history preservation, Git LFS migration, history rewriting with an external archive, or
-another reviewed route.
+The imported history was publication-sanitized after explicit user approval: generated `output/`
+and `tools/synthetic-data/output/` paths were removed from the reachable monorepo history. The
+reachable ≥10 MiB blob count is now zero. The exact pre-filter branch remains recoverable from a
+verified private Git bundle and the original source repositories remain untouched. This cleanup
+does not itself authorize pushing or changing the default branch.
 
 Never interpret “ignored by Git” as “safe to delete.” Local artifacts remain scientific or user
 data until an explicit retention decision classifies them.

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "status": "completed_local_only",
+  "date": "2026-08-15",
+  "branch": "migration/monorepo-v1",
+  "publication_authorized": false,
+  "removed_paths": [
+    "output/",
+    "tools/synthetic-data/output/"
+  ],
+  "pre_filter": {
+    "head": "9b5ab31a891cacbb978ff02122bf1d7ef4e2f0e3",
+    "commit_count": 249,
+    "reachable_blob_count_gte_10_mib": 8,
+    "reachable_blob_bytes_gte_10_mib": 360973310,
+    "bundle_path": ".migration/safety/monorepo-pre-generated-output-filter-9b5ab31.bundle",
+    "bundle_bytes": 24961147,
+    "bundle_sha256": "e1f55503191b19f2dfa230d44311363e079d2d3b7c4efc25899504128de3243b",
+    "bundle_verification": "pass_complete_history"
+  },
+  "filter": {
+    "tool": "git-filter-repo",
+    "scope_ref": "refs/heads/migration/monorepo-v1",
+    "invert_paths": true
+  },
+  "post_filter": {
+    "immediate_head": "619b0d6342f836bdc91a9c050a1de387eef52850",
+    "commit_count": 249,
+    "reachable_blob_count_gte_10_mib": 0,
+    "reachable_blob_bytes_gte_10_mib": 0,
+    "tracked_files_under_removed_paths": 0,
+    "local_ignored_output_copies_restored": true,
+    "restored_copy_checksum_dry_run": "pass_empty",
+    "worktree_clean": true
+  },
+  "preservation": {
+    "original_transfer_worktree_mutated": false,
+    "original_synthetic_worktree_mutated": false,
+    "pre_filter_branch_recoverable": true,
+    "private_bundle_deletion_authorized": false
+  }
+}

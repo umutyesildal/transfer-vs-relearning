@@ -19,15 +19,15 @@ documentation decision.
 
 ## R0.5 — Publication policy
 
-Status: unresolved; required before push/cutover, but not before local evaluation inventory.
+Status: completed locally; push/cutover remain separately unauthorized.
 
-- decide how to handle eight imported historical blobs at or above 10 MiB;
-- compare full-history preservation, Git LFS migration, and rewritten-history-plus-archive routes;
-- verify that local ignored outputs and scientific evidence remain preserved;
-- repeat secret and reachable-blob audits before any publication.
+- preserved the exact pre-filter branch in a verified private Git bundle;
+- removed generated `output/` and `tools/synthetic-data/output/` paths from reachable history;
+- retained the original source repositories and local scientific/user artifacts;
+- verified zero reachable blobs at or above 10 MiB.
 
-Exit condition: the user approves one lossless-enough publication policy and its verification
-evidence. This roadmap does not authorize rewriting history or removing blobs.
+Exit condition: passed. A fresh secret and reachable-blob audit is still required immediately
+before any separately authorized publication.
 
 ## R1 — Evaluation inventory
 

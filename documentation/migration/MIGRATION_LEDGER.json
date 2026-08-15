@@ -1,7 +1,8 @@
 {
   "schema_version": 1,
-  "status": "v1_import_verified_local_only",
+  "status": "v1_import_verified_pre_history_sanitization",
   "publication_authorized": false,
+  "current_follow_up": "documentation/migration/GENERATED_OUTPUT_HISTORY_SANITIZATION.json",
   "source_inventory": {
     "committed_to_git": false,
     "sha256": "0fd8caaf2dcfba1b6aa180875d23748fe03b993f2bc2438fb4ee3bd55fab5dfb",
@@ -22,7 +23,7 @@
       "branch": "relation-redesign-v2",
       "commit": "ec2b96a83b9aa0177db306182e432d966d688ec0",
       "destination": "tools/synthetic-data",
-      "history_import": "git_subtree_without_squash",
+      "history_import": "git_subtree_without_squash_at_v1_checkpoint",
       "source_worktree_mutated": false
     }
   },
@@ -96,8 +97,8 @@
   },
   "verification": {
     "source_inventory_before_after_equal": true,
-    "synthetic_history_reachable": true,
-    "synthetic_tracked_tree_equal": true,
+    "synthetic_history_reachable_at_v1_checkpoint": true,
+    "synthetic_tracked_tree_equal_at_v1_checkpoint": true,
     "path_stable_imports_byte_equal": true,
     "relocated_imports_byte_equal": true,
     "local_artifact_copies_byte_equal": true,

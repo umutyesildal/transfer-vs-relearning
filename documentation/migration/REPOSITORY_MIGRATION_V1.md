@@ -1,6 +1,6 @@
 # Repository Migration V1
 
-**Status:** V1 import and preservation verification passed; local-only branch; not published
+**Status:** V1 import/preservation verified; generated-output history later sanitized; not published
 **Branch:** `migration/monorepo-v1`  
 **Base:** `transfer-vs-relearning` `corpus-update` at
 `9314a02b7a6986d760602002648372d266d04227`
@@ -20,8 +20,8 @@ publication, cleanup, or deletion.
 1. The existing `transfer-vs-relearning/`, `syntheticFacts/`, and workspace-root files remain
    untouched until the migrated tree passes count, hash, history, and test verification.
 2. Migration is copy/import based. No source path is moved or deleted in V1.
-3. The main code history remains the repository spine. The committed synthetic-data history is
-   imported under `tools/synthetic-data/` without squashing.
+3. The main code history remains the repository spine. At the V1 checkpoint, the committed
+   synthetic-data history was imported under `tools/synthetic-data/` without squashing.
 4. Chronological documentation is imported byte-for-byte at its existing `documentation/` paths.
    Historical reports are not rewritten during migration.
 5. Secrets, virtual environments, caches, temporary render trees, and large generated datasets
@@ -51,7 +51,7 @@ the identity of local-only secret and runtime paths.
 | Existing source | V1 destination | Git policy |
 |---|---|---|
 | `transfer-vs-relearning/` tracked tree | repository root | Existing history retained |
-| `syntheticFacts/` committed branch | `tools/synthetic-data/` | Full history imported, no squash |
+| `syntheticFacts/` committed branch | `tools/synthetic-data/` | Full history imported at V1; later output-path filtered, no squash |
 | `syntheticFacts/` untracked outputs | original path, plus private inventory | Never auto-added |
 | `documentation/` | `documentation/` | Byte-identical tracked scientific record |
 | `AGENTS.md` | `AGENTS.md` | Imported unchanged in V1 |
@@ -95,7 +95,7 @@ not be removed until the user separately authorizes that cleanup.
 
 ## V1 Verification Result
 
-The first preservation/import wave passed locally:
+The first preservation/import wave passed locally before the later history-sanitization step:
 
 - the complete source inventory before and after import was byte-identical at SHA-256
   `0fd8caaf2dcfba1b6aa180875d23748fe03b993f2bc2438fb4ee3bd55fab5dfb`;
@@ -110,7 +110,9 @@ The first preservation/import wave passed locally:
   and passed checksum-aware `rsync` comparison;
 - the source `uv.lock` was copied byte-for-byte and used for an offline core dependency sync;
 - staged-secret-value and private-key scans passed; `ssh-client/.env` is absent from the index;
-- no imported/staged file exceeded 10 MB;
+- the staged-file audit reported no new staged file above 10 MB, but did not inspect large blobs
+  already tracked in the imported synthetic history; the later reachable-history audit corrected
+  this gap;
 - the complete main repository suite passed `395/395` tests;
 - the synthetic-data suite passed `59/59` tests;
 - the local agent orchestration suite passed `10/10` tests.
@@ -118,3 +120,19 @@ The first preservation/import wave passed locally:
 No source deletion, overwrite, GitHub push, HU/SSH action, Slurm action, training, or evaluation
 occurred. The original worktrees remain the rollback authorities until a later cutover is
 separately reviewed and authorized.
+
+## Post-V1 generated-output history sanitization
+
+After explicit user approval, the local migration branch was rewritten to remove only generated
+`output/` and `tools/synthetic-data/output/` paths from its reachable history. Before rewriting,
+the exact 249-commit branch at `9b5ab31a891cacbb978ff02122bf1d7ef4e2f0e3` was saved as a complete,
+verified private Git bundle. The source repositories were not changed.
+
+The audit changed from eight reachable blobs at or above 10 MiB (360,973,310 bytes total) to zero.
+Commit topology remains unsquashed, but rewritten commit IDs no longer make the exact synthetic
+source commit a direct ancestor. Exact pre-filter history remains available from the bundle and
+the original `syntheticFacts` repository.
+
+See [`GENERATED_OUTPUT_HISTORY_SANITIZATION.md`](GENERATED_OUTPUT_HISTORY_SANITIZATION.md) for the
+exact paths, hashes, commands, preservation evidence, and post-filter checks. This operation did
+not authorize push, cutover, source-repository cleanup, or deletion of the private bundle.

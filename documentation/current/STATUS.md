@@ -58,14 +58,18 @@ training a model, materializing a corpus, pushing the migration branch, or clean
 ## Repository state
 
 The migration branch `migration/monorepo-v1` is local-only. It preserves the main repository
-history and imports the synthetic-data history under `tools/synthetic-data/` without squash. The
-original two worktrees remain rollback sources. See the
+history and imports the synthetic-data commit topology under `tools/synthetic-data/` without
+squashing commits. Generated `output/` paths were subsequently removed from the reachable
+monorepo history after explicit approval. The original two worktrees remain rollback sources. See
+the
 [`migration record`](../migration/REPOSITORY_MIGRATION_V1.md).
 
-Publication is still blocked. The imported synthetic-data history contains eight reachable blobs
-at or above 10 MiB (about 361 MB total, largest about 76.6 MB). New ignore rules do not rewrite
-existing history. No blob was removed because that would require an explicit choice among full
-history preservation, Git LFS migration, or a rewritten history backed by an external archive.
+The reachable monorepo history now contains zero blobs at or above 10 MiB. Before filtering, the
+exact 249-commit branch was preserved in a verified private Git bundle; the original source repos
+were not changed. See the
+[`history-sanitization record`](../migration/GENERATED_OUTPUT_HISTORY_SANITIZATION.md). Push and
+cutover are still not authorized, but imported large generated blobs are no longer a publication
+blocker.
 
 ## Canonical links
 

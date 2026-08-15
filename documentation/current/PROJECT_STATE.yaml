@@ -11,16 +11,19 @@ repository:
   original_worktrees_are_rollback_sources: true
   documentation_control_plane: active
   migration_record: documentation/migration/REPOSITORY_MIGRATION_V1.md
-  publication_blockers:
-    - id: imported_large_generated_blobs
-      status: unresolved
-      reachable_blob_count_gte_10_mib: 8
-      reachable_blob_bytes_gte_10_mib: 360973310
-      largest_blob_bytes: 76566873
-      largest_blob_path: tools/synthetic-data/output/english_training_m1_bio_qa.jsonl
-      note: >-
-        Gitignore protects new files but cannot remove blobs already present in imported history.
-        Resolve through a separately reviewed history/LFS/archive policy before publication.
+  publication_blockers: []
+  history_sanitization:
+    status: completed
+    removed_paths:
+      - output/
+      - tools/synthetic-data/output/
+    pre_filter_head: 9b5ab31a891cacbb978ff02122bf1d7ef4e2f0e3
+    filter_result_head: 619b0d6342f836bdc91a9c050a1de387eef52850
+    pre_filter_reachable_blob_count_gte_10_mib: 8
+    pre_filter_reachable_blob_bytes_gte_10_mib: 360973310
+    post_filter_reachable_blob_count_gte_10_mib: 0
+    pre_filter_bundle_sha256: e1f55503191b19f2dfa230d44311363e079d2d3b7c4efc25899504128de3243b
+    record: documentation/migration/GENERATED_OUTPUT_HISTORY_SANITIZATION.md
 
 scientific_design:
   phase: evaluation_foundation_design

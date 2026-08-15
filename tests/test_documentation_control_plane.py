@@ -21,9 +21,10 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert state["readiness"]["ready_to_train"] is False
     assert state["readiness"]["selected_primary_model"] is None
     assert state["repository"]["publication_authorized"] is False
-    assert state["repository"]["publication_blockers"][0]["id"] == (
-        "imported_large_generated_blobs"
-    )
+    assert state["repository"]["publication_blockers"] == []
+    assert state["repository"]["history_sanitization"][
+        "post_filter_reachable_blob_count_gte_10_mib"
+    ] == 0
     assert state["scientific_design"]["sibling_arms"] == {
         "parent": "M1",
         "arms": ["M2-A", "M2-B"],
@@ -36,6 +37,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
 
     referenced_paths = [
         state["repository"]["migration_record"],
+        state["repository"]["history_sanitization"]["record"],
         state["scientific_design"]["current_design_plan"],
         *state["scientific_design"]["supervisor_realignments"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
