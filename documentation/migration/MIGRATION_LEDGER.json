@@ -64,6 +64,18 @@
     }
   ],
   "local_only_preservation": {
+    "byte_equal_local_copy_paths": [
+      ".agents/runs",
+      ".agents/state",
+      ".tmp",
+      "artifacts",
+      "output",
+      "outputs",
+      "papers/**/*.pdf",
+      "ssh-client/.env",
+      "tmp",
+      "tools/synthetic-data/output"
+    ],
     "secret_paths": [
       "ssh-client/.env"
     ],

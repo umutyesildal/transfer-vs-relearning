@@ -67,7 +67,7 @@ the identity of local-only secret and runtime paths.
 | `study-notes/` | `study-notes/` | Tracked |
 | authored presentation files/renders | `presentations/legacy/` | Tracked with source-path ledger |
 | workspace `scripts/` | repository `scripts/` | Merged only after collision check |
-| `output/`, `outputs/`, `tmp/`, `.tmp/` | original path/private inventory | Local generated material; not committed |
+| `output/`, `outputs/`, `tmp/`, `.tmp/` | same local paths plus private inventory | Byte-equal local copies; not committed |
 | empty `configs/`, `slurm/`, `src/`, `tests/` | inventory only | Git cannot preserve empty directories |
 | main-repo untracked artifacts and `uv.lock` | original path/private inventory | Reviewed separately; never auto-added |
 
@@ -106,6 +106,8 @@ The first preservation/import wave passed locally:
 - path-stable imports and explicitly relocated presentation/report sources passed byte comparison;
 - the existing main-repo artifact tree and synthetic output tree were copied into the local
   migration worktree and passed checksum-aware `rsync` comparison;
+- workspace `output/`, `outputs/`, `tmp/`, and `.tmp/` trees were copied to the same local paths
+  and passed checksum-aware `rsync` comparison;
 - the source `uv.lock` was copied byte-for-byte and used for an offline core dependency sync;
 - staged-secret-value and private-key scans passed; `ssh-client/.env` is absent from the index;
 - no imported/staged file exceeded 10 MB;
