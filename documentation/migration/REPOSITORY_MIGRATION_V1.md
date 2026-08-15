@@ -1,6 +1,6 @@
 # Repository Migration V1
 
-**Status:** In progress; local-only migration branch; not published  
+**Status:** V1 import and preservation verification passed; local-only branch; not published
 **Branch:** `migration/monorepo-v1`  
 **Base:** `transfer-vs-relearning` `corpus-update` at
 `9314a02b7a6986d760602002648372d266d04227`
@@ -92,3 +92,27 @@ V1 is not complete until all of the following pass:
 Rollback means abandoning the migration worktree and branch. Because V1 does not mutate or delete
 source material, rollback does not require restoring project files. The worktree and branch must
 not be removed until the user separately authorizes that cleanup.
+
+## V1 Verification Result
+
+The first preservation/import wave passed locally:
+
+- the complete source inventory before and after import was byte-identical at SHA-256
+  `0fd8caaf2dcfba1b6aa180875d23748fe03b993f2bc2438fb4ee3bd55fab5dfb`;
+- all `35,598` source regular files, `13` symlinks, and `2,962,980,827` regular-file bytes remained
+  unchanged outside the excluded migration workspace;
+- the synthetic source commit is reachable from the monorepo and all imported tracked blob IDs
+  and file modes match the source branch;
+- path-stable imports and explicitly relocated presentation/report sources passed byte comparison;
+- the existing main-repo artifact tree and synthetic output tree were copied into the local
+  migration worktree and passed checksum-aware `rsync` comparison;
+- the source `uv.lock` was copied byte-for-byte and used for an offline core dependency sync;
+- staged-secret-value and private-key scans passed; `ssh-client/.env` is absent from the index;
+- no imported/staged file exceeded 10 MB;
+- the complete main repository suite passed `395/395` tests;
+- the synthetic-data suite passed `59/59` tests;
+- the local agent orchestration suite passed `10/10` tests.
+
+No source deletion, overwrite, GitHub push, HU/SSH action, Slurm action, training, or evaluation
+occurred. The original worktrees remain the rollback authorities until a later cutover is
+separately reviewed and authorized.

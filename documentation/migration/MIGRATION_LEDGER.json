@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "in_progress_local_only",
+  "status": "v1_import_verified_local_only",
   "publication_authorized": false,
   "source_inventory": {
     "committed_to_git": false,
@@ -81,5 +81,31 @@
       "synthetic_repo_untracked_outputs"
     ],
     "reference_binary_policy": "papers/**/*.pdf are locally copied and hash-inventoried but Git-ignored pending copyright/license and Git LFS decision"
+  },
+  "verification": {
+    "source_inventory_before_after_equal": true,
+    "synthetic_history_reachable": true,
+    "synthetic_tracked_tree_equal": true,
+    "path_stable_imports_byte_equal": true,
+    "relocated_imports_byte_equal": true,
+    "local_artifact_copies_byte_equal": true,
+    "secret_value_scan_passed": true,
+    "private_key_scan_passed": true,
+    "indexed_secret_paths": 0,
+    "indexed_files_over_10_mb": 0,
+    "tests": {
+      "main": {
+        "passed": 395,
+        "failed": 0
+      },
+      "synthetic_data": {
+        "passed": 59,
+        "failed": 0
+      },
+      "agent_orchestration": {
+        "passed": 10,
+        "failed": 0
+      }
+    }
   }
 }

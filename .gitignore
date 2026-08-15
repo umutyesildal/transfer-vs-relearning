@@ -6,6 +6,7 @@ __pycache__/
 .ruff_cache/
 .venv/
 venv/
+*.egg-info/
 
 # Large or generated artifacts
 artifacts/datasets/synthetic_v*/data/
@@ -46,6 +47,15 @@ checkpoints/
 errors.jsonl
 progress.json
 artifacts/pre_m2_followup_v1/
+
+# Existing local dataset releases copied for a functional migration worktree.
+# Their source trees remain preserved and review is required before any
+# manifest/config promotion into Git.
+artifacts/datasets/acquisition_diagnostics_v1/
+artifacts/datasets/acquisition_ladder_v1/
+artifacts/datasets/synthetic_v1_binding_mix/
+artifacts/datasets/synthetic_v1_bio_qa/
+tools/synthetic-data/output/
 
 # Workspace migration: secrets and local orchestration evidence
 ssh-client/.env
