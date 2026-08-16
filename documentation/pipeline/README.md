@@ -102,3 +102,13 @@ Render the complete 15-stage graph without scientific execution:
 The tested runner accepts only registered Python adapters; it never executes arbitrary shell text
 from YAML. The CLI currently registers no scientific adapter and rejects non-dry execution until
 eval-v1, corpus/training contracts and exact authorization are frozen.
+
+Before implementing or starting the first M0 lane, inspect every machine-readable gate with:
+
+```bash
+.venv/bin/python scripts/study/run_study.py preflight-m0 \
+  --config configs/studies/m0_to_m2_eval_v1_template.yaml
+```
+
+The command performs no inference or scoring and exits nonzero while any contract, binding,
+environment or adapter prerequisite is unresolved.

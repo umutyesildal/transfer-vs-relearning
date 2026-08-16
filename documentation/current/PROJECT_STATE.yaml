@@ -4,8 +4,8 @@ project: transfer-vs-relearning
 
 repository:
   layout: monorepo_v1
-  branch: agent/eval-harness
-  status: main_cutover_complete_eval_harness_active
+  branch: agent/m0-evaluation
+  status: main_published_m0_preflight_active
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -27,6 +27,7 @@ repository:
     method: fast_forward_only
     migration_branch_published: true
     eval_harness_branch_published: true
+    current_main_head: 9054392bdc17f1f4b6453f03b83a2d93ace297ac
     remote_agents_directory_verified: true
     remote_reachable_blob_count_gte_10_mib: 0
   history_sanitization:
@@ -110,6 +111,22 @@ evaluation_target:
     full_study_stage_count: 15
     execution_adapter_ready: false
     execution_authorized: false
+    m0_preflight:
+      command: >-
+        .venv/bin/python scripts/study/run_study.py preflight-m0
+        --config configs/studies/m0_to_m2_eval_v1_template.yaml
+      latest_status: blocked_pre_scoring
+      scientific_work_started: false
+      blockers:
+        - study_contract_frozen
+        - study_bindings_resolved
+        - project_ready_to_measure
+        - project_eval_contract_frozen
+        - eval_registry_frozen
+        - eval_registry_execution_ready
+        - lm_eval_environment_available
+        - m0_evaluation_adapter_present
+        - m0_probing_adapter_present
     stage_order:
       - identity_preflight
       - train_and_trace

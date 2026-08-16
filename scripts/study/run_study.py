@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from transfer_vs_relearning.study.workflow import (
+    assess_m0_readiness,
     build_study_plan,
     initialize_study_namespace,
     load_study_namespace,
@@ -45,6 +46,15 @@ def main() -> None:
     run_parser.add_argument("--config", type=Path, required=True)
     run_parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     run_parser.add_argument("--dry-run", action="store_true")
+
+    preflight_parser = subparsers.add_parser("preflight-m0")
+    preflight_parser.add_argument("--config", type=Path, required=True)
+    preflight_parser.add_argument("--repo-root", type=Path, default=Path.cwd())
+    preflight_parser.add_argument(
+        "--project-state",
+        type=Path,
+        default=Path("documentation/current/PROJECT_STATE.yaml"),
+    )
 
     args = parser.parse_args()
     if args.command in {"plan", "init", "packets", "run"}:
@@ -91,6 +101,19 @@ def main() -> None:
                 ensure_ascii=False,
             )
         )
+    elif args.command == "preflight-m0":
+        repo_root = args.repo_root.resolve()
+        project_state = args.project_state
+        if not project_state.is_absolute():
+            project_state = repo_root / project_state
+        payload = assess_m0_readiness(
+            args.config,
+            repo_root=repo_root,
+            project_state_path=project_state,
+        )
+        print(json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True))
+        if payload["status"] != "ready":
+            raise SystemExit(2)
 
 
 if __name__ == "__main__":

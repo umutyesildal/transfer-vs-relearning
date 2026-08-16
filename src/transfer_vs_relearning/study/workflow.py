@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 import re
 from pathlib import Path
 from typing import Any, Callable
@@ -205,6 +206,110 @@ def build_study_plan(config_path: Path, *, repo_root: Path | None = None) -> dic
         "state_design": config["state_design"],
         "stages": stages,
         "stage_count": len(stages),
+    }
+
+
+def assess_m0_readiness(
+    config_path: Path,
+    *,
+    repo_root: Path,
+    project_state_path: Path,
+) -> dict[str, Any]:
+    """Return deterministic M0 execution gates without running evaluation or scoring."""
+    repo_root = repo_root.resolve()
+    config_path = config_path.resolve()
+    project_state_path = project_state_path.resolve()
+    config = load_study_config(config_path)
+    plan = build_study_plan(config_path, repo_root=repo_root)
+    project_state = load_study_config(project_state_path)
+    bindings = _mapping(config, "bindings")
+
+    registry_value = bindings.get("eval_registry")
+    registry_path = Path(str(registry_value))
+    if not registry_path.is_absolute():
+        registry_path = repo_root / registry_path
+    registry = load_study_config(registry_path) if registry_path.is_file() else {}
+
+    checks: list[dict[str, Any]] = []
+
+    def record(check_id: str, passed: bool, detail: str) -> None:
+        checks.append({"id": check_id, "status": "pass" if passed else "blocked", "detail": detail})
+
+    record(
+        "study_contract_frozen",
+        config.get("status") == "frozen",
+        f"study status is {config.get('status')!r}",
+    )
+    placeholders = _placeholder_paths(bindings)
+    record(
+        "study_bindings_resolved",
+        not placeholders,
+        "all bindings resolved" if not placeholders else "unresolved: " + ", ".join(placeholders),
+    )
+
+    readiness = _mapping(project_state, "readiness")
+    record(
+        "project_ready_to_measure",
+        readiness.get("ready_to_measure") is True,
+        f"ready_to_measure is {readiness.get('ready_to_measure')!r}",
+    )
+    record(
+        "project_eval_contract_frozen",
+        readiness.get("evaluation_contract") == "frozen",
+        f"evaluation_contract is {readiness.get('evaluation_contract')!r}",
+    )
+    record(
+        "eval_registry_present",
+        registry_path.is_file(),
+        str(registry_path),
+    )
+    record(
+        "eval_registry_frozen",
+        registry.get("status") == "frozen",
+        f"registry status is {registry.get('status')!r}",
+    )
+    record(
+        "eval_registry_execution_ready",
+        registry.get("execution_ready") is True,
+        f"execution_ready is {registry.get('execution_ready')!r}",
+    )
+    record(
+        "lm_eval_environment_available",
+        importlib.util.find_spec("lm_eval") is not None,
+        "lm_eval import is available"
+        if importlib.util.find_spec("lm_eval") is not None
+        else "lm_eval is not installed in this Python environment",
+    )
+
+    m0_stages = {
+        stage["id"]: stage
+        for stage in plan["stages"]
+        if stage["id"] in {"m0_evaluation", "m0_probing"}
+    }
+    for stage_id in ("m0_evaluation", "m0_probing"):
+        stage = m0_stages[stage_id]
+        adapter_paths = [
+            repo_root / relative
+            for relative in stage["allowed_paths"]
+            if relative.startswith("src/") and "*" not in relative
+        ]
+        present = any(path.is_file() for path in adapter_paths)
+        record(
+            f"{stage_id}_adapter_present",
+            present,
+            ", ".join(str(path.relative_to(repo_root)) for path in adapter_paths),
+        )
+
+    blockers = [check["id"] for check in checks if check["status"] != "pass"]
+    return {
+        "schema_version": 1,
+        "scope": "m0_evaluation_preflight",
+        "status": "ready" if not blockers else "blocked",
+        "scientific_work_started": False,
+        "plan_id": plan["plan_id"],
+        "study_id": plan["study_id"],
+        "checks": checks,
+        "blockers": blockers,
     }
 
 

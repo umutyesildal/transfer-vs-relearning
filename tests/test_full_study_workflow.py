@@ -8,6 +8,7 @@ import pytest
 import yaml
 
 from transfer_vs_relearning.study.workflow import (
+    assess_m0_readiness,
     build_study_plan,
     initialize_study_namespace,
     load_study_config,
@@ -153,3 +154,23 @@ def test_entrypoint_catalog_preserves_every_old_file_and_flat_roots_are_clean() 
     assert not any((ROOT / entry["old_path"]).exists() for entry in entries)
     assert {path.name for path in (ROOT / "scripts").iterdir() if path.is_file()} == {"README.md"}
     assert {path.name for path in (ROOT / "slurm").iterdir() if path.is_file()} == {"README.md"}
+
+
+def test_m0_preflight_reports_current_contract_and_adapter_blockers() -> None:
+    payload = assess_m0_readiness(
+        CONFIG,
+        repo_root=ROOT,
+        project_state_path=ROOT / "documentation/current/PROJECT_STATE.yaml",
+    )
+    assert payload["status"] == "blocked"
+    assert payload["scientific_work_started"] is False
+    assert {
+        "study_contract_frozen",
+        "study_bindings_resolved",
+        "project_ready_to_measure",
+        "project_eval_contract_frozen",
+        "eval_registry_frozen",
+        "eval_registry_execution_ready",
+        "m0_evaluation_adapter_present",
+        "m0_probing_adapter_present",
+    }.issubset(payload["blockers"])

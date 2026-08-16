@@ -26,6 +26,12 @@ Its CLI is dry-run only because final scientific adapters and execution authorit
 The former flat entrypoint roots were losslessly grouped: 129 scripts and 135 Slurm files are mapped
 by `configs/entrypoints/catalog.json`; historical numbered documents were not rewritten.
 
+The first machine-readable M0 preflight has now run on the new M0 branch. It stopped before model
+load, inference or scoring, as designed. The current blockers are the draft study/eval contracts,
+unresolved model/output bindings, `ready_to_measure = false`, the absent dedicated `lm_eval`
+environment and the not-yet-implemented M0 standard/factual adapters. This is
+`blocked_pre_scoring`, not an M0 scientific result.
+
 ## Evaluation design result
 
 - LM Evaluation Harness is pinned prospectively to v0.4.12 commit
@@ -91,10 +97,9 @@ training a model, materializing a corpus, making additional pushes, or cleaning 
 
 ## Repository state
 
-The monorepo cutover is complete. GitHub `main` was fast-forwarded from
-`5ba61f7b80ac0343e38806f08225535311a8b124` to
-`695b648615bfd302fd3a755324bfee2d4c63f97f`; the migration branch was published and the active
-development branch is `agent/eval-harness`. Remote `main` includes `.agents`, documentation,
+The monorepo cutover is complete. GitHub `main` is now fast-forwarded through
+`9054392bdc17f1f4b6453f03b83a2d93ace297ac`; the evaluation and entrypoint changes are published,
+and the active development branch is `agent/m0-evaluation`. Remote `main` includes `.agents`, documentation,
 synthetic-data tooling, paper material, scripts, configs, and tests. The original two worktrees
 remain rollback sources. See the
 [`migration record`](../migration/REPOSITORY_MIGRATION_V1.md).
