@@ -113,6 +113,12 @@ synthetic-data tooling, paper material, scripts, configs, and tests. The origina
 remain rollback sources. See the
 [`migration record`](../migration/REPOSITORY_MIGRATION_V1.md).
 
+HU now has a separate clean monorepo checkout at
+`/vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1`, tracking `agent/m0-evaluation` with
+fast-forward-only pulls. The legacy HU `corpus-update` checkout is dirty and remains untouched as
+preserved state. The shared HU Python environment has not been modified and does not yet contain
+`lm-eval`; eval-v1 will use a separately frozen dedicated environment.
+
 The reachable monorepo history now contains zero blobs at or above 10 MiB. Before filtering, the
 exact 249-commit branch was preserved in a verified private Git bundle; the original source repos
 were not changed. See the

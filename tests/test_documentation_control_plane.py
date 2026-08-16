@@ -38,6 +38,16 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert state["repository"]["history_sanitization"][
         "post_filter_reachable_blob_count_gte_10_mib"
     ] == 0
+    assert state["repository"]["hu_checkouts"]["active_monorepo"] == {
+        "path": "/vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1",
+        "branch": "agent/m0-evaluation",
+        "sync_mode": "git_pull_ff_only",
+        "dependency_commit_verified": "69032e1ab1f6accbefacdb07a2ce33b7e8c8511b",
+        "clean_at_verification": True,
+    }
+    assert state["repository"]["hu_checkouts"]["legacy_checkout"]["status"] == (
+        "preserved_dirty_do_not_pull"
+    )
     assert state["scientific_design"]["sibling_arms"] == {
         "parent": "M1",
         "arms": ["M2-A", "M2-B"],

@@ -19,6 +19,22 @@ repository:
     slurm_files_preserved: 135
     catalog: configs/entrypoints/catalog.json
     record: documentation/migration/ENTRYPOINT_LAYOUT_V2.md
+  hu_checkouts:
+    active_monorepo:
+      path: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1
+      branch: agent/m0-evaluation
+      sync_mode: git_pull_ff_only
+      dependency_commit_verified: 69032e1ab1f6accbefacdb07a2ce33b7e8c8511b
+      clean_at_verification: true
+    legacy_checkout:
+      path: /vol/fob-vol6/mi25/yesildau/transfer-vs-relearning
+      branch: corpus-update
+      head_at_verification: 9314a02b7a6986d760602002648372d266d04227
+      status: preserved_dirty_do_not_pull
+    shared_python_environment:
+      path: /vol/fob-vol6/mi25/yesildau/.conda/envs/xfer-relearn
+      lm_eval_installed: false
+      mutation_authorized: false
   publication_blockers: []
   main_cutover:
     remote: https://github.com/umutyesildal/transfer-vs-relearning

@@ -105,26 +105,41 @@ corresponding numbered plan is frozen.
 Local code repository:
 
 ```text
-/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/transfer-vs-relearning
+/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.migration/monorepo-v1
 ```
 
 Current local/remote development branch:
 
 ```text
-corpus-update
+agent/m0-evaluation
 ```
 
-HU code checkout:
+Active clean HU monorepo checkout:
 
 ```text
-/vol/fob-vol6/mi25/yesildau/transfer-vs-relearning
+/vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1
 ```
+
+Synchronize it only with:
+
+```bash
+git pull --ff-only origin agent/m0-evaluation
+```
+
+The legacy HU checkout at `/vol/fob-vol6/mi25/yesildau/transfer-vs-relearning` remains on
+`corpus-update` and has preserved tracked deletions plus untracked artifact/run links and backup
+state. Do not pull, reset, clean, switch or reuse that worktree unless a separate preservation
+plan explicitly resolves it.
 
 HU Python:
 
 ```text
 /vol/fob-vol6/mi25/yesildau/.conda/envs/xfer-relearn/bin/python
 ```
+
+That shared environment did not contain `lm-eval` at the 2026-08-16 monorepo sync. Do not mutate it
+for eval-v1. The pinned Harness dependency is now in `pyproject.toml`, `environment.yml` and
+`uv.lock`; the qualification contract must bind a dedicated HU environment before installation.
 
 Approved high-volume roots:
 
