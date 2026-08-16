@@ -57,6 +57,10 @@ namespace is preserved; no task retrieval, model load, GPU work or scoring occur
 now routes control jobs to `std`, retains evaluation lanes on V100 and targets a fresh v2 namespace.
 Its new implementation/config hashes must be frozen before resubmission.
 
+The repair identities are now frozen: control jobs use `std`, GPU lanes retain the exact V100
+request, and all three routes passed Slurm `--test-only`. After the final fast-forward and runtime
+preflight, the fresh v2 namespace may be submitted under the existing test-only authorization.
+
 ## Evaluation design result
 
 - LM Evaluation Harness is pinned prospectively to v0.4.12 commit

@@ -1,6 +1,6 @@
 # M0 OLMo eval-v1 qualification wave v1
 
-**Status:** `operational_repair_binding_pending` | **Owner:** project | **Created:** 2026-08-16
+**Status:** `frozen_operational_repair_test_only_execution_authorized` | **Owner:** project | **Created:** 2026-08-16
 **Supersedes:** none
 
 ## Purpose and estimand
@@ -83,6 +83,23 @@ submission rejection and uses the new root
 `/vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v2`. All model, task, limits, precision, seeds,
 cache bounds and scientific prohibitions remain unchanged. The repair must bind a new implementation
 commit plus exact config hashes before resubmission.
+
+Those repair bindings are now frozen:
+
+- repaired implementation commit: `31686cf07b6edb2d64cdb0b9ec44ba838a0ada84`;
+- repaired submitter SHA-256:
+  `3d21321941628b83c31ac6f7da28efa6b8fe782447676c0d66e907f2ec2c9fd1`;
+- factual qualification config SHA-256:
+  `a953177c55ddce313f47a1996a96c2bbd43ca52e8b84160fd32d5ac8f9f60437`;
+- generation qualification config SHA-256:
+  `354f5fd1bc818c09cd8f1fca17f9614fa297b2268169c48160e4bae02b359279`;
+- repaired companion config SHA-256:
+  `2ac4edf6248a64dffab4a33ebd5c57a5cbae78b6fa00cc4ca3cbab2826832dc5`.
+
+Slurm `--test-only` accepted the exact `std` 8-CPU/32G/2h data route, the
+`gpu:v10032gb:1` 8-CPU/64G/4h evaluation route and the `std` 2-CPU/8G/30m finalizer route. The
+original 2026-08-16 test-only execution authorization remains in force for this semantics-neutral
+repair and fresh v2 namespace.
 
 ## Protocol
 
