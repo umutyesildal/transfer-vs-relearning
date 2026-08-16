@@ -44,6 +44,9 @@ def _score_one(
     write_csv(output_dir / "loss_blocks.csv", rows)
     total_nll = sum(float(row["nll_sum"]) for row in rows)
     total_tokens = sum(int(row["token_count"]) for row in rows)
+    total_utf8_bytes = sum(len(document.encode("utf-8")) for document in documents)
+    if total_utf8_bytes <= 0:
+        raise ValueError("Corpus produced no UTF-8 bytes")
     mean_nll = total_nll / total_tokens
     ci_low, ci_high = bootstrap_weighted_nll_interval(rows, samples=bootstrap_samples, seed=seed)
     payload = {
@@ -54,11 +57,17 @@ def _score_one(
         "block_count": len(rows),
         "input_token_count": len(token_ids),
         "scored_token_count": total_tokens,
+        "utf8_byte_count": total_utf8_bytes,
         "token_ids_sha256": sha256_text(json.dumps(token_ids, separators=(",", ":"))),
+        "total_nll": total_nll,
         "mean_token_nll": mean_nll,
         "mean_token_nll_ci95": [ci_low, ci_high],
         "perplexity": math.exp(mean_nll),
         "perplexity_ci95_from_nll": [math.exp(ci_low), math.exp(ci_high)],
+        "byte_perplexity": math.exp(total_nll / total_utf8_bytes),
+        "bits_per_byte": total_nll / (math.log(2.0) * total_utf8_bytes),
+        "primary_cross_tokenizer_metric": "bits_per_byte",
+        "token_perplexity_role": "within_model_companion_only",
     }
     write_json(output_dir / "summary.json", payload)
     return payload

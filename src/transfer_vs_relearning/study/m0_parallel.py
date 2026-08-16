@@ -16,7 +16,12 @@ from transfer_vs_relearning.study.adapters.m0_probing import build_project_probe
 from transfer_vs_relearning.utils.io import sha256_file, sha256_text, write_json
 
 
-ALLOWED_ADAPTERS = {"lm_eval", "project_factual", "project_generation_integrity"}
+ALLOWED_ADAPTERS = {
+    "lm_eval",
+    "project_factual",
+    "project_generation_integrity",
+    "project_corpus_perplexity",
+}
 REQUIRED_FAMILIES = {
     "factual_access",
     "english_retention",

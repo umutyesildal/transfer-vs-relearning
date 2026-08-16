@@ -11,6 +11,7 @@ from transfer_vs_relearning.utils.io import sha256_file
 ENTRYPOINTS = {
     "project_factual": "scripts/m2/evaluate_pre_m2_frozen_suite.py",
     "project_generation_integrity": "scripts/evaluation/evaluate_general_capability.py",
+    "project_corpus_perplexity": "scripts/evaluation/evaluate_corpora_perplexity.py",
 }
 
 
@@ -48,6 +49,50 @@ def build_project_probe_command(
         str(plan["model"]["manifest_path"])
     ).resolve():
         raise ValueError(f"Project evaluator model-manifest path mismatch for lane {lane['id']}")
+
+    if lane["adapter"] == "project_corpus_perplexity":
+        if config.get("adapter_engine") != "corpora_perplexity":
+            raise ValueError("Corpus PPL lane requires adapter_engine=corpora_perplexity")
+        output_root = Path(str(config.get("output_dir", ""))).resolve()
+        expected_root = Path(str(lane["expected_output_root"])).resolve()
+        if output_root != expected_root:
+            raise ValueError("Corpus PPL evaluator output root mismatch")
+        corpora = config.get("corpora")
+        input_sha256 = config.get("input_sha256")
+        if not isinstance(corpora, dict) or not corpora:
+            raise ValueError("Corpus PPL evaluator requires named corpora")
+        if not isinstance(input_sha256, dict):
+            raise ValueError("Corpus PPL evaluator requires input_sha256")
+        command = [
+            plan["runtime"]["python"],
+            str(entrypoint),
+            "--model-manifest",
+            str(config["model_manifest"]),
+            "--model-label",
+            str(config["model_label"]),
+        ]
+        for label, path in corpora.items():
+            _verify_input(path, input_sha256.get(label), f"corpus_ppl.{label}")
+            command.extend(["--corpus", f"{label}={path}"])
+        command.extend(
+            [
+                "--output-dir",
+                str(config["output_dir"]),
+                "--block-size",
+                str(config["scoring"]["block_size"]),
+                "--batch-size",
+                str(config["scoring"]["batch_size"]),
+                "--bootstrap-samples",
+                str(config["scoring"]["bootstrap_samples"]),
+                "--seed",
+                str(config["runtime"]["seed"]),
+                "--device",
+                str(config["runtime"]["device"]),
+            ]
+        )
+        if config["runtime"].get("bf16") is False:
+            command.append("--no-bf16")
+        return command
 
     if lane["adapter"] == "project_generation_integrity":
         if config.get("adapter_engine") != "general_capability":
