@@ -6,8 +6,8 @@
 
 Operate OLMo, Qwen and SmolLM as one comparable cohort without letting chat history, partial
 results, or one model's failure silently change the other models' protocol. This contract freezes
-the control graph and asset identities only. It does not freeze eval-v1, a corpus, a training
-recipe, or scientific execution.
+the control graph and asset identities only. eval-v1 has since been frozen and its binding updated
+below; corpus, training recipes and scientific execution remain outside this contract.
 
 The matrix reuses the existing 15-stage single-model workflow. It adds a model dimension, explicit
 three-job barriers, machine-readable blockers, a durable state ledger and one micro-context Luna
@@ -18,7 +18,7 @@ packet per model/stage node.
 - implementation commit: `329afaa91b4b403b86eca82f60bb3649a6f38800`;
 - matrix config: `configs/studies/three_model_m0_to_m2_matrix_v1.yaml`;
 - matrix config SHA-256:
-  `788549a9d57b36886359e5a46f0d5a661268c7b0b935462b90ed23217af16917`;
+  `2d1af87a99d50d2695c6f09f8947c64b0c68bc7bc17ce296a3adb74ca107a3ce`;
 - operator entrypoint: `scripts/study/run_model_matrix.py`;
 - operator entrypoint SHA-256:
   `ad4d64050c237630bb2b8a91e930f124fb7ac6284ca820d829c4de1b948c631e`;
@@ -72,7 +72,7 @@ the sibling parent or permit outcome-aware recipe changes.
 The prepared matrix intentionally uses explicit `null` config paths and named blockers where a
 scientific binding does not yet exist. It never substitutes placeholders or historical recipes.
 
-- eval-v1 is still draft and not execution-authorized;
+- eval-v1 is frozen but not execution-authorized;
 - OLMo has a completed non-scientific qualification bundle, not a scientific M0 config;
 - Qwen and SmolLM scientific M0 configs are not frozen;
 - the M1 corpus and per-model recipes are not frozen;
@@ -100,7 +100,7 @@ does not authorize evaluation, HU, Slurm, training, Git publication or cleanup.
 
 ## Required order to open execution
 
-1. Close OLMo qualification parity and freeze eval-v1 semantics, dataset revisions and margins.
+1. Close OLMo qualification parity and freeze eval-v1 semantics, dataset revisions and margins — complete in Documents 179/180.
 2. Freeze scientific M0 configs for all three exact model assets.
 3. Freeze one shared corpus contract and explicit per-model M1 recipes/hyperparameters.
 4. Freeze matched M2-A/M2-B construction and per-model recipes from each exact M1 parent.

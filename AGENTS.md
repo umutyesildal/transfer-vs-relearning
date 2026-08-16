@@ -64,9 +64,9 @@ historical evidence. New work does not overwrite their outcomes.
 
 Unless the user's current instruction and a relevant exact contract say otherwise:
 
-- `ready_to_measure: false`;
-- `ready_to_train: false`;
-- the evaluation contract is not frozen;
+- use the readiness and contract lifecycle values in `documentation/current/PROJECT_STATE.yaml`;
+- a frozen evaluation contract does not itself authorize measurement;
+- `ready_to_train: false` unless the current exact training contract says otherwise;
 - the corpus contract is not frozen;
 - no primary model is selected for the new main study;
 - no HU/SSH, Slurm/GPU, training, evaluation, inference, scoring, model/tokenizer/corpus retrieval,
@@ -123,7 +123,7 @@ Do not put live job IDs, long run diaries, or repeated result tables in `AGENTS.
 new global sequence number for routine progress. Update the smallest owning file and link to the
 canonical evidence.
 
-Numbered Documents 00–178 remain at their current paths until a separately reviewed link-safe
+Numbered Documents 00–180 remain at their current paths until a separately reviewed link-safe
 archive move. New current work uses the directories above.
 
 ## Contract discipline

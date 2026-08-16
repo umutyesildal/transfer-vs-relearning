@@ -23,18 +23,16 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     state = yaml.safe_load(STATE_PATH.read_text(encoding="utf-8"))
 
     assert state["schema_version"] == 1
-    assert state["readiness"]["evaluation_contract"] == "not_frozen"
+    assert state["readiness"]["evaluation_contract"] == "frozen"
     assert state["readiness"]["ready_to_measure"] is False
     assert state["readiness"]["ready_to_train"] is False
     assert state["readiness"]["selected_primary_model"] is None
-    assert state["evaluation_target"]["status"] == (
-        "draft_olmo_qualification_and_parity_complete_freeze_inputs_open"
-    )
+    assert state["evaluation_target"]["status"] == "frozen_execution_not_authorized"
     assert state["evaluation_target"]["harness"]["git_commit"] == (
         "6d642546f4688648fced259eb3302efd36ece5af"
     )
-    assert state["evaluation_target"]["harness"]["dataset_revisions_frozen"] is False
-    assert state["evaluation_target"]["harness"]["environment_locked"] is False
+    assert state["evaluation_target"]["harness"]["dataset_revisions_frozen"] is True
+    assert state["evaluation_target"]["harness"]["environment_locked"] is True
     assert state["repository"]["publication_authorized"] is False
     assert state["repository"]["publication_blockers"] == []
     assert state["repository"]["history_sanitization"][
@@ -77,8 +75,11 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["repository"]["hu_checkouts"]["legacy_retention"]["cleanup_proposal"],
         state["scientific_design"]["current_design_plan"],
         *state["scientific_design"]["supervisor_realignments"],
-        state["evaluation_target"]["draft_contract"],
+        state["evaluation_target"]["contract"],
+        state["evaluation_target"]["freeze_record"],
         state["evaluation_target"]["registry"],
+        state["evaluation_target"]["scientific_inputs"],
+        state["evaluation_target"]["factual_registry_manifest"],
         state["evaluation_target"]["inventory"],
         state["evaluation_target"]["task_qualification"],
         state["evaluation_target"]["result_schema"],
@@ -162,12 +163,12 @@ def test_control_plane_markdown_links_resolve():
     assert not failures, "Broken documentation links:\n" + "\n".join(failures)
 
 
-def test_eval_v1_registry_is_draft_and_fail_closed():
+def test_eval_v1_registry_is_frozen_but_execution_stays_unauthorized():
     registry = yaml.safe_load(EVAL_REGISTRY_PATH.read_text(encoding="utf-8"))
 
     assert registry["name"] == "eval-v1"
-    assert registry["status"] == "draft"
-    assert registry["execution_ready"] is False
+    assert registry["status"] == "frozen"
+    assert registry["execution_ready"] is True
     assert registry["execution_authorized"] is False
     assert registry["harness"]["release"] == "v0.4.12"
     assert registry["harness"]["git_commit"] == (
@@ -175,10 +176,11 @@ def test_eval_v1_registry_is_draft_and_fail_closed():
     )
     tasks = {row["id"]: row for row in registry["standard_tasks"]}
     assert tasks["wikitext"]["primary_metric"] == "bits_per_byte"
-    assert tasks["pile_10k"]["inclusion"] == "core_pending_runtime"
+    assert tasks["pile_10k"]["inclusion"] == "core"
+    assert tasks["pile_10k"]["cadence"] == "full"
     assert tasks["hellaswag"]["primary_metric"] == "acc_norm"
     assert tasks["turblimp_core"]["primary_metric"] == "acc_norm"
-    assert tasks["turkishmmlu"]["status"] == "dataset_access_unverified"
+    assert tasks["turkishmmlu"]["inclusion"] == "excluded_eval_v1_access_blocked"
     assert registry["cadence"]["dense"]["rule"] == (
         "every_epoch_end_including_parent_for_future_runs"
     )
@@ -188,7 +190,22 @@ def test_eval_v1_registry_is_draft_and_fail_closed():
         "normalization",
         "presentation_bundle",
     ]
-    assert registry["freeze_blockers"]
+    assert registry["freeze_blockers"] == []
+    assert registry["final_harness_task_ids"] == [
+        "wikitext",
+        "pile_10k",
+        "blimp",
+        "hellaswag",
+        "winogender_female",
+        "winogender_male",
+        "winogender_neutral",
+        "turblimp_core",
+    ]
+    assert registry["custom_factual"]["full_registry"]["rows"] == 12_000
+    assert registry["custom_factual"]["cheap_registry"]["rows"] == 1_500
+    assert registry["scientific_gates"]["transfer_m2_a_minus_m1"][
+        "tr_to_en_top1_minimum_gain"
+    ] == 0.05
 
 
 def test_m0_qualification_is_non_scientific_and_fail_closed():

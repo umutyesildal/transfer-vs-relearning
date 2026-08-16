@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m0-evaluation
-  status: m0_qualification_and_parity_complete_eval_v1_freeze_open
+  status: eval_v1_frozen_three_model_scientific_m0_configs_open
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -90,7 +90,7 @@ scientific_design:
     - documentation/177_SUPERVISOR_FEEDBACK_EVALUATION_FIRST_OLMO_AND_M2_PRIORITY_REALIGNMENT_TR.md
 
 readiness:
-  evaluation_contract: not_frozen
+  evaluation_contract: frozen
   corpus_contract: not_frozen
   m1_training_contract: not_frozen
   m2_training_contract: not_frozen
@@ -100,9 +100,12 @@ readiness:
 
 evaluation_target:
   contract_name: eval-v1
-  status: draft_olmo_qualification_and_parity_complete_freeze_inputs_open
-  draft_contract: documentation/contracts/evaluation/eval-v1.md
+  status: frozen_execution_not_authorized
+  contract: documentation/contracts/evaluation/eval-v1.md
+  freeze_record: documentation/180_EVAL_V1_SCIENTIFIC_INPUT_AND_PROTOCOL_FREEZE_TR.md
   registry: configs/evaluation/eval_v1_registry.yaml
+  scientific_inputs: configs/evaluation/eval_v1_scientific_inputs_v1.yaml
+  factual_registry_manifest: configs/evaluation/registries/eval_v1_factual_registry_manifest.json
   inventory: documentation/evaluation/EVALUATOR_INVENTORY_V1.md
   task_qualification: documentation/evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md
   result_schema: documentation/evaluation/RESULT_SCHEMA_V1.md
@@ -201,8 +204,11 @@ evaluation_target:
     local_lock_updated: true
     local_install_identity_verified: true
     local_install_version: 0.4.12
-    dataset_revisions_frozen: false
-    environment_locked: false
+    dataset_revisions_frozen: true
+    environment_locked: true
+    scientific_inputs_frozen: true
+    scientific_inputs_sha256: 845cb891c9a74c98becb4c50e397124c8ab1f47aefdf91dfdd5548b4dcd3b62f
+    dataset_content_manifest_sha256: 0bd32f84bcf94b8208b35a32cdb9a0e311e7ba005392a7557f80c316d0dfd7fb
     qualification_environment_locked: true
     qualification_environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
   architecture: hybrid_harness_custom_factual_and_normalizer
@@ -222,9 +228,9 @@ evaluation_target:
     three_model_matrix:
       status: planned_not_authorized
       contract: documentation/contracts/three-model-study-matrix-v1.md
-      contract_sha256: 9dd8b1ec6d6b8ba9885930ec11472b59393dcc718a9b66670de62d2760582d30
+      contract_sha256: cfcd04a424f342c7b51d710a1890b57fa698b14ebb2b4bacf524db1673830b2d
       config: configs/studies/three_model_m0_to_m2_matrix_v1.yaml
-      config_sha256: 788549a9d57b36886359e5a46f0d5a661268c7b0b935462b90ed23217af16917
+      config_sha256: 2d1af87a99d50d2695c6f09f8947c64b0c68bc7bc17ce296a3adb74ca107a3ce
       entrypoint: scripts/study/run_model_matrix.py
       implementation_commit: 329afaa91b4b403b86eca82f60bb3649a6f38800
       models: [olmo, qwen, smollm]
@@ -264,14 +270,7 @@ evaluation_target:
       - full_evaluation
       - normalization
       - presentation_bundle
-  freeze_blockers:
-    - dataset_revisions_and_content_manifests
-    - final_scientific_environment_binding
-    - pile_10k_runtime_and_cadence
-    - turkishmmlu_access_decision
-    - cheap_factual_probe_registry
-    - numeric_scientific_margins
-    - exact_training_checkpoint_bindings
+  freeze_blockers: []
 
 current_evidence:
   qwen_wikipedia_pilot:
@@ -311,8 +310,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: qualify_and_freeze_eval_v1
-  first_boundary: remaining_scientific_eval_v1_freeze_inputs
+  name: freeze_three_model_scientific_m0_configs
+  first_boundary: exact_olmo_qwen_smollm_m0_bindings_and_fail_closed_preflight
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -330,17 +329,19 @@ active_priority:
     - m0_harness_and_project_adapter_scaffold
     - m0_olmo_qualification_bundle_7_of_7
     - m0_olmo_wikitext_and_turblimp_parity_pass
+    - eval_v1_exact_dataset_and_environment_freeze
+    - eval_v1_pile_and_turkishmmlu_decisions
+    - eval_v1_full_and_cheap_factual_registry_freeze
+    - eval_v1_numeric_gate_and_checkpoint_policy_freeze
     - three_model_27_node_matrix_planner
     - three_model_luna_micro_packet_renderer
   required_outputs:
-    - exact_dataset_revision_and_access_evidence
-    - final_scientific_environment_binding
-    - pile_10k_runtime_and_cadence_decision
-    - turkishmmlu_inclusion_or_exclusion_decision
-    - cheap_factual_panel_hash
-    - numeric_gate_review
-    - parity_and_resume_test_plan
-    - frozen_eval_v1_contract
+    - olmo_scientific_m0_config
+    - qwen_scientific_m0_config
+    - smollm_scientific_m0_config
+    - three_model_m0_execution_contract
+    - exact_model_and_output_namespace_preflight
+    - separately_authorized_parallel_submission
 
 authorization:
   local_repository_changes: require_current_user_instruction
@@ -354,9 +355,8 @@ authorization:
   cleanup_or_deletion: false
 
 next_decision_required:
-  subject: remaining_eval_v1_scientific_freeze_inputs
+  subject: three_model_scientific_m0_execution_binding
   note: >-
-    The OLMo non-scientific qualification bundle and both parity checks are complete. Freeze exact
-    scientific dataset identities, the final environment binding, Pile-10k cadence, TurkishMMLU
-    disposition, the cheap factual panel, numeric margins and checkpoint-binding policy before
-    scientific M0 configs or any M1/M2 training contract can open.
+    eval-v1 is frozen and the qualification metrics remain non-scientific. Create and validate
+    exact OLMo, Qwen and SmolLM scientific M0 configs plus one bounded execution contract. No HU,
+    Slurm, scoring or training begins without a new explicit authorization.

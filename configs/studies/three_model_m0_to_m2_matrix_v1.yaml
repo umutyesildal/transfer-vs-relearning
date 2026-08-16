@@ -24,11 +24,11 @@ workflow_template:
 
 contracts:
   evaluation:
-    status: draft
+    status: frozen
     execution_authorized: false
     path: documentation/contracts/evaluation/eval-v1.md
-    sha256: 971f3b669d1ecb0aebae4aad351e282145aafa56a9dfe3855f7dec147a45869a
-    blocker: qualification_parity_dataset_revisions_and_numeric_margins_not_frozen
+    sha256: 72403598d7f9c8ba35bdfcc3e4791d097d41c6ef8f4e79c55cf9a6f34a37479e
+    blocker: scientific_m0_execution_not_authorized
   m1_training:
     status: not_frozen
     execution_authorized: false

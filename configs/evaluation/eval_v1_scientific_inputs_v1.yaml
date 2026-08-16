@@ -1,0 +1,97 @@
+schema_version: 1
+name: eval-v1-scientific-inputs-v1
+status: frozen
+as_of: "2026-08-16"
+
+harness_environment:
+  root: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3
+  python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
+  environment_lock_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/environment.lock.txt
+  environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
+  environment_identity_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/environment_identity.json
+  environment_identity_sha256: 9061cbc59d021676ca6b768f7688eb7da10e5460bf4919b963c9931eefcc7d71
+  identity:
+    python: 3.11.15
+    torch: 2.6.0+cu124
+    cuda: "12.4"
+    transformers: 5.13.0
+    datasets: 5.0.0
+    accelerate: 1.14.0
+    lm_eval_version: 0.4.12
+    lm_eval_commit: 6d642546f4688648fced259eb3302efd36ece5af
+
+huggingface_cache:
+  root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8/cache
+  hf_home: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8/cache/huggingface
+  datasets_cache: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8/cache/huggingface_datasets
+  access_mode: immutable_read_only_offline
+  content_manifest: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8/dataset_content_manifest.jsonl
+  content_manifest_sha256: 0bd32f84bcf94b8208b35a32cdb9a0e311e7ba005392a7557f80c316d0dfd7fb
+  file_count: 404
+  total_bytes: 413883554
+  offline_reload: passed
+  task_resolution_sha256: 597ef374fe588a6458c74b7e175bbe49eafd61624214ed30ad88d463a74d063a
+  datasets:
+    wikitext:
+      repository: EleutherAI/wikitext_document_level
+      revision: 647234772b9554e208af6c826f23b99e3cac88c8
+      config: wikitext-2-raw-v1
+      split: test
+    pile_10k:
+      repository: NeelNanda/pile-10k
+      revision: 127bfedcd5047750df5ccf3a12979a47bfa0bafa
+      config: null
+      split: train
+      rows: 10000
+      nonempty_rows: 10000
+      utf8_bytes: 61074719
+      whitespace_words: 9114313
+      dataset_fingerprint: 174215cc54146878
+    blimp:
+      repository: nyu-mll/blimp
+      revision: 877fba0801ffb7cbd8c39c1ff314a46f053f6036
+      split: train_as_validation
+    hellaswag:
+      repository: Rowan/hellaswag
+      revision: 218ec52e09a7e7462a5400043bb9a69a41d06b76
+      split: validation
+    winogender:
+      repository: oskarvanderwal/winogender
+      revision: d1cdb5b708800c151d09c5d8817290d3f6ced9f4
+      split: test
+    turblimp:
+      repository: juletxara/turblimp
+      revision: cce94ca73ac04a0fabd9fbd7a56068261e6348ad
+      split: train_as_test
+
+turkish_perplexity_controls:
+  trwiki_cross_domain:
+    role: frozen_cross_domain_control_not_primary_in_domain_corpus
+    source_id: trwiki-20260601
+    path: /vol/tmp2/yesildau/turkish_bridge_v1/corpus/trwiki_20260601_bridge_v1/splits/validation_documents.jsonl
+    sha256: 15480c1f543acf6df7aac1b2a2ee15fdcb3a544814f0063a181bd7a9cb0ca4f8
+    documents: 10034
+    bytes: 37385118
+    corpus_manifest: /vol/tmp2/yesildau/turkish_bridge_v1/corpus/trwiki_20260601_bridge_v1/manifests/corpus_manifest_final.json
+    corpus_manifest_sha256: 108c72375bb253742831da3fafb9e4b4b7b736974cb3cf6ef13f9b0f167502f7
+  primary_in_domain:
+    role: required_for_m2_manipulation_claim
+    binding_policy: exact_path_hash_document_manifest_must_be_frozen_by_corpus_contract_before_m2
+    current_binding: null
+    semantic_change_when_bound: false
+    execution_effect: m2_primary_turkish_manipulation_summary_remains_open_until_bound_and_m1_baseline_measured
+
+factual_registries:
+  manifest: configs/evaluation/registries/eval_v1_factual_registry_manifest.json
+  source_english_audit:
+    path: configs/evaluation/registries/eval_v1_factual_full_4000.csv
+    sha256: 54bf2968bcffecee8f0438b0ac489a6ab5fd0150dca2c459a4a1ad9efe50796b
+    rows: 4000
+  full_bilingual:
+    path: configs/evaluation/registries/eval_v1_factual_full_bilingual_12000.csv
+    sha256: 5125850a2db24c6b570971a58e9ba8a8586cabdec9084eb0e99bbd639691d93f
+    rows: 12000
+  cheap_bilingual:
+    path: configs/evaluation/registries/eval_v1_factual_cheap_bilingual_1500.csv
+    sha256: 9619339d5d0373036d26d39c88f36976bd4a9248f64ed346241a6ce54e658fc2
+    rows: 1500

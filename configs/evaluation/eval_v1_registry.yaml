@@ -1,8 +1,8 @@
 schema_version: 1
 name: eval-v1
-status: draft
+status: frozen
 as_of: "2026-08-16"
-execution_ready: false
+execution_ready: true
 execution_authorized: false
 
 design_sources:
@@ -13,7 +13,7 @@ harness:
   package: lm_eval
   release: v0.4.12
   git_commit: 6d642546f4688648fced259eb3302efd36ece5af
-  install_mode: dedicated_locked_environment_required
+  install_mode: frozen_dedicated_environment
   cli: lm-eval
   model_backend: hf
   apply_chat_template: false
@@ -26,6 +26,13 @@ harness:
     fewshot: 42
   project_bootstrap_samples: 10000
   project_bootstrap_seed: 42
+  scientific_inputs: configs/evaluation/eval_v1_scientific_inputs_v1.yaml
+  environment_root: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3
+  environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
+  environment_identity_sha256: 9061cbc59d021676ca6b768f7688eb7da10e5460bf4919b963c9931eefcc7d71
+  dataset_cache_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8/cache
+  dataset_content_manifest_sha256: 0bd32f84bcf94b8208b35a32cdb9a0e311e7ba005392a7557f80c316d0dfd7fb
+  offline_only: true
 
 qualification_evidence:
   status: olmo_7_of_7_bundle_and_two_parity_checks_complete
@@ -60,15 +67,17 @@ cadence:
     full: [0, 126, 252]
     available_epochs: [0, 6, 12, 18, 24, 30, 36]
     limitation: missing_epoch_weights_cannot_be_reconstructed_or_imputed
-  unresolved:
-    - pile_10k_dense_or_full_after_runtime_qualification
-    - exact_m2_steps_from_future_training_contract
-    - cheap_factual_probe_registry_and_hash
+  checkpoint_binding_policy:
+    owner: each_future_training_contract
+    rule: bind_every_epoch_to_exact_integer_update_and_checkpoint_hash_before_training
+    midpoint_rule: bind_one_exact_integer_update_before_training_no_interpolation
+    semantic_change: false
+  dense_at_full_checkpoint: derive_cheap_rows_from_same_full_probe_scores_without_rescoring
 
 standard_tasks:
   - id: wikitext
     inclusion: core
-    status: upstream_semantics_and_count_result_heading_parity_verified_dataset_revision_unresolved
+    status: frozen_verified
     role: english_retention_primary
     cadence: dense
     fewshot: 0
@@ -77,24 +86,29 @@ standard_tasks:
     dataset: EleutherAI/wikitext_document_level
     dataset_config: wikitext-2-raw-v1
     split: test
+    dataset_revision: 647234772b9554e208af6c826f23b99e3cac88c8
     upstream_config_sha256: f6d1a228da486466ac91922c99cb5ff197610ec045decb2009599a16b80eaf45
 
   - id: pile_10k
-    inclusion: core_pending_runtime
-    status: upstream_semantics_verified_dataset_revision_unresolved
+    inclusion: core
+    status: frozen_verified
     role: english_retention_broad_domain_control
-    cadence: unresolved_dense_or_full
+    cadence: full
     fewshot: 0
     primary_metric: bits_per_byte
     reported_metrics: [word_perplexity, byte_perplexity, bits_per_byte]
     dataset: NeelNanda/pile-10k
     dataset_config: null
     split: train
+    dataset_revision: 127bfedcd5047750df5ccf3a12979a47bfa0bafa
+    rows: 10000
+    utf8_bytes: 61074719
+    cadence_reason: broad_domain_control_is_too_expensive_for_every_epoch_and_is_required_at_entry_midpoint_endpoint
     upstream_config_sha256: 89cf6d71c1e41414a5645c2329216e583c5bbdbc2846b6625985b713929faaad
 
   - id: blimp
     inclusion: core
-    status: upstream_semantics_verified_dataset_revision_unresolved
+    status: frozen_verified
     role: english_grammar_capability
     cadence: full
     fewshot: 0
@@ -102,12 +116,13 @@ standard_tasks:
     aggregation: unweighted_macro_over_67_subtasks
     dataset: nyu-mll/blimp
     split: train_as_validation
+    dataset_revision: 877fba0801ffb7cbd8c39c1ff314a46f053f6036
     upstream_group_sha256: 967349a443540d81bf70e73ee4049d2eb70f1e4812b684384f796de6bd4ba26f
     upstream_template_sha256: c69805e3455a2904af0dac907c981331db08fd4bd6b16822113abdb74bcb528e
 
   - id: hellaswag
     inclusion: core
-    status: upstream_semantics_verified_dataset_revision_unresolved
+    status: frozen_verified
     role: english_commonsense_capability
     cadence: full
     fewshot: 0
@@ -115,12 +130,13 @@ standard_tasks:
     sensitivity_metric: acc
     dataset: Rowan/hellaswag
     split: validation
+    dataset_revision: 218ec52e09a7e7462a5400043bb9a69a41d06b76
     upstream_config_sha256: e9ef8ac3fed02bf283777d946ae76cbf906152e9c92533c9794e5a9dad78d1cf
 
   - id: winogender_slices
     task_ids: [winogender_female, winogender_male, winogender_neutral]
     inclusion: diagnostic
-    status: upstream_semantics_verified_dataset_revision_unresolved
+    status: frozen_verified
     role: english_coreference_and_bias_diagnostic
     cadence: full
     fewshot: 0
@@ -128,11 +144,12 @@ standard_tasks:
     derived_metrics: [female_minus_male_accuracy, neutral_minus_binary_mean_accuracy]
     dataset: oskarvanderwal/winogender
     split: test
+    dataset_revision: d1cdb5b708800c151d09c5d8817290d3f6ced9f4
     upstream_base_config_sha256: 89b9e873c28f37e0ff608eedc6ff0f4062c98eb1127bfbce588011d010bacc13
 
   - id: turblimp_core
     inclusion: core
-    status: upstream_semantics_and_16_subtask_macro_parity_verified_dataset_revision_unresolved
+    status: frozen_verified
     role: turkish_grammar_manipulation_check
     cadence: full
     fewshot: 0
@@ -142,6 +159,7 @@ standard_tasks:
     aggregation: unweighted_macro_over_16_subtasks
     dataset: juletxara/turblimp
     split: train_as_test
+    dataset_revision: cce94ca73ac04a0fabd9fbd7a56068261e6348ad
     upstream_group_sha256: 5a0a660e69eb0da0316fcd758ec0adb7b7e857b368ce5d151a0e143afbf3d421
     upstream_template_sha256: 26e9fe58fd8fb83dd86b6669f152964167e84a5ee56ad8ef87c78e1a0c10f388
 
@@ -156,10 +174,10 @@ standard_tasks:
       - turkishmmlu_religion_and_ethics
       - turkishmmlu_turkish_language_and_literature
       - turkishmmlu_mathematics
-    inclusion: conditional_before_freeze
-    status: dataset_access_unverified
+    inclusion: excluded_eval_v1_access_blocked
+    status: excluded_before_freeze_dataset_requires_author_contact
     role: turkish_knowledge_capability_secondary
-    cadence: full
+    cadence: not_in_contract
     fewshot: 5
     primary_metric: acc
     sensitivity_metric: acc_norm
@@ -169,10 +187,10 @@ standard_tasks:
     upstream_template_sha256: d8ae99801eb61484dfc8a8b83e4e07b0ced05f601fca360a31afd23e5fdbc7e2
 
   - id: xcopa_tr
-    inclusion: reserve_secondary
-    status: upstream_semantics_verified_dataset_revision_unresolved
+    inclusion: excluded_eval_v1_not_promoted_before_freeze
+    status: deferred_to_eval_v2_if_ever_added
     role: turkish_causal_commonsense_secondary
-    cadence: full_if_promoted_before_freeze
+    cadence: not_in_contract
     fewshot: 0
     primary_metric: acc
     dataset: xcopa
@@ -181,6 +199,10 @@ standard_tasks:
     upstream_config_sha256: e95ccddfe0b3128b5a26b07f65eb0410728ce97110a98fe4cc7897ac3227358b
 
 excluded_or_deferred:
+  - id: turkishmmlu
+    reason: dataset_card_requires_contacting_authors_for_access_and_no_exact_revision_was_available_before_eval_v1_freeze
+  - id: xcopa_tr
+    reason: reserve_secondary_was_not_promoted_before_eval_v1_freeze
   - id: xquad_tr
     reason: generation_format_sensitivity_and_no_incremental_core_estimand
   - id: ewok
@@ -207,11 +229,29 @@ custom_factual:
     - same_subject_relation_swap
   uncertainty: paired_subject_bootstrap
   exact_prefix_generation: secondary_where_explicitly_defined
+  source_english_audit_registry:
+    path: configs/evaluation/registries/eval_v1_factual_full_4000.csv
+    sha256: 54bf2968bcffecee8f0438b0ac489a6ab5fd0150dca2c459a4a1ad9efe50796b
+    rows: 4000
+  full_registry:
+    path: configs/evaluation/registries/eval_v1_factual_full_bilingual_12000.csv
+    sha256: 5125850a2db24c6b570971a58e9ba8a8586cabdec9084eb0e99bbd639691d93f
+    rows: 12000
+  cheap_registry:
+    path: configs/evaluation/registries/eval_v1_factual_cheap_bilingual_1500.csv
+    sha256: 9619339d5d0373036d26d39c88f36976bd4a9248f64ed346241a6ce54e658fc2
+    rows: 1500
+    denominator: one_probe_per_fact_per_direction
 
 retention:
   english_primary: wikitext_raw_bits_per_byte_and_absolute_delta_to_parent
   english_secondary: pile_10k_raw_bits_per_byte_and_absolute_delta_to_parent
   turkish_primary: frozen_heldout_turkish_raw_bits_per_byte_and_absolute_delta_to_parent
+  turkish_cross_domain_control:
+    source: trwiki-20260601_validation
+    sha256: 15480c1f543acf6df7aac1b2a2ee15fdcb3a544814f0063a181bd7a9cb0ca4f8
+    documents: 10034
+    role: required_cross_domain_control_not_substitute_for_primary_in_domain
   report_always:
     - raw_value
     - parent_value
@@ -226,6 +266,62 @@ retention:
     formula: 100 / perplexity_ratio
     role: visualization_only
     scientific_gate: false
+
+scientific_gates:
+  comparison_unit: paired_subject
+  confidence:
+    method: paired_subject_bootstrap
+    draws: 10000
+    seed: 42
+    interval: 0.95
+    causal_positive_rule: point_estimate_at_least_minimum_gain_and_two_sided_interval_lower_bound_above_zero
+  m1_factual_acquisition:
+    en_to_en_exact_prefix_min: 0.90
+    en_to_en_trained_forms_a_b_top1_global_min: 0.80
+    en_to_en_trained_forms_a_b_top1_each_relation_min: 0.80
+    en_to_en_heldout_forms_c_d_top1_global_min: 0.80
+    en_to_en_heldout_forms_c_d_top1_each_relation_min: 0.80
+    en_to_en_robust_eight_cell_fact_intersection_global_min: 0.70
+    en_to_en_robust_eight_cell_fact_intersection_each_relation_min: 0.70
+  english_retention:
+    wikitext_delta_bpb_max: 0.32192809488736235
+    wikitext_equivalent_byte_perplexity_ratio_max: 1.25
+    pile_10k_delta_bpb_max: 0.32192809488736235
+    pile_10k_equivalent_byte_perplexity_ratio_max: 1.25
+    blimp_absolute_accuracy_drop_max: 0.05
+    hellaswag_acc_norm_absolute_drop_max: 0.05
+    winogender_role: diagnostic_no_gate
+  m2_turkish_manipulation:
+    primary_in_domain_byte_perplexity_ratio_to_m1_max: 0.95
+    primary_in_domain_delta_bpb_max: -0.07400058144377693
+    trwiki_control_report_required: true
+    turblimp_acc_norm_absolute_drop_max: 0.05
+  m2_english_factual_retention:
+    en_to_en_top1_absolute_drop_from_m1_max: 0.05
+    en_to_en_robust_intersection_absolute_drop_from_m1_max: 0.05
+  transfer_m2_a_minus_m1:
+    tr_to_en_top1_minimum_gain: 0.05
+    bootstrap_interval_lower_bound_strictly_above: 0.0
+    already_open_fallback_floor: 0.30
+    already_open_fallback_drop_max: 0.05
+  relearning_m2_b_minus_m2_a:
+    tr_to_en_top1_minimum_gain: 0.05
+    bootstrap_interval_lower_bound_strictly_above: 0.0
+  replication:
+    rule: every_required_seed_must_meet_the_same_point_and_interval_rule
+  selection:
+    rule: earliest_precommitted_checkpoint_passing_every_required_gate
+    outcome_aware_threshold_or_checkpoint_change: forbidden
+
+final_harness_task_ids:
+  - wikitext
+  - pile_10k
+  - blimp
+  - hellaswag
+  - winogender_female
+  - winogender_male
+  - winogender_neutral
+  - turblimp_core
 
 training_trace:
   required_for_future_runs: true
@@ -272,11 +368,4 @@ pipeline:
     - evaluation_manifest.json
     - presentation/figure_manifest.json
 
-freeze_blockers:
-  - exact_huggingface_dataset_revisions_and_local_content_manifests
-  - final_scientific_environment_binding_from_qualified_lock
-  - pile_10k_runtime_and_cadence_decision
-  - turkishmmlu_access_inclusion_or_exclusion_decision
-  - cheap_factual_panel_ids_and_hash
-  - numeric_acquisition_retention_manipulation_and_noninferiority_margins
-  - exact_training_contract_checkpoint_bindings
+freeze_blockers: []

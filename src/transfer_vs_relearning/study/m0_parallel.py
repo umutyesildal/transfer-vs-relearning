@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import time
 from datetime import datetime, timezone
@@ -54,6 +55,49 @@ def _placeholder_paths(value: Any, prefix: str = "") -> list[str]:
     elif isinstance(value, str) and value.startswith("__") and value.endswith("__"):
         found.append(prefix)
     return found
+
+
+def _scientific_cache_paths(plan: dict[str, Any], output_root: Path) -> dict[str, Path]:
+    preflight = plan["data_preflight"]
+    if preflight.get("mode") == "frozen_offline_reuse":
+        cache_root = Path(str(preflight["source_cache_root"])).resolve()
+    else:
+        cache_root = output_root / "cache"
+    return {
+        "root": cache_root,
+        "hf_home": cache_root / "huggingface",
+        "datasets": cache_root / "huggingface_datasets",
+        "xdg": cache_root,
+    }
+
+
+def _verified_content_manifest(preflight: dict[str, Any]) -> tuple[Path, list[dict[str, Any]]]:
+    manifest_path = Path(str(preflight["source_content_manifest"])).resolve()
+    if not manifest_path.is_file():
+        raise FileNotFoundError(f"Frozen dataset content manifest is missing: {manifest_path}")
+    if sha256_file(manifest_path) != str(preflight["source_content_manifest_sha256"]):
+        raise ValueError("Frozen dataset content manifest SHA-256 mismatch")
+    rows: list[dict[str, Any]] = []
+    with manifest_path.open(encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            path = Path(str(row.get("path", ""))).resolve()
+            if not path.is_file():
+                raise FileNotFoundError(
+                    f"Frozen dataset cache file is missing at manifest row {line_number}: {path}"
+                )
+            if path.stat().st_size != int(row.get("bytes", -1)):
+                raise ValueError(f"Frozen dataset cache byte mismatch: {path}")
+            if sha256_file(path) != str(row.get("sha256", "")):
+                raise ValueError(f"Frozen dataset cache SHA-256 mismatch: {path}")
+            rows.append(row)
+    expected_files = int(preflight["source_cache_files"])
+    expected_bytes = int(preflight["source_cache_bytes"])
+    if len(rows) != expected_files or sum(int(row["bytes"]) for row in rows) != expected_bytes:
+        raise ValueError("Frozen dataset cache manifest count/byte totals do not match")
+    return manifest_path, rows
 
 
 def load_m0_config(path: Path) -> dict[str, Any]:
@@ -142,6 +186,10 @@ def build_m0_parallel_plan(config_path: Path, *, repo_root: Path) -> dict[str, A
     max_parallel = parallel.get("max_parallel_lanes")
     if not isinstance(max_parallel, int) or not 1 <= max_parallel <= len(normalized_lanes):
         raise ValueError("max_parallel_lanes must be between one and the lane count")
+    if config["classification"] == "scientific_evaluation" and any(
+        lane.get("limit") is not None for lane in normalized_lanes
+    ):
+        raise ValueError("Scientific M0 evaluation cannot use --limit")
     runtime = _mapping(parallel.get("runtime"), "parallel_evaluation.runtime")
     slurm = _mapping(parallel.get("slurm"), "parallel_evaluation.slurm")
     route_policy = slurm.get(
@@ -203,6 +251,23 @@ def build_m0_parallel_plan(config_path: Path, *, repo_root: Path) -> dict[str, A
         parallel.get("data_preflight"),
         "parallel_evaluation.data_preflight",
     )
+    data_mode = data_preflight.get("mode", "network_materialize")
+    if data_mode not in {"network_materialize", "frozen_offline_reuse"}:
+        raise ValueError("Unsupported M0 data preflight mode")
+    if config["classification"] == "scientific_evaluation":
+        if data_mode != "frozen_offline_reuse":
+            raise ValueError("Scientific M0 requires frozen_offline_reuse data mode")
+        if data_preflight.get("network_retrieval_authorized") is not False:
+            raise ValueError("Scientific M0 frozen input reuse must forbid network retrieval")
+        for key in (
+            "source_cache_root",
+            "source_content_manifest",
+            "source_content_manifest_sha256",
+            "source_cache_files",
+            "source_cache_bytes",
+        ):
+            if data_preflight.get(key) in {None, ""}:
+                raise ValueError(f"Scientific M0 data preflight is missing {key}")
     seeds = _mapping(config.get("seeds"), "seeds")
     if set(seeds) != {"python", "numpy", "torch", "fewshot"}:
         raise ValueError("M0 requires exactly four named deterministic seeds")
@@ -312,6 +377,18 @@ def assess_m0_parallel_readiness(
         str(output).startswith("/vol/tmp2/yesildau/"),
         str(output),
     )
+    if plan["classification"] == "scientific_evaluation":
+        try:
+            _, content_rows = _verified_content_manifest(plan["data_preflight"])
+            cache_identity_ok = True
+            cache_detail = (
+                f"files={len(content_rows)}, "
+                f"bytes={sum(int(row['bytes']) for row in content_rows)}"
+            )
+        except (OSError, ValueError, KeyError, json.JSONDecodeError) as exc:
+            cache_identity_ok = False
+            cache_detail = str(exc)
+        record("frozen_dataset_cache_identity", cache_identity_ok, cache_detail)
 
     if plan["placeholders"]:
         record("runtime_and_artifact_identity", False, "cannot validate unresolved bindings")
@@ -610,26 +687,39 @@ def prepare_m0_environment(plan: dict[str, Any], *, repo_root: Path) -> dict[str
 
 def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[str, Any]:
     preflight = plan["data_preflight"]
-    if preflight.get("network_retrieval_authorized") is not True:
+    offline_reuse = preflight.get("mode") == "frozen_offline_reuse"
+    if not offline_reuse and preflight.get("network_retrieval_authorized") is not True:
         raise PermissionError("M0 task-data retrieval is not authorized")
+    if offline_reuse and preflight.get("network_retrieval_authorized") is not False:
+        raise PermissionError("Frozen scientific cache reuse must keep network retrieval disabled")
     preflight_root = output_root / "preflight"
     if preflight_root.exists():
         raise FileExistsError(f"M0 data preflight output already exists: {preflight_root}")
     preflight_root.mkdir()
-    cache_root = output_root / "cache"
+    cache_paths = _scientific_cache_paths(plan, output_root)
+    cache_root = cache_paths["root"]
     tasks = [task for lane in plan["lanes"] for task in lane.get("task_ids", [])]
     environment = os.environ.copy()
     environment.update(
         {
-            "HF_HOME": str(cache_root / "huggingface"),
-            "HF_DATASETS_CACHE": str(cache_root / "huggingface_datasets"),
-            "XDG_CACHE_HOME": str(cache_root),
+            "HF_HOME": str(cache_paths["hf_home"]),
+            "HF_DATASETS_CACHE": str(cache_paths["datasets"]),
+            "XDG_CACHE_HOME": str(cache_paths["xdg"]),
             "HF_HUB_DISABLE_TELEMETRY": "1",
             "PYTHONDONTWRITEBYTECODE": "1",
         }
     )
-    for name in ("HF_HUB_OFFLINE", "HF_DATASETS_OFFLINE", "TRANSFORMERS_OFFLINE"):
-        environment.pop(name, None)
+    if offline_reuse:
+        environment.update(
+            {
+                "HF_HUB_OFFLINE": "1",
+                "HF_DATASETS_OFFLINE": "1",
+                "TRANSFORMERS_OFFLINE": "1",
+            }
+        )
+    else:
+        for name in ("HF_HUB_OFFLINE", "HF_DATASETS_OFFLINE", "TRANSFORMERS_OFFLINE"):
+            environment.pop(name, None)
     started_at = datetime.now(timezone.utc).isoformat()
     started = time.monotonic()
     project_rows: list[dict[str, Any]] = []
@@ -681,8 +771,9 @@ def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[st
             ",".join(tasks),
             *include_args,
         ],
-        "task_materialize": [plan["runtime"]["python"], "-c", materialize_code],
     }
+    if not offline_reuse:
+        commands["task_materialize"] = [plan["runtime"]["python"], "-c", materialize_code]
     completed: dict[str, subprocess.CompletedProcess[str]] = {}
     for label, command in commands.items():
         result = subprocess.run(
@@ -729,7 +820,11 @@ def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[st
             "task_id": task,
             "discovered": task in discovered,
             "validation_returncode": completed["task_validate"].returncode,
-            "materialization_returncode": completed["task_materialize"].returncode,
+            "materialization_returncode": (
+                None
+                if offline_reuse
+                else completed["task_materialize"].returncode
+            ),
             "offline_reload_returncode": completed["task_offline_reload"].returncode,
             "status": (
                 "complete"
@@ -741,8 +836,22 @@ def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[st
         }
         for task in tasks
     ]
-    cache_files = [path for path in sorted(cache_root.rglob("*")) if path.is_file()]
-    cache_bytes = sum(path.stat().st_size for path in cache_files)
+    if offline_reuse:
+        source_manifest, content_rows = _verified_content_manifest(preflight)
+        cache_files = [Path(str(row["path"])) for row in content_rows]
+        cache_bytes = sum(int(row["bytes"]) for row in content_rows)
+    else:
+        source_manifest = None
+        cache_files = [path for path in sorted(cache_root.rglob("*")) if path.is_file()]
+        cache_bytes = sum(path.stat().st_size for path in cache_files)
+        content_rows = [
+            {
+                "path": str(path),
+                "bytes": path.stat().st_size,
+                "sha256": sha256_file(path),
+            }
+            for path in cache_files
+        ]
     within_bounds = (
         len(cache_files) <= int(preflight["max_cache_files"])
         and cache_bytes <= int(preflight["max_cache_bytes"])
@@ -751,16 +860,11 @@ def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[st
         len(cache_files) >= int(preflight["min_cache_files"])
         and cache_bytes >= int(preflight["min_cache_bytes"])
     )
-    content_rows = [
-        {
-            "path": str(path),
-            "bytes": path.stat().st_size,
-            "sha256": sha256_file(path),
-        }
-        for path in cache_files
-    ]
     _write_jsonl(output_root / "task_resolution.jsonl", rows)
-    _write_jsonl(output_root / "dataset_content_manifest.jsonl", content_rows)
+    if source_manifest is None:
+        _write_jsonl(output_root / "dataset_content_manifest.jsonl", content_rows)
+    else:
+        shutil.copyfile(source_manifest, output_root / "dataset_content_manifest.jsonl")
     status = (
         "complete"
         if all(row["status"] == "complete" for row in rows)
@@ -785,7 +889,11 @@ def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[st
         "cache_materialized": cache_materialized,
         "offline_reload_passed": completed["task_offline_reload"].returncode == 0,
         "project_input_lane_count": len(project_rows),
-        "network_retrieval_used": cache_materialized,
+        "data_mode": preflight.get("mode", "network_materialize"),
+        "source_content_manifest_sha256": (
+            preflight.get("source_content_manifest_sha256") if offline_reuse else None
+        ),
+        "network_retrieval_used": False if offline_reuse else cache_materialized,
     }
     write_json(preflight_root / "preflight_result.json", payload)
     if status != "complete":
@@ -896,12 +1004,13 @@ def run_m0_lane(plan: dict[str, Any], lane_index: int, *, output_root: Path) -> 
     else:
         command = build_project_probe_command(plan, lane, repo_root=repo_root)
 
+    cache_paths = _scientific_cache_paths(plan, output_root)
     environment = os.environ.copy()
     environment.update(
         {
-            "HF_HOME": str(output_root / "cache/huggingface"),
-            "HF_DATASETS_CACHE": str(output_root / "cache/huggingface_datasets"),
-            "XDG_CACHE_HOME": str(output_root / "cache"),
+            "HF_HOME": str(cache_paths["hf_home"]),
+            "HF_DATASETS_CACHE": str(cache_paths["datasets"]),
+            "XDG_CACHE_HOME": str(cache_paths["xdg"]),
             "HF_HUB_OFFLINE": "1",
             "HF_DATASETS_OFFLINE": "1",
             "TRANSFORMERS_OFFLINE": "1",
@@ -1029,8 +1138,44 @@ def finalize_m0_bundle(plan: dict[str, Any], *, output_root: Path) -> dict[str, 
             result.get("status", "partial_invalid") if valid_identity else "partial_invalid"
         )
         results.append(result)
-    complete = len(results) == plan["lane_count"] and all(
+    lanes_complete = len(results) == plan["lane_count"] and all(
         status == "complete" for status in lane_status.values()
+    )
+    lock_path = Path(str(plan["runtime"]["environment_lock_path"]))
+    lock_exists = lock_path.is_file()
+    lock_observed = sha256_file(lock_path) if lock_exists else None
+    lock_valid = lock_observed == plan["runtime"]["environment_lock_sha256"]
+    model_manifest = Path(str(plan["model"]["manifest_path"]))
+    model_exists = model_manifest.is_file()
+    model_observed = sha256_file(model_manifest) if model_exists else None
+    model_valid = model_observed == plan["model"]["manifest_sha256"]
+    cache_integrity: dict[str, Any] = {"status": "not_applicable"}
+    cache_valid = True
+    if plan["run_classification"] == "scientific":
+        try:
+            _, content_rows = _verified_content_manifest(plan["data_preflight"])
+            cache_root = Path(str(plan["data_preflight"]["source_cache_root"])).resolve()
+            expected_paths = {Path(str(row["path"])).resolve() for row in content_rows}
+            observed_paths = {
+                path.resolve() for path in cache_root.rglob("*") if path.is_file()
+            }
+            cache_valid = observed_paths == expected_paths
+            cache_integrity = {
+                "status": "verified" if cache_valid else "mutated_or_incomplete",
+                "manifest_sha256": plan["data_preflight"][
+                    "source_content_manifest_sha256"
+                ],
+                "expected_files": len(expected_paths),
+                "observed_files": len(observed_paths),
+                "unexpected_files": sorted(str(path) for path in observed_paths - expected_paths),
+                "missing_files": sorted(str(path) for path in expected_paths - observed_paths),
+            }
+        except (OSError, ValueError, KeyError, json.JSONDecodeError) as exc:
+            cache_valid = False
+            cache_integrity = {"status": "unavailable_or_mismatched", "error": str(exc)}
+    identity_valid = lock_valid and model_valid and cache_valid
+    complete = lanes_complete and (
+        identity_valid if plan["run_classification"] == "scientific" else True
     )
     payload = {
         "schema_version": 1,
@@ -1041,6 +1186,11 @@ def finalize_m0_bundle(plan: dict[str, Any], *, output_root: Path) -> dict[str, 
         "complete_lane_count": sum(status == "complete" for status in lane_status.values()),
         "lanes": lane_status,
         "normalization_allowed": complete,
+        "identity_gate": {
+            "environment_lock": lock_valid,
+            "model_manifest": model_valid,
+            "dataset_cache": cache_integrity,
+        },
     }
     write_json(output_root / "bundle_status.json", payload)
     manifest_path = output_root / "evaluation_manifest.json"
@@ -1122,9 +1272,6 @@ def finalize_m0_bundle(plan: dict[str, Any], *, output_root: Path) -> dict[str, 
         },
     )
 
-    lock_path = Path(str(plan["runtime"]["environment_lock_path"]))
-    lock_exists = lock_path.is_file()
-    lock_observed = sha256_file(lock_path) if lock_exists else None
     write_json(
         output_root / "environment_lock.json",
         {
@@ -1141,9 +1288,6 @@ def finalize_m0_bundle(plan: dict[str, Any], *, output_root: Path) -> dict[str, 
             "run_classification": plan["run_classification"],
         },
     )
-    model_manifest = Path(str(plan["model"]["manifest_path"]))
-    model_exists = model_manifest.is_file()
-    model_observed = sha256_file(model_manifest) if model_exists else None
     write_json(
         output_root / "model_identity.json",
         {
@@ -1158,62 +1302,85 @@ def finalize_m0_bundle(plan: dict[str, Any], *, output_root: Path) -> dict[str, 
             "run_classification": plan["run_classification"],
         },
     )
-    parity_rows = [
-        {
-            "check_id": "wikitext_count_result_and_heading_parity",
-            "status": "not_run_blocked",
-            "reason": "qualification_v1_smoke_does_not_yet_implement_reviewed_parity_tolerance",
-            "run_classification": plan["run_classification"],
-        },
-        {
-            "check_id": "turblimp_16_subtask_macro_parity",
-            "status": "not_run_blocked",
-            "reason": "qualification_v1_smoke_does_not_yet_implement_reviewed_parity_tolerance",
-            "run_classification": plan["run_classification"],
-        },
-    ]
-    _write_jsonl(output_root / "parity_results.jsonl", parity_rows)
-
-    qualification_blockers = [
-        f"lane_incomplete:{lane_id}"
-        for lane_id, status in lane_status.items()
-        if status != "complete"
-    ]
-    qualification_blockers.extend(row["check_id"] for row in parity_rows)
-    write_json(
-        output_root / "qualification_manifest.json",
-        {
-            "schema_version": 1,
-            "plan_id": plan["plan_id"],
-            "config_path": plan["config_path"],
-            "config_sha256": plan["config_sha256"],
-            "implementation_commit": plan["runtime"]["implementation_commit"],
-            "implementation_files": plan["runtime"]["implementation_files"],
-            "model": plan["model"],
-            "harness": plan["harness"],
-            "run_classification": plan["run_classification"],
-            "scientific_result": False,
-            "bundle_status": payload["status"],
-            "required_lane_count": plan["lane_count"],
-            "complete_lane_count": payload["complete_lane_count"],
-        },
-    )
-    write_json(
-        output_root / "qualification_result.json",
-        {
-            "schema_version": 1,
-            "plan_id": plan["plan_id"],
-            "gate": "blocked",
-            "blockers": qualification_blockers,
-            "scientific_result": False,
-            "scientific_work_started": False,
-            "run_classification": plan["run_classification"],
-            "note": (
-                "This bounded run may qualify execution mechanics only; its metrics cannot enter "
-                "scientific M0 tables or gates."
-            ),
-        },
-    )
+    if plan["run_classification"] == "test_only_non_scientific":
+        parity_rows = [
+            {
+                "check_id": "wikitext_count_result_and_heading_parity",
+                "status": "not_run_blocked",
+                "reason": "qualification_v1_smoke_does_not_yet_implement_reviewed_parity_tolerance",
+                "run_classification": plan["run_classification"],
+            },
+            {
+                "check_id": "turblimp_16_subtask_macro_parity",
+                "status": "not_run_blocked",
+                "reason": "qualification_v1_smoke_does_not_yet_implement_reviewed_parity_tolerance",
+                "run_classification": plan["run_classification"],
+            },
+        ]
+        _write_jsonl(output_root / "parity_results.jsonl", parity_rows)
+        qualification_blockers = [
+            f"lane_incomplete:{lane_id}"
+            for lane_id, status in lane_status.items()
+            if status != "complete"
+        ]
+        qualification_blockers.extend(row["check_id"] for row in parity_rows)
+        write_json(
+            output_root / "qualification_manifest.json",
+            {
+                "schema_version": 1,
+                "plan_id": plan["plan_id"],
+                "config_path": plan["config_path"],
+                "config_sha256": plan["config_sha256"],
+                "implementation_commit": plan["runtime"]["implementation_commit"],
+                "implementation_files": plan["runtime"]["implementation_files"],
+                "model": plan["model"],
+                "harness": plan["harness"],
+                "run_classification": plan["run_classification"],
+                "scientific_result": False,
+                "bundle_status": payload["status"],
+                "required_lane_count": plan["lane_count"],
+                "complete_lane_count": payload["complete_lane_count"],
+            },
+        )
+        write_json(
+            output_root / "qualification_result.json",
+            {
+                "schema_version": 1,
+                "plan_id": plan["plan_id"],
+                "gate": "blocked",
+                "blockers": qualification_blockers,
+                "scientific_result": False,
+                "scientific_work_started": False,
+                "run_classification": plan["run_classification"],
+                "note": (
+                    "This bounded run may qualify execution mechanics only; its metrics cannot "
+                    "enter scientific M0 tables or gates."
+                ),
+            },
+        )
+    else:
+        write_json(
+            output_root / "scientific_bundle_result.json",
+            {
+                "schema_version": 1,
+                "plan_id": plan["plan_id"],
+                "status": (
+                    "complete_raw_pending_normalization"
+                    if complete
+                    else "partial_invalid_no_scientific_summary"
+                ),
+                "run_classification": "scientific",
+                "raw_bundle_complete": complete,
+                "normalization_allowed": complete,
+                "model": plan["model"],
+                "identity_gate": payload["identity_gate"],
+                "model_pass_fail": "not_computed_by_raw_finalizer",
+                "note": (
+                    "Scientific metrics remain in immutable raw artifacts until the frozen "
+                    "normalizer computes eval-v1 rows and gates."
+                ),
+            },
+        )
     inventory = [
         {
             "path": str(path),

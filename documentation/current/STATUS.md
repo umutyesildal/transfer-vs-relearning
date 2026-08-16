@@ -1,6 +1,6 @@
 # Current project status
 
-**As of:** 2026-08-16 | **Phase:** evaluation foundation design
+**As of:** 2026-08-16 | **Phase:** three-model scientific M0 binding
 **Readiness:** `ready_to_measure = false`, `ready_to_train = false`
 
 ## Executive state
@@ -9,11 +9,11 @@ The project is not restarting and the existing code is not disposable. The compl
 model-screening runs, evaluation scripts, corpus tooling, Slurm launchers, scientific records,
 papers, and study notes have been preserved in one verified local monorepo.
 
-The next scientific bottleneck is measurement stability. Document 178 gives the end-to-end design,
-and the first eval-v1 design pass now fixes the hybrid architecture, upstream harness release/task
-semantics, metric roles, normalized schema and proposed dense/full cadence. eval-v1 remains a draft:
-exact dataset revisions, environment/runtime evidence, parity checks, cheap-panel identity and
-numeric scientific margins are not frozen. No new training family can open before those close.
+The measurement-stability boundary is now closed. Document 180 freezes eval-v1's hybrid
+architecture, exact Harness environment/dataset identities, final task set, Pile cadence,
+full/cheap bilingual factual registries, normalized schema, numeric gates, uncertainty and
+checkpoint-binding policy. Any semantic change requires eval-v2. Freeze does not authorize
+scientific execution; exact three-model M0 configs and a bounded execution contract are next.
 
 The local pipeline foundation is now opt-in and fail-closed. It derives an exact epoch/update/batch
 schedule, records tokenization and optimization traces, preserves model-only epoch snapshots behind
@@ -121,18 +121,18 @@ completed the predefined Markdown-heading sensitivity on V100 job `461668`; fina
 reported `parity_pass`. An earlier pre-submission root is preserved because it exposed and stopped
 on a validator error: upstream `acc_norm` uses Python Unicode string length, while byte-normalized
 accuracy is a distinct descriptive sensitivity. Document 179 records both roots and hashes. The
-qualification gate is now `qualified_for_eval_v1_freeze_review`, but eval-v1 remains draft pending
-scientific dataset identities, final environment binding, Pile cadence, TurkishMMLU disposition,
-cheap factual panel hash, numeric margins and checkpoint-binding policy.
+qualification gate is `qualified_for_eval_v1_freeze_review`. Document 180 then froze the exact
+scientific dataset/environment identities, Pile cadence, TurkishMMLU/XCOPA exclusions, 12,000-row
+full and 1,500-row cheap factual registries, numeric margins and checkpoint-binding policy.
 
 ## Evaluation design result
 
 - LM Evaluation Harness is pinned prospectively to v0.4.12 commit
-  `6d642546f4688648fced259eb3302efd36ece5af` in a dedicated future lock.
+  `6d642546f4688648fced259eb3302efd36ece5af` in the frozen dedicated environment lock.
 - Official WikiText BPB is primary English retention; word/byte PPL remain reported.
 - v0.4.12 already includes `pile_10k`, so no custom replacement is currently needed.
-- BLiMP, HellaSwag, WinoGender slices and TurBLiMP form the proposed capability bundle;
-  TurkishMMLU remains conditional on access.
+- BLiMP, HellaSwag, WinoGender slices and TurBLiMP form the frozen capability bundle;
+  TurkishMMLU and XCOPA-TR are outside eval-v1.
 - Project-native factual ranking, robust intersections, relation swaps, paired subject bootstrap
   and generation integrity are preserved.
 - Canonical results are long tables; one-row-per-checkpoint output is a generated view.
@@ -142,7 +142,8 @@ cheap factual panel hash, numeric margins and checkpoint-binding policy.
 - Training trace, typed normalized tables and presentation metadata are mandatory future outputs.
 
 See the [`evaluation read set`](../evaluation/README.md) and
-[`eval-v1 draft`](../contracts/evaluation/eval-v1.md).
+[`frozen eval-v1`](../contracts/evaluation/eval-v1.md) and
+[`freeze record`](../180_EVAL_V1_SCIENTIFIC_INPUT_AND_PROTOCOL_FREEZE_TR.md).
 
 ## Fixed design direction
 
@@ -171,17 +172,17 @@ These are constraints and evidence, not reasons to throw away existing implement
 
 ## Active work boundary
 
-The valid next work is the remaining eval-v1 freeze package:
+The valid next work is the three-model scientific M0 binding package:
 
-1. freeze exact scientific dataset revisions/content manifests and bind the qualified environment;
-2. decide Pile-10k cadence and TurkishMMLU inclusion;
-3. freeze the cheap factual probe registry and numeric scientific margins;
-4. freeze the per-training-contract checkpoint-binding rule;
-5. only then freeze `eval-v1` and the three scientific M0 configs.
+1. bind exact OLMo, Qwen and SmolLM model/tokenizer manifests;
+2. generate one frozen scientific M0 config per model using unchanged eval-v1;
+3. make the controller use full datasets, the frozen full/cheap factual registries and immutable
+   offline inputs without qualification limits;
+4. run local/HU read-only fail-closed preflight and record runtime estimates;
+5. prepare one bounded parallel-execution contract; submit only after a new explicit authorization.
 
-The planner/tracing and M0 adapter implementation may be tested and reviewed locally. Exact runtime,
-dataset, project-evaluator and resource bindings remain before qualification execution; they must
-not be bypassed with ad-hoc commands.
+M1/M2 training, corpus materialization and scientific scoring remain unauthorized. They must not be
+bypassed with ad-hoc commands.
 
 The 2026-08-16 qualification/recovery/parity authorization has been consumed. No further
 evaluation, scientific M0, training, corpus materialization, cleanup, deletion or writes to prior
@@ -200,8 +201,8 @@ remain rollback sources. See the
 HU now has a separate clean monorepo checkout at
 `/vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1`, tracking `agent/m0-evaluation` with
 fast-forward-only pulls. The legacy HU `corpus-update` checkout is dirty and remains untouched as
-preserved state. The shared HU Python environment has not been modified and does not yet contain
-`lm-eval`; eval-v1 will use a separately frozen dedicated environment.
+preserved state. The shared HU Python environment has not been modified and does not contain
+`lm-eval`; eval-v1 uses the separately frozen dedicated environment under `/vol/tmp2`.
 
 The legacy HU `artifacts`/`runs` retention inventory is complete and source-preserving. It records
 9,825 files / 742,915,363,463 bytes with manifest SHA-256

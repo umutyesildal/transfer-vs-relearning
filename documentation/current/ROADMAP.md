@@ -49,8 +49,7 @@ architecture and normalized schema own the previously missing integration surfac
 
 ## R2 — Evaluation qualification and freeze
 
-Status: active; upstream task semantics, a complete 7/7 non-scientific OLMo qualification bundle
-and WikiText/TurBLiMP parity PASS exist; the scientific freeze inputs remain open.
+Status: completed. eval-v1 is frozen; execution is not authorized.
 
 - pin LM Evaluation Harness and exact task/dataset revisions;
 - validate task IDs, prompts, few-shot settings, metrics, and availability;
@@ -62,20 +61,20 @@ and WikiText/TurBLiMP parity PASS exist; the scientific freeze inputs remain ope
 
 Exit condition: semantic changes require `eval-v2`; all states use `eval-v1` unchanged.
 
-Current draft evidence:
+Freeze evidence:
 
 - [`../evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md`](../evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md);
 - [`../evaluation/RESULT_SCHEMA_V1.md`](../evaluation/RESULT_SCHEMA_V1.md);
 - [`../contracts/evaluation/eval-v1.md`](../contracts/evaluation/eval-v1.md);
 - [`../../configs/evaluation/eval_v1_registry.yaml`](../../configs/evaluation/eval_v1_registry.yaml).
 
-Remaining boundary: exact scientific dataset revisions/access, final environment binding,
-Pile-10k cadence, TurkishMMLU disposition, cheap-panel hash, reviewed numerical margins and the
-per-training-contract checkpoint-binding rule.
+Document 180 binds the exact scientific dataset/environment identities, Pile cadence,
+TurkishMMLU/XCOPA exclusions, full/cheap factual registries, numeric margins and the
+per-training-contract checkpoint-binding rule. Any semantic change requires eval-v2.
 
 ## R3 — Pipeline productionization
 
-Status: local checkpoint planner, full 15-stage study controller, 27-node OLMo/Qwen/SmolLM matrix,
+Status: active. The local checkpoint planner, full 15-stage study controller, 27-node OLMo/Qwen/SmolLM matrix,
 training trace, typed artifact scaffold, presentation contract, Luna micro-packets and seven-lane
 M0 parallel adapters prepared; frozen bindings and all later-state execution adapters remain
 blocked on R2 freeze.

@@ -564,3 +564,121 @@ def test_data_preflight_rejects_successful_validation_with_an_empty_cache(
     assert result["status"] == "failed_pre_scoring"
     assert result["cache_materialized"] is False
     assert result["network_retrieval_used"] is False
+
+
+def _scientific_cache_fixture(tmp_path: Path, plan: dict) -> tuple[Path, Path]:
+    source_cache = tmp_path / "source-cache"
+    source_cache.mkdir()
+    source_file = source_cache / "dataset.arrow"
+    source_file.write_bytes(b"immutable-scientific-data")
+    manifest = tmp_path / "dataset_content_manifest.jsonl"
+    manifest.write_text(
+        json.dumps(
+            {
+                "bytes": source_file.stat().st_size,
+                "path": str(source_file),
+                "sha256": sha256_file(source_file),
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    plan["classification"] = "scientific_evaluation"
+    plan["run_classification"] = "scientific"
+    plan["data_preflight"] = {
+        **plan["data_preflight"],
+        "mode": "frozen_offline_reuse",
+        "network_retrieval_authorized": False,
+        "source_cache_root": str(source_cache),
+        "source_content_manifest": str(manifest),
+        "source_content_manifest_sha256": sha256_file(manifest),
+        "source_cache_files": 1,
+        "source_cache_bytes": source_file.stat().st_size,
+    }
+    return source_cache, manifest
+
+
+def test_scientific_preflight_reuses_frozen_cache_without_network(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    plan = build_m0_parallel_plan(CONFIG, repo_root=ROOT)
+    plan["runtime"]["python"] = "/frozen/env/bin/python"
+    _, source_manifest = _scientific_cache_fixture(tmp_path, plan)
+    output_root = tmp_path / "scientific-preflight"
+    output_root.mkdir()
+    task_ids = [task for lane in plan["lanes"] for task in lane.get("task_ids", [])]
+    seen_environments: list[dict[str, str]] = []
+    seen_commands: list[list[str]] = []
+
+    def fake_run(command: list[str], **kwargs: object) -> object:
+        seen_commands.append(command)
+        seen_environments.append(dict(kwargs["env"]))
+        stdout = (
+            "\n".join(f"| {task} | task |" for task in task_ids)
+            if "ls" in command
+            else "validated"
+        )
+        return type("Result", (), {"stdout": stdout, "stderr": "", "returncode": 0})()
+
+    monkeypatch.setattr("transfer_vs_relearning.study.m0_parallel.subprocess.run", fake_run)
+    monkeypatch.setattr(
+        "transfer_vs_relearning.study.m0_parallel.build_project_probe_command",
+        lambda *_args, **_kwargs: ["verified"],
+    )
+    payload = run_m0_data_preflight(plan, output_root=output_root)
+    assert payload["status"] == "complete"
+    assert payload["data_mode"] == "frozen_offline_reuse"
+    assert payload["network_retrieval_used"] is False
+    assert all(environment["HF_HUB_OFFLINE"] == "1" for environment in seen_environments)
+    assert len([command for command in seen_commands if "-c" in command]) == 1
+    assert (output_root / "dataset_content_manifest.jsonl").read_bytes() == source_manifest.read_bytes()
+
+
+def test_scientific_finalizer_never_emits_qualification_claims(tmp_path: Path) -> None:
+    plan, manifest_path = _runtime_plan(tmp_path)
+    _scientific_cache_fixture(tmp_path, plan)
+    lock_path = tmp_path / "environment.lock.txt"
+    lock_path.write_text("locked\n", encoding="utf-8")
+    plan["runtime"]["environment_lock_path"] = str(lock_path)
+    plan["runtime"]["environment_lock_sha256"] = sha256_file(lock_path)
+    plan["model"]["manifest_path"] = str(manifest_path)
+    plan["model"]["manifest_sha256"] = sha256_file(manifest_path)
+    output_root = initialize_m0_namespace(tmp_path / "scientific-result", plan)
+    for lane in plan["lanes"]:
+        raw_root = output_root / "lanes" / lane["id"] / "raw"
+        raw_root.mkdir()
+        raw = raw_root / "raw.json"
+        raw.write_text("{}", encoding="utf-8")
+        write_json(
+            output_root / "lanes" / lane["id"] / "lane_result.json",
+            {
+                "schema_version": 1,
+                "plan_id": plan["plan_id"],
+                "lane_id": lane["id"],
+                "run_classification": "scientific",
+                "adapter": lane["adapter"],
+                "families": lane["families"],
+                "task_ids": lane.get("task_ids", []),
+                "status": "complete",
+                "returncode": 0,
+                "artifact_root": str(raw_root),
+                "artifacts": [
+                    {
+                        "path": str(raw),
+                        "bytes": raw.stat().st_size,
+                        "sha256": sha256_file(raw),
+                    }
+                ],
+            },
+        )
+    result = finalize_m0_bundle(plan, output_root=output_root)
+    assert result["status"] == "complete"
+    scientific = json.loads(
+        (output_root / "scientific_bundle_result.json").read_text(encoding="utf-8")
+    )
+    assert scientific["status"] == "complete_raw_pending_normalization"
+    assert scientific["model_pass_fail"] == "not_computed_by_raw_finalizer"
+    assert not (output_root / "qualification_result.json").exists()
+    assert not (output_root / "qualification_manifest.json").exists()
+    assert not (output_root / "parity_results.jsonl").exists()

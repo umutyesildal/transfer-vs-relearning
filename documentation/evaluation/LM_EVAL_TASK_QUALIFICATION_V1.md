@@ -1,6 +1,6 @@
 # LM Evaluation Harness task qualification v1
 
-**Status:** OLMo task/runtime/parity qualification complete; scientific freeze inputs remain
+**Status:** complete; final task set and scientific identities frozen
 **Upstream:** `lm_eval` v0.4.12 at commit
 `6d642546f4688648fced259eb3302efd36ece5af`
 
@@ -22,13 +22,13 @@ Primary upstream references:
 
 | Task | Exact task ID | Role | Primary metric | Shot | Cadence | Qualification |
 |---|---|---|---|---:|---|---|
-| WikiText-2 | `wikitext` | primary English retention | BPB | 0 | dense | task and parity verified; scientific dataset revision open |
-| Pile-10k | `pile_10k` | broad-domain English control | BPB | 0 | runtime decides dense/full | task verified; dataset revision/runtime open |
+| WikiText-2 | `wikitext` | primary English retention | BPB | 0 | dense | frozen, task/parity/offline identity verified |
+| Pile-10k | `pile_10k` | broad-domain English control | BPB | 0 | full | frozen, exact 10,000-row identity verified |
 | BLiMP | `blimp` | English grammar | macro `acc` | 0 | full | 67-task group verified |
 | HellaSwag | `hellaswag` | English commonsense | `acc_norm` | 0 | full | task verified |
 | WinoGender | gender slice task IDs | coreference/bias diagnostic | `acc` and gaps | 0 | full | task IDs verified |
 | TurBLiMP | `turblimp_core` | Turkish grammar check | macro `acc_norm` | 0 | full | 16-subtask duplicate-key parity verified |
-| TurkishMMLU | `turkishmmlu_*` | Turkish knowledge, secondary | `acc` | 5 | full | access unresolved |
+| TurkishMMLU | — | excluded from eval-v1 | — | — | — | dataset requires author contact; adding it requires eval-v2 |
 
 All tasks use the full frozen split. `--limit` is test-only and cannot define a scientific cheap
 panel. Any cheap subset must be an explicit immutable sample-ID registry selected before outcomes.
@@ -60,11 +60,10 @@ fails. It is complementary because it is a Pile sample and may overlap a model's
   parity validator reproduced the intended 16-subtask macro exactly. In pinned Harness,
   `acc_norm` divides by Python Unicode string length; UTF-8-byte normalization is a separate
   descriptive sensitivity and must not be labelled `acc_norm`.
-- TurkishMMLU follows the benchmark's published five-shot setup, but is secondary because it mixes
-  language, curriculum knowledge and reasoning. It enters eval-v1 only if access and revision are
-  frozen before contract freeze.
+- TurkishMMLU was not accessible as an exact frozen dataset before contract freeze and is excluded
+  from eval-v1. It cannot be added to an eval-v1 run later.
 
-`xcopa_tr` is a reserve secondary task. `xquad_tr` is excluded from the proposed core because
+`xcopa_tr` was not promoted before freeze and is excluded from eval-v1. `xquad_tr` is excluded because
 free-form answer formatting adds a new source of variance without filling a missing primary
 estimand. EWOK and Turkish HellaSwag remain outside eval-v1 until exact sources are supplied;
 automatic translation is forbidden.
@@ -87,9 +86,9 @@ were reproduced from raw samples at `1e-12` tolerance; Markdown headings remaine
 TurBLiMP's Unicode-length-normalized macro reproduced `0.40625`, while the separately labelled byte
 sensitivity was `0.34375`.
 
-## Remaining freeze evidence
+## Freeze closure
 
-The scientific contract still requires exact Hugging Face dataset commits/content manifests, a
-final binding to the qualified environment, Pile-10k runtime/cadence, TurkishMMLU inclusion or
-exclusion, the cheap factual panel hash, numeric scientific margins and the per-training-contract
-checkpoint binding rule. Qualification metrics remain test-only and cannot enter scientific tables.
+Document 180 binds exact Hugging Face commits and the 404-file offline content manifest, promotes
+the qualified environment unchanged, places full Pile-10k at entry/midpoint/endpoint, excludes
+TurkishMMLU and XCOPA-TR, and freezes the factual registry hashes and numeric gates. Qualification
+metrics remain test-only and cannot enter scientific tables.

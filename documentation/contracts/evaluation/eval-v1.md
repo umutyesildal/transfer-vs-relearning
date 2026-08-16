@@ -1,6 +1,6 @@
 # eval-v1 — M0/M1/M2 sibling evaluation contract
 
-**Status:** `draft` | **Owner:** project | **Created:** 2026-08-15  
+**Status:** `frozen` | **Owner:** project | **Created:** 2026-08-15 | **Frozen:** 2026-08-16
 **Supersedes:** none
 
 ## Purpose and estimands
@@ -16,22 +16,27 @@ No universal aggregate score is defined.
 
 ## Scope and prohibitions
 
-This draft defines prospective semantics only. It does not authorize dataset/model retrieval,
+This contract defines prospective semantics only. It does not authorize dataset/model retrieval,
 evaluation or scoring, HU/SSH, Slurm/GPU, training, corpus materialization, cleanup, publication or
 push. Historical outputs remain immutable and attached to their original contracts.
 
-## Immutable identities at draft stage
+## Immutable identities
 
 - design inputs: Documents 177 and 178;
 - machine registry:
   [`../../../configs/evaluation/eval_v1_registry.yaml`](../../../configs/evaluation/eval_v1_registry.yaml);
+- scientific inputs:
+  [`../../../configs/evaluation/eval_v1_scientific_inputs_v1.yaml`](../../../configs/evaluation/eval_v1_scientific_inputs_v1.yaml);
 - LM Evaluation Harness: v0.4.12, commit
   `6d642546f4688648fced259eb3302efd36ece5af`;
 - base/pretrained causal-LM prompts: no chat template or system instruction;
-- project bootstrap: 10,000 paired draws, seed 42.
+- project bootstrap: 10,000 paired draws, seed 42;
+- factual registry manifest:
+  [`../../../configs/evaluation/registries/eval_v1_factual_registry_manifest.json`](../../../configs/evaluation/registries/eval_v1_factual_registry_manifest.json).
 
-Exact dataset revisions, environment lock, probe registries, model/runtime bindings and numerical
-thresholds remain freeze blockers. Their absence keeps this contract non-executable.
+The environment lock, exact public dataset revisions/content manifest, factual registries,
+thresholds and cadence are frozen. A state execution contract must still bind the exact model,
+checkpoint, precision route, fresh output namespace and epoch/update map before execution.
 
 ## Architecture
 
@@ -50,8 +55,12 @@ ratios, gaps and aggregates.
 
 ### Standard task lane
 
-The proposed core is WikiText, Pile-10k, BLiMP, HellaSwag, WinoGender slices and TurBLiMP.
-TurkishMMLU is included only if access is resolved before freeze. Exact task
+The final core is WikiText, Pile-10k, BLiMP, HellaSwag, the three WinoGender slices and TurBLiMP.
+The exact active Harness task IDs are `wikitext`, `pile_10k`, `blimp`, `hellaswag`,
+`winogender_female`, `winogender_male`, `winogender_neutral` and `turblimp_core`. TurkishMMLU is
+excluded from eval-v1 because its dataset requires author contact and no exact accessible revision
+was available before freeze. XCOPA-TR was not promoted from reserve. Adding either requires
+eval-v2. Exact task
 roles and metric semantics are in
 [`../../evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md`](../../evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md).
 
@@ -82,6 +91,11 @@ the exact 16 equal-size subtasks.
 - exact-prefix generation is secondary where an exact rule exists;
 - paired subject bootstrap is the causal uncertainty unit.
 
+The full registry contains 12,000 probes: 500 facts × three directions × four forms × two
+scaffolds. The dense registry contains 1,500 probes: exactly one deterministically counterbalanced
+form/scaffold probe for every fact in every direction. At a full-suite checkpoint, dense metrics
+are derived from the matching full rows and are not rescored.
+
 ### Generation integrity lane
 
 Report lexical-empty, near-empty, early EOS, repeated 3/4-grams, distinct-1/2/3, longest repeated
@@ -102,8 +116,10 @@ weights do not exist and must not be reconstructed, interpolated or reported as 
 Future training contracts must bind every epoch to an exact update before outcomes. If progress
 0.5 is not an integer epoch, its checkpoint mapping is frozen before training.
 
-Pile-10k cadence remains unresolved until measured runtime is known. A cheap scientific subset may
-not use `--limit`; it requires an explicit frozen sample-ID registry.
+Pile-10k is full-cadence only at state entry, midpoint and endpoint. All 10,000 frozen rows are
+used; `--limit` is forbidden for scientific results. WikiText remains dense at every epoch end.
+Each future training contract must bind every epoch and the exact integer midpoint update before
+training; interpolation is forbidden.
 
 ## Inputs, outputs and schemas
 
@@ -128,18 +144,31 @@ remains visible and prevents a complete figure status.
 
 ## Scientific decision rules
 
-- M1 selection may use only a precommitted rule such as the earliest checkpoint satisfying all
-  acquisition, robustness and retention guardrails.
-- Transfer uses the paired M2-A−M1 TR→EN contrast.
-- Relearning uses the paired M2-B−M2-A TR→EN contrast.
-- M2-A and M2-B must have the same M1 parent, task bundle, checkpoint cadence and comparison budget.
-- Capability benchmarks are manipulation/retention evidence, not a replacement for the factual
-  causal estimand.
-- A replicated causal claim requires the frozen sign/confidence rule at every required seed.
+All thresholds below are frozen before scientific M0 outcomes:
 
-Numeric acquisition, retention, Turkish-manipulation and English non-inferiority margins must be
-set before freeze. Historical thresholds, including token-PPL ratio `1.25`, are not automatically
-portable to official BPB.
+- M1 EN→EN exact-prefix accuracy must be at least `0.90`;
+- trained Forms A/B and held-out Forms C/D top-1 accuracy must each be at least `0.80` globally and
+  within every relation;
+- the EN→EN eight-cell robust fact intersection must be at least `0.70` globally and within every
+  relation;
+- WikiText and Pile-10k must each satisfy `ΔBPB ≤ log2(1.25) = 0.32192809488736235` relative to the
+  parent; BLiMP accuracy and HellaSwag `acc_norm` may each drop by at most `0.05`; WinoGender is
+  diagnostic and has no gate;
+- M2 primary in-domain Turkish byte PPL must be at most `0.95×` M1, equivalently
+  `ΔBPB ≤ log2(0.95) = -0.07400058144377693`; TurBLiMP `acc_norm` may drop by at most `0.05` and the
+  frozen trwiki cross-domain control must always be reported;
+- M2 EN→EN top-1 and robust-intersection accuracy may each drop by at most `0.05` from M1;
+- transfer is TR→EN(M2-A) − TR→EN(M1), and relearning is TR→EN(M2-B) − TR→EN(M2-A); each requires
+  a point gain of at least `0.05` and a paired-subject 95% bootstrap lower bound strictly above
+  zero;
+- the transfer fallback for an already-open M1 baseline requires M2-A TR→EN at least `0.30` and no
+  drop greater than `0.05`;
+- bootstrap uses 10,000 draws and seed 42; every required seed must independently satisfy the same
+  point and interval rule;
+- checkpoint selection is the earliest precommitted checkpoint passing every required gate.
+
+M2-A and M2-B use the same M1 parent, task bundle, cadence and comparison budget. Capability
+benchmarks are manipulation/retention evidence, not replacements for the factual estimands.
 
 ## Gates and missingness
 
@@ -164,24 +193,24 @@ open.
 
 ## Verification before freeze
 
-1. OLMo base smoke for every final task.
-2. Canonical WikiText count/result parity and bounded heading sensitivity.
-3. Pile-10k runtime and final cadence evidence.
-4. TurBLiMP 16-subtask macro parity despite the upstream duplicate YAML key.
-5. TurkishMMLU access inclusion/exclusion decision.
-6. Cheap/full factual registry hashes and denominator tests.
-7. Harness-to-normalized golden fixture, resume mismatch and partial-result tests.
-8. Reviewed numerical margins and exact training checkpoint bindings.
+1. OLMo base smoke for every final task — complete in the qualification bundle.
+2. Canonical WikiText count/result parity and bounded heading sensitivity — complete in Document
+   179.
+3. Pile-10k exact 10,000-row offline identity and full-cadence decision — complete.
+4. TurBLiMP 16-subtask macro parity — complete in Document 179.
+5. TurkishMMLU exclusion — complete before freeze.
+6. Cheap/full factual registry generation, source projection and denominator tests — complete.
+7. Harness-to-normalized fixtures, resume mismatch and partial-result tests — complete in the
+   existing qualification/controller suite.
+8. Numerical margins and per-training-contract checkpoint-binding policy — complete.
 
-Items 2 and 4 are complete in Document 179. The bounded OLMo qualification also proves the pinned
-runtime, final active task discovery, offline reload and base task smokes, but its metrics remain
-test-only. The remaining items are tracked machine-readably in `eval_v1_registry.yaml`; no parity
-PASS promotes this draft automatically.
+Document 180 records the freeze evidence. Qualification metrics remain test-only and do not become
+scientific results through contract freeze.
 
 ## Authority boundary
 
-Even after freeze, an exact separately authorized wave is required for retrieval, evaluation,
-HU/SSH, Slurm/GPU or training. This draft authorizes none of them.
+An exact separately authorized wave is required for evaluation, HU/SSH, Slurm/GPU or training.
+This frozen measurement contract authorizes none of them.
 
 ## Change policy
 

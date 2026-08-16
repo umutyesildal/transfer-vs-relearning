@@ -99,11 +99,12 @@ def build_project_probe_command(
         str(config["candidate_batch_size"]),
         "--checkpoint-interval",
         str(config["checkpoint_interval"]),
-        "--probe-limit",
-        str(config["probe_limit"]),
         "--device",
         str(config["device"]),
     ]
+    probe_limit = config.get("probe_limit")
+    if probe_limit is not None:
+        command.extend(["--probe-limit", str(probe_limit)])
     if config.get("bf16") is False:
         command.append("--no-bf16")
     return command

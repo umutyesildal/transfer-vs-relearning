@@ -164,14 +164,11 @@ def test_m0_preflight_reports_current_contract_and_adapter_blockers() -> None:
     )
     assert payload["status"] == "blocked"
     assert payload["scientific_work_started"] is False
-    assert {
+    assert set(payload["blockers"]) == {
         "study_contract_frozen",
         "study_bindings_resolved",
         "project_ready_to_measure",
-        "project_eval_contract_frozen",
-        "eval_registry_frozen",
-        "eval_registry_execution_ready",
-    }.issubset(payload["blockers"])
+    }
     checks = {row["id"]: row for row in payload["checks"]}
     assert checks["m0_evaluation_adapter_present"]["status"] == "pass"
     assert checks["m0_probing_adapter_present"]["status"] == "pass"
