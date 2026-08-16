@@ -86,7 +86,8 @@ project configs, task set and fresh namespace are now hash-frozen under the exis
 test-only authorization. V5 then materialized all task data but failed after TaskManager returned,
 when the controller tried to sort mixed string/`ConfigurableGroup` result keys. No GPU/model/scoring
 work ran. V6 replaces only that diagnostic with a JSON-safe loaded-entry count and targets a fresh
-namespace; its implementation/config hashes are binding-pending.
+namespace; its implementation, project configs and companion config are now hash-frozen under the
+existing bounded test-only authorization.
 
 ## Evaluation design result
 

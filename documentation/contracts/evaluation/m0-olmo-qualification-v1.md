@@ -319,7 +319,26 @@ The v6 repair changes only the diagnostic payload to
 `{"loaded_entry_count": len(d)}`. It does not alter TaskManager inputs, task identities, datasets,
 cache bounds, offline flags, model, lane limits, GPU routes or evaluation semantics. A regression
 test requires both online and offline generated commands to use the JSON-safe count and forbids
-`sorted(d)`. V6 requires a fresh namespace and exact implementation/config hashes before execution.
+`sorted(d)`. The v6 repair bindings are frozen:
+
+- implementation commit: `abe4f72bdd570b05f7c1d35cd62629a5387eff73`;
+- operator entrypoint SHA-256:
+  `ae2c0b4a595250c404cc1e7e3778c8f6a5efdb4be298ffb51e2c3dc03cb8e3bd`;
+- parallel controller/materializer SHA-256:
+  `67393a9894bd54c712663eb38b06705be8c291a5a44664e88d093d8aca4d5625`;
+- Harness adapter SHA-256:
+  `5480e4f01ef89047d979ca5a00511514283da11487ea8d2842e2e46eb38d8598`;
+- project adapter SHA-256:
+  `5b8a49003e151454c3028c2eb135fda943a9169037a1a4b9d04ae5a0810fcde6`;
+- factual qualification config SHA-256:
+  `8c2b1ef0a09cad91e7bdc9685d5851f7224f892b391ed61e4f6c48ee785c24bb`;
+- generation qualification config SHA-256:
+  `25f6837d74aa8e862e7349569a9c469a5916c7efc578b922db97b302ca3b2141`;
+- companion config SHA-256:
+  `29ad59b7c9c665fded8e25f534a3258b4329a649421a9fc4f89a51677dd76772`;
+- fresh execution root: `/vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v6`.
+
+The existing bounded test-only authorization permits this semantics-neutral controller repair.
 
 The corrected repair uses the dedicated root
 `/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3`, preserves the parent compat

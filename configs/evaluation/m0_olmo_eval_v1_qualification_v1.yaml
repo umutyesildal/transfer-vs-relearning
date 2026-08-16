@@ -1,11 +1,11 @@
 schema_version: 1
 name: m0-olmo-eval-v1-qualification-v1-materializer-serialization-repair-v1
-status: materializer_serialization_repair_binding_pending
+status: frozen
 as_of: "2026-08-16"
 classification: qualification_only
 scientific_result: false
-execution_ready: false
-execution_authorized: false
+execution_ready: true
+execution_authorized: true
 
 contract: documentation/contracts/evaluation/m0-olmo-qualification-v1.md
 parent_evaluation_contract: documentation/contracts/evaluation/eval-v1.md
@@ -75,10 +75,10 @@ parallel_evaluation:
     lane completed with the identical plan and run classification.
   runtime:
     python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
-    implementation_commit: 1c3791a9c140777df0fc3df66a817fcafcfd4bc6
+    implementation_commit: abe4f72bdd570b05f7c1d35cd62629a5387eff73
     implementation_files:
       scripts/study/run_m0_olmo_evaluation.py: ae2c0b4a595250c404cc1e7e3778c8f6a5efdb4be298ffb51e2c3dc03cb8e3bd
-      src/transfer_vs_relearning/study/m0_parallel.py: 2fd4caa8c686c59925957ed41b9c6b4423e17ab42c3f0fa3d95ec5a100349e68
+      src/transfer_vs_relearning/study/m0_parallel.py: 67393a9894bd54c712663eb38b06705be8c291a5a44664e88d093d8aca4d5625
       src/transfer_vs_relearning/study/adapters/m0_evaluation.py: 5480e4f01ef89047d979ca5a00511514283da11487ea8d2842e2e46eb38d8598
       src/transfer_vs_relearning/study/adapters/m0_probing.py: 5b8a49003e151454c3028c2eb135fda943a9169037a1a4b9d04ae5a0810fcde6
     environment_lock_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/environment.lock.txt
@@ -195,13 +195,13 @@ parallel_evaluation:
       adapter: project_factual
       families: [factual_access, statistical_uncertainty]
       evaluator_config: configs/evaluation/m0_olmo_qualification_factual_v1.yaml
-      evaluator_config_sha256: 7c2919fef13fa95f069cba94b919134becf749fc692a6193879322f321dc3502
+      evaluator_config_sha256: 8c2b1ef0a09cad91e7bdc9685d5851f7224f892b391ed61e4f6c48ee785c24bb
       expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v6/lanes/factual_access/raw/frozen_suite
     - id: generation_integrity
       adapter: project_generation_integrity
       families: [generation_integrity]
       evaluator_config: configs/evaluation/m0_olmo_qualification_generation_v1.yaml
-      evaluator_config_sha256: 9f34d8d825823dffe6ed714f9e369b1bddc71ad49faf7cddca5d393211017eee
+      evaluator_config_sha256: 25f6837d74aa8e862e7349569a9c469a5916c7efc578b922db97b302ca3b2141
       expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v6/lanes/generation_integrity/raw/general_capability
 
 test_only_policy:
@@ -245,10 +245,7 @@ forbidden_claims:
   - ready_to_train
   - selected_primary_model
 
-freeze_blockers:
-  - materializer_serialization_repair_commit_and_hashes
-  - repaired_project_config_hashes
-  - repaired_contract_and_config_hashes
+freeze_blockers: []
 
 freeze_authority:
   user_instruction: run_and_try_current_m0_qualification_wave

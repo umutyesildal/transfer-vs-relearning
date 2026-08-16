@@ -42,7 +42,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         "path": "/vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1",
         "branch": "agent/m0-evaluation",
         "sync_mode": "git_pull_ff_only",
-        "dependency_commit_verified": "1c3791a9c140777df0fc3df66a817fcafcfd4bc6",
+        "dependency_commit_verified": "abe4f72bdd570b05f7c1d35cd62629a5387eff73",
         "clean_at_verification": True,
     }
     assert state["repository"]["hu_checkouts"]["legacy_checkout"]["status"] == (
@@ -95,10 +95,10 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         assert (ROOT / relative).is_file(), relative
 
     qualification = state["evaluation_target"]["m0_qualification_wave"]
-    assert qualification["status"] == "materializer_serialization_repair_binding_pending"
+    assert qualification["status"] == "frozen_execution_ready"
     assert qualification["scientific_result"] is False
-    assert qualification["execution_ready"] is False
-    assert qualification["execution_authorized"] is False
+    assert qualification["execution_ready"] is True
+    assert qualification["execution_authorized"] is True
 
 
 def test_active_entrypoints_stay_within_context_budget():
@@ -170,11 +170,11 @@ def test_eval_v1_registry_is_draft_and_fail_closed():
 def test_m0_qualification_is_non_scientific_and_fail_closed():
     qualification = yaml.safe_load(M0_QUALIFICATION_PATH.read_text(encoding="utf-8"))
 
-    assert qualification["status"] == "materializer_serialization_repair_binding_pending"
+    assert qualification["status"] == "frozen"
     assert qualification["classification"] == "qualification_only"
     assert qualification["scientific_result"] is False
-    assert qualification["execution_ready"] is False
-    assert qualification["execution_authorized"] is False
+    assert qualification["execution_ready"] is True
+    assert qualification["execution_authorized"] is True
     assert qualification["model"]["repository"] == "allenai/OLMo-2-0425-1B"
     assert qualification["model"]["revision"] == (
         "a1847dff35000b4271fa70afc5db10fd29fedbdf"
@@ -189,7 +189,7 @@ def test_m0_qualification_is_non_scientific_and_fail_closed():
         "blocked",
     ]
     assert "scientific_m0_score" in qualification["forbidden_claims"]
-    assert qualification["freeze_blockers"]
+    assert qualification["freeze_blockers"] == []
     assert qualification["eval_v1_promotion_blockers"]
 
 

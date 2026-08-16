@@ -24,7 +24,7 @@ repository:
       path: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1
       branch: agent/m0-evaluation
       sync_mode: git_pull_ff_only
-      dependency_commit_verified: 1c3791a9c140777df0fc3df66a817fcafcfd4bc6
+      dependency_commit_verified: abe4f72bdd570b05f7c1d35cd62629a5387eff73
       clean_at_verification: true
     legacy_checkout:
       path: /vol/fob-vol6/mi25/yesildau/transfer-vs-relearning
@@ -107,7 +107,7 @@ evaluation_target:
   task_qualification: documentation/evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md
   result_schema: documentation/evaluation/RESULT_SCHEMA_V1.md
   m0_qualification_wave:
-    status: materializer_serialization_repair_binding_pending
+    status: frozen_execution_ready
     classification: qualification_only
     scientific_result: false
     model: allenai/OLMo-2-0425-1B
@@ -120,9 +120,9 @@ evaluation_target:
     harness_task_count: 8
     max_parallel_lanes: 3
     local_adapters_implemented: true
-    implementation_commit: pending_materializer_serialization_repair_freeze
-    contract_sha256: pending_materializer_serialization_repair_freeze
-    config_sha256: pending_materializer_serialization_repair_freeze
+    implementation_commit: abe4f72bdd570b05f7c1d35cd62629a5387eff73
+    contract_sha256: 31117458410a1e4084e1d9ac116f50658dc6eb627fd58dc2e580aae82184f4dc
+    config_sha256: 29ad59b7c9c665fded8e25f534a3258b4329a649421a9fc4f89a51677dd76772
     gpu_route_policy: earliest_test_only_start_then_declared_order
     gpu_route_candidates: [v10032gb, a10080gb, rtx3090, rtx6000, rtxa6000]
     environment_root: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3
@@ -134,8 +134,8 @@ evaluation_target:
       - /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v3
       - /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v4
       - /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v5
-    execution_ready: false
-    execution_authorized: false
+    execution_ready: true
+    execution_authorized: true
     user_authorization: qualification_run_requested_2026_08_16
   applies_to:
     - M0
@@ -175,9 +175,9 @@ evaluation_target:
     luna_packet_manifest: .agents/task-packets/study-v1/manifest.json
     full_study_stage_count: 15
     execution_adapter_ready: false
-    m0_adapter_status: materializer_serialization_repair_binding_pending
+    m0_adapter_status: frozen_execution_ready
     m0_parallel_entrypoint: scripts/study/run_m0_olmo_evaluation.py
-    execution_authorized: false
+    execution_authorized: true
     m0_preflight:
       command: >-
         .venv/bin/python scripts/study/run_study.py preflight-m0
@@ -198,9 +198,6 @@ evaluation_target:
       latest_status: blocked_pre_scoring
       scientific_work_started: false
       blockers:
-        - qualification_contract_frozen
-        - qualification_execution_ready
-        - qualification_execution_authorized
         - runtime_and_artifact_identity
     stage_order:
       - identity_preflight
