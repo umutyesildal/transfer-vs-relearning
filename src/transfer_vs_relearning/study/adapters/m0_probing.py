@@ -14,6 +14,15 @@ ENTRYPOINTS = {
 }
 
 
+def _verify_input(path_value: Any, expected_sha256: Any, label: str) -> Path:
+    path = Path(str(path_value)).resolve()
+    if not path.is_file():
+        raise FileNotFoundError(f"Project evaluator input is missing ({label}): {path}")
+    if sha256_file(path) != str(expected_sha256):
+        raise ValueError(f"Project evaluator input SHA-256 mismatch ({label}): {path}")
+    return path
+
+
 def build_project_probe_command(
     plan: dict[str, Any], lane: dict[str, Any], *, repo_root: Path
 ) -> list[str]:
@@ -35,6 +44,10 @@ def build_project_probe_command(
         raise ValueError(f"Project evaluator config is not a mapping: {config_path}")
     if config.get("run_classification") != plan["run_classification"]:
         raise ValueError(f"Project evaluator classification mismatch for lane {lane['id']}")
+    if Path(str(config.get("model_manifest", ""))).resolve() != Path(
+        str(plan["model"]["manifest_path"])
+    ).resolve():
+        raise ValueError(f"Project evaluator model-manifest path mismatch for lane {lane['id']}")
 
     if lane["adapter"] == "project_generation_integrity":
         if config.get("adapter_engine") != "general_capability":
@@ -43,6 +56,11 @@ def build_project_probe_command(
         expected_root = Path(str(lane["expected_output_root"])).resolve()
         if output_root != expected_root:
             raise ValueError("Generation evaluator output root mismatch")
+        input_sha256 = config.get("input_sha256")
+        if not isinstance(input_sha256, dict):
+            raise ValueError("Generation evaluator requires input_sha256")
+        for key in ("corpus_file", "prompts_file", "completions_file", "synthetic_subjects_file"):
+            _verify_input(config["data"][key], input_sha256.get(key), f"generation.{key}")
         return [plan["runtime"]["python"], str(entrypoint), "--config", str(config_path)]
 
     if config.get("adapter_engine") != "pre_m2_frozen":
@@ -51,6 +69,19 @@ def build_project_probe_command(
     expected_root = Path(str(lane["expected_output_root"])).resolve()
     if output_root != expected_root:
         raise ValueError("Factual evaluator output root mismatch")
+    input_sha256 = config.get("input_sha256")
+    if not isinstance(input_sha256, dict):
+        raise ValueError("Factual evaluator requires input_sha256")
+    _verify_input(
+        Path(str(config["dataset_dir"])) / "manifest.json",
+        input_sha256.get("dataset_manifest"),
+        "factual.dataset_manifest",
+    )
+    _verify_input(
+        config["probe_registry"],
+        input_sha256.get("probe_registry"),
+        "factual.probe_registry",
+    )
     command = [
         plan["runtime"]["python"],
         str(entrypoint),

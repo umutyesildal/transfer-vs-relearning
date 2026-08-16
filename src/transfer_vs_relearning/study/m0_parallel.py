@@ -562,6 +562,26 @@ def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[st
         environment.pop(name, None)
     started_at = datetime.now(timezone.utc).isoformat()
     started = time.monotonic()
+    project_rows: list[dict[str, Any]] = []
+    for lane in plan["lanes"]:
+        if lane["adapter"] == "lm_eval":
+            continue
+        build_project_probe_command(plan, lane, repo_root=Path(plan["repo_root"]))
+        project_rows.append(
+            {
+                "lane_id": lane["id"],
+                "evaluator_config": lane["evaluator_config"],
+                "evaluator_config_sha256": lane["evaluator_config_sha256"],
+                "status": "verified_pre_model_load",
+            }
+        )
+    _write_jsonl(output_root / "project_input_resolution.jsonl", project_rows)
+    tasks_json = json.dumps(tasks)
+    materialize_code = (
+        "import json;from lm_eval.tasks import TaskManager;"
+        f"d=TaskManager().load_task_or_group(json.loads({tasks_json!r}));"
+        "print(json.dumps(sorted(d)))"
+    )
     commands = {
         "task_list": [plan["runtime"]["python"], "-m", "lm_eval", "ls", "tasks"],
         "task_validate": [
@@ -572,6 +592,7 @@ def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[st
             "--tasks",
             ",".join(tasks),
         ],
+        "task_materialize": [plan["runtime"]["python"], "-c", materialize_code],
     }
     completed: dict[str, subprocess.CompletedProcess[str]] = {}
     for label, command in commands.items():
@@ -586,6 +607,29 @@ def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[st
         (preflight_root / f"{label}.stdout.log").write_text(result.stdout, encoding="utf-8")
         (preflight_root / f"{label}.stderr.log").write_text(result.stderr, encoding="utf-8")
         completed[label] = result
+    offline_environment = environment.copy()
+    offline_environment.update(
+        {
+            "HF_HUB_OFFLINE": "1",
+            "HF_DATASETS_OFFLINE": "1",
+            "TRANSFORMERS_OFFLINE": "1",
+        }
+    )
+    offline_result = subprocess.run(
+        [plan["runtime"]["python"], "-c", materialize_code],
+        cwd=Path(plan["repo_root"]),
+        env=offline_environment,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    (preflight_root / "task_offline_reload.stdout.log").write_text(
+        offline_result.stdout, encoding="utf-8"
+    )
+    (preflight_root / "task_offline_reload.stderr.log").write_text(
+        offline_result.stderr, encoding="utf-8"
+    )
+    completed["task_offline_reload"] = offline_result
     discovered = {
         line.split("|")[1].strip()
         for line in completed["task_list"].stdout.splitlines()
@@ -596,9 +640,12 @@ def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[st
             "task_id": task,
             "discovered": task in discovered,
             "validation_returncode": completed["task_validate"].returncode,
+            "materialization_returncode": completed["task_materialize"].returncode,
+            "offline_reload_returncode": completed["task_offline_reload"].returncode,
             "status": (
                 "complete"
-                if task in discovered and completed["task_validate"].returncode == 0
+                if task in discovered
+                and all(result.returncode == 0 for result in completed.values())
                 else "failed_pre_scoring"
             ),
             "run_classification": plan["run_classification"],
@@ -610,6 +657,10 @@ def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[st
     within_bounds = (
         len(cache_files) <= int(preflight["max_cache_files"])
         and cache_bytes <= int(preflight["max_cache_bytes"])
+    )
+    cache_materialized = (
+        len(cache_files) >= int(preflight["min_cache_files"])
+        and cache_bytes >= int(preflight["min_cache_bytes"])
     )
     content_rows = [
         {
@@ -623,7 +674,9 @@ def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[st
     _write_jsonl(output_root / "dataset_content_manifest.jsonl", content_rows)
     status = (
         "complete"
-        if all(row["status"] == "complete" for row in rows) and within_bounds
+        if all(row["status"] == "complete" for row in rows)
+        and within_bounds
+        and cache_materialized
         else "failed_pre_scoring"
     )
     payload = {
@@ -640,7 +693,10 @@ def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[st
         "max_cache_files": int(preflight["max_cache_files"]),
         "max_cache_bytes": int(preflight["max_cache_bytes"]),
         "within_bounds": within_bounds,
-        "network_retrieval_used": True,
+        "cache_materialized": cache_materialized,
+        "offline_reload_passed": completed["task_offline_reload"].returncode == 0,
+        "project_input_lane_count": len(project_rows),
+        "network_retrieval_used": cache_materialized,
     }
     write_json(preflight_root / "preflight_result.json", payload)
     if status != "complete":

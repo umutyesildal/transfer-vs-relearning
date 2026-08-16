@@ -1,6 +1,6 @@
 # M0 OLMo eval-v1 qualification wave v1
 
-**Status:** `frozen_operational_repair_test_only_execution_authorized` | **Owner:** project | **Created:** 2026-08-16
+**Status:** `data_materialization_repair_binding_pending` | **Owner:** project | **Created:** 2026-08-16
 **Supersedes:** none
 
 ## Purpose and estimand
@@ -100,6 +100,28 @@ Slurm `--test-only` accepted the exact `std` 8-CPU/32G/2h data route, the
 `gpu:v10032gb:1` 8-CPU/64G/4h evaluation route and the `std` 2-CPU/8G/30m finalizer route. The
 original 2026-08-16 test-only execution authorization remains in force for this semantics-neutral
 repair and fresh v2 namespace.
+
+### Append-only task materialization and project-input correction
+
+The v2 Slurm route was accepted. Data preflight job `460950` discovered and validated all ten task
+IDs, but Harness `validate` does not instantiate tasks or download datasets; the resulting cache
+manifest contained zero files and zero bytes. The faulty gate allowed array `460951` to start.
+WikiText, Pile-10k and BLiMP each failed before scoring because offline mode could not reach their
+datasets. The factual lane failed before model load because the registry path was absent from the
+active monorepo checkout. Other lanes were cancelled; the generation lane reached weight loading
+but produced no completed lane result or accepted score. Finalizer `460952` recorded zero complete
+lanes, `partial_invalid`, `normalization_allowed=false` and gate `blocked`. All 62 inventoried files
+under `/vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v2` are preserved without reuse or cleanup.
+
+The next semantics-neutral repair uses fresh root
+`/vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v3`. Its CPU preflight must instantiate the exact
+TaskManager task/group set online, require a non-empty bounded cache, instantiate the same set again
+with every offline flag enabled, and only then release the GPU dependency. It also verifies every
+factual/generation input byte hash before model load. The factual registry is read-only at its
+preserved legacy path with SHA-256
+`2cf9bf4a61f7ef3771e71caf61f03a3e59d22707ef4d5367a6ef6184a18f664b`; the legacy Git worktree
+itself is not modified or reused. A new implementation commit and exact config hashes are required
+before v3 execution.
 
 ## Protocol
 

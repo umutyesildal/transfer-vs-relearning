@@ -61,6 +61,14 @@ The repair identities are now frozen: control jobs use `std`, GPU lanes retain t
 request, and all three routes passed Slurm `--test-only`. After the final fast-forward and runtime
 preflight, the fresh v2 namespace may be submitted under the existing test-only authorization.
 
+The v2 run is now closed as blocked qualification evidence. Harness task validation returned 10/10
+but materialized a zero-byte cache; three offline Harness lanes therefore failed before scoring.
+The factual lane exposed an absent active-checkout registry path, and cancellation caught the
+generation lane after weight load but before a completed result. The finalizer recorded 0/7 complete,
+`partial_invalid`, normalization disabled and no scientific result. The preserved v3 repair must
+perform online task instantiation, non-empty cache inventory, offline re-instantiation and exact
+project-input hash checks before another GPU dependency can open.
+
 ## Evaluation design result
 
 - LM Evaluation Harness is pinned prospectively to v0.4.12 commit

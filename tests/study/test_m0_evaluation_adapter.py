@@ -98,7 +98,12 @@ def test_current_parallel_preflight_fails_before_scoring() -> None:
     assert payload["status"] == "blocked_pre_scoring"
     assert payload["scientific_work_started"] is False
     assert payload["lane_count"] == 7
-    assert payload["blockers"] == ["runtime_and_artifact_identity"]
+    assert {
+        "qualification_contract_frozen",
+        "qualification_execution_ready",
+        "qualification_execution_authorized",
+        "runtime_and_artifact_identity",
+    }.issubset(payload["blockers"])
     assert "project_ready_to_measure" not in payload["blockers"]
 
 
@@ -126,19 +131,29 @@ def test_lm_eval_command_is_offline_base_model_and_limit_is_test_only(tmp_path: 
 
 
 def test_project_probe_command_accepts_only_registered_entrypoint_and_exact_config(tmp_path: Path) -> None:
-    plan, _ = _runtime_plan(tmp_path)
+    plan, manifest_path = _runtime_plan(tmp_path)
     evaluator_config = tmp_path / "factual.yaml"
     output_dir = tmp_path / "factual-output"
+    dataset_dir = tmp_path / "dataset"
+    dataset_dir.mkdir()
+    dataset_manifest = dataset_dir / "manifest.json"
+    dataset_manifest.write_text("{}", encoding="utf-8")
+    probe_registry = tmp_path / "probes.csv"
+    probe_registry.write_text("probe_id\nprobe-1\n", encoding="utf-8")
     _write_yaml(
         evaluator_config,
         {
             "adapter_engine": "pre_m2_frozen",
             "run_classification": plan["run_classification"],
             "model_label": "m0-test",
-            "model_manifest": "/frozen/model_manifest.json",
-            "dataset_dir": "/frozen/dataset",
-            "probe_registry": "/frozen/probes.csv",
+            "model_manifest": str(manifest_path),
+            "dataset_dir": str(dataset_dir),
+            "probe_registry": str(probe_registry),
             "output_dir": str(output_dir),
+            "input_sha256": {
+                "dataset_manifest": sha256_file(dataset_manifest),
+                "probe_registry": sha256_file(probe_registry),
+            },
             "candidate_batch_size": 16,
             "checkpoint_interval": 8,
             "probe_limit": 8,
@@ -306,6 +321,10 @@ def test_data_preflight_records_exact_task_and_cache_identity(
         return type("Result", (), {"stdout": stdout, "stderr": "", "returncode": 0})()
 
     monkeypatch.setattr("transfer_vs_relearning.study.m0_parallel.subprocess.run", fake_run)
+    monkeypatch.setattr(
+        "transfer_vs_relearning.study.m0_parallel.build_project_probe_command",
+        lambda *_args, **_kwargs: ["verified"],
+    )
     payload = run_m0_data_preflight(plan, output_root=output_root)
     assert payload["status"] == "complete"
     assert payload["resolved_task_count"] == len(task_ids)
@@ -327,3 +346,35 @@ def test_data_preflight_records_exact_task_and_cache_identity(
             "sha256": sha256_file(cache_file),
         }
     ]
+
+
+def test_data_preflight_rejects_successful_validation_with_an_empty_cache(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    plan = build_m0_parallel_plan(CONFIG, repo_root=ROOT)
+    plan["runtime"]["python"] = "/frozen/env/bin/python"
+    output_root = tmp_path / "empty-cache"
+    (output_root / "cache").mkdir(parents=True)
+    task_ids = [task for lane in plan["lanes"] for task in lane.get("task_ids", [])]
+
+    def fake_run(command: list[str], **_: object) -> object:
+        stdout = (
+            "\n".join(f"| {task} | task |" for task in task_ids)
+            if "ls" in command
+            else "validated"
+        )
+        return type("Result", (), {"stdout": stdout, "stderr": "", "returncode": 0})()
+
+    monkeypatch.setattr("transfer_vs_relearning.study.m0_parallel.subprocess.run", fake_run)
+    monkeypatch.setattr(
+        "transfer_vs_relearning.study.m0_parallel.build_project_probe_command",
+        lambda *_args, **_kwargs: ["verified"],
+    )
+    with pytest.raises(RuntimeError, match="task-data preflight failed"):
+        run_m0_data_preflight(plan, output_root=output_root)
+    result = json.loads(
+        (output_root / "preflight/preflight_result.json").read_text(encoding="utf-8")
+    )
+    assert result["status"] == "failed_pre_scoring"
+    assert result["cache_materialized"] is False
+    assert result["network_retrieval_used"] is False
