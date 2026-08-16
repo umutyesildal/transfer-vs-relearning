@@ -340,6 +340,64 @@ test requires both online and offline generated commands to use the JSON-safe co
 
 The existing bounded test-only authorization permits this semantics-neutral controller repair.
 
+### Append-only installed-package integrity and independent-lane correction
+
+V6 data job `461301` completed in 401.94 seconds, resolved all eight task IDs, materialized 404
+cache files / 413,883,545 bytes and passed the offline reload. Array `461302` then loaded the exact
+model and cached task data. The factual-access and generation-integrity lanes completed, while all
+five Harness lanes stopped before scoring with the same
+`FileNotFoundError: Unable to find package root within 3 upwards` from Harness
+`run_task_tests`. This is the installed VCS wheel layout lacking the repository test-root expected
+by CLI `--check_integrity`; it is not evidence that a task, dataset or model failed. Finalizer
+`461303` recorded 2/7 complete lanes and a blocked, non-scientific result. The immutable v6 root
+contains 489 files / 417,993,720 bytes. Its exact hashes are:
+
+- preflight result: `392f52d37086d88faad510eec22120df18a473dc0c6cd7cd703be02af4de940d`;
+- bundle status: `d2e13eeefad1929d0c71fdb144b0e6a2c6bedc6c9990a941de17ebc5fc4d29de`;
+- qualification result: `1f2c386e8e1ae2378b0166b5d6b3e335c3a8e0a4f692956b748667fed09e7bd6`;
+- final inventory: `1d22a689ca92aaf74a02da72fee237eab9768b9d7c25cbbcd7e56b12eda7cfb2`.
+
+V7 removes only the redundant Harness CLI `--check_integrity` invocation. The controller retains
+the stronger execution preflight already evidenced in v6: exact task discovery/validation,
+TaskManager construction during online materialization, bounded content inventory and a second
+TaskManager construction with all network routes disabled. Model identity, Harness commit, task
+IDs, few-shot values, limits, datasets, seeds, precision and metric implementations are unchanged.
+Numerical WikiText/TurBLiMP parity remains an explicit later blocker and is not implied by this
+repair.
+
+V7 also replaces the one-GPU-type array with seven independent lane jobs created by the same
+operator command. Each lane receives one scheduler-tested route, exact route/job identity is stored
+with its result, and one `afterany` finalizer depends on every lane job. Declared physical route
+slots allow three V10032GB, three A10080GB, one RTX3090, three RTX6000 and four RTXA6000 candidate
+assignments, but only routes passing `sbatch --test-only` are eligible. This maximizes concurrent
+launch across GPU types without claiming that unavailable hardware ran. The finalizer always writes
+`evaluation_results.json` with all lane statuses, runtimes, route identities and parsed metric or
+project summary documents; `raw_artifact_manifest.jsonl` retains every raw artifact path, byte count
+and SHA-256.
+
+The v7 bindings are frozen:
+
+- implementation commit: `d39cdc2653a558c1cf494f6791b00a4aaef3ba08`;
+- operator entrypoint SHA-256:
+  `1ec72fd68afe3668a7663d456fd6dac94bdc75fda839adf98409843a81b80687`;
+- parallel controller/finalizer SHA-256:
+  `874b2739c96191a954d9af7d1a8c7352db847dc94af51413b3fa3a10a4c00b90`;
+- Harness adapter SHA-256:
+  `953f1958b6051be33e96c2b94ecb86ae79c5b19ce9a9376cd00f16af7ecdcfa5`;
+- project adapter SHA-256:
+  `5b8a49003e151454c3028c2eb135fda943a9169037a1a4b9d04ae5a0810fcde6`;
+- factual qualification config SHA-256:
+  `0f3d385847a6652279418b9914224e6c51d8a511e0986a282ceed4122fbfc75e`;
+- generation qualification config SHA-256:
+  `15790e1272448b4ddf17b00acea9aefc07482a6a45163e41b0abefa67f8038ca`;
+- companion config SHA-256:
+  `baa039ba2827256f33466a3018fa49afe325588536784ae492c97958b8cc5f26`;
+- fresh execution root: `/vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v7`.
+
+The user's 2026-08-16 instruction to implement this repair and keep the one-command complete result
+pipeline authorizes this bounded v7 qualification wave. It remains test-only and cannot create a
+scientific M0 score.
+
 The corrected repair uses the dedicated root
 `/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3`, preserves the parent compat
 prefix path without resolving it to the shared interpreter, normalizes distribution names and
@@ -386,12 +444,13 @@ The proposed root is fresh and fail-closed. Required future outputs are:
 - `runtime_measurements.jsonl`;
 - `parity_results.jsonl`;
 - `raw_artifact_manifest.jsonl`;
+- `evaluation_results.json`;
 - `qualification_result.json`;
 - `final_inventory.json`.
 
 The parallel controller additionally writes `parallel_plan.json`, `submission_manifest.json`, one
 `lanes/<lane-id>/lane_result.json` per lane and `bundle_status.json`. These operational manifests
-do not replace the qualification outputs above. A partial array remains visible and cannot open
+do not replace the qualification outputs above. A partial lane set remains visible and cannot open
 normalization or create a complete evaluation manifest.
 
 All JSON files use atomic write-then-rename. Raw artifacts are immutable. Every result row includes
@@ -453,9 +512,9 @@ fresh output root are fixed in the companion config.
 ## Authority boundary
 
 Environment preparation completed under the 2026-08-16 user authorization. The CPU/data preflight
-and test-only GPU array may now run through the frozen companion config. Any semantic or resource
-change after this freeze needs new user authorization and a new namespace. Scientific M0 evaluation
-always requires a later, separate frozen execution contract.
+and test-only independent GPU lane jobs may now run through the frozen companion config. Any
+semantic or resource change after this freeze needs new user authorization and a new namespace.
+Scientific M0 evaluation always requires a later, separate frozen execution contract.
 
 ## Change policy
 

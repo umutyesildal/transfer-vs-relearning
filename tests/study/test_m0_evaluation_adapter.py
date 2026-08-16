@@ -65,7 +65,10 @@ def _runtime_plan(tmp_path: Path) -> tuple[dict, Path]:
 def test_parallel_plan_covers_every_required_family_and_harness_task_once() -> None:
     plan = build_m0_parallel_plan(CONFIG, repo_root=ROOT)
     assert plan["lane_count"] == 7
-    assert plan["max_parallel_lanes"] == 3
+    assert plan["max_parallel_lanes"] == 7
+    assert plan["topology"] == (
+        "gpu_route_selection_per_lane_then_preflight_then_independent_jobs_plus_afterany_finalizer"
+    )
     assert plan["run_classification"] == "test_only_non_scientific"
     assert [route["id"] for route in plan["slurm"]["gpu_routes"]] == [
         "v10032gb",
@@ -196,6 +199,8 @@ def test_single_entrypoint_submits_one_parallel_array_and_afterany_finalizer(
     spec.loader.exec_module(entrypoint)
 
     plan = build_m0_parallel_plan(CONFIG, repo_root=ROOT)
+    plan["topology"] = "gpu_route_selection_then_preflight_then_single_slurm_array_plus_afterany_finalizer"
+    plan["max_parallel_lanes"] = 3
     plan["runtime"]["python"] = "/frozen/env/bin/python"
     plan["slurm"] = {
         "account": "yesildau",
@@ -393,7 +398,7 @@ def test_submitter_persists_first_sbatch_rejection_without_claiming_a_job(
     )
     assert manifest["status"] == "no_job_submitted_preflight_sbatch_rejected"
     assert manifest["preflight_job_id"] is None
-    assert manifest["array_job_id"] is None
+    assert manifest["lane_jobs"] == []
     assert manifest["finalizer_job_id"] is None
 
 

@@ -22,9 +22,10 @@ artifact/presentation namespaces. It does not yet execute LM Eval or project eva
 
 The full-study controller now expresses the 15-stage M0→M1→M2-A/M2-B dependency graph, preserves
 the sibling-parent and matched-budget gates, and produces one bounded Luna adapter packet per stage.
-The M0 standard and project adapters plus a single seven-lane parallel Slurm-array controller now
-exist locally; the full-study CLI remains dry-run because their frozen bindings and all later-state
-adapters/execution authority do not exist yet.
+The M0 standard and project adapters plus a single operator-facing controller now exist locally.
+That controller performs task-data preflight, submits seven independently GPU-routed lanes, joins
+them with one finalizer and writes a consolidated result plus hashed raw-artifact manifest. The
+full-study CLI remains dry-run because all later-state adapters/execution authority do not exist yet.
 The former flat entrypoint roots were losslessly grouped: 129 scripts and 135 Slurm files are mapped
 by `configs/entrypoints/catalog.json`; historical numbered documents were not rewritten.
 
@@ -39,10 +40,11 @@ locked and installed directly from Harness v0.4.12 commit
 
 The next boundary is written as the
 [`M0 OLMo qualification draft`](../contracts/evaluation/m0-olmo-qualification-v1.md) with a
-machine-readable companion config and one operator-facing entrypoint. The proposed topology is
+machine-readable companion config and one operator-facing entrypoint. The current topology is
 one task-data preflight followed by seven independent GPU lanes—WikiText, Pile-10k, BLiMP, other
-English capability, Turkish capability, factual access and generation integrity—with at most three
-V100 lanes active, followed by an `afterany` evidence finalizer. It binds the
+English capability, Turkish capability, factual access and generation integrity—distributed across
+scheduler-qualified GPU types where capacity exists, followed by one `afterany` evidence finalizer.
+It binds the
 exact OLMo and Harness revisions, separates limited smokes from scientific scores, requires fresh
 immutable artifacts, and enumerates the environment/data/parity/resource fields still needed for
 freeze. The user authorized the bounded qualification attempt on 2026-08-16. Two rejected scratch
@@ -85,9 +87,15 @@ possible future upstream repair are isolated in the evaluation incident note. V5
 project configs, task set and fresh namespace are now hash-frozen under the existing bounded
 test-only authorization. V5 then materialized all task data but failed after TaskManager returned,
 when the controller tried to sort mixed string/`ConfigurableGroup` result keys. No GPU/model/scoring
-work ran. V6 replaces only that diagnostic with a JSON-safe loaded-entry count and targets a fresh
-namespace; its implementation, project configs and companion config are now hash-frozen under the
-existing bounded test-only authorization.
+work ran. V6 replaced only that diagnostic with a JSON-safe loaded-entry count. Its data preflight
+then passed all eight task constructions and offline reload, and its factual/generation lanes
+completed. Five Harness lanes stopped before scoring because pip-installed Harness could not find
+the repository test-root required by redundant CLI `--check_integrity`; v6 is preserved as a 2/7,
+blocked, non-scientific run. V7 keeps the successful controller preflight, removes only that
+packaging-dependent duplicate check, submits seven independent per-lane GPU jobs from the same
+script and adds `evaluation_results.json` alongside the complete raw-artifact manifest. Its exact
+implementation, project configs, companion config and fresh v7 namespace are frozen under the
+user's bounded test-only rerun authorization.
 
 ## Evaluation design result
 

@@ -1,5 +1,5 @@
 schema_version: 1
-name: m0-olmo-eval-v1-qualification-v1-materializer-serialization-repair-v1
+name: m0-olmo-eval-v1-qualification-v1-independent-lane-integrity-repair-v1
 status: frozen
 as_of: "2026-08-16"
 classification: qualification_only
@@ -28,6 +28,7 @@ harness:
   environment_lock_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/environment.lock.txt
   environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
   environment_identity_sha256: 9061cbc59d021676ca6b768f7688eb7da10e5460bf4919b963c9931eefcc7d71
+  integrity_validation: task_manager_online_materialization_and_offline_reload_preflight
 
 seeds:
   python: 42
@@ -67,19 +68,19 @@ phases:
   - q4_qualification_result_and_freeze_gate
 
 parallel_evaluation:
-  topology: gpu_route_selection_then_preflight_then_single_slurm_array_plus_afterany_finalizer
+  topology: gpu_route_selection_per_lane_then_preflight_then_independent_jobs_plus_afterany_finalizer
   one_model_instance_per_lane: true
-  max_parallel_lanes: 3
+  max_parallel_lanes: 7
   finalizer_policy: >-
     Always inventory lane outcomes; emit the complete bundle manifest only when every required
     lane completed with the identical plan and run classification.
   runtime:
     python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
-    implementation_commit: abe4f72bdd570b05f7c1d35cd62629a5387eff73
+    implementation_commit: d39cdc2653a558c1cf494f6791b00a4aaef3ba08
     implementation_files:
-      scripts/study/run_m0_olmo_evaluation.py: ae2c0b4a595250c404cc1e7e3778c8f6a5efdb4be298ffb51e2c3dc03cb8e3bd
-      src/transfer_vs_relearning/study/m0_parallel.py: 67393a9894bd54c712663eb38b06705be8c291a5a44664e88d093d8aca4d5625
-      src/transfer_vs_relearning/study/adapters/m0_evaluation.py: 5480e4f01ef89047d979ca5a00511514283da11487ea8d2842e2e46eb38d8598
+      scripts/study/run_m0_olmo_evaluation.py: 1ec72fd68afe3668a7663d456fd6dac94bdc75fda839adf98409843a81b80687
+      src/transfer_vs_relearning/study/m0_parallel.py: 874b2739c96191a954d9af7d1a8c7352db847dc94af51413b3fa3a10a4c00b90
+      src/transfer_vs_relearning/study/adapters/m0_evaluation.py: 953f1958b6051be33e96c2b94ecb86ae79c5b19ce9a9376cd00f16af7ecdcfa5
       src/transfer_vs_relearning/study/adapters/m0_probing.py: 5b8a49003e151454c3028c2eb135fda943a9169037a1a4b9d04ae5a0810fcde6
     environment_lock_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/environment.lock.txt
     environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
@@ -142,22 +143,27 @@ parallel_evaluation:
         partition: gpu
         gres: gpu:v10032gb:1
         memory: 64G
+        parallel_slots: 3
       - id: a10080gb
         partition: gpu
         gres: gpu:a10080gb:1
         memory: 64G
+        parallel_slots: 3
       - id: rtx3090
         partition: wbimlgpu
         gres: gpu:rtx3090:1
         memory: 64G
+        parallel_slots: 1
       - id: rtx6000
         partition: gpu
         gres: gpu:rtx6000:1
         memory: 64G
+        parallel_slots: 3
       - id: rtxa6000
         partition: gpu
         gres: gpu:rtxa6000:1
         memory: 64G
+        parallel_slots: 4
     cpus_per_task: 8
     time_limit: 04:00:00
   lanes:
@@ -195,14 +201,14 @@ parallel_evaluation:
       adapter: project_factual
       families: [factual_access, statistical_uncertainty]
       evaluator_config: configs/evaluation/m0_olmo_qualification_factual_v1.yaml
-      evaluator_config_sha256: 8c2b1ef0a09cad91e7bdc9685d5851f7224f892b391ed61e4f6c48ee785c24bb
-      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v6/lanes/factual_access/raw/frozen_suite
+      evaluator_config_sha256: 0f3d385847a6652279418b9914224e6c51d8a511e0986a282ceed4122fbfc75e
+      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v7/lanes/factual_access/raw/frozen_suite
     - id: generation_integrity
       adapter: project_generation_integrity
       families: [generation_integrity]
       evaluator_config: configs/evaluation/m0_olmo_qualification_generation_v1.yaml
-      evaluator_config_sha256: 25f6837d74aa8e862e7349569a9c469a5916c7efc578b922db97b302ca3b2141
-      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v6/lanes/generation_integrity/raw/general_capability
+      evaluator_config_sha256: 15790e1272448b4ddf17b00acea9aefc07482a6a45163e41b0abefa67f8038ca
+      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v7/lanes/generation_integrity/raw/general_capability
 
 test_only_policy:
   limited_run_classification: test_only_non_scientific
@@ -216,7 +222,7 @@ test_only_policy:
     generic_completion_items: 31
 
 storage:
-  proposed_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v6
+  proposed_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v7
   fresh_root_required: true
   hu_home_read_only: true
   previous_evidence_roots_read_only: true
@@ -231,6 +237,7 @@ required_outputs:
   - runtime_measurements.jsonl
   - parity_results.jsonl
   - raw_artifact_manifest.jsonl
+  - evaluation_results.json
   - qualification_result.json
   - final_inventory.json
 
@@ -311,6 +318,25 @@ operational_history:
     final_inventory_bytes: 417737203
     preflight_result_sha256: 3a2db3eafe9a86ed57a9e2a8a6c4192362a43e062e7bbea0d7b873699cfc682e
     qualification_result_sha256: 8c27a4522958e6803690685b5b4bc4a48c228c707a814ac36badc184ee1e8a36
+    preservation: immutable_no_reuse_no_cleanup
+  - namespace: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v6
+    status: BLOCKED_LM_EVAL_INSTALLED_PACKAGE_TEST_ROOT
+    preflight_job_id: "461301"
+    array_job_id: "461302"
+    finalizer_job_id: "461303"
+    cache_files: 404
+    cache_bytes: 413883545
+    resolved_task_count: 8
+    offline_reload_passed: true
+    completed_lanes: 2
+    harness_lanes_failed_pre_scoring: 5
+    scientific_result: false
+    final_inventory_files: 489
+    final_inventory_bytes: 417993720
+    preflight_result_sha256: 392f52d37086d88faad510eec22120df18a473dc0c6cd7cd703be02af4de940d
+    bundle_status_sha256: d2e13eeefad1929d0c71fdb144b0e6a2c6bedc6c9990a941de17ebc5fc4d29de
+    qualification_result_sha256: 1f2c386e8e1ae2378b0166b5d6b3e335c3a8e0a4f692956b748667fed09e7bd6
+    final_inventory_sha256: 1d22a689ca92aaf74a02da72fee237eab9768b9d7c25cbbcd7e56b12eda7cfb2
     preservation: immutable_no_reuse_no_cleanup
 
 eval_v1_promotion_blockers:
