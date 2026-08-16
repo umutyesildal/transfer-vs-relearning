@@ -69,29 +69,29 @@ squeue -u yesildau -h -o '%i|%j|%T|%R'
 mkdir -p "$SCRATCH_ROOT/logs"
 
 acquisition_preflight_id=$(sbatch --parsable \
-  --export=ALL,PREFLIGHT_STAGE=acquisition,CANDIDATE_INDICES=0:1:2,TARGET_LAUNCHER="$PWD/slurm/acquire_m1_provenance_screen.slurm",TARGET_JOB_NAME=m1-prov-acquire \
-  slurm/preflight_m1_provenance_screen.slurm)
+  --export=ALL,PREFLIGHT_STAGE=acquisition,CANDIDATE_INDICES=0:1:2,TARGET_LAUNCHER="$PWD/slurm/m1/acquire_m1_provenance_screen.slurm",TARGET_JOB_NAME=m1-prov-acquire \
+  slurm/m1/preflight_m1_provenance_screen.slurm)
 acquisition_id=$(sbatch --parsable \
   --dependency="afterok:$acquisition_preflight_id" \
-  slurm/acquire_m1_provenance_screen.slurm)
+  slurm/m1/acquire_m1_provenance_screen.slurm)
 
 training_preflight_id=$(sbatch --parsable \
   --dependency="afterok:$acquisition_id" \
-  --export=ALL,PREFLIGHT_STAGE=training,CANDIDATE_INDICES=0:1:2,TARGET_LAUNCHER="$PWD/slurm/train_m1_provenance_screen.slurm",TARGET_JOB_NAME=m1-prov-train \
-  slurm/preflight_m1_provenance_screen.slurm)
+  --export=ALL,PREFLIGHT_STAGE=training,CANDIDATE_INDICES=0:1:2,TARGET_LAUNCHER="$PWD/slurm/m1/train_m1_provenance_screen.slurm",TARGET_JOB_NAME=m1-prov-train \
+  slurm/m1/preflight_m1_provenance_screen.slurm)
 training_id=$(sbatch --parsable \
   --dependency="afterok:$training_preflight_id" \
   --array=0-2%3 \
-  slurm/train_m1_provenance_screen.slurm)
+  slurm/m1/train_m1_provenance_screen.slurm)
 
 evaluation_preflight_id=$(sbatch --parsable \
   --dependency="afterok:$training_id" \
-  --export=ALL,PREFLIGHT_STAGE=evaluation,CANDIDATE_INDICES=0:1:2,TARGET_LAUNCHER="$PWD/slurm/eval_m1_provenance_screen.slurm",TARGET_JOB_NAME=m1-prov-eval \
-  slurm/preflight_m1_provenance_screen.slurm)
+  --export=ALL,PREFLIGHT_STAGE=evaluation,CANDIDATE_INDICES=0:1:2,TARGET_LAUNCHER="$PWD/slurm/m1/eval_m1_provenance_screen.slurm",TARGET_JOB_NAME=m1-prov-eval \
+  slurm/m1/preflight_m1_provenance_screen.slurm)
 evaluation_id=$(sbatch --parsable \
   --dependency="afterok:$evaluation_preflight_id" \
   --array=0-2%3 \
-  slurm/eval_m1_provenance_screen.slurm)
+  slurm/m1/eval_m1_provenance_screen.slurm)
 
 echo "__ACQUISITION_PREFLIGHT_JOB_ID__=$acquisition_preflight_id"
 echo "__ACQUISITION_ARRAY_JOB_ID__=$acquisition_id"

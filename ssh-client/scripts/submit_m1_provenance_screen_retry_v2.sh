@@ -58,29 +58,29 @@ export_args="ALL,M1_PROVENANCE_SCREEN_ROOT=$SCRATCH_ROOT,M1_PROVENANCE_REGISTRY=
 acq_pre=$(sbatch --parsable --job-name=m1-prov-retry-v2-preflight-acq \
   --output="$SCRATCH_ROOT/logs/m1-prov-retry-v2-preflight-acq-%j.out" \
   --error="$SCRATCH_ROOT/logs/m1-prov-retry-v2-preflight-acq-%j.err" \
-  --export="$export_args,PREFLIGHT_STAGE=acquisition,CANDIDATE_INDICES=0:1:2,TARGET_LAUNCHER=$PWD/slurm/acquire_m1_provenance_screen.slurm,TARGET_JOB_NAME=m1-prov-retry-v2-acquire" \
-  slurm/preflight_m1_provenance_screen.slurm)
+  --export="$export_args,PREFLIGHT_STAGE=acquisition,CANDIDATE_INDICES=0:1:2,TARGET_LAUNCHER=$PWD/slurm/m1/acquire_m1_provenance_screen.slurm,TARGET_JOB_NAME=m1-prov-retry-v2-acquire" \
+  slurm/m1/preflight_m1_provenance_screen.slurm)
 acq=$(sbatch --parsable --job-name=m1-prov-retry-v2-acquire --dependency="afterok:$acq_pre" --array=0-2%3 \
   --output="$SCRATCH_ROOT/logs/m1-prov-retry-v2-acquire-%A_%a.out" --error="$SCRATCH_ROOT/logs/m1-prov-retry-v2-acquire-%A_%a.err" \
-  --export="$export_args" slurm/acquire_m1_provenance_screen.slurm)
+  --export="$export_args" slurm/m1/acquire_m1_provenance_screen.slurm)
 
 train_pre=$(sbatch --parsable --job-name=m1-prov-retry-v2-preflight-train --dependency="afterok:$acq" \
   --output="$SCRATCH_ROOT/logs/m1-prov-retry-v2-preflight-train-%j.out" \
   --error="$SCRATCH_ROOT/logs/m1-prov-retry-v2-preflight-train-%j.err" \
-  --export="$export_args,PREFLIGHT_STAGE=training,CANDIDATE_INDICES=0:1:2,TARGET_LAUNCHER=$PWD/slurm/train_m1_provenance_screen.slurm,TARGET_JOB_NAME=m1-prov-retry-v2-train" \
-  slurm/preflight_m1_provenance_screen.slurm)
+  --export="$export_args,PREFLIGHT_STAGE=training,CANDIDATE_INDICES=0:1:2,TARGET_LAUNCHER=$PWD/slurm/m1/train_m1_provenance_screen.slurm,TARGET_JOB_NAME=m1-prov-retry-v2-train" \
+  slurm/m1/preflight_m1_provenance_screen.slurm)
 train=$(sbatch --parsable --job-name=m1-prov-retry-v2-train --dependency="afterok:$train_pre" --array=0-2%3 \
   --output="$SCRATCH_ROOT/logs/m1-prov-retry-v2-train-%A_%a.out" --error="$SCRATCH_ROOT/logs/m1-prov-retry-v2-train-%A_%a.err" \
-  --export="$export_args" slurm/train_m1_provenance_screen.slurm)
+  --export="$export_args" slurm/m1/train_m1_provenance_screen.slurm)
 
 eval_pre=$(sbatch --parsable --job-name=m1-prov-retry-v2-preflight-eval --dependency="afterok:$train" \
   --output="$SCRATCH_ROOT/logs/m1-prov-retry-v2-preflight-eval-%j.out" \
   --error="$SCRATCH_ROOT/logs/m1-prov-retry-v2-preflight-eval-%j.err" \
-  --export="$export_args,PREFLIGHT_STAGE=evaluation,CANDIDATE_INDICES=0:1:2,TARGET_LAUNCHER=$PWD/slurm/eval_m1_provenance_screen.slurm,TARGET_JOB_NAME=m1-prov-retry-v2-eval" \
-  slurm/preflight_m1_provenance_screen.slurm)
+  --export="$export_args,PREFLIGHT_STAGE=evaluation,CANDIDATE_INDICES=0:1:2,TARGET_LAUNCHER=$PWD/slurm/m1/eval_m1_provenance_screen.slurm,TARGET_JOB_NAME=m1-prov-retry-v2-eval" \
+  slurm/m1/preflight_m1_provenance_screen.slurm)
 eval=$(sbatch --parsable --job-name=m1-prov-retry-v2-eval --dependency="afterok:$eval_pre" --array=0-2%3 \
   --output="$SCRATCH_ROOT/logs/m1-prov-retry-v2-eval-%A_%a.out" --error="$SCRATCH_ROOT/logs/m1-prov-retry-v2-eval-%A_%a.err" \
-  --export="$export_args" slurm/eval_m1_provenance_screen.slurm)
+  --export="$export_args" slurm/m1/eval_m1_provenance_screen.slurm)
 
 echo "__ACQUISITION_PREFLIGHT_JOB_ID__=$acq_pre"
 echo "__ACQUISITION_ARRAY_JOB_ID__=$acq"

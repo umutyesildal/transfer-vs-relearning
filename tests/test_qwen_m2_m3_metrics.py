@@ -125,7 +125,7 @@ def test_analysis_cli_writes_complete_cpu_package(tmp_path: Path) -> None:
     subprocess.run(
         [
             sys.executable,
-            str(root / "scripts/analyze_qwen_m2_m3_results.py"),
+            str(root / "scripts/m2/analyze_qwen_m2_m3_results.py"),
             "--results-manifest",
             str(manifest),
             "--output-dir",

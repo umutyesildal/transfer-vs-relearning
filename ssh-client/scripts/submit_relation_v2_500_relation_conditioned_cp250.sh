@@ -38,7 +38,7 @@ manifest = manifest_dir / 'checkpoint-250_model_manifest.json'
 subprocess.run(
     [
         str(Path('/vol/fob-vol6/mi25/yesildau/.conda/envs/xfer-relearn/bin/python')),
-        'scripts/create_local_model_manifest.py',
+        'scripts/operations/create_local_model_manifest.py',
         '--source-manifest', 'artifacts/models/HuggingFaceTB__SmolLM2-360M/model_manifest.json',
         '--local-model-dir', str(checkpoint),
         '--output-manifest', str(manifest),
@@ -82,7 +82,7 @@ PY
 JOB_ID=$(sbatch --parsable \
   --job-name=m1-v2-relcond \
   --export=ALL,TRAIN_CONFIG="$CONFIG" \
-  slurm/train_m1_ranking.slurm)
+  slurm/m1/train_m1_ranking.slurm)
 echo "__JOB_ID__=$JOB_ID"
 squeue -h -j "$JOB_ID" -o "%i %T %M %L %R %j"
 EOF

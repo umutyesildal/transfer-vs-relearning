@@ -32,7 +32,7 @@ if len(examples) != 1500 or len({example.fact_id for example in examples}) != 50
 print(f'base_model={payload["local_path_absolute"]}')
 print(f'examples={len(examples)} facts={len({example.fact_id for example in examples})}')
 PY
-JOB_ID=$(sbatch --parsable --job-name=m1-v2-relcond-lr2 --export=ALL,TRAIN_CONFIG="$CONFIG" slurm/train_m1_ranking.slurm)
+JOB_ID=$(sbatch --parsable --job-name=m1-v2-relcond-lr2 --export=ALL,TRAIN_CONFIG="$CONFIG" slurm/m1/train_m1_ranking.slurm)
 echo "__JOB_ID__=$JOB_ID"
 squeue -h -j "$JOB_ID" -o "%i %T %M %L %R %j"
 EOF

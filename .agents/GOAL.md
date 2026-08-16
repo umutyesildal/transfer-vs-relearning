@@ -2,6 +2,7 @@
 
 Status: NOT_SET
 Goal ID: NOT_SET
+Task packet: NOT_SET
 
 ## Objective
 
@@ -28,3 +29,5 @@ status; that belongs in `documentation/current/PROJECT_STATE.yaml`.
 - External, scientific-execution, destructive, push, and secret actions remain non-automatic.
 
 Activate only after human review by changing `Status` to `ACTIVE` and assigning a unique Goal ID.
+Set `Task packet` to exactly one reviewed file under `.agents/task-packets/`; never point Luna at a
+whole directory or the chronological archive.

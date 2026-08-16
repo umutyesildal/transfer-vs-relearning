@@ -68,7 +68,7 @@ for label in base seed42 seed43; do
     --output="$LOG_DIR/%x-%j.out" \
     --error="$LOG_DIR/%x-%j.err" \
     --export=ALL,EVAL_CONFIG="$CONFIG",PYTHONDONTWRITEBYTECODE=1 \
-    slurm/eval_m1_general_capability.slurm)
+    slurm/m1/eval_m1_general_capability.slurm)
   echo "__JOB_ID_${label}__=$JOB_ID"
 done
 squeue -h -u yesildau -n gen-cap-base,gen-cap-seed42,gen-cap-seed43 -o '%i %T %M %L %R %j'

@@ -19,12 +19,12 @@ fi
 preflight_indices="${indices//,/:}"
 mkdir -p "$SCRATCH_ROOT/logs"
 preflight_id=$(sbatch --parsable \
-  --export=ALL,PREFLIGHT_STAGE=training,CANDIDATE_INDICES="$preflight_indices",TARGET_LAUNCHER="$PWD/slurm/train_m1_cross_family.slurm" \
-  slurm/preflight_m1_cross_family.slurm)
+  --export=ALL,PREFLIGHT_STAGE=training,CANDIDATE_INDICES="$preflight_indices",TARGET_LAUNCHER="$PWD/slurm/m1/train_m1_cross_family.slurm" \
+  slurm/m1/preflight_m1_cross_family.slurm)
 training_id=$(sbatch --parsable \
   --dependency="afterok:$preflight_id" \
   --array="$indices" \
-  slurm/train_m1_cross_family.slurm)
+  slurm/m1/train_m1_cross_family.slurm)
 echo "__CANDIDATE_INDICES__=$indices"
 echo "__PREFLIGHT_JOB_ID__=$preflight_id"
 echo "__TRAINING_ARRAY_JOB_ID__=$training_id"

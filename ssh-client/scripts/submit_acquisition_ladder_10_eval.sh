@@ -64,7 +64,7 @@ for checkpoint in checkpoints:
     subprocess.run(
         [
             str(Path('/vol/fob-vol6/mi25/yesildau/.conda/envs/xfer-relearn/bin/python')),
-            'scripts/create_local_model_manifest.py',
+            'scripts/operations/create_local_model_manifest.py',
             '--source-manifest', str(source_manifest),
             '--local-model-dir', str(checkpoint),
             '--output-manifest', str(manifest_path),
@@ -116,7 +116,7 @@ for manifest in runs/local_model_manifests/m1_acquisition_ladder_10/checkpoint-*
   checkpoint=$(basename "$manifest" _model_manifest.json)
   job_id=$(sbatch --parsable \
     --export=ALL,EVAL_CONFIG_DIR="$EVAL_CONFIG_DIR",CHECKPOINT="$checkpoint" \
-    slurm/eval_m1_acquisition_ladder.slurm)
+    slurm/m1/eval_m1_acquisition_ladder.slurm)
   echo "__EVAL_JOB__=$job_id $checkpoint"
   sleep 1
 done

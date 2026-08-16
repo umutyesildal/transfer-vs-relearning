@@ -75,9 +75,9 @@ PYTHONDONTWRITEBYTECODE=1 "$PYTHON" -m pytest -q -p no:cacheprovider \
 "$PYTHON" -m py_compile \
   src/transfer_vs_relearning/models/download.py \
   src/transfer_vs_relearning/experiments/m1_cross_family.py \
-  scripts/acquire_m1_cross_family_candidate.py \
-  scripts/prepare_m1_cross_family_evaluation.py \
-  scripts/summarize_m1_provenance_screen_v3.py
+  scripts/m1/acquire_m1_cross_family_candidate.py \
+  scripts/m1/prepare_m1_cross_family_evaluation.py \
+  scripts/m1/summarize_m1_provenance_screen_v3.py
 
 queued=$(squeue -u yesildau -h -o '%i|%j|%T|%R')
 if printf '%s\n' "$queued" | grep -E '\|m1-pv3-' >/dev/null; then
@@ -93,8 +93,8 @@ acq_pre=$(sbatch --parsable \
   --job-name=m1-pv3-preflight-acq \
   --output="$SCRATCH_ROOT/logs/m1-pv3-preflight-acq-%j.out" \
   --error="$SCRATCH_ROOT/logs/m1-pv3-preflight-acq-%j.err" \
-  --export="$export_args,PREFLIGHT_STAGE=acquisition,CANDIDATE_INDICES=0:1:2,TARGET_LAUNCHER=$PWD/slurm/acquire_m1_provenance_screen.slurm,TARGET_JOB_NAME=m1-pv3-acq,PREFLIGHT_MANIFEST_PATH=$acq_manifest" \
-  slurm/preflight_m1_provenance_screen.slurm)
+  --export="$export_args,PREFLIGHT_STAGE=acquisition,CANDIDATE_INDICES=0:1:2,TARGET_LAUNCHER=$PWD/slurm/m1/acquire_m1_provenance_screen.slurm,TARGET_JOB_NAME=m1-pv3-acq,PREFLIGHT_MANIFEST_PATH=$acq_manifest" \
+  slurm/m1/preflight_m1_provenance_screen.slurm)
 
 labels=(olmo pythia falcon)
 acq_ids=()
@@ -111,7 +111,7 @@ for i in 0 1 2; do
     --output="$SCRATCH_ROOT/logs/m1-pv3-${label}-acq-%A_%a.out" \
     --error="$SCRATCH_ROOT/logs/m1-pv3-${label}-acq-%A_%a.err" \
     --export="$export_args,PREFLIGHT_MANIFEST=$acq_manifest" \
-    slurm/acquire_m1_provenance_screen.slurm)
+    slurm/m1/acquire_m1_provenance_screen.slurm)
   acq_ids+=("$acq")
 
   train_manifest="$SCRATCH_ROOT/preflight/training_${label}.json"
@@ -120,8 +120,8 @@ for i in 0 1 2; do
     --dependency="afterok:$acq" \
     --output="$SCRATCH_ROOT/logs/m1-pv3-${label}-pretrain-%j.out" \
     --error="$SCRATCH_ROOT/logs/m1-pv3-${label}-pretrain-%j.err" \
-    --export="$export_args,PREFLIGHT_STAGE=training,CANDIDATE_INDICES=$i,TARGET_LAUNCHER=$PWD/slurm/train_m1_provenance_screen.slurm,TARGET_JOB_NAME=m1-pv3-${label}-train,ALLOW_SUBSET_RETRY=1,PREFLIGHT_MANIFEST_PATH=$train_manifest" \
-    slurm/preflight_m1_provenance_screen.slurm)
+    --export="$export_args,PREFLIGHT_STAGE=training,CANDIDATE_INDICES=$i,TARGET_LAUNCHER=$PWD/slurm/m1/train_m1_provenance_screen.slurm,TARGET_JOB_NAME=m1-pv3-${label}-train,ALLOW_SUBSET_RETRY=1,PREFLIGHT_MANIFEST_PATH=$train_manifest" \
+    slurm/m1/preflight_m1_provenance_screen.slurm)
   train_pre_ids+=("$train_pre")
   train=$(sbatch --parsable \
     --job-name="m1-pv3-${label}-train" \
@@ -130,7 +130,7 @@ for i in 0 1 2; do
     --output="$SCRATCH_ROOT/logs/m1-pv3-${label}-train-%A_%a.out" \
     --error="$SCRATCH_ROOT/logs/m1-pv3-${label}-train-%A_%a.err" \
     --export="$export_args,PREFLIGHT_MANIFEST=$train_manifest" \
-    slurm/train_m1_provenance_screen.slurm)
+    slurm/m1/train_m1_provenance_screen.slurm)
   train_ids+=("$train")
 
   eval_manifest="$SCRATCH_ROOT/preflight/evaluation_${label}.json"
@@ -139,8 +139,8 @@ for i in 0 1 2; do
     --dependency="afterok:$train" \
     --output="$SCRATCH_ROOT/logs/m1-pv3-${label}-preeval-%j.out" \
     --error="$SCRATCH_ROOT/logs/m1-pv3-${label}-preeval-%j.err" \
-    --export="$export_args,PREFLIGHT_STAGE=evaluation,CANDIDATE_INDICES=$i,TARGET_LAUNCHER=$PWD/slurm/eval_m1_provenance_screen.slurm,TARGET_JOB_NAME=m1-pv3-${label}-eval,ALLOW_COMPLETED_SUBSET_EVALUATION=1,PREFLIGHT_MANIFEST_PATH=$eval_manifest" \
-    slurm/preflight_m1_provenance_screen.slurm)
+    --export="$export_args,PREFLIGHT_STAGE=evaluation,CANDIDATE_INDICES=$i,TARGET_LAUNCHER=$PWD/slurm/m1/eval_m1_provenance_screen.slurm,TARGET_JOB_NAME=m1-pv3-${label}-eval,ALLOW_COMPLETED_SUBSET_EVALUATION=1,PREFLIGHT_MANIFEST_PATH=$eval_manifest" \
+    slurm/m1/preflight_m1_provenance_screen.slurm)
   eval_pre_ids+=("$eval_pre")
   eval=$(sbatch --parsable \
     --job-name="m1-pv3-${label}-eval" \
@@ -149,7 +149,7 @@ for i in 0 1 2; do
     --output="$SCRATCH_ROOT/logs/m1-pv3-${label}-eval-%A_%a.out" \
     --error="$SCRATCH_ROOT/logs/m1-pv3-${label}-eval-%A_%a.err" \
     --export="$export_args,PREFLIGHT_MANIFEST=$eval_manifest" \
-    slurm/eval_m1_provenance_screen.slurm)
+    slurm/m1/eval_m1_provenance_screen.slurm)
   eval_ids+=("$eval")
 done
 
@@ -160,7 +160,7 @@ summary=$(sbatch --parsable \
   --output="$SCRATCH_ROOT/logs/m1-pv3-summary-%j.out" \
   --error="$SCRATCH_ROOT/logs/m1-pv3-summary-%j.err" \
   --export="$export_args" \
-  slurm/summarize_m1_provenance_screen_v3.slurm)
+  slurm/m1/summarize_m1_provenance_screen_v3.slurm)
 
 printf '__ACQUISITION_PREFLIGHT_JOB_ID__=%s\n' "$acq_pre"
 printf '__ACQUISITION_JOB_IDS__=%s\n' "${acq_ids[*]}"

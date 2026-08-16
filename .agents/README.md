@@ -13,7 +13,8 @@ Every role starts with the small live set:
 2. `documentation/current/PROJECT_STATE.yaml`;
 3. `.agents/POLICY.md`;
 4. `.agents/GOAL.md`;
-5. the current decision/report and only its named evidence.
+5. the single task packet named by `GOAL.md`;
+6. the current decision/report and only its named evidence.
 
 The complete numbered record and `LUNA_WORKER_CURRENT_HANDOFF.md` are no longer mandatory per-turn
 reads. A task may name them when they are actually relevant.
@@ -35,6 +36,7 @@ conversation. Sol checks meaning, scope, and evidence between tasks.
 ├── GOAL.md
 ├── orchestrator.py
 ├── prompts/
+├── task-packets/ # versioned micro-context packets
 ├── schemas/
 ├── tests/
 ├── state/       # ignored local runtime state
@@ -44,7 +46,7 @@ conversation. Sol checks meaning, scope, and evidence between tasks.
 ## Safe workflow
 
 1. Write one concrete `GOAL.md` with `Status: ACTIVE`, a unique Goal ID, acceptance criteria,
-   allowed paths, and prohibitions.
+   one task-packet path, allowed paths, and prohibitions.
 2. Review the goal against the root state and applicable contracts.
 3. Run local checks:
 
@@ -92,6 +94,22 @@ shape, or write tests for one resume invariant.
 
 A bad task is “finish the experiment,” “read all documents and decide,” or a mixed code + remote
 execution + interpretation wave.
+
+## Full-study packet set
+
+The versioned packets under `task-packets/study-v1/` mirror the 15-stage M0→M2 graph. Each packet
+is an adapter implementation/validation task, not authorization to run its scientific stage. To
+use one, review it and set `GOAL.md` to one unique Goal ID plus exactly that packet path. Never point
+Luna at the packet directory or ask it to carry context from the previous packet.
+
+Regenerate the set deterministically after an approved study-config change:
+
+```bash
+.venv/bin/python scripts/study/run_study.py packets \
+  --config configs/studies/m0_to_m2_eval_v1_template.yaml \
+  --output-dir .agents/task-packets/study-v1 \
+  --replace
+```
 
 ## Goal lifecycle
 

@@ -1,0 +1,22 @@
+{
+  "packets": [
+    "00-contract_preflight.md",
+    "01-m0_evaluation.md",
+    "02-m0_probing.md",
+    "03-m0_normalization.md",
+    "04-m1_training.md",
+    "05-m1_evaluation.md",
+    "06-m1_probing.md",
+    "07-m1_checkpoint_selection.md",
+    "08-m2_sibling_preflight.md",
+    "09-m2a_training.md",
+    "10-m2b_training.md",
+    "11-m2a_evaluation_probing.md",
+    "12-m2b_evaluation_probing.md",
+    "13-branch_analysis.md",
+    "14-presentation_bundle.md"
+  ],
+  "plan_id": "74edcc978b9011e6",
+  "schema_version": 1,
+  "study_id": "transfer-vs-relearning-m0-to-m2-eval-v1"
+}

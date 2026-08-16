@@ -45,7 +45,7 @@ PY
 JOB_ID=$(sbatch --parsable \
   --job-name=m1-rank-cont \
   --export=ALL,TRAIN_CONFIG="$CONFIG" \
-  slurm/train_m1_ranking.slurm)
+  slurm/m1/train_m1_ranking.slurm)
 
 echo "__JOB_ID__=$JOB_ID"
 echo "__QUEUE__"

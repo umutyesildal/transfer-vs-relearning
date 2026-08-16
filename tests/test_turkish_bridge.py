@@ -159,7 +159,7 @@ def test_paired_bootstrap_and_frozen_bridge_classifier() -> None:
 
 
 def test_corpus_launcher_keeps_all_large_outputs_on_scratch() -> None:
-    launcher = (Path(__file__).resolve().parents[1] / "slurm/prepare_turkish_bridge_corpus.slurm").read_text(encoding="utf-8")
+    launcher = (Path(__file__).resolve().parents[1] / "slurm/m2/prepare_turkish_bridge_corpus.slurm").read_text(encoding="utf-8")
     assert "#SBATCH --partition=std" in launcher
     assert "#SBATCH --output=/vol/tmp2/yesildau/turkish_bridge_v1/logs/" in launcher
     assert 'SCRATCH_ROOT="/vol/tmp2/yesildau/turkish_bridge_v1"' in launcher
@@ -170,8 +170,8 @@ def test_corpus_launcher_keeps_all_large_outputs_on_scratch() -> None:
 
 def test_bridge_v2_launchers_are_scratch_only_and_append_only() -> None:
     root = Path(__file__).resolve().parents[1]
-    preflight = (root / "slurm/preflight_turkish_bridge_contract_v2.slurm").read_text(encoding="utf-8")
-    materialize = (root / "slurm/materialize_turkish_bridge_contract_v2.slurm").read_text(encoding="utf-8")
+    preflight = (root / "slurm/m2/preflight_turkish_bridge_contract_v2.slurm").read_text(encoding="utf-8")
+    materialize = (root / "slurm/m2/materialize_turkish_bridge_contract_v2.slurm").read_text(encoding="utf-8")
     for source in (preflight, materialize):
         assert "#SBATCH --output=/vol/tmp2/yesildau/turkish_bridge_v1/logs/" in source
         assert 'OUTPUT_ROOT="${SCRATCH_ROOT}/contracts/v2"' in source
@@ -182,10 +182,10 @@ def test_bridge_v2_launchers_are_scratch_only_and_append_only() -> None:
 
 def test_bridge_training_wave_is_parallel_gated_and_scratch_only() -> None:
     root = Path(__file__).resolve().parents[1]
-    preflight = (root / "slurm/preflight_turkish_bridge_training.slurm").read_text(encoding="utf-8")
-    training = (root / "slurm/train_turkish_bridge.slurm").read_text(encoding="utf-8")
-    audit = (root / "slurm/audit_turkish_bridge_training.slurm").read_text(encoding="utf-8")
-    submit = (root / "scripts/submit_turkish_bridge_training.sh").read_text(encoding="utf-8")
+    preflight = (root / "slurm/m2/preflight_turkish_bridge_training.slurm").read_text(encoding="utf-8")
+    training = (root / "slurm/m2/train_turkish_bridge.slurm").read_text(encoding="utf-8")
+    audit = (root / "slurm/m2/audit_turkish_bridge_training.slurm").read_text(encoding="utf-8")
+    submit = (root / "scripts/m2/submit_turkish_bridge_training.sh").read_text(encoding="utf-8")
     for source in (preflight, training, audit):
         assert "#SBATCH --output=/vol/tmp2/yesildau/turkish_bridge_v1/logs/" in source
         assert 'SCRATCH_ROOT="/vol/tmp2/yesildau/turkish_bridge_v1"' in source
@@ -204,9 +204,9 @@ def test_bridge_training_wave_is_parallel_gated_and_scratch_only() -> None:
 
 def test_qwen_recovery_selects_one_clean_gpu_from_two_allocated_a100s() -> None:
     root = Path(__file__).resolve().parents[1]
-    preflight = (root / "slurm/preflight_turkish_bridge_qwen_recovery.slurm").read_text(encoding="utf-8")
-    training = (root / "slurm/train_turkish_bridge_qwen_recovery.slurm").read_text(encoding="utf-8")
-    submit = (root / "scripts/submit_turkish_bridge_qwen_recovery.sh").read_text(encoding="utf-8")
+    preflight = (root / "slurm/m2/preflight_turkish_bridge_qwen_recovery.slurm").read_text(encoding="utf-8")
+    training = (root / "slurm/m2/train_turkish_bridge_qwen_recovery.slurm").read_text(encoding="utf-8")
+    submit = (root / "scripts/m2/submit_turkish_bridge_qwen_recovery.sh").read_text(encoding="utf-8")
     for source in (preflight, training):
         assert "#SBATCH --output=/vol/tmp2/yesildau/turkish_bridge_v1/logs/" in source
         assert 'SCRATCH_ROOT="/vol/tmp2/yesildau/turkish_bridge_v1"' in source
@@ -224,12 +224,12 @@ def test_qwen_recovery_selects_one_clean_gpu_from_two_allocated_a100s() -> None:
 
 def test_bridge_evaluation_wave_freezes_four_states_and_uses_scratch_only() -> None:
     root = Path(__file__).resolve().parents[1]
-    preflight = (root / "slurm/preflight_turkish_bridge_evaluation.slurm").read_text(encoding="utf-8")
-    evaluation = (root / "slurm/evaluate_turkish_bridge.slurm").read_text(encoding="utf-8")
-    audit = (root / "slurm/audit_turkish_bridge_evaluation.slurm").read_text(encoding="utf-8")
-    submit = (root / "scripts/submit_turkish_bridge_evaluation.sh").read_text(encoding="utf-8")
-    preparer = (root / "scripts/prepare_turkish_bridge_evaluation.py").read_text(encoding="utf-8")
-    finalizer = (root / "scripts/finalize_turkish_bridge_evaluation.py").read_text(encoding="utf-8")
+    preflight = (root / "slurm/m2/preflight_turkish_bridge_evaluation.slurm").read_text(encoding="utf-8")
+    evaluation = (root / "slurm/m2/evaluate_turkish_bridge.slurm").read_text(encoding="utf-8")
+    audit = (root / "slurm/m2/audit_turkish_bridge_evaluation.slurm").read_text(encoding="utf-8")
+    submit = (root / "scripts/m2/submit_turkish_bridge_evaluation.sh").read_text(encoding="utf-8")
+    preparer = (root / "scripts/m2/prepare_turkish_bridge_evaluation.py").read_text(encoding="utf-8")
+    finalizer = (root / "scripts/m2/finalize_turkish_bridge_evaluation.py").read_text(encoding="utf-8")
     for source in (preflight, evaluation, audit):
         assert "#SBATCH --output=/vol/tmp2/yesildau/turkish_bridge_v1/logs/" in source
     assert '#SBATCH --gres=gpu:rtx3090:1' in evaluation
@@ -249,11 +249,11 @@ def test_bridge_evaluation_wave_freezes_four_states_and_uses_scratch_only() -> N
 
 def test_qwen_bridge_recovery_is_append_only_and_reuses_frozen_m0() -> None:
     root = Path(__file__).resolve().parents[1]
-    preflight = (root / "slurm/preflight_qwen_bridge_evaluation_recovery.slurm").read_text(encoding="utf-8")
-    evaluation = (root / "slurm/evaluate_qwen_bridge_recovery.slurm").read_text(encoding="utf-8")
-    audit = (root / "slurm/audit_qwen_bridge_evaluation_recovery.slurm").read_text(encoding="utf-8")
-    submit = (root / "scripts/submit_qwen_bridge_evaluation_recovery.sh").read_text(encoding="utf-8")
-    preparer = (root / "scripts/prepare_qwen_bridge_evaluation_recovery.py").read_text(encoding="utf-8")
+    preflight = (root / "slurm/m2/preflight_qwen_bridge_evaluation_recovery.slurm").read_text(encoding="utf-8")
+    evaluation = (root / "slurm/m2/evaluate_qwen_bridge_recovery.slurm").read_text(encoding="utf-8")
+    audit = (root / "slurm/m2/audit_qwen_bridge_evaluation_recovery.slurm").read_text(encoding="utf-8")
+    submit = (root / "scripts/m2/submit_qwen_bridge_evaluation_recovery.sh").read_text(encoding="utf-8")
+    preparer = (root / "scripts/m2/prepare_qwen_bridge_evaluation_recovery.py").read_text(encoding="utf-8")
     for source in (preflight, evaluation, audit):
         assert "#SBATCH --output=/vol/tmp2/yesildau/turkish_bridge_v1/logs/" in source
     assert 'OUTPUT_ROOT="${SCRATCH_ROOT}/evaluation_v2_qwen"' in preflight

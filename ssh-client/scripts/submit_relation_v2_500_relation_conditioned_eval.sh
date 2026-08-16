@@ -90,7 +90,7 @@ for checkpoint in checkpoints:
     model_manifest = manifest_dir / f'{checkpoint.name}_model_manifest.json'
     subprocess.run([
         str(Path('/vol/fob-vol6/mi25/yesildau/.conda/envs/xfer-relearn/bin/python')),
-        'scripts/create_local_model_manifest.py', '--source-manifest',
+        'scripts/operations/create_local_model_manifest.py', '--source-manifest',
         'artifacts/models/HuggingFaceTB__SmolLM2-360M/model_manifest.json',
         '--local-model-dir', str(checkpoint), '--output-manifest', str(model_manifest),
         '--model-id', f'{namespace}/{checkpoint.name}',
@@ -112,7 +112,7 @@ PY
 echo "__EVAL_CONFIG_DIR__=$EVAL_CONFIG_DIR"
 for config in "$EVAL_CONFIG_DIR"/checkpoint-*_exact_prefix.yaml; do
   checkpoint=$(basename "$config" _exact_prefix.yaml)
-  job_id=$(sbatch --parsable --export=ALL,EVAL_CONFIG_DIR="$EVAL_CONFIG_DIR",CHECKPOINT="$checkpoint" slurm/eval_m1_acquisition_ladder.slurm)
+  job_id=$(sbatch --parsable --export=ALL,EVAL_CONFIG_DIR="$EVAL_CONFIG_DIR",CHECKPOINT="$checkpoint" slurm/m1/eval_m1_acquisition_ladder.slurm)
   echo "__EVAL_JOB__=$job_id $checkpoint"
 done
 squeue -h -u yesildau -o "%i %T %M %L %R %j" | grep m1-ladder-eval || true

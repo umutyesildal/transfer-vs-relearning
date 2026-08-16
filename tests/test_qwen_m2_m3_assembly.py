@@ -85,7 +85,7 @@ def test_assembler_writes_state_csv_and_manifest(tmp_path: Path) -> None:
     subprocess.run(
         [
             sys.executable,
-            str(root / "scripts/assemble_qwen_m2_m3_results.py"),
+            str(root / "scripts/m2/assemble_qwen_m2_m3_results.py"),
             "--evaluation-manifest",
             str(manifest),
             "--slice-registry",
@@ -112,7 +112,7 @@ def test_assembler_refuses_incomplete_slice_without_creating_output(tmp_path: Pa
     completed = subprocess.run(
         [
             sys.executable,
-            str(root / "scripts/assemble_qwen_m2_m3_results.py"),
+            str(root / "scripts/m2/assemble_qwen_m2_m3_results.py"),
             "--evaluation-manifest",
             str(manifest),
             "--slice-registry",
@@ -140,7 +140,7 @@ def test_empty_retry_preparation_maps_only_empty_targets(tmp_path: Path) -> None
     subprocess.run(
         [
             sys.executable,
-            str(root / "scripts/prepare_qwen_m2_m3_empty_retry.py"),
+            str(root / "scripts/m2/prepare_qwen_m2_m3_empty_retry.py"),
             "--evaluation-manifest",
             str(manifest),
             "--slice-registry",

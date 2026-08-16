@@ -38,7 +38,7 @@ if effective_batch != 500 or steps != 252:
 print(f'model={model_path}')
 print(f'rows={len(rows)} facts=500 effective_batch={effective_batch} updates={steps}')
 PY
-JOB_ID=$(sbatch --parsable --job-name=m1-v2-1p7b --export=ALL,TRAIN_CONFIG="$CONFIG" slurm/train_m1_gpt2_english_facts.slurm)
+JOB_ID=$(sbatch --parsable --job-name=m1-v2-1p7b --export=ALL,TRAIN_CONFIG="$CONFIG" slurm/m1/train_m1_gpt2_english_facts.slurm)
 echo "__JOB_ID__=$JOB_ID"
 squeue -h -j "$JOB_ID" -o "%i %T %M %L %R %j"
 EOF

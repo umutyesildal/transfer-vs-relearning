@@ -34,6 +34,14 @@ HISTORY_PATH = STATE_DIR / "history.jsonl"
 UUID_RE = re.compile(
     r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
 )
+TASK_PACKET_REQUIRED_HEADINGS = {
+    "## Objective",
+    "## Context budget",
+    "## Allowed paths",
+    "## Acceptance criteria",
+    "## Stop conditions",
+    "## Handoff",
+}
 
 DECISION_KEYS = {
     "goal_id",
@@ -627,6 +635,52 @@ def parse_goal_id(goal_text: str) -> str:
     return match.group(1)
 
 
+def validate_task_packet(goal_text: str, workspace: Path, max_lines: int) -> Path:
+    match = re.search(r"(?m)^Task packet:\s*(\S+)\s*$", goal_text)
+    if not match or match.group(1) == "NOT_SET":
+        raise OrchestratorError("GOAL.md must name one non-template task packet")
+    relative = Path(match.group(1))
+    if relative.is_absolute():
+        raise OrchestratorError("Task packet path must be workspace-relative")
+    packet = (workspace / relative).resolve()
+    packet_root = (workspace / ".agents" / "task-packets").resolve()
+    try:
+        packet.relative_to(packet_root)
+    except ValueError as exc:
+        raise OrchestratorError("Task packet must remain under .agents/task-packets") from exc
+    if not packet.is_file() or packet.suffix.lower() != ".md":
+        raise OrchestratorError(f"Task packet is missing or is not Markdown: {packet}")
+    text = packet.read_text(encoding="utf-8")
+    line_count = len(text.splitlines())
+    if line_count > max_lines:
+        raise OrchestratorError(
+            f"Task packet exceeds max_task_packet_lines: {line_count} > {max_lines}"
+        )
+    missing = sorted(heading for heading in TASK_PACKET_REQUIRED_HEADINGS if heading not in text)
+    if missing:
+        raise OrchestratorError(f"Task packet is missing required headings: {missing}")
+    if re.search(r"__[A-Z0-9_]+__", text):
+        raise OrchestratorError("Task packet contains unresolved placeholders")
+    context_section = text.split("## Context budget", 1)[1].split("## Allowed paths", 1)[0]
+    context_files = re.findall(r"(?m)^- `([^`]+)`\s*$", context_section)
+    if not context_files or len(context_files) > 8:
+        raise OrchestratorError("Task packet must name between one and eight context files")
+    if len(set(context_files)) != len(context_files):
+        raise OrchestratorError("Task packet context files must be unique")
+    for relative_context in context_files:
+        relative_path = Path(relative_context)
+        if relative_path.is_absolute():
+            raise OrchestratorError("Task packet context files must be workspace-relative")
+        context_path = (workspace / relative_path).resolve()
+        try:
+            context_path.relative_to(workspace)
+        except ValueError as exc:
+            raise OrchestratorError("Task packet context file escapes workspace") from exc
+        if not context_path.is_file():
+            raise OrchestratorError(f"Task packet context file is missing: {relative_context}")
+    return packet
+
+
 def ensure_ready() -> tuple[dict[str, Any], Path, dict[str, Any], str]:
     errors, _ = doctor(quiet=True)
     if errors:
@@ -636,6 +690,7 @@ def ensure_ready() -> tuple[dict[str, Any], Path, dict[str, Any], str]:
     if "Status: NOT_SET" in goal or "Status: ACTIVE" not in goal:
         raise OrchestratorError("GOAL.md must contain Status: ACTIVE and a concrete bounded goal")
     goal_id = parse_goal_id(goal)
+    validate_task_packet(goal, workspace, int(config["limits"]["max_task_packet_lines"]))
     sessions = read_json(SESSIONS_PATH)
     for role in ("sol", "luna"):
         if not UUID_RE.match(str(sessions.get(f"{role}_session_id", ""))):

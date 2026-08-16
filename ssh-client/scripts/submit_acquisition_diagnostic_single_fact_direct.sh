@@ -10,7 +10,7 @@ cd /vol/fob-vol6/mi25/yesildau/transfer-vs-relearning
 git pull --ff-only origin corpus-update
 
 PYTHON=/vol/fob-vol6/mi25/yesildau/.conda/envs/xfer-relearn/bin/python
-"$PYTHON" scripts/build_acquisition_diagnostics.py
+"$PYTHON" scripts/m1/build_acquisition_diagnostics.py
 "$PYTHON" -m pytest -q \
   tests/test_acquisition_ladder.py \
   tests/test_training_answer_only.py \
@@ -19,7 +19,7 @@ PYTHON=/vol/fob-vol6/mi25/yesildau/.conda/envs/xfer-relearn/bin/python
 
 JOB_ID=$(sbatch --parsable \
   --export=ALL,TRAIN_CONFIG=configs/training/m1_smollm2_360m_diagnostic_single_fact_direct_answer_only_lr1e-4_ep36.yaml \
-  slurm/train_m1_gpt2_english_facts.slurm)
+  slurm/m1/train_m1_gpt2_english_facts.slurm)
 
 echo "__JOB_ID__=$JOB_ID"
 echo "__QUEUE__"

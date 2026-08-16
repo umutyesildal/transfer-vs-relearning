@@ -55,20 +55,20 @@ def test_registry_and_templates_freeze_document_159() -> None:
 
 
 def test_launchers_bind_gpu_classes_and_no_cleanup() -> None:
-    olmo = (repo_root() / "slurm/train_m1_dose_pareto_olmo_rtx3090.slurm").read_text(encoding="utf-8")
+    olmo = (repo_root() / "slurm/m1/train_m1_dose_pareto_olmo_rtx3090.slurm").read_text(encoding="utf-8")
     assert "#SBATCH --gres=gpu:rtx3090:1" in olmo
     assert "#SBATCH --exclude=guppi6" in olmo
     for label in ("falcon", "pythia"):
-        train = (repo_root() / f"slurm/train_m1_dose_pareto_{label}_rtx3090.slurm").read_text(encoding="utf-8")
-        evaluate = (repo_root() / f"slurm/eval_m1_dose_pareto_{label}_rtx3090.slurm").read_text(encoding="utf-8")
+        train = (repo_root() / f"slurm/m1/train_m1_dose_pareto_{label}_rtx3090.slurm").read_text(encoding="utf-8")
+        evaluate = (repo_root() / f"slurm/m1/eval_m1_dose_pareto_{label}_rtx3090.slurm").read_text(encoding="utf-8")
         assert "#SBATCH --gres=gpu:rtx3090:1" in train
         assert "#SBATCH --exclude=guppi6" in train
         assert "#SBATCH --exclude=guppi6" in evaluate
-    sources = "\n".join(path.read_text(encoding="utf-8") for path in (repo_root() / "slurm").glob("*m1_dose_pareto*.slurm"))
+    sources = "\n".join(path.read_text(encoding="utf-8") for path in (repo_root() / "slurm/m1").glob("*m1_dose_pareto*.slurm"))
     assert "rm " not in sources
     assert "--force" not in sources
     for label in ("olmo", "falcon"):
-        launcher = (repo_root() / f"slurm/train_m1_dose_pareto_{label}_rtx3090.slurm").read_text(encoding="utf-8")
+        launcher = (repo_root() / f"slurm/m1/train_m1_dose_pareto_{label}_rtx3090.slurm").read_text(encoding="utf-8")
         assert "M1_V4_PREFLIGHT" in launcher
 
 
@@ -81,7 +81,7 @@ def test_olmo_relocation_fallback_preserves_effective_batch_and_bounds_eval_batc
     assert training["gradient_accumulation_steps"] == 250
     assert training["optimizer_foreach"] is False
     assert training["per_device_train_batch_size"] * training["gradient_accumulation_steps"] == 500
-    evaluate = (repo_root() / "slurm/eval_m1_dose_pareto_olmo_rtx3090.slurm").read_text(encoding="utf-8")
+    evaluate = (repo_root() / "slurm/m1/eval_m1_dose_pareto_olmo_rtx3090.slurm").read_text(encoding="utf-8")
     assert "--candidate-batch-size 32" in evaluate
 
 
@@ -145,13 +145,13 @@ def test_falcon_recovery_state_requires_exact_15_of_18_inventory(tmp_path: Path)
 
 def test_falcon_recovery_launchers_are_evaluation_only_and_dependency_closed() -> None:
     evaluation = (
-        repo_root() / "slurm/eval_m1_dose_pareto_falcon_recovery_rtx3090.slurm"
+        repo_root() / "slurm/m1/eval_m1_dose_pareto_falcon_recovery_rtx3090.slurm"
     ).read_text(encoding="utf-8")
     summary = (
-        repo_root() / "slurm/summarize_m1_dose_pareto_falcon_recovery.slurm"
+        repo_root() / "slurm/m1/summarize_m1_dose_pareto_falcon_recovery.slurm"
     ).read_text(encoding="utf-8")
     submit = (
-        repo_root() / "scripts/submit_m1_dose_pareto_falcon_recovery.sh"
+        repo_root() / "scripts/m1/submit_m1_dose_pareto_falcon_recovery.sh"
     ).read_text(encoding="utf-8")
     assert "#SBATCH --array=2,4,5%1" in evaluation
     assert "#SBATCH --partition=wbimlgpu" in evaluation
@@ -191,16 +191,16 @@ def test_falcon_rtxa6000_relocation_is_exact_and_access_checked() -> None:
         )
 
     evaluation = (
-        repo_root() / "slurm/eval_m1_dose_pareto_falcon_recovery_rtxa6000.slurm"
+        repo_root() / "slurm/m1/eval_m1_dose_pareto_falcon_recovery_rtxa6000.slurm"
     ).read_text(encoding="utf-8")
     summary = (
-        repo_root() / "slurm/summarize_m1_dose_pareto_falcon_recovery_rtxa6000.slurm"
+        repo_root() / "slurm/m1/summarize_m1_dose_pareto_falcon_recovery_rtxa6000.slurm"
     ).read_text(encoding="utf-8")
     submit = (
-        repo_root() / "scripts/submit_m1_dose_pareto_falcon_rtxa6000_recovery.sh"
+        repo_root() / "scripts/m1/submit_m1_dose_pareto_falcon_rtxa6000_recovery.sh"
     ).read_text(encoding="utf-8")
     preflight = (
-        repo_root() / "scripts/preflight_m1_dose_pareto_falcon_rtxa6000_recovery.py"
+        repo_root() / "scripts/m1/preflight_m1_dose_pareto_falcon_rtxa6000_recovery.py"
     ).read_text(encoding="utf-8")
     assert "#SBATCH --partition=gpu" in evaluation
     assert "#SBATCH --nodelist=gruenau8" in evaluation
@@ -231,16 +231,16 @@ def test_falcon_rtxa6000_exclusive_retry_requires_runtime_cleanliness() -> None:
     assert runtime["min_free_memory_bytes"] == 40 * 1024**3
 
     evaluation = (
-        repo_root() / "slurm/eval_m1_dose_pareto_falcon_recovery_rtxa6000_exclusive.slurm"
+        repo_root() / "slurm/m1/eval_m1_dose_pareto_falcon_recovery_rtxa6000_exclusive.slurm"
     ).read_text(encoding="utf-8")
     submit = (
-        repo_root() / "scripts/submit_m1_dose_pareto_falcon_rtxa6000_exclusive_recovery.sh"
+        repo_root() / "scripts/m1/submit_m1_dose_pareto_falcon_rtxa6000_exclusive_recovery.sh"
     ).read_text(encoding="utf-8")
     preflight = (
-        repo_root() / "scripts/preflight_m1_dose_pareto_falcon_rtxa6000_exclusive_recovery.py"
+        repo_root() / "scripts/m1/preflight_m1_dose_pareto_falcon_rtxa6000_exclusive_recovery.py"
     ).read_text(encoding="utf-8")
     runtime_validator = (
-        repo_root() / "scripts/validate_m1_dose_pareto_runtime.py"
+        repo_root() / "scripts/m1/validate_m1_dose_pareto_runtime.py"
     ).read_text(encoding="utf-8")
     assert "#SBATCH --exclusive" in evaluation
     assert "#SBATCH --array=2,4,5%1" in evaluation
@@ -266,10 +266,10 @@ def test_falcon_clean_uuid_retry_audits_before_torch_and_is_dependency_closed() 
         registry, "falcon", falcon_relocation_sha256=FALCON_EVALUATION_CLEAN_UUID_SHA256
     )
     assert runtime["expected_gpu_substring"] == "RTX A6000"
-    evaluation = (repo_root() / "slurm/eval_m1_dose_pareto_falcon_clean_uuid_recovery.slurm").read_text(encoding="utf-8")
-    selector = (repo_root() / "scripts/select_clean_a6000_uuid.py").read_text(encoding="utf-8")
-    submit = (repo_root() / "scripts/submit_m1_dose_pareto_falcon_clean_uuid_recovery.sh").read_text(encoding="utf-8")
-    preflight = (repo_root() / "scripts/preflight_m1_dose_pareto_falcon_clean_uuid_recovery.py").read_text(encoding="utf-8")
+    evaluation = (repo_root() / "slurm/m1/eval_m1_dose_pareto_falcon_clean_uuid_recovery.slurm").read_text(encoding="utf-8")
+    selector = (repo_root() / "scripts/operations/select_clean_a6000_uuid.py").read_text(encoding="utf-8")
+    submit = (repo_root() / "scripts/m1/submit_m1_dose_pareto_falcon_clean_uuid_recovery.sh").read_text(encoding="utf-8")
+    preflight = (repo_root() / "scripts/m1/preflight_m1_dose_pareto_falcon_clean_uuid_recovery.py").read_text(encoding="utf-8")
     assert "#SBATCH --exclusive" in evaluation and "#SBATCH --array=2,4,5%1" in evaluation
     assert evaluation.index("select_clean_a6000_uuid.py") < evaluation.index("validate_m1_dose_pareto_runtime.py")
     assert 'export CUDA_VISIBLE_DEVICES="${selected_uuid}"' in evaluation
@@ -292,10 +292,10 @@ def test_falcon_audit_persistent_recovery_is_single_allocation_and_dependency_cl
         registry, "falcon", falcon_relocation_sha256=FALCON_EVALUATION_AUDIT_PERSISTENT_SHA256
     )
     assert runtime["expected_gpu_substring"] == "RTX A6000"
-    evaluation = (repo_root() / "slurm/eval_m1_dose_pareto_falcon_audit_persistent_recovery.slurm").read_text(encoding="utf-8")
-    selector = (repo_root() / "scripts/select_clean_a6000_uuid.py").read_text(encoding="utf-8")
-    submit = (repo_root() / "scripts/submit_m1_dose_pareto_falcon_audit_persistent_recovery.sh").read_text(encoding="utf-8")
-    preflight = (repo_root() / "scripts/preflight_m1_dose_pareto_falcon_audit_persistent_recovery.py").read_text(encoding="utf-8")
+    evaluation = (repo_root() / "slurm/m1/eval_m1_dose_pareto_falcon_audit_persistent_recovery.slurm").read_text(encoding="utf-8")
+    selector = (repo_root() / "scripts/operations/select_clean_a6000_uuid.py").read_text(encoding="utf-8")
+    submit = (repo_root() / "scripts/m1/submit_m1_dose_pareto_falcon_audit_persistent_recovery.sh").read_text(encoding="utf-8")
+    preflight = (repo_root() / "scripts/m1/preflight_m1_dose_pareto_falcon_audit_persistent_recovery.py").read_text(encoding="utf-8")
     assert "#SBATCH --exclusive" in evaluation and "#SBATCH --array" not in evaluation
     assert "for step in 126 210 252" in evaluation
     assert evaluation.count("select_clean_a6000_uuid.py") == 1

@@ -44,7 +44,7 @@ if steps != 150:
 print(f'base_model={manifest["local_path_absolute"]}')
 print(f'examples={len(examples)} groups={len(groups)} updates={steps}')
 PY
-JOB_ID=$(sbatch --parsable --job-name=m1-v2-consistency --export=ALL,TRAIN_CONFIG="$CONFIG" slurm/train_m1_ranking.slurm)
+JOB_ID=$(sbatch --parsable --job-name=m1-v2-consistency --export=ALL,TRAIN_CONFIG="$CONFIG" slurm/m1/train_m1_ranking.slurm)
 echo "__JOB_ID__=$JOB_ID"
 squeue -h -j "$JOB_ID" -o "%i %T %M %L %R %j"
 EOF

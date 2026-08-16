@@ -15,12 +15,12 @@ mkdir -p "$SCRATCH_ROOT/logs"
   tests/test_training_core.py \
   tests/test_training_answer_only.py
 preflight_id=$(sbatch --parsable \
-  --export=ALL,PREFLIGHT_STAGE=acquisition,CANDIDATE_INDICES=0:1:2:3,TARGET_LAUNCHER="$PWD/slurm/acquire_m1_cross_family_models.slurm" \
-  slurm/preflight_m1_cross_family.slurm)
+  --export=ALL,PREFLIGHT_STAGE=acquisition,CANDIDATE_INDICES=0:1:2:3,TARGET_LAUNCHER="$PWD/slurm/m1/acquire_m1_cross_family_models.slurm" \
+  slurm/m1/preflight_m1_cross_family.slurm)
 acquisition_id=$(sbatch --parsable \
   --dependency="afterok:$preflight_id" \
   --array=0,1,2,3 \
-  slurm/acquire_m1_cross_family_models.slurm)
+  slurm/m1/acquire_m1_cross_family_models.slurm)
 echo "__PREFLIGHT_JOB_ID__=$preflight_id"
 echo "__ACQUISITION_ARRAY_JOB_ID__=$acquisition_id"
 squeue -h -j "$preflight_id,$acquisition_id" -o "%i %T %M %L %R %j"

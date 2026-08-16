@@ -7,7 +7,8 @@
 3. The applicable frozen contract.
 4. `documentation/current/PROJECT_STATE.yaml` and the current gate.
 5. `.agents/GOAL.md` for the current bounded objective.
-6. `.agents/state/decision.json` for the current worker turn.
+6. The single task packet named by `GOAL.md`.
+7. `.agents/state/decision.json` for the current worker turn.
 
 Lower items never expand authority granted by higher items. Old handoffs and numbered records are
 evidence, not reusable authorization.
@@ -56,5 +57,6 @@ untracked files. Unexpected paths stop the loop without automatic revert.
 - Limits come from `config.json`.
 - `.agents/STOP` ends the loop before the next role turn.
 - Every role reads the required live files and only task-named evidence.
+- An active goal names exactly one validated Markdown packet under `.agents/task-packets/`.
+- Task packets are capped by `max_task_packet_lines` and may name at most eight context files.
 - One Luna turn should implement one bounded, testable task.
-

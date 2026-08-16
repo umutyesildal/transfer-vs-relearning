@@ -13,7 +13,7 @@ from transfer_vs_relearning.data.qwen_pre_m2 import (
     materialize_generic_blocks,
     validate_intermediate_population,
 )
-from scripts.summarize_qwen_pre_m2_baseline import _robust_rows
+from scripts.m2.summarize_qwen_pre_m2_baseline import _robust_rows
 
 
 def _profile(index: int, branch: str) -> dict[str, str]:
@@ -145,7 +145,7 @@ def test_contract_builder_materializes_24_balanced_evaluation_slices(tmp_path: P
     subprocess.run(
         [
             sys.executable,
-            str(root / "scripts/build_qwen_pre_m2_contract.py"),
+            str(root / "scripts/m2/build_qwen_pre_m2_contract.py"),
             "--repo-root",
             str(root),
             "--output-root",
@@ -189,12 +189,12 @@ def test_baseline_robust_summary_requires_all_eight_cells_per_direction() -> Non
 
 def test_qwen_baseline_wave_launchers_are_scratch_only_and_gated() -> None:
     root = Path(__file__).resolve().parents[1]
-    preflight = (root / "slurm/preflight_qwen_pre_m2_baseline.slurm").read_text(encoding="utf-8")
-    evaluation = (root / "slurm/eval_qwen_pre_m2_baseline_slice.slurm").read_text(encoding="utf-8")
-    submit = (root / "scripts/submit_qwen_pre_m2_baseline.sh").read_text(encoding="utf-8")
-    smoke = (root / "slurm/smoke_qwen_pre_m2_baseline.slurm").read_text(encoding="utf-8")
-    rtx3090_submit = (root / "scripts/submit_qwen_pre_m2_rtx3090_smoke.sh").read_text(encoding="utf-8")
-    rtx3090_baseline_submit = (root / "scripts/submit_qwen_pre_m2_baseline_rtx3090.sh").read_text(encoding="utf-8")
+    preflight = (root / "slurm/m2/preflight_qwen_pre_m2_baseline.slurm").read_text(encoding="utf-8")
+    evaluation = (root / "slurm/m2/eval_qwen_pre_m2_baseline_slice.slurm").read_text(encoding="utf-8")
+    submit = (root / "scripts/m2/submit_qwen_pre_m2_baseline.sh").read_text(encoding="utf-8")
+    smoke = (root / "slurm/m2/smoke_qwen_pre_m2_baseline.slurm").read_text(encoding="utf-8")
+    rtx3090_submit = (root / "scripts/m2/submit_qwen_pre_m2_rtx3090_smoke.sh").read_text(encoding="utf-8")
+    rtx3090_baseline_submit = (root / "scripts/m2/submit_qwen_pre_m2_baseline_rtx3090.sh").read_text(encoding="utf-8")
     assert "#SBATCH --partition=std" in preflight
     assert "#SBATCH --array=0-47%1" in evaluation
     assert 'BASELINE_SCRATCH_ROOT:-/vol/tmp2/yesildau/qwen_pre_m2_baseline_v1' in preflight

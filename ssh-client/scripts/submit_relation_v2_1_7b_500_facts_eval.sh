@@ -131,7 +131,7 @@ for checkpoint in checkpoints:
     subprocess.run(
         [
             str(Path('/vol/fob-vol6/mi25/yesildau/.conda/envs/xfer-relearn/bin/python')),
-            'scripts/create_local_model_manifest.py',
+            'scripts/operations/create_local_model_manifest.py',
             '--source-manifest', str(source_manifest),
             '--local-model-dir', str(checkpoint),
             '--output-manifest', str(model_manifest),
@@ -188,7 +188,7 @@ for config in "$EVAL_CONFIG_DIR"/checkpoint-*_exact_prefix.yaml; do
     --output="$SCRATCH/eval_logs/%x-%j.out" \
     --error="$SCRATCH/eval_logs/%x-%j.err" \
     --export=ALL,EVAL_CONFIG_DIR="$EVAL_CONFIG_DIR",CHECKPOINT="$checkpoint",HF_HOME="$SCRATCH/cache",XDG_CACHE_HOME="$SCRATCH/cache",PYTHONDONTWRITEBYTECODE=1 \
-    slurm/eval_m1_acquisition_ladder.slurm)
+    slurm/m1/eval_m1_acquisition_ladder.slurm)
   echo "__EVAL_JOB__=$job_id $checkpoint"
 done
 

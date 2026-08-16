@@ -9,12 +9,12 @@ ROOT=/vol/tmp2/yesildau/m1_qwen_checkpoint_pareto_v1
 mkdir -p "$ROOT/logs"
 if test -f "$ROOT/checkpoint_registry.csv" && test -f "$ROOT/wave_manifest.json"; then
   prepare_id=ALREADY_COMPLETE
-  preflight_id=$(sbatch --parsable slurm/preflight_m1_qwen_checkpoint_pareto.slurm)
+  preflight_id=$(sbatch --parsable slurm/m1/preflight_m1_qwen_checkpoint_pareto.slurm)
 else
-  prepare_id=$(sbatch --parsable slurm/prepare_m1_qwen_checkpoint_pareto.slurm)
-  preflight_id=$(sbatch --parsable --dependency="afterok:$prepare_id" slurm/preflight_m1_qwen_checkpoint_pareto.slurm)
+  prepare_id=$(sbatch --parsable slurm/m1/prepare_m1_qwen_checkpoint_pareto.slurm)
+  preflight_id=$(sbatch --parsable --dependency="afterok:$prepare_id" slurm/m1/preflight_m1_qwen_checkpoint_pareto.slurm)
 fi
-evaluation_id=$(sbatch --parsable --dependency="afterok:$preflight_id" --array="0-10%3" --exclude=gruenau10 slurm/eval_m1_qwen_checkpoint_pareto.slurm)
+evaluation_id=$(sbatch --parsable --dependency="afterok:$preflight_id" --array="0-10%3" --exclude=gruenau10 slurm/m1/eval_m1_qwen_checkpoint_pareto.slurm)
 echo "__PREPARATION_JOB_ID__=$prepare_id"
 echo "__PREFLIGHT_JOB_ID__=$preflight_id"
 echo "__EVALUATION_ARRAY_JOB_ID__=$evaluation_id"

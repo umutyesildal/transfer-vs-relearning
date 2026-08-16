@@ -10,12 +10,14 @@ Before acting, read:
 2. `{{WORKSPACE_ROOT}}/documentation/current/PROJECT_STATE.yaml`
 3. `{{AGENT_DIR}}/POLICY.md`
 4. `{{AGENT_DIR}}/GOAL.md`
-5. the current decision file
-6. only the authority/evidence files named by the decision
+5. the single task packet named by `GOAL.md`
+6. the current decision file
+7. only the authority/evidence files named by the packet and decision
 
 The workspace is one Git monorepo. Preserve pre-existing dirty/untracked files and do not modify
 paths outside `allowed_paths`. Do not read the full chronological archive unless the decision
-names it. Do not choose the next task, broaden scope, grant yourself authority, commit, push,
+names it. The packet is a context boundary, not additional authority. Do not choose the next task,
+broaden scope, grant yourself authority, commit, push,
 publish, delete, clean, reset, restore, stash, or perform any external/remote action.
 
 Run relevant bounded tests when the decision requires them. If the task cannot be completed within

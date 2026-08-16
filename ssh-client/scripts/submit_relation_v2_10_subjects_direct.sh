@@ -18,7 +18,7 @@ PYTHON=/vol/fob-vol6/mi25/yesildau/.conda/envs/xfer-relearn/bin/python
 
 JOB_ID=$(sbatch --parsable \
   --export=ALL,TRAIN_CONFIG=configs/training/m1_smollm2_360m_relation_v2_10_subjects_direct_answer_only_lr1e-4_ep36.yaml \
-  slurm/train_m1_gpt2_english_facts.slurm)
+  slurm/m1/train_m1_gpt2_english_facts.slurm)
 
 echo "__JOB_ID__=$JOB_ID"
 echo "__QUEUE__"

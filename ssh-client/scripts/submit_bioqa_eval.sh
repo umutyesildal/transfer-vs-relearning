@@ -110,7 +110,7 @@ for path in sorted(config_dir.glob("*.yaml")):
 PY
 
 for cfg in runs/local_configs/m1_checkpoint_eval_smollm2_360m_bio_qa_lr5e-5_ep1/*.yaml; do
-  sbatch --export=ALL,EVAL_CONFIG="$cfg" slurm/eval_m0_gpt2_pilot.slurm
+  sbatch --export=ALL,EVAL_CONFIG="$cfg" slurm/m0/eval_m0_gpt2_pilot.slurm
   sleep 1
 done
 

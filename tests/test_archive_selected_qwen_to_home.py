@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from scripts.archive_selected_qwen_to_home import collect_sources, copy_verified, sha256_file
+from scripts.operations.archive_selected_qwen_to_home import collect_sources, copy_verified, sha256_file
 
 
 def write_json(path: Path, payload: dict) -> None:

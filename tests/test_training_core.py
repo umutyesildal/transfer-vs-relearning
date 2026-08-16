@@ -124,10 +124,10 @@ def test_smollm_prompt_consistency_contract_uses_only_training_forms_a_and_b() -
         "training_representations": ["form_a_qa", "form_a_direct", "form_b_qa", "form_b_direct"],
     }
     assert not any("form_c" in value or "form_d" in value for value in config["prompt_consistency"]["training_representations"])
-    preflight = Path("slurm/preflight_smollm_prompt_consistency.slurm").read_text(encoding="utf-8")
+    preflight = Path("slurm/m1/preflight_smollm_prompt_consistency.slurm").read_text(encoding="utf-8")
     assert "smollm_prompt_consistency_v2" in preflight
     assert "train_smollm_prompt_consistency.slurm" in preflight
-    evaluation = Path("slurm/eval_smollm_prompt_consistency_array.slurm").read_text(encoding="utf-8")
+    evaluation = Path("slurm/m1/eval_smollm_prompt_consistency_array.slurm").read_text(encoding="utf-8")
     assert "#SBATCH --array=0-11" in evaluation
     assert "checkpoint-252 final_model" in evaluation
     assert "evaluation_v1" in evaluation

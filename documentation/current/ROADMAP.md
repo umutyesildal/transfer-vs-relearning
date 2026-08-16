@@ -73,8 +73,9 @@ and TurBLiMP parity, Pile-10k runtime, cheap-panel hash and reviewed numerical m
 
 ## R3 — Pipeline productionization
 
-Status: local planner, training trace, typed artifact scaffold and presentation contract prepared;
-execution adapters remain blocked on R2 freeze.
+Status: local checkpoint planner, full 15-stage study controller, training trace, typed artifact
+scaffold, presentation contract and Luna micro-packets prepared; execution adapters remain blocked
+on R2 freeze.
 
 - expose one validated pipeline interface for state/checkpoint evaluation;
 - make manifests, resume, failure states, and output namespaces deterministic;
@@ -85,9 +86,10 @@ execution adapters remain blocked on R2 freeze.
 Exit condition: the same command/config family can evaluate M0, M1, M2-A, and M2-B.
 
 Current local evidence: [`../pipeline/README.md`](../pipeline/README.md), the pipeline config under
-`configs/pipelines/`, and fail-closed planner/trace/artifact tests. Remaining work is to bind the
-final frozen LM Eval and project evaluator commands, Slurm route, complete-result normalization and
-figure rendering without changing eval-v1 semantics.
+`configs/pipelines/`, the full-study config under `configs/studies/`, and fail-closed
+planner/trace/artifact/study tests. Remaining work is to implement and register the final frozen LM
+Eval, project evaluator, training and Slurm adapters plus complete-result normalization and figure
+rendering without changing eval-v1 semantics.
 
 ## R4 — Corpus contract
 

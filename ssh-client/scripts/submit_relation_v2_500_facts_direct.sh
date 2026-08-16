@@ -41,7 +41,7 @@ CONFIG=configs/training/m1_smollm2_360m_relation_v2_100_subjects_500_facts_direc
 JOB_ID=$(sbatch --parsable \
   --job-name=m1-v2-500 \
   --export=ALL,TRAIN_CONFIG="$CONFIG" \
-  slurm/train_m1_gpt2_english_facts.slurm)
+  slurm/m1/train_m1_gpt2_english_facts.slurm)
 echo "__JOB_ID__=$JOB_ID"
 squeue -h -j "$JOB_ID" -o "%i %T %M %L %R %j"
 EOF

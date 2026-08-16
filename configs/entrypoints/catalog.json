@@ -1,0 +1,1854 @@
+{
+  "schema_version": 1,
+  "layout": "entrypoints-v2",
+  "entries": [
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "acquire_m1_cross_family_candidate.py",
+      "old_path": "scripts/acquire_m1_cross_family_candidate.py",
+      "path": "scripts/m1/acquire_m1_cross_family_candidate.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "adjudicate_m1_retention_evaluation.py",
+      "old_path": "scripts/adjudicate_m1_retention_evaluation.py",
+      "path": "scripts/m1/adjudicate_m1_retention_evaluation.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "analyze_qwen_m2_m3_results.py",
+      "old_path": "scripts/analyze_qwen_m2_m3_results.py",
+      "path": "scripts/m2/analyze_qwen_m2_m3_results.py"
+    },
+    {
+      "kind": "script",
+      "category": "operations",
+      "name": "archive_selected_qwen_to_home.py",
+      "old_path": "scripts/archive_selected_qwen_to_home.py",
+      "path": "scripts/operations/archive_selected_qwen_to_home.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "assemble_qwen_m2_m3_results.py",
+      "old_path": "scripts/assemble_qwen_m2_m3_results.py",
+      "path": "scripts/m2/assemble_qwen_m2_m3_results.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "audit_acquisition_checkpoint.py",
+      "old_path": "scripts/audit_acquisition_checkpoint.py",
+      "path": "scripts/m1/audit_acquisition_checkpoint.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "audit_m1_canonical_form_diversity_exposure.py",
+      "old_path": "scripts/audit_m1_canonical_form_diversity_exposure.py",
+      "path": "scripts/m1/audit_m1_canonical_form_diversity_exposure.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "audit_m1_cross_family_tokenization.py",
+      "old_path": "scripts/audit_m1_cross_family_tokenization.py",
+      "path": "scripts/m1/audit_m1_cross_family_tokenization.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "build_acquisition_diagnostics.py",
+      "old_path": "scripts/build_acquisition_diagnostics.py",
+      "path": "scripts/m1/build_acquisition_diagnostics.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "build_acquisition_ladder.py",
+      "old_path": "scripts/build_acquisition_ladder.py",
+      "path": "scripts/m1/build_acquisition_ladder.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "build_m1_canonical_form_diversity_dataset.py",
+      "old_path": "scripts/build_m1_canonical_form_diversity_dataset.py",
+      "path": "scripts/m1/build_m1_canonical_form_diversity_dataset.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "build_m1_form_generalization_datasets.py",
+      "old_path": "scripts/build_m1_form_generalization_datasets.py",
+      "path": "scripts/m1/build_m1_form_generalization_datasets.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "build_m1_recipe_dataset.py",
+      "old_path": "scripts/build_m1_recipe_dataset.py",
+      "path": "scripts/m1/build_m1_recipe_dataset.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "build_pre_m2_followup_contract.py",
+      "old_path": "scripts/build_pre_m2_followup_contract.py",
+      "path": "scripts/m2/build_pre_m2_followup_contract.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "build_pre_m2_wp1b_datasets.py",
+      "old_path": "scripts/build_pre_m2_wp1b_datasets.py",
+      "path": "scripts/m2/build_pre_m2_wp1b_datasets.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "build_pre_m2_wp3_stage_a.py",
+      "old_path": "scripts/build_pre_m2_wp3_stage_a.py",
+      "path": "scripts/m2/build_pre_m2_wp3_stage_a.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "build_qwen_canonical_scale_dataset.py",
+      "old_path": "scripts/build_qwen_canonical_scale_dataset.py",
+      "path": "scripts/m1/build_qwen_canonical_scale_dataset.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "build_qwen_pre_m2_contract.py",
+      "old_path": "scripts/build_qwen_pre_m2_contract.py",
+      "path": "scripts/m2/build_qwen_pre_m2_contract.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "build_qwen_scale_probe_dataset.py",
+      "old_path": "scripts/build_qwen_scale_probe_dataset.py",
+      "path": "scripts/m1/build_qwen_scale_probe_dataset.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "build_relation_v2_binding_control.py",
+      "old_path": "scripts/build_relation_v2_binding_control.py",
+      "path": "scripts/m1/build_relation_v2_binding_control.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "build_supervisor_m1_docx.py",
+      "old_path": "scripts/build_supervisor_m1_docx.py",
+      "path": "scripts/m1/build_supervisor_m1_docx.py"
+    },
+    {
+      "kind": "script",
+      "category": "operations",
+      "name": "check_training_start_window.py",
+      "old_path": "scripts/check_training_start_window.py",
+      "path": "scripts/operations/check_training_start_window.py"
+    },
+    {
+      "kind": "script",
+      "category": "evaluation",
+      "name": "compare_general_capability.py",
+      "old_path": "scripts/compare_general_capability.py",
+      "path": "scripts/evaluation/compare_general_capability.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "compare_pre_m2_frozen_suite.py",
+      "old_path": "scripts/compare_pre_m2_frozen_suite.py",
+      "path": "scripts/m2/compare_pre_m2_frozen_suite.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "compare_pre_m2_wp1b.py",
+      "old_path": "scripts/compare_pre_m2_wp1b.py",
+      "path": "scripts/m2/compare_pre_m2_wp1b.py"
+    },
+    {
+      "kind": "script",
+      "category": "operations",
+      "name": "create_local_model_manifest.py",
+      "old_path": "scripts/create_local_model_manifest.py",
+      "path": "scripts/operations/create_local_model_manifest.py"
+    },
+    {
+      "kind": "script",
+      "category": "operations",
+      "name": "download_model.py",
+      "old_path": "scripts/download_model.py",
+      "path": "scripts/operations/download_model.py"
+    },
+    {
+      "kind": "script",
+      "category": "evaluation",
+      "name": "evaluate_corpora_perplexity.py",
+      "old_path": "scripts/evaluate_corpora_perplexity.py",
+      "path": "scripts/evaluation/evaluate_corpora_perplexity.py"
+    },
+    {
+      "kind": "script",
+      "category": "evaluation",
+      "name": "evaluate_facts.py",
+      "old_path": "scripts/evaluate_facts.py",
+      "path": "scripts/evaluation/evaluate_facts.py"
+    },
+    {
+      "kind": "script",
+      "category": "evaluation",
+      "name": "evaluate_general_capability.py",
+      "old_path": "scripts/evaluate_general_capability.py",
+      "path": "scripts/evaluation/evaluate_general_capability.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "evaluate_pre_m2_frozen_suite.py",
+      "old_path": "scripts/evaluate_pre_m2_frozen_suite.py",
+      "path": "scripts/m2/evaluate_pre_m2_frozen_suite.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "evaluate_turkish_bridge.py",
+      "old_path": "scripts/evaluate_turkish_bridge.py",
+      "path": "scripts/m2/evaluate_turkish_bridge.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "explore_qwen_m2_m3_results.py",
+      "old_path": "scripts/explore_qwen_m2_m3_results.py",
+      "path": "scripts/m2/explore_qwen_m2_m3_results.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "finalize_qwen_m2_m3_gate_report.py",
+      "old_path": "scripts/finalize_qwen_m2_m3_gate_report.py",
+      "path": "scripts/m2/finalize_qwen_m2_m3_gate_report.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "finalize_turkish_bridge_corpus.py",
+      "old_path": "scripts/finalize_turkish_bridge_corpus.py",
+      "path": "scripts/m2/finalize_turkish_bridge_corpus.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "finalize_turkish_bridge_evaluation.py",
+      "old_path": "scripts/finalize_turkish_bridge_evaluation.py",
+      "path": "scripts/m2/finalize_turkish_bridge_evaluation.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "freeze_m1_form_generalization_launch.py",
+      "old_path": "scripts/freeze_m1_form_generalization_launch.py",
+      "path": "scripts/m1/freeze_m1_form_generalization_launch.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "freeze_pre_m2_wp1b_launch.py",
+      "old_path": "scripts/freeze_pre_m2_wp1b_launch.py",
+      "path": "scripts/m2/freeze_pre_m2_wp1b_launch.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "freeze_pre_m2_wp3_launch.py",
+      "old_path": "scripts/freeze_pre_m2_wp3_launch.py",
+      "path": "scripts/m2/freeze_pre_m2_wp3_launch.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "freeze_qwen_m2_m3_model_only.py",
+      "old_path": "scripts/freeze_qwen_m2_m3_model_only.py",
+      "path": "scripts/m2/freeze_qwen_m2_m3_model_only.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "freeze_qwen_scale_selected_artifacts.py",
+      "old_path": "scripts/freeze_qwen_scale_selected_artifacts.py",
+      "path": "scripts/m1/freeze_qwen_scale_selected_artifacts.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "gate_m1_dose_pareto_checkpoint.py",
+      "old_path": "scripts/gate_m1_dose_pareto_checkpoint.py",
+      "path": "scripts/m1/gate_m1_dose_pareto_checkpoint.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "m1_cross_family_preflight.py",
+      "old_path": "scripts/m1_cross_family_preflight.py",
+      "path": "scripts/m1/m1_cross_family_preflight.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "m1_form_generalization_preflight.py",
+      "old_path": "scripts/m1_form_generalization_preflight.py",
+      "path": "scripts/m1/m1_form_generalization_preflight.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "m1_qwen_checkpoint_pareto_preflight.py",
+      "old_path": "scripts/m1_qwen_checkpoint_pareto_preflight.py",
+      "path": "scripts/m1/m1_qwen_checkpoint_pareto_preflight.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "materialize_qwen_m2_m3_blocks.py",
+      "old_path": "scripts/materialize_qwen_m2_m3_blocks.py",
+      "path": "scripts/m2/materialize_qwen_m2_m3_blocks.py"
+    },
+    {
+      "kind": "script",
+      "category": "study",
+      "name": "plan_experiment_pipeline.py",
+      "old_path": "scripts/plan_experiment_pipeline.py",
+      "path": "scripts/study/plan_experiment_pipeline.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "preflight_m1_dose_pareto.py",
+      "old_path": "scripts/preflight_m1_dose_pareto.py",
+      "path": "scripts/m1/preflight_m1_dose_pareto.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "preflight_m1_dose_pareto_falcon_audit_persistent_recovery.py",
+      "old_path": "scripts/preflight_m1_dose_pareto_falcon_audit_persistent_recovery.py",
+      "path": "scripts/m1/preflight_m1_dose_pareto_falcon_audit_persistent_recovery.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "preflight_m1_dose_pareto_falcon_clean_uuid_recovery.py",
+      "old_path": "scripts/preflight_m1_dose_pareto_falcon_clean_uuid_recovery.py",
+      "path": "scripts/m1/preflight_m1_dose_pareto_falcon_clean_uuid_recovery.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "preflight_m1_dose_pareto_falcon_recovery.py",
+      "old_path": "scripts/preflight_m1_dose_pareto_falcon_recovery.py",
+      "path": "scripts/m1/preflight_m1_dose_pareto_falcon_recovery.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "preflight_m1_dose_pareto_falcon_rtxa6000_exclusive_recovery.py",
+      "old_path": "scripts/preflight_m1_dose_pareto_falcon_rtxa6000_exclusive_recovery.py",
+      "path": "scripts/m1/preflight_m1_dose_pareto_falcon_rtxa6000_exclusive_recovery.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "preflight_m1_dose_pareto_falcon_rtxa6000_recovery.py",
+      "old_path": "scripts/preflight_m1_dose_pareto_falcon_rtxa6000_recovery.py",
+      "path": "scripts/m1/preflight_m1_dose_pareto_falcon_rtxa6000_recovery.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "preflight_m1_dose_pareto_olmo_fallback.py",
+      "old_path": "scripts/preflight_m1_dose_pareto_olmo_fallback.py",
+      "path": "scripts/m1/preflight_m1_dose_pareto_olmo_fallback.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "preflight_m1_dose_pareto_olmo_relocation.py",
+      "old_path": "scripts/preflight_m1_dose_pareto_olmo_relocation.py",
+      "path": "scripts/m1/preflight_m1_dose_pareto_olmo_relocation.py"
+    },
+    {
+      "kind": "script",
+      "category": "corpora",
+      "name": "prepare_general_capability_corpus.py",
+      "old_path": "scripts/prepare_general_capability_corpus.py",
+      "path": "scripts/corpora/prepare_general_capability_corpus.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "prepare_m1_canonical_form_diversity_config.py",
+      "old_path": "scripts/prepare_m1_canonical_form_diversity_config.py",
+      "path": "scripts/m1/prepare_m1_canonical_form_diversity_config.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "prepare_m1_canonical_form_diversity_evaluation.py",
+      "old_path": "scripts/prepare_m1_canonical_form_diversity_evaluation.py",
+      "path": "scripts/m1/prepare_m1_canonical_form_diversity_evaluation.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "prepare_m1_cross_family_config.py",
+      "old_path": "scripts/prepare_m1_cross_family_config.py",
+      "path": "scripts/m1/prepare_m1_cross_family_config.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "prepare_m1_cross_family_evaluation.py",
+      "old_path": "scripts/prepare_m1_cross_family_evaluation.py",
+      "path": "scripts/m1/prepare_m1_cross_family_evaluation.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "prepare_m1_dose_pareto_config.py",
+      "old_path": "scripts/prepare_m1_dose_pareto_config.py",
+      "path": "scripts/m1/prepare_m1_dose_pareto_config.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "prepare_m1_dose_pareto_evaluation.py",
+      "old_path": "scripts/prepare_m1_dose_pareto_evaluation.py",
+      "path": "scripts/m1/prepare_m1_dose_pareto_evaluation.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "prepare_m1_form_generalization_config.py",
+      "old_path": "scripts/prepare_m1_form_generalization_config.py",
+      "path": "scripts/m1/prepare_m1_form_generalization_config.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "prepare_m1_form_generalization_evaluation.py",
+      "old_path": "scripts/prepare_m1_form_generalization_evaluation.py",
+      "path": "scripts/m1/prepare_m1_form_generalization_evaluation.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "prepare_m1_qwen_checkpoint_pareto.py",
+      "old_path": "scripts/prepare_m1_qwen_checkpoint_pareto.py",
+      "path": "scripts/m1/prepare_m1_qwen_checkpoint_pareto.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "prepare_m1_retention_anchor.py",
+      "old_path": "scripts/prepare_m1_retention_anchor.py",
+      "path": "scripts/m1/prepare_m1_retention_anchor.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "prepare_m1_retention_evaluation.py",
+      "old_path": "scripts/prepare_m1_retention_evaluation.py",
+      "path": "scripts/m1/prepare_m1_retention_evaluation.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "prepare_m1_retention_seed43_evaluation.py",
+      "old_path": "scripts/prepare_m1_retention_seed43_evaluation.py",
+      "path": "scripts/m1/prepare_m1_retention_seed43_evaluation.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "prepare_pre_m2_wp5_evaluation_wave.py",
+      "old_path": "scripts/prepare_pre_m2_wp5_evaluation_wave.py",
+      "path": "scripts/m2/prepare_pre_m2_wp5_evaluation_wave.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "prepare_qwen_bridge_evaluation_recovery.py",
+      "old_path": "scripts/prepare_qwen_bridge_evaluation_recovery.py",
+      "path": "scripts/m2/prepare_qwen_bridge_evaluation_recovery.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "prepare_qwen_m2_m3_empty_retry.py",
+      "old_path": "scripts/prepare_qwen_m2_m3_empty_retry.py",
+      "path": "scripts/m2/prepare_qwen_m2_m3_empty_retry.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "prepare_qwen_m2_m3_evaluation.py",
+      "old_path": "scripts/prepare_qwen_m2_m3_evaluation.py",
+      "path": "scripts/m2/prepare_qwen_m2_m3_evaluation.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "prepare_qwen_m2_m3_training_family.py",
+      "old_path": "scripts/prepare_qwen_m2_m3_training_family.py",
+      "path": "scripts/m2/prepare_qwen_m2_m3_training_family.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "prepare_qwen_scale_probe_evaluation.py",
+      "old_path": "scripts/prepare_qwen_scale_probe_evaluation.py",
+      "path": "scripts/m1/prepare_qwen_scale_probe_evaluation.py"
+    },
+    {
+      "kind": "script",
+      "category": "corpora",
+      "name": "prepare_trwiki.py",
+      "old_path": "scripts/prepare_trwiki.py",
+      "path": "scripts/corpora/prepare_trwiki.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "prepare_turkish_bridge_contract.py",
+      "old_path": "scripts/prepare_turkish_bridge_contract.py",
+      "path": "scripts/m2/prepare_turkish_bridge_contract.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "prepare_turkish_bridge_contract_v2.py",
+      "old_path": "scripts/prepare_turkish_bridge_contract_v2.py",
+      "path": "scripts/m2/prepare_turkish_bridge_contract_v2.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "prepare_turkish_bridge_evaluation.py",
+      "old_path": "scripts/prepare_turkish_bridge_evaluation.py",
+      "path": "scripts/m2/prepare_turkish_bridge_evaluation.py"
+    },
+    {
+      "kind": "script",
+      "category": "corpora",
+      "name": "prepare_vngrs_clustered_schedule.py",
+      "old_path": "scripts/prepare_vngrs_clustered_schedule.py",
+      "path": "scripts/corpora/prepare_vngrs_clustered_schedule.py"
+    },
+    {
+      "kind": "script",
+      "category": "corpora",
+      "name": "project_vngrs_sample_transport.py",
+      "old_path": "scripts/project_vngrs_sample_transport.py",
+      "path": "scripts/corpora/project_vngrs_sample_transport.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "repair_m1_dose_pareto_preflight.py",
+      "old_path": "scripts/repair_m1_dose_pareto_preflight.py",
+      "path": "scripts/m1/repair_m1_dose_pareto_preflight.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "repair_pythia_official_tokenizer.py",
+      "old_path": "scripts/repair_pythia_official_tokenizer.py",
+      "path": "scripts/m1/repair_pythia_official_tokenizer.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "resolve_m1_cross_family_candidate.py",
+      "old_path": "scripts/resolve_m1_cross_family_candidate.py",
+      "path": "scripts/m1/resolve_m1_cross_family_candidate.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "resolve_m1_qwen_checkpoint_pareto.py",
+      "old_path": "scripts/resolve_m1_qwen_checkpoint_pareto.py",
+      "path": "scripts/m1/resolve_m1_qwen_checkpoint_pareto.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "resolve_m1_retention_evaluation.py",
+      "old_path": "scripts/resolve_m1_retention_evaluation.py",
+      "path": "scripts/m1/resolve_m1_retention_evaluation.py"
+    },
+    {
+      "kind": "script",
+      "category": "corpora",
+      "name": "sample_contamination_review.py",
+      "old_path": "scripts/sample_contamination_review.py",
+      "path": "scripts/corpora/sample_contamination_review.py"
+    },
+    {
+      "kind": "script",
+      "category": "operations",
+      "name": "select_clean_a6000_uuid.py",
+      "old_path": "scripts/select_clean_a6000_uuid.py",
+      "path": "scripts/operations/select_clean_a6000_uuid.py"
+    },
+    {
+      "kind": "script",
+      "category": "data",
+      "name": "select_pilot.py",
+      "old_path": "scripts/select_pilot.py",
+      "path": "scripts/data/select_pilot.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "smoke_m1_cross_family_candidate.py",
+      "old_path": "scripts/smoke_m1_cross_family_candidate.py",
+      "path": "scripts/m1/smoke_m1_cross_family_candidate.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "smoke_pre_m2_wp1b_batch.py",
+      "old_path": "scripts/smoke_pre_m2_wp1b_batch.py",
+      "path": "scripts/m2/smoke_pre_m2_wp1b_batch.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "submit_m1_dose_pareto_falcon_audit_persistent_recovery.sh",
+      "old_path": "scripts/submit_m1_dose_pareto_falcon_audit_persistent_recovery.sh",
+      "path": "scripts/m1/submit_m1_dose_pareto_falcon_audit_persistent_recovery.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "submit_m1_dose_pareto_falcon_clean_uuid_recovery.sh",
+      "old_path": "scripts/submit_m1_dose_pareto_falcon_clean_uuid_recovery.sh",
+      "path": "scripts/m1/submit_m1_dose_pareto_falcon_clean_uuid_recovery.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "submit_m1_dose_pareto_falcon_recovery.sh",
+      "old_path": "scripts/submit_m1_dose_pareto_falcon_recovery.sh",
+      "path": "scripts/m1/submit_m1_dose_pareto_falcon_recovery.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "submit_m1_dose_pareto_falcon_rtxa6000_exclusive_recovery.sh",
+      "old_path": "scripts/submit_m1_dose_pareto_falcon_rtxa6000_exclusive_recovery.sh",
+      "path": "scripts/m1/submit_m1_dose_pareto_falcon_rtxa6000_exclusive_recovery.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "submit_m1_dose_pareto_falcon_rtxa6000_recovery.sh",
+      "old_path": "scripts/submit_m1_dose_pareto_falcon_rtxa6000_recovery.sh",
+      "path": "scripts/m1/submit_m1_dose_pareto_falcon_rtxa6000_recovery.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "submit_m1_retention_evaluation.sh",
+      "old_path": "scripts/submit_m1_retention_evaluation.sh",
+      "path": "scripts/m1/submit_m1_retention_evaluation.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "submit_m1_retention_seed42.sh",
+      "old_path": "scripts/submit_m1_retention_seed42.sh",
+      "path": "scripts/m1/submit_m1_retention_seed42.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "submit_m1_retention_seed43.sh",
+      "old_path": "scripts/submit_m1_retention_seed43.sh",
+      "path": "scripts/m1/submit_m1_retention_seed43.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "submit_m1_retention_seed43_evaluation.sh",
+      "old_path": "scripts/submit_m1_retention_seed43_evaluation.sh",
+      "path": "scripts/m1/submit_m1_retention_seed43_evaluation.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "submit_prepared_m1_retention_evaluation.sh",
+      "old_path": "scripts/submit_prepared_m1_retention_evaluation.sh",
+      "path": "scripts/m1/submit_prepared_m1_retention_evaluation.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "submit_qwen_bridge_evaluation_recovery.sh",
+      "old_path": "scripts/submit_qwen_bridge_evaluation_recovery.sh",
+      "path": "scripts/m2/submit_qwen_bridge_evaluation_recovery.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "submit_qwen_m2_m3.sh",
+      "old_path": "scripts/submit_qwen_m2_m3.sh",
+      "path": "scripts/m2/submit_qwen_m2_m3.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "submit_qwen_m2_m3_empty_retry.sh",
+      "old_path": "scripts/submit_qwen_m2_m3_empty_retry.sh",
+      "path": "scripts/m2/submit_qwen_m2_m3_empty_retry.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "submit_qwen_m2_m3_evaluation.sh",
+      "old_path": "scripts/submit_qwen_m2_m3_evaluation.sh",
+      "path": "scripts/m2/submit_qwen_m2_m3_evaluation.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "submit_qwen_m2_m3_materialization.sh",
+      "old_path": "scripts/submit_qwen_m2_m3_materialization.sh",
+      "path": "scripts/m2/submit_qwen_m2_m3_materialization.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "submit_qwen_m2_m3_smoke.sh",
+      "old_path": "scripts/submit_qwen_m2_m3_smoke.sh",
+      "path": "scripts/m2/submit_qwen_m2_m3_smoke.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "submit_qwen_pre_m2_baseline.sh",
+      "old_path": "scripts/submit_qwen_pre_m2_baseline.sh",
+      "path": "scripts/m2/submit_qwen_pre_m2_baseline.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "submit_qwen_pre_m2_baseline_rtx3090.sh",
+      "old_path": "scripts/submit_qwen_pre_m2_baseline_rtx3090.sh",
+      "path": "scripts/m2/submit_qwen_pre_m2_baseline_rtx3090.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "submit_qwen_pre_m2_final_baseline.sh",
+      "old_path": "scripts/submit_qwen_pre_m2_final_baseline.sh",
+      "path": "scripts/m2/submit_qwen_pre_m2_final_baseline.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "submit_qwen_pre_m2_rtx3090_smoke.sh",
+      "old_path": "scripts/submit_qwen_pre_m2_rtx3090_smoke.sh",
+      "path": "scripts/m2/submit_qwen_pre_m2_rtx3090_smoke.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "submit_turkish_bridge_evaluation.sh",
+      "old_path": "scripts/submit_turkish_bridge_evaluation.sh",
+      "path": "scripts/m2/submit_turkish_bridge_evaluation.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "submit_turkish_bridge_qwen_recovery.sh",
+      "old_path": "scripts/submit_turkish_bridge_qwen_recovery.sh",
+      "path": "scripts/m2/submit_turkish_bridge_qwen_recovery.sh"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "submit_turkish_bridge_training.sh",
+      "old_path": "scripts/submit_turkish_bridge_training.sh",
+      "path": "scripts/m2/submit_turkish_bridge_training.sh"
+    },
+    {
+      "kind": "script",
+      "category": "evaluation",
+      "name": "summarize_evaluation.py",
+      "old_path": "scripts/summarize_evaluation.py",
+      "path": "scripts/evaluation/summarize_evaluation.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "summarize_m1_dose_pareto.py",
+      "old_path": "scripts/summarize_m1_dose_pareto.py",
+      "path": "scripts/m1/summarize_m1_dose_pareto.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "summarize_m1_provenance_screen_v3.py",
+      "old_path": "scripts/summarize_m1_provenance_screen_v3.py",
+      "path": "scripts/m1/summarize_m1_provenance_screen_v3.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "summarize_m1_qwen_checkpoint_pareto.py",
+      "old_path": "scripts/summarize_m1_qwen_checkpoint_pareto.py",
+      "path": "scripts/m1/summarize_m1_qwen_checkpoint_pareto.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "summarize_m1_retention_evaluation.py",
+      "old_path": "scripts/summarize_m1_retention_evaluation.py",
+      "path": "scripts/m1/summarize_m1_retention_evaluation.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "summarize_m1_retention_seed43_evaluation.py",
+      "old_path": "scripts/summarize_m1_retention_seed43_evaluation.py",
+      "path": "scripts/m1/summarize_m1_retention_seed43_evaluation.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "summarize_pre_m2_wp5_checkpoint_wave.py",
+      "old_path": "scripts/summarize_pre_m2_wp5_checkpoint_wave.py",
+      "path": "scripts/m2/summarize_pre_m2_wp5_checkpoint_wave.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "summarize_qwen_pre_m2_baseline.py",
+      "old_path": "scripts/summarize_qwen_pre_m2_baseline.py",
+      "path": "scripts/m2/summarize_qwen_pre_m2_baseline.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "summarize_turkish_bridge.py",
+      "old_path": "scripts/summarize_turkish_bridge.py",
+      "path": "scripts/m2/summarize_turkish_bridge.py"
+    },
+    {
+      "kind": "script",
+      "category": "data",
+      "name": "sync_synthetic_dataset.py",
+      "old_path": "scripts/sync_synthetic_dataset.py",
+      "path": "scripts/data/sync_synthetic_dataset.py"
+    },
+    {
+      "kind": "script",
+      "category": "training",
+      "name": "train_clm.py",
+      "old_path": "scripts/train_clm.py",
+      "path": "scripts/training/train_clm.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "train_ranking.py",
+      "old_path": "scripts/train_ranking.py",
+      "path": "scripts/m1/train_ranking.py"
+    },
+    {
+      "kind": "script",
+      "category": "data",
+      "name": "validate_dataset.py",
+      "old_path": "scripts/validate_dataset.py",
+      "path": "scripts/data/validate_dataset.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "validate_m1_dose_pareto_runtime.py",
+      "old_path": "scripts/validate_m1_dose_pareto_runtime.py",
+      "path": "scripts/m1/validate_m1_dose_pareto_runtime.py"
+    },
+    {
+      "kind": "script",
+      "category": "m1",
+      "name": "validate_m1_pythia_v100_runtime.py",
+      "old_path": "scripts/validate_m1_pythia_v100_runtime.py",
+      "path": "scripts/m1/validate_m1_pythia_v100_runtime.py"
+    },
+    {
+      "kind": "script",
+      "category": "m2",
+      "name": "validate_qwen_m2_m3_training_family.py",
+      "old_path": "scripts/validate_qwen_m2_m3_training_family.py",
+      "path": "scripts/m2/validate_qwen_m2_m3_training_family.py"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "acquire_m1_cross_family_models.slurm",
+      "old_path": "slurm/acquire_m1_cross_family_models.slurm",
+      "path": "slurm/m1/acquire_m1_cross_family_models.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "acquire_m1_provenance_screen.slurm",
+      "old_path": "slurm/acquire_m1_provenance_screen.slurm",
+      "path": "slurm/m1/acquire_m1_provenance_screen.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "audit_m1_retention_evaluation.slurm",
+      "old_path": "slurm/audit_m1_retention_evaluation.slurm",
+      "path": "slurm/m1/audit_m1_retention_evaluation.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "audit_m1_retention_seed42.slurm",
+      "old_path": "slurm/audit_m1_retention_seed42.slurm",
+      "path": "slurm/m1/audit_m1_retention_seed42.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "audit_m1_retention_seed43.slurm",
+      "old_path": "slurm/audit_m1_retention_seed43.slurm",
+      "path": "slurm/m1/audit_m1_retention_seed43.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "audit_m1_retention_seed43_evaluation.slurm",
+      "old_path": "slurm/audit_m1_retention_seed43_evaluation.slurm",
+      "path": "slurm/m1/audit_m1_retention_seed43_evaluation.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "audit_qwen_bridge_evaluation_recovery.slurm",
+      "old_path": "slurm/audit_qwen_bridge_evaluation_recovery.slurm",
+      "path": "slurm/m2/audit_qwen_bridge_evaluation_recovery.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "audit_qwen_canonical_25000.slurm",
+      "old_path": "slurm/audit_qwen_canonical_25000.slurm",
+      "path": "slurm/m1/audit_qwen_canonical_25000.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "audit_turkish_bridge_evaluation.slurm",
+      "old_path": "slurm/audit_turkish_bridge_evaluation.slurm",
+      "path": "slurm/m2/audit_turkish_bridge_evaluation.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "audit_turkish_bridge_training.slurm",
+      "old_path": "slurm/audit_turkish_bridge_training.slurm",
+      "path": "slurm/m2/audit_turkish_bridge_training.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "build_m1_v100_compat_env.slurm",
+      "old_path": "slurm/build_m1_v100_compat_env.slurm",
+      "path": "slurm/m1/build_m1_v100_compat_env.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "compare_pre_m2_frozen_suite.slurm",
+      "old_path": "slurm/compare_pre_m2_frozen_suite.slurm",
+      "path": "slurm/m2/compare_pre_m2_frozen_suite.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m0",
+      "name": "eval_m0_gpt2_pilot.slurm",
+      "old_path": "slurm/eval_m0_gpt2_pilot.slurm",
+      "path": "slurm/m0/eval_m0_gpt2_pilot.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_acquisition_ladder.slurm",
+      "old_path": "slurm/eval_m1_acquisition_ladder.slurm",
+      "path": "slurm/m1/eval_m1_acquisition_ladder.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_canonical_form_diversity.slurm",
+      "old_path": "slurm/eval_m1_canonical_form_diversity.slurm",
+      "path": "slurm/m1/eval_m1_canonical_form_diversity.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_cross_family.slurm",
+      "old_path": "slurm/eval_m1_cross_family.slurm",
+      "path": "slurm/m1/eval_m1_cross_family.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_dose_pareto_falcon_audit_persistent_recovery.slurm",
+      "old_path": "slurm/eval_m1_dose_pareto_falcon_audit_persistent_recovery.slurm",
+      "path": "slurm/m1/eval_m1_dose_pareto_falcon_audit_persistent_recovery.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_dose_pareto_falcon_clean_uuid_recovery.slurm",
+      "old_path": "slurm/eval_m1_dose_pareto_falcon_clean_uuid_recovery.slurm",
+      "path": "slurm/m1/eval_m1_dose_pareto_falcon_clean_uuid_recovery.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_dose_pareto_falcon_recovery_rtx3090.slurm",
+      "old_path": "slurm/eval_m1_dose_pareto_falcon_recovery_rtx3090.slurm",
+      "path": "slurm/m1/eval_m1_dose_pareto_falcon_recovery_rtx3090.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_dose_pareto_falcon_recovery_rtxa6000.slurm",
+      "old_path": "slurm/eval_m1_dose_pareto_falcon_recovery_rtxa6000.slurm",
+      "path": "slurm/m1/eval_m1_dose_pareto_falcon_recovery_rtxa6000.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_dose_pareto_falcon_recovery_rtxa6000_exclusive.slurm",
+      "old_path": "slurm/eval_m1_dose_pareto_falcon_recovery_rtxa6000_exclusive.slurm",
+      "path": "slurm/m1/eval_m1_dose_pareto_falcon_recovery_rtxa6000_exclusive.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_dose_pareto_falcon_rtx3090.slurm",
+      "old_path": "slurm/eval_m1_dose_pareto_falcon_rtx3090.slurm",
+      "path": "slurm/m1/eval_m1_dose_pareto_falcon_rtx3090.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_dose_pareto_olmo_rtx3090.slurm",
+      "old_path": "slurm/eval_m1_dose_pareto_olmo_rtx3090.slurm",
+      "path": "slurm/m1/eval_m1_dose_pareto_olmo_rtx3090.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_dose_pareto_olmo_v100.slurm",
+      "old_path": "slurm/eval_m1_dose_pareto_olmo_v100.slurm",
+      "path": "slurm/m1/eval_m1_dose_pareto_olmo_v100.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_dose_pareto_pythia_rtx3090.slurm",
+      "old_path": "slurm/eval_m1_dose_pareto_pythia_rtx3090.slurm",
+      "path": "slurm/m1/eval_m1_dose_pareto_pythia_rtx3090.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_form_generalization.slurm",
+      "old_path": "slurm/eval_m1_form_generalization.slurm",
+      "path": "slurm/m1/eval_m1_form_generalization.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_general_capability.slurm",
+      "old_path": "slurm/eval_m1_general_capability.slurm",
+      "path": "slurm/m1/eval_m1_general_capability.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_provenance_screen.slurm",
+      "old_path": "slurm/eval_m1_provenance_screen.slurm",
+      "path": "slurm/m1/eval_m1_provenance_screen.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_pythia_repair_rtx3090_bf16.slurm",
+      "old_path": "slurm/eval_m1_pythia_repair_rtx3090_bf16.slurm",
+      "path": "slurm/m1/eval_m1_pythia_repair_rtx3090_bf16.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_pythia_repair_v100.slurm",
+      "old_path": "slurm/eval_m1_pythia_repair_v100.slurm",
+      "path": "slurm/m1/eval_m1_pythia_repair_v100.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_qwen_checkpoint_pareto.slurm",
+      "old_path": "slurm/eval_m1_qwen_checkpoint_pareto.slurm",
+      "path": "slurm/m1/eval_m1_qwen_checkpoint_pareto.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_retention_checkpoints.slurm",
+      "old_path": "slurm/eval_m1_retention_checkpoints.slurm",
+      "path": "slurm/m1/eval_m1_retention_checkpoints.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_m1_retention_seed43_checkpoints.slurm",
+      "old_path": "slurm/eval_m1_retention_seed43_checkpoints.slurm",
+      "path": "slurm/m1/eval_m1_retention_seed43_checkpoints.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "eval_pre_m2_frozen_suite.slurm",
+      "old_path": "slurm/eval_pre_m2_frozen_suite.slurm",
+      "path": "slurm/m2/eval_pre_m2_frozen_suite.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "eval_pre_m2_wp5_checkpoint_wave.slurm",
+      "old_path": "slurm/eval_pre_m2_wp5_checkpoint_wave.slurm",
+      "path": "slurm/m2/eval_pre_m2_wp5_checkpoint_wave.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "eval_qwen_m2_m3_slice.slurm",
+      "old_path": "slurm/eval_qwen_m2_m3_slice.slurm",
+      "path": "slurm/m2/eval_qwen_m2_m3_slice.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "eval_qwen_pre_m2_baseline_slice.slurm",
+      "old_path": "slurm/eval_qwen_pre_m2_baseline_slice.slurm",
+      "path": "slurm/m2/eval_qwen_pre_m2_baseline_slice.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_qwen_scale_probe_checkpoints.slurm",
+      "old_path": "slurm/eval_qwen_scale_probe_checkpoints.slurm",
+      "path": "slurm/m1/eval_qwen_scale_probe_checkpoints.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_qwen_scale_probe_seed43_checkpoints.slurm",
+      "old_path": "slurm/eval_qwen_scale_probe_seed43_checkpoints.slurm",
+      "path": "slurm/m1/eval_qwen_scale_probe_seed43_checkpoints.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_smollm_binding_condition.slurm",
+      "old_path": "slurm/eval_smollm_binding_condition.slurm",
+      "path": "slurm/m1/eval_smollm_binding_condition.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "eval_smollm_prompt_consistency_array.slurm",
+      "old_path": "slurm/eval_smollm_prompt_consistency_array.slurm",
+      "path": "slurm/m1/eval_smollm_prompt_consistency_array.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "evaluate_qwen_bridge_recovery.slurm",
+      "old_path": "slurm/evaluate_qwen_bridge_recovery.slurm",
+      "path": "slurm/m2/evaluate_qwen_bridge_recovery.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "evaluate_qwen_pre_m2_ppl_rtx3090.slurm",
+      "old_path": "slurm/evaluate_qwen_pre_m2_ppl_rtx3090.slurm",
+      "path": "slurm/m2/evaluate_qwen_pre_m2_ppl_rtx3090.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "evaluate_turkish_bridge.slurm",
+      "old_path": "slurm/evaluate_turkish_bridge.slurm",
+      "path": "slurm/m2/evaluate_turkish_bridge.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "finalize_turkish_bridge_corpus.slurm",
+      "old_path": "slurm/finalize_turkish_bridge_corpus.slurm",
+      "path": "slurm/m2/finalize_turkish_bridge_corpus.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "materialize_qwen_m2_m3_blocks.slurm",
+      "old_path": "slurm/materialize_qwen_m2_m3_blocks.slurm",
+      "path": "slurm/m2/materialize_qwen_m2_m3_blocks.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "materialize_turkish_bridge_contract_v2.slurm",
+      "old_path": "slurm/materialize_turkish_bridge_contract_v2.slurm",
+      "path": "slurm/m2/materialize_turkish_bridge_contract_v2.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_m1_canonical_form_diversity.slurm",
+      "old_path": "slurm/preflight_m1_canonical_form_diversity.slurm",
+      "path": "slurm/m1/preflight_m1_canonical_form_diversity.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_m1_canonical_form_diversity_evaluation.slurm",
+      "old_path": "slurm/preflight_m1_canonical_form_diversity_evaluation.slurm",
+      "path": "slurm/m1/preflight_m1_canonical_form_diversity_evaluation.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_m1_cross_family.slurm",
+      "old_path": "slurm/preflight_m1_cross_family.slurm",
+      "path": "slurm/m1/preflight_m1_cross_family.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_m1_form_generalization.slurm",
+      "old_path": "slurm/preflight_m1_form_generalization.slurm",
+      "path": "slurm/m1/preflight_m1_form_generalization.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_m1_provenance_screen.slurm",
+      "old_path": "slurm/preflight_m1_provenance_screen.slurm",
+      "path": "slurm/m1/preflight_m1_provenance_screen.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_m1_qwen_checkpoint_pareto.slurm",
+      "old_path": "slurm/preflight_m1_qwen_checkpoint_pareto.slurm",
+      "path": "slurm/m1/preflight_m1_qwen_checkpoint_pareto.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_m1_retention_evaluation.slurm",
+      "old_path": "slurm/preflight_m1_retention_evaluation.slurm",
+      "path": "slurm/m1/preflight_m1_retention_evaluation.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_m1_retention_seed42.slurm",
+      "old_path": "slurm/preflight_m1_retention_seed42.slurm",
+      "path": "slurm/m1/preflight_m1_retention_seed42.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_m1_retention_seed43.slurm",
+      "old_path": "slurm/preflight_m1_retention_seed43.slurm",
+      "path": "slurm/m1/preflight_m1_retention_seed43.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_m1_retention_seed43_evaluation.slurm",
+      "old_path": "slurm/preflight_m1_retention_seed43_evaluation.slurm",
+      "path": "slurm/m1/preflight_m1_retention_seed43_evaluation.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "preflight_qwen_bridge_evaluation_recovery.slurm",
+      "old_path": "slurm/preflight_qwen_bridge_evaluation_recovery.slurm",
+      "path": "slurm/m2/preflight_qwen_bridge_evaluation_recovery.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_qwen_canonical_25000_prepare.slurm",
+      "old_path": "slurm/preflight_qwen_canonical_25000_prepare.slurm",
+      "path": "slurm/m1/preflight_qwen_canonical_25000_prepare.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_qwen_canonical_25000_training.slurm",
+      "old_path": "slurm/preflight_qwen_canonical_25000_training.slurm",
+      "path": "slurm/m1/preflight_qwen_canonical_25000_training.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "preflight_qwen_m2_m3.slurm",
+      "old_path": "slurm/preflight_qwen_m2_m3.slurm",
+      "path": "slurm/m2/preflight_qwen_m2_m3.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "preflight_qwen_m2_m3_empty_retry.slurm",
+      "old_path": "slurm/preflight_qwen_m2_m3_empty_retry.slurm",
+      "path": "slurm/m2/preflight_qwen_m2_m3_empty_retry.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "preflight_qwen_m2_m3_evaluation.slurm",
+      "old_path": "slurm/preflight_qwen_m2_m3_evaluation.slurm",
+      "path": "slurm/m2/preflight_qwen_m2_m3_evaluation.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "preflight_qwen_pre_m2_baseline.slurm",
+      "old_path": "slurm/preflight_qwen_pre_m2_baseline.slurm",
+      "path": "slurm/m2/preflight_qwen_pre_m2_baseline.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "preflight_qwen_pre_m2_contract.slurm",
+      "old_path": "slurm/preflight_qwen_pre_m2_contract.slurm",
+      "path": "slurm/m2/preflight_qwen_pre_m2_contract.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_qwen_scale_probe.slurm",
+      "old_path": "slurm/preflight_qwen_scale_probe.slurm",
+      "path": "slurm/m1/preflight_qwen_scale_probe.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_qwen_scale_probe_seed43.slurm",
+      "old_path": "slurm/preflight_qwen_scale_probe_seed43.slurm",
+      "path": "slurm/m1/preflight_qwen_scale_probe_seed43.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_qwen_scale_probe_seed43_evaluation.slurm",
+      "old_path": "slurm/preflight_qwen_scale_probe_seed43_evaluation.slurm",
+      "path": "slurm/m1/preflight_qwen_scale_probe_seed43_evaluation.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_smollm_contrastive_binding.slurm",
+      "old_path": "slurm/preflight_smollm_contrastive_binding.slurm",
+      "path": "slurm/m1/preflight_smollm_contrastive_binding.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_smollm_prompt_consistency.slurm",
+      "old_path": "slurm/preflight_smollm_prompt_consistency.slurm",
+      "path": "slurm/m1/preflight_smollm_prompt_consistency.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "preflight_smollm_prompt_consistency_eval.slurm",
+      "old_path": "slurm/preflight_smollm_prompt_consistency_eval.slurm",
+      "path": "slurm/m1/preflight_smollm_prompt_consistency_eval.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "preflight_turkish_bridge_contract_v2.slurm",
+      "old_path": "slurm/preflight_turkish_bridge_contract_v2.slurm",
+      "path": "slurm/m2/preflight_turkish_bridge_contract_v2.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "preflight_turkish_bridge_corpus.slurm",
+      "old_path": "slurm/preflight_turkish_bridge_corpus.slurm",
+      "path": "slurm/m2/preflight_turkish_bridge_corpus.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "preflight_turkish_bridge_corpus_resume.slurm",
+      "old_path": "slurm/preflight_turkish_bridge_corpus_resume.slurm",
+      "path": "slurm/m2/preflight_turkish_bridge_corpus_resume.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "preflight_turkish_bridge_evaluation.slurm",
+      "old_path": "slurm/preflight_turkish_bridge_evaluation.slurm",
+      "path": "slurm/m2/preflight_turkish_bridge_evaluation.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "preflight_turkish_bridge_finalization.slurm",
+      "old_path": "slurm/preflight_turkish_bridge_finalization.slurm",
+      "path": "slurm/m2/preflight_turkish_bridge_finalization.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "preflight_turkish_bridge_provenance.slurm",
+      "old_path": "slurm/preflight_turkish_bridge_provenance.slurm",
+      "path": "slurm/m2/preflight_turkish_bridge_provenance.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "preflight_turkish_bridge_qwen_recovery.slurm",
+      "old_path": "slurm/preflight_turkish_bridge_qwen_recovery.slurm",
+      "path": "slurm/m2/preflight_turkish_bridge_qwen_recovery.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "preflight_turkish_bridge_training.slurm",
+      "old_path": "slurm/preflight_turkish_bridge_training.slurm",
+      "path": "slurm/m2/preflight_turkish_bridge_training.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "prepare_m1_qwen_checkpoint_pareto.slurm",
+      "old_path": "slurm/prepare_m1_qwen_checkpoint_pareto.slurm",
+      "path": "slurm/m1/prepare_m1_qwen_checkpoint_pareto.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "prepare_m1_retention_anchor.slurm",
+      "old_path": "slurm/prepare_m1_retention_anchor.slurm",
+      "path": "slurm/m1/prepare_m1_retention_anchor.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "prepare_m1_retention_evaluation.slurm",
+      "old_path": "slurm/prepare_m1_retention_evaluation.slurm",
+      "path": "slurm/m1/prepare_m1_retention_evaluation.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "prepare_m1_retention_seed43_evaluation.slurm",
+      "old_path": "slurm/prepare_m1_retention_seed43_evaluation.slurm",
+      "path": "slurm/m1/prepare_m1_retention_seed43_evaluation.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "prepare_qwen_canonical_25000.slurm",
+      "old_path": "slurm/prepare_qwen_canonical_25000.slurm",
+      "path": "slurm/m1/prepare_qwen_canonical_25000.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "prepare_qwen_pre_m2_contract.slurm",
+      "old_path": "slurm/prepare_qwen_pre_m2_contract.slurm",
+      "path": "slurm/m2/prepare_qwen_pre_m2_contract.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "prepare_qwen_scale_probe.slurm",
+      "old_path": "slurm/prepare_qwen_scale_probe.slurm",
+      "path": "slurm/m1/prepare_qwen_scale_probe.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "prepare_qwen_scale_probe_evaluation.slurm",
+      "old_path": "slurm/prepare_qwen_scale_probe_evaluation.slurm",
+      "path": "slurm/m1/prepare_qwen_scale_probe_evaluation.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "prepare_qwen_scale_probe_seed43_evaluation.slurm",
+      "old_path": "slurm/prepare_qwen_scale_probe_seed43_evaluation.slurm",
+      "path": "slurm/m1/prepare_qwen_scale_probe_seed43_evaluation.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "prepare_turkish_bridge_corpus.slurm",
+      "old_path": "slurm/prepare_turkish_bridge_corpus.slurm",
+      "path": "slurm/m2/prepare_turkish_bridge_corpus.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "refresh_turkish_bridge_corpus_provenance.slurm",
+      "old_path": "slurm/refresh_turkish_bridge_corpus_provenance.slurm",
+      "path": "slurm/m2/refresh_turkish_bridge_corpus_provenance.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "repair_pythia_official_tokenizer.slurm",
+      "old_path": "slurm/repair_pythia_official_tokenizer.slurm",
+      "path": "slurm/m1/repair_pythia_official_tokenizer.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "resume_turkish_bridge_corpus_contamination.slurm",
+      "old_path": "slurm/resume_turkish_bridge_corpus_contamination.slurm",
+      "path": "slurm/m2/resume_turkish_bridge_corpus_contamination.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "smoke_qwen_canonical_25000.slurm",
+      "old_path": "slurm/smoke_qwen_canonical_25000.slurm",
+      "path": "slurm/m1/smoke_qwen_canonical_25000.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "smoke_qwen_m2_m3.slurm",
+      "old_path": "slurm/smoke_qwen_m2_m3.slurm",
+      "path": "slurm/m2/smoke_qwen_m2_m3.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "smoke_qwen_pre_m2_baseline.slurm",
+      "old_path": "slurm/smoke_qwen_pre_m2_baseline.slurm",
+      "path": "slurm/m2/smoke_qwen_pre_m2_baseline.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "smoke_smollm_contrastive_binding.slurm",
+      "old_path": "slurm/smoke_smollm_contrastive_binding.slurm",
+      "path": "slurm/m1/smoke_smollm_contrastive_binding.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "submit_qwen_scale_probe.sh",
+      "old_path": "slurm/submit_qwen_scale_probe.sh",
+      "path": "slurm/m1/submit_qwen_scale_probe.sh"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "summarize_m1_dose_pareto_falcon_audit_persistent_recovery.slurm",
+      "old_path": "slurm/summarize_m1_dose_pareto_falcon_audit_persistent_recovery.slurm",
+      "path": "slurm/m1/summarize_m1_dose_pareto_falcon_audit_persistent_recovery.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "summarize_m1_dose_pareto_falcon_clean_uuid_recovery.slurm",
+      "old_path": "slurm/summarize_m1_dose_pareto_falcon_clean_uuid_recovery.slurm",
+      "path": "slurm/m1/summarize_m1_dose_pareto_falcon_clean_uuid_recovery.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "summarize_m1_dose_pareto_falcon_recovery.slurm",
+      "old_path": "slurm/summarize_m1_dose_pareto_falcon_recovery.slurm",
+      "path": "slurm/m1/summarize_m1_dose_pareto_falcon_recovery.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "summarize_m1_dose_pareto_falcon_recovery_rtxa6000.slurm",
+      "old_path": "slurm/summarize_m1_dose_pareto_falcon_recovery_rtxa6000.slurm",
+      "path": "slurm/m1/summarize_m1_dose_pareto_falcon_recovery_rtxa6000.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "summarize_m1_dose_pareto_falcon_recovery_rtxa6000_exclusive.slurm",
+      "old_path": "slurm/summarize_m1_dose_pareto_falcon_recovery_rtxa6000_exclusive.slurm",
+      "path": "slurm/m1/summarize_m1_dose_pareto_falcon_recovery_rtxa6000_exclusive.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "summarize_m1_provenance_screen_v3.slurm",
+      "old_path": "slurm/summarize_m1_provenance_screen_v3.slurm",
+      "path": "slurm/m1/summarize_m1_provenance_screen_v3.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "summarize_m1_retention_evaluation.slurm",
+      "old_path": "slurm/summarize_m1_retention_evaluation.slurm",
+      "path": "slurm/m1/summarize_m1_retention_evaluation.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "summarize_m1_retention_seed43_evaluation.slurm",
+      "old_path": "slurm/summarize_m1_retention_seed43_evaluation.slurm",
+      "path": "slurm/m1/summarize_m1_retention_seed43_evaluation.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "summarize_qwen_pre_m2_baseline_final.slurm",
+      "old_path": "slurm/summarize_qwen_pre_m2_baseline_final.slurm",
+      "path": "slurm/m2/summarize_qwen_pre_m2_baseline_final.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "test_qwen_canonical_25000.slurm",
+      "old_path": "slurm/test_qwen_canonical_25000.slurm",
+      "path": "slurm/m1/test_qwen_canonical_25000.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_m1_canonical_form_diversity.slurm",
+      "old_path": "slurm/train_m1_canonical_form_diversity.slurm",
+      "path": "slurm/m1/train_m1_canonical_form_diversity.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_m1_cross_family.slurm",
+      "old_path": "slurm/train_m1_cross_family.slurm",
+      "path": "slurm/m1/train_m1_cross_family.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_m1_dose_pareto_falcon_rtx3090.slurm",
+      "old_path": "slurm/train_m1_dose_pareto_falcon_rtx3090.slurm",
+      "path": "slurm/m1/train_m1_dose_pareto_falcon_rtx3090.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_m1_dose_pareto_olmo_rtx3090.slurm",
+      "old_path": "slurm/train_m1_dose_pareto_olmo_rtx3090.slurm",
+      "path": "slurm/m1/train_m1_dose_pareto_olmo_rtx3090.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_m1_dose_pareto_olmo_v100.slurm",
+      "old_path": "slurm/train_m1_dose_pareto_olmo_v100.slurm",
+      "path": "slurm/m1/train_m1_dose_pareto_olmo_v100.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_m1_dose_pareto_pythia_rtx3090.slurm",
+      "old_path": "slurm/train_m1_dose_pareto_pythia_rtx3090.slurm",
+      "path": "slurm/m1/train_m1_dose_pareto_pythia_rtx3090.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_m1_form_generalization.slurm",
+      "old_path": "slurm/train_m1_form_generalization.slurm",
+      "path": "slurm/m1/train_m1_form_generalization.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_m1_gpt2_english_facts.slurm",
+      "old_path": "slurm/train_m1_gpt2_english_facts.slurm",
+      "path": "slurm/m1/train_m1_gpt2_english_facts.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_m1_provenance_screen.slurm",
+      "old_path": "slurm/train_m1_provenance_screen.slurm",
+      "path": "slurm/m1/train_m1_provenance_screen.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_m1_pythia_repair_rtx3090_bf16.slurm",
+      "old_path": "slurm/train_m1_pythia_repair_rtx3090_bf16.slurm",
+      "path": "slurm/m1/train_m1_pythia_repair_rtx3090_bf16.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_m1_pythia_repair_v100.slurm",
+      "old_path": "slurm/train_m1_pythia_repair_v100.slurm",
+      "path": "slurm/m1/train_m1_pythia_repair_v100.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_m1_ranking.slurm",
+      "old_path": "slurm/train_m1_ranking.slurm",
+      "path": "slurm/m1/train_m1_ranking.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_m1_retention_seed42.slurm",
+      "old_path": "slurm/train_m1_retention_seed42.slurm",
+      "path": "slurm/m1/train_m1_retention_seed42.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_m1_retention_seed43.slurm",
+      "old_path": "slurm/train_m1_retention_seed43.slurm",
+      "path": "slurm/m1/train_m1_retention_seed43.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "train_pre_m2_wp1b.slurm",
+      "old_path": "slurm/train_pre_m2_wp1b.slurm",
+      "path": "slurm/m2/train_pre_m2_wp1b.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "train_pre_m2_wp3_stage_a.slurm",
+      "old_path": "slurm/train_pre_m2_wp3_stage_a.slurm",
+      "path": "slurm/m2/train_pre_m2_wp3_stage_a.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "train_pre_m2_wp5_lr_sweep.slurm",
+      "old_path": "slurm/train_pre_m2_wp5_lr_sweep.slurm",
+      "path": "slurm/m2/train_pre_m2_wp5_lr_sweep.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_qwen_canonical_25000.slurm",
+      "old_path": "slurm/train_qwen_canonical_25000.slurm",
+      "path": "slurm/m1/train_qwen_canonical_25000.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "train_qwen_m2_m3_array.slurm",
+      "old_path": "slurm/train_qwen_m2_m3_array.slurm",
+      "path": "slurm/m2/train_qwen_m2_m3_array.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_qwen_scale_probe.slurm",
+      "old_path": "slurm/train_qwen_scale_probe.slurm",
+      "path": "slurm/m1/train_qwen_scale_probe.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_qwen_scale_probe_seed43.slurm",
+      "old_path": "slurm/train_qwen_scale_probe_seed43.slurm",
+      "path": "slurm/m1/train_qwen_scale_probe_seed43.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_smollm_binding_control.slurm",
+      "old_path": "slurm/train_smollm_binding_control.slurm",
+      "path": "slurm/m1/train_smollm_binding_control.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_smollm_contrastive_binding.slurm",
+      "old_path": "slurm/train_smollm_contrastive_binding.slurm",
+      "path": "slurm/m1/train_smollm_contrastive_binding.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_smollm_contrastive_lambda025.slurm",
+      "old_path": "slurm/train_smollm_contrastive_lambda025.slurm",
+      "path": "slurm/m1/train_smollm_contrastive_lambda025.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "train_smollm_prompt_consistency.slurm",
+      "old_path": "slurm/train_smollm_prompt_consistency.slurm",
+      "path": "slurm/m1/train_smollm_prompt_consistency.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "train_turkish_bridge.slurm",
+      "old_path": "slurm/train_turkish_bridge.slurm",
+      "path": "slurm/m2/train_turkish_bridge.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m2",
+      "name": "train_turkish_bridge_qwen_recovery.slurm",
+      "old_path": "slurm/train_turkish_bridge_qwen_recovery.slurm",
+      "path": "slurm/m2/train_turkish_bridge_qwen_recovery.slurm"
+    },
+    {
+      "kind": "slurm",
+      "category": "m1",
+      "name": "validate_m1_v100_compat_env.slurm",
+      "old_path": "slurm/validate_m1_v100_compat_env.slurm",
+      "path": "slurm/m1/validate_m1_v100_compat_env.slurm"
+    }
+  ]
+}

@@ -1,0 +1,324 @@
+schema_version: 1
+study_id: transfer-vs-relearning-m0-to-m2-eval-v1
+status: draft
+execution_authorized: false
+
+state_design:
+  states: [M0, M1, M2-A, M2-B]
+  evaluation_contract: eval-v1
+  m2_siblings:
+    parent: M1
+    arms: [M2-A, M2-B]
+    matched_budget_required: true
+
+bindings:
+  m0_model_manifest: __FROZEN_M0_MODEL_MANIFEST__
+  m1_training_pipeline: __FROZEN_M1_TRAINING_PIPELINE__
+  m2a_training_pipeline: __FROZEN_M2A_TRAINING_PIPELINE__
+  m2b_training_pipeline: __FROZEN_M2B_TRAINING_PIPELINE__
+  eval_registry: configs/evaluation/eval_v1_registry.yaml
+  result_namespace: __FRESH_STUDY_RESULT_NAMESPACE__
+
+stages:
+  - id: contract_preflight
+    state: STUDY
+    kind: preflight
+    objective: Validate exact study, model, corpus, evaluation and output identities before any scientific work.
+    depends_on: []
+    adapter_id: contract_preflight
+    authority_class: local_read_only
+    context_files:
+      - documentation/current/PROJECT_STATE.yaml
+      - documentation/contracts/evaluation/eval-v1.md
+      - configs/evaluation/eval_v1_registry.yaml
+      - configs/studies/m0_to_m2_eval_v1_template.yaml
+    allowed_paths:
+      - src/transfer_vs_relearning/study/**
+      - tests/test_full_study_workflow.py
+    acceptance_criteria:
+      - Every frozen identity is present and placeholder-free.
+      - M2-A and M2-B share the same M1 parent, budget policy and eval contract.
+    outputs:
+      - stages/contract_preflight/manifest.json
+
+  - id: m0_evaluation
+    state: M0
+    kind: evaluation
+    objective: Run the frozen standard baseline evaluation bundle on M0 without changing model state.
+    depends_on: [contract_preflight]
+    adapter_id: m0_evaluation
+    authority_class: evaluation
+    context_files:
+      - documentation/contracts/evaluation/eval-v1.md
+      - configs/evaluation/eval_v1_registry.yaml
+      - documentation/evaluation/RESULT_SCHEMA_V1.md
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/m0_evaluation.py
+      - tests/study/test_m0_evaluation_adapter.py
+    acceptance_criteria:
+      - Raw task outputs and an immutable evaluation manifest are complete.
+      - Every required metric denominator and dataset revision is recorded.
+    outputs:
+      - stages/m0_evaluation/evaluation_manifest.json
+
+  - id: m0_probing
+    state: M0
+    kind: probing
+    objective: Run the frozen factual access and generation-integrity probes on the identical M0 checkpoint.
+    depends_on: [m0_evaluation]
+    adapter_id: m0_probing
+    authority_class: evaluation
+    context_files:
+      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/evaluation/RESULT_SCHEMA_V1.md
+      - documentation/evaluation/EVALUATOR_INVENTORY_V1.md
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/m0_probing.py
+      - tests/study/test_m0_probing_adapter.py
+    acceptance_criteria:
+      - Probe registry hash and complete per-probe rows are preserved.
+      - EN→EN, TR→EN and TR→TR denominators remain explicit.
+    outputs:
+      - stages/m0_probing/evaluation_manifest.json
+
+  - id: m0_normalization
+    state: M0
+    kind: normalization
+    objective: Normalize M0 evaluation and probing into canonical long tables without rescoring.
+    depends_on: [m0_evaluation, m0_probing]
+    adapter_id: normalize_state
+    authority_class: local_write
+    context_files:
+      - documentation/evaluation/RESULT_SCHEMA_V1.md
+      - documentation/pipeline/README.md
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/normalize_state.py
+      - tests/study/test_state_normalizer.py
+    acceptance_criteria:
+      - Canonical tables contain one explicit row for every required observation.
+      - Missing or failed inputs are never converted to zero.
+    outputs:
+      - stages/m0_normalization/checkpoint_registry.parquet
+      - stages/m0_normalization/metric_observations.parquet
+      - stages/m0_normalization/factual_probe_results.parquet
+
+  - id: m1_training
+    state: M1
+    kind: training
+    objective: Train the frozen M1 recipe from the exact M0 parent with epoch trace and snapshots enabled.
+    depends_on: [m0_normalization]
+    adapter_id: m1_training
+    authority_class: training
+    context_files:
+      - documentation/pipeline/README.md
+      - configs/training/eval_v1_olmo_epoch_tracked_template.yaml
+      - documentation/contracts/evaluation/eval-v1.md
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/m1_training.py
+      - tests/study/test_m1_training_adapter.py
+    acceptance_criteria:
+      - Training identity, hyperparameters, epoch trace and snapshot hashes are complete.
+      - No M1 evaluation result is used to mutate the frozen recipe.
+    outputs:
+      - stages/m1_training/training_manifest.json
+      - stages/m1_training/training_trace_manifest.json
+
+  - id: m1_evaluation
+    state: M1
+    kind: evaluation
+    objective: Apply the unchanged eval-v1 standard bundle to every required M1 trajectory point.
+    depends_on: [m1_training]
+    adapter_id: m1_evaluation
+    authority_class: evaluation
+    context_files:
+      - documentation/contracts/evaluation/eval-v1.md
+      - configs/evaluation/eval_v1_registry.yaml
+      - documentation/pipeline/README.md
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/m1_evaluation.py
+      - tests/study/test_m1_evaluation_adapter.py
+    acceptance_criteria:
+      - Parent and every required epoch have explicit complete or failed status.
+      - BPB, ΔBPB and companion PPL quantities use the same frozen parent.
+    outputs:
+      - stages/m1_evaluation/evaluation_manifest.json
+
+  - id: m1_probing
+    state: M1
+    kind: probing
+    objective: Apply the unchanged factual and integrity probe bundle to required M1 trajectory points.
+    depends_on: [m1_training]
+    adapter_id: m1_probing
+    authority_class: evaluation
+    context_files:
+      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/evaluation/RESULT_SCHEMA_V1.md
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/m1_probing.py
+      - tests/study/test_m1_probing_adapter.py
+    acceptance_criteria:
+      - Fact access, robust intersection and failure taxonomy rows are complete.
+      - Probe identities match M0 exactly where comparisons require pairing.
+    outputs:
+      - stages/m1_probing/evaluation_manifest.json
+
+  - id: m1_checkpoint_selection
+    state: M1
+    kind: selection
+    objective: Apply only the precommitted M1 checkpoint rule to normalized M1 evaluation and probing evidence.
+    depends_on: [m1_evaluation, m1_probing]
+    adapter_id: m1_checkpoint_selection
+    authority_class: local_write
+    context_files:
+      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/evaluation/RESULT_SCHEMA_V1.md
+      - documentation/current/PROJECT_STATE.yaml
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/m1_selection.py
+      - tests/study/test_m1_selection_adapter.py
+    acceptance_criteria:
+      - Selection is deterministic and uses no outcome-aware threshold changes.
+      - The selected checkpoint manifest and rejection reasons are preserved.
+    outputs:
+      - stages/m1_checkpoint_selection/selection_manifest.json
+
+  - id: m2_sibling_preflight
+    state: STUDY
+    kind: preflight
+    objective: Bind M2-A and M2-B to the same selected M1 parent and matched training/evaluation budgets.
+    depends_on: [m1_checkpoint_selection]
+    adapter_id: m2_sibling_preflight
+    authority_class: local_read_only
+    context_files:
+      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/178_END_TO_END_EXPERIMENTAL_PLAN_AND_EVALUATION_PROTOCOL_EN.md
+      - configs/studies/m0_to_m2_eval_v1_template.yaml
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/m2_preflight.py
+      - tests/study/test_m2_sibling_preflight.py
+    acceptance_criteria:
+      - Both arms resolve the identical M1 checkpoint hash.
+      - Total tokens, sequence policy, seeds and evaluation bundles are matched.
+    outputs:
+      - stages/m2_sibling_preflight/manifest.json
+
+  - id: m2a_training
+    state: M2-A
+    kind: training
+    objective: Train the fact-free Turkish adaptation arm from the frozen selected M1 parent.
+    depends_on: [m2_sibling_preflight]
+    adapter_id: m2a_training
+    authority_class: training
+    context_files:
+      - documentation/178_END_TO_END_EXPERIMENTAL_PLAN_AND_EVALUATION_PROTOCOL_EN.md
+      - documentation/pipeline/README.md
+      - documentation/contracts/evaluation/eval-v1.md
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/m2a_training.py
+      - tests/study/test_m2a_training_adapter.py
+    acceptance_criteria:
+      - Fact-free corpus and exact M1 parent identities pass before the first optimizer step.
+      - Full epoch trace and model-only snapshots are preserved.
+    outputs:
+      - stages/m2a_training/training_manifest.json
+
+  - id: m2b_training
+    state: M2-B
+    kind: training
+    objective: Train the matched Turkish factual re-exposure arm from the same frozen M1 parent.
+    depends_on: [m2_sibling_preflight]
+    adapter_id: m2b_training
+    authority_class: training
+    context_files:
+      - documentation/178_END_TO_END_EXPERIMENTAL_PLAN_AND_EVALUATION_PROTOCOL_EN.md
+      - documentation/pipeline/README.md
+      - documentation/contracts/evaluation/eval-v1.md
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/m2b_training.py
+      - tests/study/test_m2b_training_adapter.py
+    acceptance_criteria:
+      - Re-exposure rows and matched non-factual budget have frozen identities.
+      - Full epoch trace and model-only snapshots are preserved.
+    outputs:
+      - stages/m2b_training/training_manifest.json
+
+  - id: m2a_evaluation_probing
+    state: M2-A
+    kind: evaluation
+    objective: Apply unchanged eval-v1 standard and factual probe bundles to M2-A.
+    depends_on: [m2a_training]
+    adapter_id: m2a_evaluation_probing
+    authority_class: evaluation
+    context_files:
+      - documentation/contracts/evaluation/eval-v1.md
+      - configs/evaluation/eval_v1_registry.yaml
+      - documentation/evaluation/RESULT_SCHEMA_V1.md
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/m2a_evaluation.py
+      - tests/study/test_m2a_evaluation_adapter.py
+    acceptance_criteria:
+      - Transfer contrasts remain paired to the same M1 observations.
+      - Turkish and English retention/manipulation metrics are complete.
+    outputs:
+      - stages/m2a_evaluation_probing/evaluation_manifest.json
+
+  - id: m2b_evaluation_probing
+    state: M2-B
+    kind: evaluation
+    objective: Apply the identical eval-v1 standard and factual probe bundles to M2-B.
+    depends_on: [m2b_training]
+    adapter_id: m2b_evaluation_probing
+    authority_class: evaluation
+    context_files:
+      - documentation/contracts/evaluation/eval-v1.md
+      - configs/evaluation/eval_v1_registry.yaml
+      - documentation/evaluation/RESULT_SCHEMA_V1.md
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/m2b_evaluation.py
+      - tests/study/test_m2b_evaluation_adapter.py
+    acceptance_criteria:
+      - Relearning contrasts use the frozen M2-B minus M2-A pairing.
+      - Evaluation identities and budgets match M2-A exactly.
+    outputs:
+      - stages/m2b_evaluation_probing/evaluation_manifest.json
+
+  - id: branch_analysis
+    state: STUDY
+    kind: analysis
+    objective: Normalize both M2 branches and compute only precommitted transfer/relearning contrasts.
+    depends_on: [m2a_evaluation_probing, m2b_evaluation_probing]
+    adapter_id: branch_analysis
+    authority_class: local_write
+    context_files:
+      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/evaluation/RESULT_SCHEMA_V1.md
+      - documentation/178_END_TO_END_EXPERIMENTAL_PLAN_AND_EVALUATION_PROTOCOL_EN.md
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/branch_analysis.py
+      - tests/study/test_branch_analysis_adapter.py
+    acceptance_criteria:
+      - M2-A minus M1 and M2-B minus M2-A paired contrasts are explicit.
+      - Incomplete required rows block aggregate conclusions.
+    outputs:
+      - stages/branch_analysis/branch_contrasts.parquet
+      - stages/branch_analysis/analysis_manifest.json
+
+  - id: presentation_bundle
+    state: STUDY
+    kind: presentation
+    objective: Generate thesis-ready tables, plot data, figures and metadata-complete captions from canonical rows.
+    depends_on: [branch_analysis]
+    adapter_id: presentation_bundle
+    authority_class: local_write
+    context_files:
+      - documentation/pipeline/README.md
+      - documentation/evaluation/RESULT_SCHEMA_V1.md
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/presentation.py
+      - tests/study/test_presentation_adapter.py
+    acceptance_criteria:
+      - Every figure is generated only from canonical complete rows.
+      - Captions include model/data revisions, seeds, batch, sequence and precision identity.
+    outputs:
+      - stages/presentation_bundle/presentation/figure_manifest.json
+      - stages/presentation_bundle/presentation/captions.json

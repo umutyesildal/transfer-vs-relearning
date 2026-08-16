@@ -13,6 +13,12 @@ repository:
   original_worktrees_are_rollback_sources: true
   documentation_control_plane: active
   migration_record: documentation/migration/REPOSITORY_MIGRATION_V1.md
+  entrypoint_layout:
+    version: entrypoints_v2
+    scripts_preserved: 129
+    slurm_files_preserved: 135
+    catalog: configs/entrypoints/catalog.json
+    record: documentation/migration/ENTRYPOINT_LAYOUT_V2.md
   publication_blockers: []
   main_cutover:
     remote: https://github.com/umutyesildal/transfer-vs-relearning
@@ -95,9 +101,13 @@ evaluation_target:
   architecture: hybrid_harness_custom_factual_and_normalizer
   canonical_result_shape: long_tables_with_generated_checkpoint_view
   pipeline:
-    status: local_planner_trace_and_artifact_foundation_prepared
+    status: local_checkpoint_and_full_study_foundation_prepared
     documentation: documentation/pipeline/README.md
     prospective_template: configs/pipelines/eval_v1_olmo_epoch_trajectory_template.yaml
+    full_study_template: configs/studies/m0_to_m2_eval_v1_template.yaml
+    full_study_entrypoint: scripts/study/run_study.py
+    luna_packet_manifest: .agents/task-packets/study-v1/manifest.json
+    full_study_stage_count: 15
     execution_adapter_ready: false
     execution_authorized: false
     stage_order:

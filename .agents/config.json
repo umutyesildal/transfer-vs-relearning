@@ -27,6 +27,7 @@
     "same_decision_max": 3,
     "turn_timeout_seconds": 1800,
     "run_wall_clock_seconds": 3600,
-    "max_file_hash_bytes": 16777216
+    "max_file_hash_bytes": 16777216,
+    "max_task_packet_lines": 160
   }
 }

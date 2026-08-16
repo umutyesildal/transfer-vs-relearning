@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def _load_script(name: str):
-    path = ROOT / "scripts" / name
+    path = ROOT / "scripts/m1" / name
     spec = importlib.util.spec_from_file_location(name.removesuffix(".py"), path)
     assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)
@@ -60,7 +60,7 @@ def test_hard_metrics_preserve_scaffold_cell_minima(tmp_path: Path) -> None:
 
 
 def test_slurm_wave_excludes_anomalous_node_and_is_bounded() -> None:
-    launcher = (ROOT / "slurm/eval_m1_qwen_checkpoint_pareto.slurm").read_text(encoding="utf-8")
+    launcher = (ROOT / "slurm/m1/eval_m1_qwen_checkpoint_pareto.slurm").read_text(encoding="utf-8")
     assert "#SBATCH --exclude=gruenau10" in launcher
     submitter = (ROOT.parent / "ssh-client/scripts/submit_m1_qwen_checkpoint_pareto.sh")
     if submitter.exists():

@@ -45,6 +45,8 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     referenced_paths = [
         state["repository"]["migration_record"],
         state["repository"]["history_sanitization"]["record"],
+        state["repository"]["entrypoint_layout"]["record"],
+        state["repository"]["entrypoint_layout"]["catalog"],
         state["scientific_design"]["current_design_plan"],
         *state["scientific_design"]["supervisor_realignments"],
         state["evaluation_target"]["draft_contract"],
@@ -54,6 +56,9 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["result_schema"],
         state["evaluation_target"]["pipeline"]["documentation"],
         state["evaluation_target"]["pipeline"]["prospective_template"],
+        state["evaluation_target"]["pipeline"]["full_study_template"],
+        state["evaluation_target"]["pipeline"]["full_study_entrypoint"],
+        state["evaluation_target"]["pipeline"]["luna_packet_manifest"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],

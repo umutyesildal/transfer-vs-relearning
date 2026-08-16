@@ -60,9 +60,9 @@ stable rules, while `PROJECT_STATE.yaml` contains the changing project state.
 | Path | Role |
 |---|---|
 | `src/transfer_vs_relearning/` | Core Python package |
-| `scripts/` | Dataset, training, evaluation, analysis, and migration entry points |
+| `scripts/` | Grouped study, state-specific, corpus, training and evaluation entry points |
 | `configs/` | Versioned experiment, model, corpus, training, and evaluation settings |
-| `slurm/` | Slurm launchers; their presence is not execution authorization |
+| `slurm/` | Launchers grouped under `m0/`, `m1/`, and `m2/`; presence is not authorization |
 | `tests/` | Main offline test suite |
 | `tools/synthetic-data/` | Synthetic data generator with imported, publication-sanitized history |
 | `documentation/current/` | Small live control plane: state, authority, and roadmap |

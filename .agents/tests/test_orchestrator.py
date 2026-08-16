@@ -132,6 +132,63 @@ class OrchestratorTests(unittest.TestCase):
             ["$.uniqueItems"],
         )
 
+    def test_task_packet_is_small_scoped_and_complete(self):
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory).resolve()
+            (workspace / "AGENTS.md").write_text("# Instructions\n", encoding="utf-8")
+            packet = workspace / ".agents/task-packets/study/task.md"
+            packet.parent.mkdir(parents=True)
+            packet.write_text(
+                "# Task\n\n## Objective\n\nOne task.\n\n"
+                "## Context budget\n\n- `AGENTS.md`\n\n"
+                "## Allowed paths\n\n- `tests/example.py`\n\n"
+                "## Acceptance criteria\n\n- Pass.\n\n"
+                "## Stop conditions\n\n- Stop.\n\n"
+                "## Handoff\n\nReport.\n",
+                encoding="utf-8",
+            )
+            goal = "Status: ACTIVE\nGoal ID: goal-1\nTask packet: .agents/task-packets/study/task.md\n"
+            self.assertEqual(
+                orchestrator.validate_task_packet(goal, workspace, 80),
+                packet,
+            )
+
+    def test_task_packet_rejects_escape_placeholder_and_excess_context(self):
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory).resolve()
+            with self.assertRaises(orchestrator.OrchestratorError):
+                orchestrator.validate_task_packet(
+                    "Task packet: ../outside.md\n", workspace, 80
+                )
+            packet = workspace / ".agents/task-packets/task.md"
+            packet.parent.mkdir(parents=True)
+            packet.write_text(
+                "## Objective\n__TODO__\n## Context budget\n- `a`\n"
+                "## Allowed paths\n- `b`\n## Acceptance criteria\n- c\n"
+                "## Stop conditions\n- d\n## Handoff\n- e\n",
+                encoding="utf-8",
+            )
+            with self.assertRaises(orchestrator.OrchestratorError):
+                orchestrator.validate_task_packet(
+                    "Task packet: .agents/task-packets/task.md\n", workspace, 80
+                )
+
+    def test_task_packet_rejects_context_outside_workspace(self):
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory).resolve()
+            packet = workspace / ".agents/task-packets/task.md"
+            packet.parent.mkdir(parents=True)
+            packet.write_text(
+                "## Objective\nOne task.\n## Context budget\n- `../outside.md`\n"
+                "## Allowed paths\n- `b`\n## Acceptance criteria\n- c\n"
+                "## Stop conditions\n- d\n## Handoff\n- e\n",
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(orchestrator.OrchestratorError, "escapes workspace"):
+                orchestrator.validate_task_packet(
+                    "Task packet: .agents/task-packets/task.md\n", workspace, 80
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

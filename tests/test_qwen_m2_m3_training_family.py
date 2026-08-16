@@ -11,7 +11,7 @@ from transfer_vs_relearning.training.clm import load_training_config
 
 def _run_script(root: Path, script: str, *args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        [sys.executable, str(root / "scripts" / script), *args],
+        [sys.executable, str(root / "scripts/m2" / script), *args],
         check=True,
         env={**os.environ, "PYTHONPATH": str(root / "src")},
         capture_output=True,
@@ -141,10 +141,10 @@ def test_prepare_and_validate_qwen_m2_m3_family_contract(tmp_path: Path) -> None
 def test_qwen_m2_m3_slurm_launchers_are_syntax_valid() -> None:
     root = Path(__file__).resolve().parents[1]
     for filename in (
-        "slurm/preflight_qwen_m2_m3.slurm",
-        "slurm/train_qwen_m2_m3_array.slurm",
-        "slurm/smoke_qwen_m2_m3.slurm",
-        "scripts/submit_qwen_m2_m3.sh",
-        "scripts/submit_qwen_m2_m3_smoke.sh",
+        "slurm/m2/preflight_qwen_m2_m3.slurm",
+        "slurm/m2/train_qwen_m2_m3_array.slurm",
+        "slurm/m2/smoke_qwen_m2_m3.slurm",
+        "scripts/m2/submit_qwen_m2_m3.sh",
+        "scripts/m2/submit_qwen_m2_m3_smoke.sh",
     ):
         subprocess.run(["bash", "-n", str(root / filename)], check=True)

@@ -20,6 +20,12 @@ schedule, records tokenization and optimization traces, preserves model-only epo
 storage guards, plans dense/full evaluation in order, and initializes typed `planned_not_run`
 artifact/presentation namespaces. It does not yet execute LM Eval or project evaluation stages.
 
+The full-study controller now expresses the 15-stage M0→M1→M2-A/M2-B dependency graph, preserves
+the sibling-parent and matched-budget gates, and produces one bounded Luna adapter packet per stage.
+Its CLI is dry-run only because final scientific adapters and execution authority do not exist yet.
+The former flat entrypoint roots were losslessly grouped: 129 scripts and 135 Slurm files are mapped
+by `configs/entrypoints/catalog.json`; historical numbered documents were not rewritten.
+
 ## Evaluation design result
 
 - LM Evaluation Harness is pinned prospectively to v0.4.12 commit

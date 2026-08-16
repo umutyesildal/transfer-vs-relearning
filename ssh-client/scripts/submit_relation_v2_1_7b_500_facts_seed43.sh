@@ -63,7 +63,7 @@ JOB_ID=$(sbatch --parsable \
   --output="$SCRATCH/logs/%x-%j.out" \
   --error="$SCRATCH/logs/%x-%j.err" \
   --export=ALL,TRAIN_CONFIG="$CONFIG",HF_HOME="$SCRATCH/cache",XDG_CACHE_HOME="$SCRATCH/cache",PYTHONDONTWRITEBYTECODE=1 \
-  slurm/train_m1_gpt2_english_facts.slurm)
+  slurm/m1/train_m1_gpt2_english_facts.slurm)
 echo "__JOB_ID__=$JOB_ID"
 squeue -h -j "$JOB_ID" -o "%i %T %M %L %R %j"
 EOF

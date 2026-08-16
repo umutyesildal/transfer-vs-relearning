@@ -53,7 +53,7 @@ PY
 JOB_ID=$(sbatch --parsable \
   --job-name=m1-v2-city-rank \
   --export=ALL,TRAIN_CONFIG="$CONFIG" \
-  slurm/train_m1_ranking.slurm)
+  slurm/m1/train_m1_ranking.slurm)
 echo "__JOB_ID__=$JOB_ID"
 squeue -h -j "$JOB_ID" -o "%i %T %M %L %R %j"
 EOF

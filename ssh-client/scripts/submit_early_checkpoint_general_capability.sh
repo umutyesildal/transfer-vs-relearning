@@ -17,7 +17,7 @@ cd "$REPO"
 for checkpoint in 50 75; do
   MODEL_DIR="$TRAIN_RUN/checkpoints/checkpoint-$checkpoint"
   MANIFEST="$MANIFEST_DIR/seed42_checkpoint${checkpoint}.json"
-  "$PYTHON" scripts/create_local_model_manifest.py \
+  "$PYTHON" scripts/operations/create_local_model_manifest.py \
     --source-manifest artifacts/models/HuggingFaceTB__SmolLM2-1.7B/model_manifest.json \
     --local-model-dir "$MODEL_DIR" \
     --output-manifest "$MANIFEST" \
@@ -55,7 +55,7 @@ for checkpoint in 50 75; do
     --output="$LOG_DIR/%x-%j.out" \
     --error="$LOG_DIR/%x-%j.err" \
     --export=ALL,EVAL_CONFIG="$CONFIG",PYTHONDONTWRITEBYTECODE=1 \
-    slurm/eval_m1_general_capability.slurm)
+    slurm/m1/eval_m1_general_capability.slurm)
   echo "__JOB_ID_${label}__=$JOB_ID"
 done
 squeue -h -u yesildau -n gen-cap-s42c50,gen-cap-s42c75 -o '%i %T %M %L %R %j'

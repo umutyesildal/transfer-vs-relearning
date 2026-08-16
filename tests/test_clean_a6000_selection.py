@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from scripts import select_clean_a6000_uuid
-from scripts.select_clean_a6000_uuid import choose_clean_uuid, validate_visible_binding
+from scripts.operations import select_clean_a6000_uuid
+from scripts.operations.select_clean_a6000_uuid import choose_clean_uuid, validate_visible_binding
 
 
 def gpu(uuid: str, *, free_gib: int = 47, used_mib: int = 100) -> dict[str, object]:

@@ -23,7 +23,7 @@ The prospective OLMo planning example is
 Render and validate its non-executable plan with:
 
 ```bash
-.venv/bin/python scripts/plan_experiment_pipeline.py \
+.venv/bin/python scripts/study/plan_experiment_pipeline.py \
   --config configs/pipelines/eval_v1_olmo_epoch_trajectory_template.yaml \
   --output /tmp/eval-v1-pipeline-plan.json
 ```
@@ -76,3 +76,29 @@ final pinned LM Evaluation Harness tasks, project factual evaluator, Slurm route
 normalizer remain blocked on eval-v1 qualification and a separately authorized execution contract.
 Until then every rendered plan has `execution_authorized: false` and
 `status: planned_not_authorized`.
+
+## Full M0→M2 study control
+
+[`../../scripts/study/run_study.py`](../../scripts/study/run_study.py) owns the complete lifecycle:
+
+```text
+contract preflight
+→ M0 evaluation → M0 probing → normalization
+→ M1 training → evaluation + probing → checkpoint selection
+→ matched M2 sibling preflight
+→ M2-A training + M2-B training
+→ identical branch evaluation + probing
+→ paired branch analysis → presentation bundle
+```
+
+Render the complete 15-stage graph without scientific execution:
+
+```bash
+.venv/bin/python scripts/study/run_study.py run \
+  --config configs/studies/m0_to_m2_eval_v1_template.yaml \
+  --dry-run
+```
+
+The tested runner accepts only registered Python adapters; it never executes arbitrary shell text
+from YAML. The CLI currently registers no scientific adapter and rejects non-dry execution until
+eval-v1, corpus/training contracts and exact authorization are frozen.

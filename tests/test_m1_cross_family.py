@@ -6,7 +6,7 @@ from pathlib import Path
 import yaml
 
 import transfer_vs_relearning.experiments.m1_cross_family as cross_family
-from scripts.m1_cross_family_preflight import _unexpected_target_jobs, home_usage_evidence
+from scripts.m1.m1_cross_family_preflight import _unexpected_target_jobs, home_usage_evidence
 from transfer_vs_relearning.experiments.m1_cross_family import (
     candidate_by_index,
     combined_weight_sha256,
@@ -84,7 +84,7 @@ def test_pythia_retry_registry_uses_new_root_and_same_frozen_source() -> None:
     assert retry["scratch_root"] != initial["scratch_root"]
     assert retry["official_tokenizer_source"] == initial["official_tokenizer_source"]
     assert retry["candidates"] == initial["candidates"]
-    repair_source = (_repo_root() / "scripts/repair_pythia_official_tokenizer.py").read_text(encoding="utf-8")
+    repair_source = (_repo_root() / "scripts/m1/repair_pythia_official_tokenizer.py").read_text(encoding="utf-8")
     assert "pad_token=None" in repair_source
 
 
@@ -114,7 +114,7 @@ def test_pythia_rtx3090_relocation_changes_only_runtime_identity() -> None:
         ("train_m1_pythia_repair_v100.slurm", "training"),
         ("eval_m1_pythia_repair_v100.slurm", "evaluation"),
     ):
-        launcher = (_repo_root() / "slurm" / launcher_name).read_text(encoding="utf-8")
+        launcher = (_repo_root() / "slurm/m1" / launcher_name).read_text(encoding="utf-8")
         assert "M1_PYTHIA_PREFLIGHT_MANIFEST" in launcher
         assert f"preflight/{stage}.json" in launcher
 
@@ -146,19 +146,19 @@ def test_pythia_rtx3090_bf16_repair_preserves_scientific_recipe() -> None:
     assert registry["candidates"][0]["training_overrides"] == {"model_load_dtype": "bfloat16"}
     assert registry["runtime"]["expected_amp_dtype"] == "bfloat16"
     assert registry["runtime"]["min_free_memory_bytes"] == 20 * 1024**3
-    validator = (_repo_root() / "scripts/validate_m1_pythia_v100_runtime.py").read_text(encoding="utf-8")
+    validator = (_repo_root() / "scripts/m1/validate_m1_pythia_v100_runtime.py").read_text(encoding="utf-8")
     assert 'expected.get("expected_amp_dtype", "float16")' in validator
     assert "torch.cuda.is_bf16_supported()" in validator
     assert "torch.cuda.mem_get_info(0)" in validator
     for launcher_name in ("train_m1_pythia_repair_v100.slurm", "eval_m1_pythia_repair_v100.slurm"):
-        launcher = (_repo_root() / "slurm" / launcher_name).read_text(encoding="utf-8")
+        launcher = (_repo_root() / "slurm/m1" / launcher_name).read_text(encoding="utf-8")
         assert "M1_PYTHIA_REPAIR_TEMPLATE" in launcher
 
     train_launcher = (
-        _repo_root() / "slurm/train_m1_pythia_repair_rtx3090_bf16.slurm"
+        _repo_root() / "slurm/m1/train_m1_pythia_repair_rtx3090_bf16.slurm"
     ).read_text(encoding="utf-8")
     eval_launcher = (
-        _repo_root() / "slurm/eval_m1_pythia_repair_rtx3090_bf16.slurm"
+        _repo_root() / "slurm/m1/eval_m1_pythia_repair_rtx3090_bf16.slurm"
     ).read_text(encoding="utf-8")
     for launcher in (train_launcher, eval_launcher):
         assert "#SBATCH --gres=gpu:rtx3090:1" in launcher
@@ -173,9 +173,9 @@ def test_pythia_rtx3090_bf16_repair_preserves_scientific_recipe() -> None:
     assert "evaluation_rtx3090_bf16.json" in eval_launcher
     assert "--preserve-checkpoint" in train_launcher
 
-    preflight = (_repo_root() / "scripts/m1_cross_family_preflight.py").read_text(encoding="utf-8")
+    preflight = (_repo_root() / "scripts/m1/m1_cross_family_preflight.py").read_text(encoding="utf-8")
     assert "registry_training_template_binding" in preflight
-    smoke = (_repo_root() / "scripts/smoke_m1_cross_family_candidate.py").read_text(encoding="utf-8")
+    smoke = (_repo_root() / "scripts/m1/smoke_m1_cross_family_candidate.py").read_text(encoding="utf-8")
     assert "optimizer_state_dtypes" in smoke
     assert "BF16 AdamW state dtype gate failed" in smoke
 
@@ -252,7 +252,7 @@ def test_olmo_v100_retry_changes_only_mixed_precision() -> None:
 
 
 def test_provenance_launchers_allow_isolated_scratch_python() -> None:
-    for relative in ("slurm/train_m1_provenance_screen.slurm", "slurm/eval_m1_provenance_screen.slurm"):
+    for relative in ("slurm/m1/train_m1_provenance_screen.slurm", "slurm/m1/eval_m1_provenance_screen.slurm"):
         launcher = (_repo_root() / relative).read_text(encoding="utf-8")
         assert 'M1_PROVENANCE_PYTHON' in launcher
         assert 'test -x "${M1_PROVENANCE_PYTHON}"' in launcher
@@ -357,9 +357,9 @@ def test_completed_subset_evaluation_allows_only_disjoint_running_tasks() -> Non
 
 def test_array_launchers_reject_blank_labels_and_avoid_shared_training_config() -> None:
     launchers = [
-        _repo_root() / "slurm/acquire_m1_cross_family_models.slurm",
-        _repo_root() / "slurm/train_m1_cross_family.slurm",
-        _repo_root() / "slurm/eval_m1_cross_family.slurm",
+        _repo_root() / "slurm/m1/acquire_m1_cross_family_models.slurm",
+        _repo_root() / "slurm/m1/train_m1_cross_family.slurm",
+        _repo_root() / "slurm/m1/eval_m1_cross_family.slurm",
     ]
     for launcher in launchers:
         text = launcher.read_text(encoding="utf-8")
@@ -370,8 +370,8 @@ def test_array_launchers_reject_blank_labels_and_avoid_shared_training_config() 
 
 
 def test_subset_retry_requires_explicit_preflight_mode() -> None:
-    preflight = (_repo_root() / "scripts/m1_cross_family_preflight.py").read_text(encoding="utf-8")
-    launcher = (_repo_root() / "slurm/preflight_m1_cross_family.slurm").read_text(encoding="utf-8")
+    preflight = (_repo_root() / "scripts/m1/m1_cross_family_preflight.py").read_text(encoding="utf-8")
+    launcher = (_repo_root() / "slurm/m1/preflight_m1_cross_family.slurm").read_text(encoding="utf-8")
     assert 'parser.add_argument("--allow-subset-retry", action="store_true")' in preflight
     assert 'args.stage == "training"' in preflight
     assert 'bool(args.candidate_index)' in preflight
@@ -379,8 +379,8 @@ def test_subset_retry_requires_explicit_preflight_mode() -> None:
 
 
 def test_completed_subset_evaluation_requires_explicit_preflight_mode() -> None:
-    preflight = (_repo_root() / "scripts/m1_cross_family_preflight.py").read_text(encoding="utf-8")
-    launcher = (_repo_root() / "slurm/preflight_m1_cross_family.slurm").read_text(encoding="utf-8")
+    preflight = (_repo_root() / "scripts/m1/m1_cross_family_preflight.py").read_text(encoding="utf-8")
+    launcher = (_repo_root() / "slurm/m1/preflight_m1_cross_family.slurm").read_text(encoding="utf-8")
     assert 'parser.add_argument("--allow-completed-subset-evaluation", action="store_true")' in preflight
     assert 'args.stage == "evaluation"' in preflight
     assert 'completed_training_endpoints' in preflight

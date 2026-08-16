@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from scripts.smoke_m1_cross_family_candidate import _verify_base_weights
+from scripts.m1.smoke_m1_cross_family_candidate import _verify_base_weights
 from transfer_vs_relearning.utils.io import sha256_file
 
 
