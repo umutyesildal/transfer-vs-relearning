@@ -95,6 +95,254 @@ def _select_gpu_route(plan: dict, *, output_root: Path) -> dict[str, str]:
     return selected_probe[2]["route"]
 
 
+def _select_gpu_routes_for_lanes(plan: dict, *, output_root: Path) -> list[dict]:
+    probes = [_probe_gpu_route(plan, route) for route in plan["slurm"]["gpu_routes"]]
+    slots: list[tuple[str, int, int, dict]] = []
+    for route_index, probe in enumerate(probes):
+        if not probe["eligible"]:
+            continue
+        for slot_index in range(int(probe["route"].get("parallel_slots", 1))):
+            slots.append(
+                (
+                    probe["estimated_start"],
+                    route_index,
+                    slot_index,
+                    probe["route"],
+                )
+            )
+    slots.sort(key=lambda item: (item[0], item[1], item[2]))
+    if not slots:
+        write_json(
+            output_root / "gpu_route_selection.json",
+            {
+                "schema_version": 2,
+                "policy": plan["slurm"]["gpu_route_selection_policy"],
+                "probes": probes,
+                "lane_assignments": [],
+            },
+        )
+        raise RuntimeError("No configured GPU route passed the Slurm test-only availability gate")
+    assignments = []
+    for lane_index, lane in enumerate(plan["lanes"]):
+        estimated_start, _, slot_index, route = slots[lane_index % len(slots)]
+        assignments.append(
+            {
+                "lane_id": lane["id"],
+                "lane_index": lane_index,
+                "route": route,
+                "route_slot": slot_index,
+                "estimated_start": estimated_start,
+            }
+        )
+    write_json(
+        output_root / "gpu_route_selection.json",
+        {
+            "schema_version": 2,
+            "policy": plan["slurm"]["gpu_route_selection_policy"],
+            "probes": probes,
+            "lane_assignments": assignments,
+        },
+    )
+    return assignments
+
+
+def _submit_independent_lane_jobs(
+    plan: dict,
+    *,
+    config_path: Path,
+    repo_root: Path,
+    output_root: Path,
+) -> dict:
+    script = Path(__file__).resolve()
+    runtime = plan["runtime"]
+    slurm = plan["slurm"]
+    try:
+        assignments = _select_gpu_routes_for_lanes(plan, output_root=output_root)
+    except Exception as exc:
+        write_json(
+            output_root / "submission_manifest.json",
+            {
+                "schema_version": 2,
+                "plan_id": plan["plan_id"],
+                "status": "no_job_submitted_no_eligible_gpu_route",
+                "preflight_job_id": None,
+                "lane_jobs": [],
+                "finalizer_job_id": None,
+                "error": str(exc),
+            },
+        )
+        raise
+    common = ["sbatch", "--parsable", f"--account={slurm['account']}"]
+    preflight_command = [
+        runtime["python"],
+        str(script),
+        "run-preflight",
+        "--config",
+        str(config_path),
+        "--repo-root",
+        str(repo_root),
+        "--namespace",
+        str(output_root),
+    ]
+    try:
+        preflight_id = _submit(
+            [
+                *common,
+                f"--partition={plan['data_preflight']['partition']}",
+                "--job-name=m0-olmo-data",
+                f"--cpus-per-task={plan['data_preflight']['cpus_per_task']}",
+                f"--mem={plan['data_preflight']['memory']}",
+                f"--time={plan['data_preflight']['time_limit']}",
+                f"--output={output_root / 'logs/%x-%j.out'}",
+                f"--error={output_root / 'logs/%x-%j.err'}",
+                f"--chdir={repo_root}",
+                f"--wrap=exec {shlex.join(preflight_command)}",
+            ]
+        )
+    except Exception as exc:
+        write_json(
+            output_root / "submission_manifest.json",
+            {
+                "schema_version": 2,
+                "plan_id": plan["plan_id"],
+                "status": "no_job_submitted_preflight_sbatch_rejected",
+                "preflight_job_id": None,
+                "lane_jobs": [],
+                "finalizer_job_id": None,
+                "error": str(exc),
+            },
+        )
+        raise
+
+    lane_jobs: list[dict] = []
+    for assignment in assignments:
+        route = assignment["route"]
+        lane_index = assignment["lane_index"]
+        lane_command = [
+            runtime["python"],
+            str(script),
+            "run-lane",
+            "--config",
+            str(config_path),
+            "--repo-root",
+            str(repo_root),
+            "--namespace",
+            str(output_root),
+            "--lane-index",
+            str(lane_index),
+        ]
+        exports = ",".join(
+            [
+                "ALL",
+                f"HF_HOME={output_root / 'cache/huggingface'}",
+                f"HF_DATASETS_CACHE={output_root / 'cache/huggingface_datasets'}",
+                f"XDG_CACHE_HOME={output_root / 'cache'}",
+                "HF_HUB_OFFLINE=1",
+                "HF_DATASETS_OFFLINE=1",
+                "TRANSFORMERS_OFFLINE=1",
+                "WANDB_MODE=disabled",
+                "PYTHONDONTWRITEBYTECODE=1",
+                f"M0_GPU_ROUTE_ID={route['id']}",
+                f"M0_GPU_GRES={route['gres']}",
+                f"M0_GPU_PARTITION={route['partition']}",
+            ]
+        )
+        try:
+            job_id = _submit(
+                [
+                    *common,
+                    f"--partition={route['partition']}",
+                    f"--job-name=m0-olmo-eval-{lane_index}",
+                    f"--dependency=afterok:{preflight_id}",
+                    f"--gres={route['gres']}",
+                    f"--cpus-per-task={slurm['cpus_per_task']}",
+                    f"--mem={route['memory']}",
+                    f"--time={slurm['time_limit']}",
+                    f"--output={output_root / 'logs/%x-%j.out'}",
+                    f"--error={output_root / 'logs/%x-%j.err'}",
+                    f"--export={exports}",
+                    f"--chdir={repo_root}",
+                    f"--wrap=exec {shlex.join(lane_command)}",
+                ]
+            )
+        except Exception as exc:
+            write_json(
+                output_root / "submission_manifest.json",
+                {
+                    "schema_version": 2,
+                    "plan_id": plan["plan_id"],
+                    "status": "partial_submission_preflight_and_lane_jobs_active",
+                    "preflight_job_id": preflight_id,
+                    "lane_jobs": lane_jobs,
+                    "failed_lane_assignment": assignment,
+                    "finalizer_job_id": None,
+                    "error": str(exc),
+                },
+            )
+            raise
+        lane_jobs.append({**assignment, "job_id": job_id})
+
+    final_command = [
+        runtime["python"],
+        str(script),
+        "finalize",
+        "--config",
+        str(config_path),
+        "--repo-root",
+        str(repo_root),
+        "--namespace",
+        str(output_root),
+    ]
+    lane_job_ids = [row["job_id"] for row in lane_jobs]
+    finalizer_dependency = "afterany:" + ":".join(lane_job_ids)
+    try:
+        finalizer_id = _submit(
+            [
+                *common,
+                f"--partition={slurm['control_partition']}",
+                "--job-name=m0-olmo-finalize",
+                f"--dependency={finalizer_dependency}",
+                "--cpus-per-task=2",
+                "--mem=8G",
+                "--time=00:30:00",
+                f"--output={output_root / 'logs/%x-%j.out'}",
+                f"--error={output_root / 'logs/%x-%j.err'}",
+                f"--chdir={repo_root}",
+                f"--wrap=exec {shlex.join(final_command)}",
+            ]
+        )
+    except Exception as exc:
+        write_json(
+            output_root / "submission_manifest.json",
+            {
+                "schema_version": 2,
+                "plan_id": plan["plan_id"],
+                "status": "partial_submission_lane_jobs_active_finalizer_missing",
+                "preflight_job_id": preflight_id,
+                "lane_jobs": lane_jobs,
+                "finalizer_job_id": None,
+                "error": str(exc),
+            },
+        )
+        raise
+    payload = {
+        "schema_version": 2,
+        "plan_id": plan["plan_id"],
+        "status": "submitted",
+        "submission_mode": "independent_lane_jobs",
+        "preflight_job_id": preflight_id,
+        "lane_dependency": f"afterok:{preflight_id}",
+        "lane_jobs": lane_jobs,
+        "lane_job_ids": lane_job_ids,
+        "finalizer_job_id": finalizer_id,
+        "finalizer_dependency": finalizer_dependency,
+        "gpu_route_selection_manifest": str(output_root / "gpu_route_selection.json"),
+        "run_classification": plan["run_classification"],
+    }
+    write_json(output_root / "submission_manifest.json", payload)
+    return payload
+
+
 def _submit_parallel_jobs(
     plan: dict,
     *,
@@ -102,6 +350,15 @@ def _submit_parallel_jobs(
     repo_root: Path,
     output_root: Path,
 ) -> dict:
+    if plan.get("topology") == (
+        "gpu_route_selection_per_lane_then_preflight_then_independent_jobs_plus_afterany_finalizer"
+    ):
+        return _submit_independent_lane_jobs(
+            plan,
+            config_path=config_path,
+            repo_root=repo_root,
+            output_root=output_root,
+        )
     script = Path(__file__).resolve()
     runtime = plan["runtime"]
     slurm = plan["slurm"]

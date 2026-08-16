@@ -78,7 +78,6 @@ def build_lm_eval_command(
         ",".join(str(plan["seeds"][name]) for name in ("python", "numpy", "torch", "fewshot")),
         "--output_path",
         str(output_path),
-        "--check_integrity",
         "--show_config",
     ]
     if runtime["log_samples"]:

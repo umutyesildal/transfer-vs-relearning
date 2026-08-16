@@ -88,11 +88,12 @@ def build_m0_parallel_plan(config_path: Path, *, repo_root: Path) -> dict[str, A
     supported_topologies = {
         "preflight_then_single_slurm_array_plus_afterany_finalizer",
         "gpu_route_selection_then_preflight_then_single_slurm_array_plus_afterany_finalizer",
+        "gpu_route_selection_per_lane_then_preflight_then_independent_jobs_plus_afterany_finalizer",
     }
     if parallel.get("topology") not in supported_topologies:
         raise ValueError(
-            "M0 parallel topology must select one GPU route, then use data preflight, "
-            "one array and an afterany finalizer"
+            "M0 parallel topology must use data preflight, GPU-routed lane jobs and an "
+            "afterany finalizer"
         )
     lanes = parallel.get("lanes")
     if not isinstance(lanes, list) or not lanes:
@@ -170,12 +171,16 @@ def build_m0_parallel_plan(config_path: Path, *, repo_root: Path) -> dict[str, A
         route_id = str(route.get("id", ""))
         if not route_id or route_id in gpu_route_ids:
             raise ValueError(f"GPU route ID is missing or duplicated: {route_id!r}")
-        normalized_route: dict[str, str] = {"id": route_id}
+        normalized_route: dict[str, Any] = {"id": route_id}
         for key in ("partition", "gres", "memory"):
             value = route.get(key)
             if not isinstance(value, str) or not value:
                 raise ValueError(f"GPU route {route_id} is missing {key}")
             normalized_route[key] = value
+        parallel_slots = route.get("parallel_slots", 1)
+        if not isinstance(parallel_slots, int) or parallel_slots < 1:
+            raise ValueError(f"GPU route {route_id} parallel_slots must be a positive integer")
+        normalized_route["parallel_slots"] = parallel_slots
         gpu_route_ids.add(route_id)
         gpu_routes.append(normalized_route)
     slurm = {
@@ -241,6 +246,7 @@ def build_m0_parallel_plan(config_path: Path, *, repo_root: Path) -> dict[str, A
         "environment_preparation": environment_preparation,
         "data_preflight": data_preflight,
         "storage": config["storage"],
+        "topology": parallel["topology"],
         "max_parallel_lanes": max_parallel,
         "lane_count": len(normalized_lanes),
         "lanes": normalized_lanes,
@@ -825,6 +831,37 @@ def _inventory_files(root: Path) -> list[dict[str, Any]]:
     ]
 
 
+def _summary_documents(result: dict[str, Any], lane_root: Path) -> list[dict[str, Any]]:
+    artifact_root = Path(str(result.get("artifact_root", lane_root))).resolve()
+    try:
+        artifact_root.relative_to(lane_root.resolve())
+    except ValueError:
+        return []
+    candidates = [
+        path
+        for path in sorted(artifact_root.rglob("*.json"))
+        if path.name.startswith("results_")
+        or path.name in {"summary.json", "summary_metrics.json", "errors.json", "run_manifest.json"}
+    ]
+    documents: list[dict[str, Any]] = []
+    for path in candidates:
+        if path.stat().st_size > 10 * 1024 * 1024:
+            continue
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            continue
+        documents.append(
+            {
+                "path": str(path),
+                "bytes": path.stat().st_size,
+                "sha256": sha256_file(path),
+                "payload": payload,
+            }
+        )
+    return documents
+
+
 def run_m0_lane(plan: dict[str, Any], lane_index: int, *, output_root: Path) -> dict[str, Any]:
     if not 0 <= lane_index < plan["lane_count"]:
         raise IndexError(f"M0 lane index is out of range: {lane_index}")
@@ -927,6 +964,13 @@ def run_m0_lane(plan: dict[str, Any], lane_index: int, *, output_root: Path) -> 
         "duration_seconds": time.monotonic() - started,
         "artifact_root": str(artifact_root),
         "artifacts": inventory,
+        "execution": {
+            "slurm_job_id": os.environ.get("SLURM_JOB_ID"),
+            "slurm_node": os.environ.get("SLURMD_NODENAME"),
+            "gpu_route_id": os.environ.get("M0_GPU_ROUTE_ID"),
+            "gpu_gres": os.environ.get("M0_GPU_GRES"),
+            "gpu_partition": os.environ.get("M0_GPU_PARTITION"),
+        },
     }
     write_json(result_path, payload)
     if status != "complete":
@@ -1036,6 +1080,40 @@ def finalize_m0_bundle(plan: dict[str, Any], *, output_root: Path) -> dict[str, 
         if isinstance(artifact, dict)
     ]
     _write_jsonl(output_root / "raw_artifact_manifest.jsonl", raw_artifacts)
+    write_json(
+        output_root / "evaluation_results.json",
+        {
+            "schema_version": 1,
+            "plan_id": plan["plan_id"],
+            "status": payload["status"],
+            "run_classification": plan["run_classification"],
+            "model": plan["model"],
+            "harness": plan["harness"],
+            "lane_count": plan["lane_count"],
+            "complete_lane_count": payload["complete_lane_count"],
+            "raw_artifact_manifest": str(output_root / "raw_artifact_manifest.jsonl"),
+            "lanes": [
+                {
+                    "lane_id": result.get("lane_id"),
+                    "adapter": result.get("adapter"),
+                    "families": result.get("families"),
+                    "task_ids": result.get("task_ids", []),
+                    "status": result.get("status"),
+                    "returncode": result.get("returncode"),
+                    "started_at": result.get("started_at"),
+                    "ended_at": result.get("ended_at"),
+                    "duration_seconds": result.get("duration_seconds"),
+                    "execution": result.get("execution", {}),
+                    "artifact_root": result.get("artifact_root"),
+                    "summary_documents": _summary_documents(
+                        result,
+                        output_root / "lanes" / str(result.get("lane_id", "")),
+                    ),
+                }
+                for result in results
+            ],
+        },
+    )
 
     lock_path = Path(str(plan["runtime"]["environment_lock_path"]))
     lock_exists = lock_path.is_file()

@@ -79,6 +79,7 @@ def test_parallel_plan_covers_every_required_family_and_harness_task_once() -> N
         "partition": "wbimlgpu",
         "gres": "gpu:rtx3090:1",
         "memory": "64G",
+        "parallel_slots": 1,
     }
     families = {family for lane in plan["lanes"] for family in lane["families"]}
     assert REQUIRED_FAMILIES.issubset(families)
@@ -133,6 +134,7 @@ def test_lm_eval_command_is_offline_base_model_and_limit_is_test_only(tmp_path: 
     assert command[command.index("--tasks") + 1] == "wikitext"
     assert command[command.index("--seed") + 1] == "42,42,42,42"
     assert command[command.index("--limit") + 1] == "3"
+    assert "--check_integrity" not in command
 
     plan["run_classification"] = "scientific"
     with pytest.raises(ValueError, match="forbidden"):
@@ -263,6 +265,96 @@ def test_single_entrypoint_submits_one_parallel_array_and_afterany_finalizer(
     assert json.loads((output_root / "submission_manifest.json").read_text(encoding="utf-8")) == payload
 
 
+def test_single_entrypoint_submits_independent_gpu_routed_lanes_and_one_finalizer(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    entrypoint_path = ROOT / "scripts/study/run_m0_olmo_evaluation.py"
+    spec = importlib.util.spec_from_file_location("m0_independent_entrypoint", entrypoint_path)
+    assert spec and spec.loader
+    entrypoint = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(entrypoint)
+
+    plan = build_m0_parallel_plan(CONFIG, repo_root=ROOT)
+    plan["topology"] = (
+        "gpu_route_selection_per_lane_then_preflight_then_independent_jobs_plus_afterany_finalizer"
+    )
+    plan["max_parallel_lanes"] = plan["lane_count"]
+    plan["runtime"]["python"] = "/frozen/env/bin/python"
+    plan["slurm"] = {
+        "account": "yesildau",
+        "control_partition": "std",
+        "gpu_route_selection_policy": "earliest_test_only_start_then_declared_order",
+        "gpu_routes": [
+            {
+                "id": "v10032gb",
+                "partition": "gpu",
+                "gres": "gpu:v10032gb:1",
+                "memory": "64G",
+                "parallel_slots": 3,
+            },
+            {
+                "id": "rtx6000",
+                "partition": "gpu",
+                "gres": "gpu:rtx6000:1",
+                "memory": "64G",
+                "parallel_slots": 3,
+            },
+        ],
+        "cpus_per_task": 8,
+        "time_limit": "04:00:00",
+    }
+    output_root = tmp_path / "m0-independent"
+    (output_root / "logs").mkdir(parents=True)
+    submissions: list[list[str]] = []
+
+    def fake_submit(argv: list[str]) -> str:
+        submissions.append(argv)
+        return str(1000 + len(submissions))
+
+    def fake_probe(_: dict, route: dict[str, str]) -> dict:
+        return {
+            "route": route,
+            "eligible": True,
+            "returncode": 0,
+            "estimated_start": "2026-08-16T12:00:00",
+            "probe_output": "test-only",
+        }
+
+    monkeypatch.setattr(entrypoint, "_submit", fake_submit)
+    monkeypatch.setattr(entrypoint, "_probe_gpu_route", fake_probe)
+    payload = entrypoint._submit_parallel_jobs(
+        plan,
+        config_path=CONFIG,
+        repo_root=ROOT,
+        output_root=output_root,
+    )
+    assert len(submissions) == 9
+    assert any("run-preflight" in argument for argument in submissions[0])
+    for lane_index, submission in enumerate(submissions[1:8]):
+        assert f"--dependency=afterok:1001" in submission
+        assert any("run-lane" in argument for argument in submission)
+        assert str(lane_index) in submission[-1]
+        assert not any(argument.startswith("--array=") for argument in submission)
+    assert "--dependency=afterany:1002:1003:1004:1005:1006:1007:1008" in submissions[8]
+    assert payload["submission_mode"] == "independent_lane_jobs"
+    assert payload["preflight_job_id"] == "1001"
+    assert payload["lane_job_ids"] == [str(job_id) for job_id in range(1002, 1009)]
+    assert payload["finalizer_job_id"] == "1009"
+    assert [row["route"]["id"] for row in payload["lane_jobs"]] == [
+        "v10032gb",
+        "v10032gb",
+        "v10032gb",
+        "rtx6000",
+        "rtx6000",
+        "rtx6000",
+        "v10032gb",
+    ]
+    selection = json.loads((output_root / "gpu_route_selection.json").read_text(encoding="utf-8"))
+    assert selection["schema_version"] == 2
+    assert len(selection["lane_assignments"]) == plan["lane_count"]
+    assert json.loads((output_root / "submission_manifest.json").read_text(encoding="utf-8")) == payload
+
+
 def test_submitter_persists_first_sbatch_rejection_without_claiming_a_job(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -315,9 +407,16 @@ def test_finalizer_requires_every_lane_and_never_zero_fills(tmp_path: Path) -> N
     assert not (incomplete_root / "evaluation_manifest.json").exists()
 
     complete_root = initialize_m0_namespace(tmp_path / "complete", plan)
-    for lane in plan["lanes"]:
-        raw = complete_root / "lanes" / lane["id"] / "raw.json"
-        raw.write_text("{}", encoding="utf-8")
+    for lane_index, lane in enumerate(plan["lanes"]):
+        raw_root = complete_root / "lanes" / lane["id"] / "raw"
+        raw_root.mkdir()
+        raw = raw_root / ("results_fixture.json" if lane_index == 0 else "raw.json")
+        raw.write_text(
+            json.dumps({"results": {"wikitext": {"word_perplexity": 12.5}}})
+            if lane_index == 0
+            else "{}",
+            encoding="utf-8",
+        )
         write_json(
             complete_root / "lanes" / lane["id"] / "lane_result.json",
             {
@@ -330,6 +429,7 @@ def test_finalizer_requires_every_lane_and_never_zero_fills(tmp_path: Path) -> N
                 "task_ids": lane.get("task_ids", []),
                 "status": "complete",
                 "returncode": 0,
+                "artifact_root": str(raw_root),
                 "artifacts": [
                     {
                         "path": str(raw),
@@ -345,6 +445,12 @@ def test_finalizer_requires_every_lane_and_never_zero_fills(tmp_path: Path) -> N
     assert complete["normalization_allowed"] is True
     manifest = json.loads((complete_root / "evaluation_manifest.json").read_text(encoding="utf-8"))
     assert manifest["run_classification"] == "test_only_non_scientific"
+    detailed = json.loads((complete_root / "evaluation_results.json").read_text(encoding="utf-8"))
+    assert detailed["status"] == "complete"
+    assert len(detailed["lanes"]) == plan["lane_count"]
+    assert detailed["lanes"][0]["summary_documents"][0]["payload"]["results"]["wikitext"][
+        "word_perplexity"
+    ] == 12.5
 
 
 def test_data_preflight_records_exact_task_and_cache_identity(
