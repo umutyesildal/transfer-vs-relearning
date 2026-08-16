@@ -74,3 +74,30 @@ lanes remain running or queued and their finalizers remain active.
 These are preserved operational failures, not zero scores or model-quality evidence. The submitted
 wave continues under its original dependencies. No cancellation, retry, reroute or foreign-process
 intervention was performed or authorized.
+
+## Later read-only operational snapshot
+
+At `2026-08-16T15:51:59Z`, 13 of the 24 lanes had `complete` raw results, seven were preserved as
+`failed_pre_scoring`, three factual-access jobs were running and SmolLM generation integrity was
+pending. All three model and family finalizers remained dependency-pending.
+
+| Model | Complete raw | `failed_pre_scoring` | Running | Pending |
+|---|---:|---:|---:|---:|
+| OLMo | 4 | 3 | 1 | 0 |
+| Qwen | 4 | 3 | 1 | 0 |
+| SmolLM | 5 | 1 | 1 | 1 |
+| **Total** | **13** | **7** | **3** | **1** |
+
+The additional preserved operational failures were:
+
+- OLMo TurBLiMP `461865` and trwiki `461866`: the same foreign RTX6000 process prevented model
+  warm-up or transfer to the GPU;
+- Qwen Pile-10k `461876`: a V100 attention allocation failed during the full request, before any
+  valid finalized lane metric was emitted;
+- Qwen TurBLiMP `461879` and trwiki `461880`: the same foreign RTX6000 process prevented model
+  warm-up or transfer to the GPU.
+
+Together with OLMo English capability `461864` and SmolLM English capability `461892`, these are
+seven missing scientific lane results, not seven zero scores. The factual-access jobs `461867`,
+`461881` and `461895` continued running; SmolLM generation job `461896` remained queued. This
+read-only observation did not consume a new authorization and caused no remote mutation.

@@ -89,6 +89,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["m0_qualification_wave"]["parity"]["record"],
         state["evaluation_target"]["m0_qualification_wave"]["config"],
         state["evaluation_target"]["pipeline"]["documentation"],
+        state["evaluation_target"]["pipeline"]["deep_dive_guide"],
         state["evaluation_target"]["pipeline"]["prospective_template"],
         state["evaluation_target"]["pipeline"]["full_study_template"],
         state["evaluation_target"]["pipeline"]["full_study_entrypoint"],
@@ -154,7 +155,14 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert scientific_m0["hu_focused_tests"] == 39
     assert scientific_m0["scientific_work_started"] is True
     assert scientific_m0["scientific_metrics_available"] is False
-    assert len(scientific_m0["known_operational_failures"]) == 2
+    assert scientific_m0["latest_read_only_snapshot_utc"] == "2026-08-16T15:51:59Z"
+    assert scientific_m0["lane_snapshot"] == {
+        "complete": 13,
+        "failed_pre_scoring": 7,
+        "running": 3,
+        "pending": 1,
+    }
+    assert len(scientific_m0["known_operational_failures"]) == 7
 
 
 def test_active_entrypoints_stay_within_context_budget():

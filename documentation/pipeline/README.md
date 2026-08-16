@@ -16,6 +16,11 @@ identity/storage preflight
 It reuses the existing trainer and evaluators. It does not replace them, choose scientific gates,
 download inputs, submit Slurm jobs or grant execution authority.
 
+The human-oriented Turkish deep dive covering the full design, metric formulas, thresholds,
+artifacts and current scientific M0 wave is
+[`EVAL_V1_AND_END_TO_END_PIPELINE_DEEP_DIVE_TR.md`](../evaluation/EVAL_V1_AND_END_TO_END_PIPELINE_DEEP_DIVE_TR.md).
+It is explanatory reference material, not an execution contract.
+
 ## Current entry point
 
 The prospective OLMo planning example is

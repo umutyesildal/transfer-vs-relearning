@@ -5,6 +5,11 @@ the prospective protocol so an agent does not need the chronological archive by 
 
 ## Read order
 
+For a human-oriented explanation of the complete scientific design, formulas, gates, current M0
+wave and M0→M2 workflow, read
+[`EVAL_V1_AND_END_TO_END_PIPELINE_DEEP_DIVE_TR.md`](EVAL_V1_AND_END_TO_END_PIPELINE_DEEP_DIVE_TR.md).
+It is a detailed learning/reference guide, not part of the mandatory small agent context.
+
 1. [`EVALUATOR_INVENTORY_V1.md`](EVALUATOR_INVENTORY_V1.md) — what already exists and what is reusable;
 2. [`LM_EVAL_TASK_QUALIFICATION_V1.md`](LM_EVAL_TASK_QUALIFICATION_V1.md) — verified and frozen upstream task set;
 3. [`RESULT_SCHEMA_V1.md`](RESULT_SCHEMA_V1.md) — canonical normalized artifacts;

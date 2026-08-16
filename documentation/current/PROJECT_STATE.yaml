@@ -216,6 +216,7 @@ evaluation_target:
   pipeline:
     status: scientific_three_model_m0_submitted_later_stages_blocked
     documentation: documentation/pipeline/README.md
+    deep_dive_guide: documentation/evaluation/EVAL_V1_AND_END_TO_END_PIPELINE_DEEP_DIVE_TR.md
     prospective_template: configs/pipelines/eval_v1_olmo_epoch_trajectory_template.yaml
     full_study_template: configs/studies/m0_to_m2_eval_v1_template.yaml
     full_study_entrypoint: scripts/study/run_study.py
@@ -284,7 +285,13 @@ evaluation_target:
       preflight_command: >-
         /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
         scripts/study/run_three_model_m0_evaluation.py preflight
-      latest_status: data_preflights_passed_two_foreign_process_oom_lanes_preserved_others_active
+      latest_status: thirteen_complete_seven_failed_pre_scoring_three_running_one_pending
+      latest_read_only_snapshot_utc: "2026-08-16T15:51:59Z"
+      lane_snapshot:
+        complete: 13
+        failed_pre_scoring: 7
+        running: 3
+        pending: 1
       preflight_record: >-
         documentation/records/evaluation/M0_THREE_MODEL_READ_ONLY_PREFLIGHT_2026-08-16.md
       preflight_record_sha256: e42052dad0a99db6306cb8a0b1c29a91ec146ce94e163fc18a21fe4d228afab8
@@ -293,7 +300,7 @@ evaluation_target:
       hu_identity_checks_passed_for_all_models: true
       submission_record: >-
         documentation/records/evaluation/M0_THREE_MODEL_SCIENTIFIC_SUBMISSION_2026-08-16.md
-      submission_record_sha256: cc938067f8fc0737f36d0e0df5c931eb1e15f6441b74a033897127b8f2a62391
+      submission_record_sha256: 54fe9698a8f159f456ee2b4e03413d502c2a01b1a1af397c377879e4f402ac65
       submit_time_home_bytes: 14545990549
       job_ledger:
         olmo:
@@ -322,6 +329,31 @@ evaluation_target:
           lane: english_capability
           status: failed_pre_scoring
           cause: foreign_process_rtx6000_oom_during_model_load
+        - job_id: "461865"
+          model: olmo
+          lane: turkish_capability
+          status: failed_pre_scoring
+          cause: foreign_process_rtx6000_oom_during_model_load
+        - job_id: "461866"
+          model: olmo
+          lane: turkish_perplexity
+          status: failed_pre_scoring
+          cause: foreign_process_rtx6000_oom_during_model_transfer
+        - job_id: "461876"
+          model: qwen
+          lane: english_retention_pile_10k
+          status: failed_pre_scoring
+          cause: v100_attention_allocation_oom_before_valid_final_metric
+        - job_id: "461879"
+          model: qwen
+          lane: turkish_capability
+          status: failed_pre_scoring
+          cause: foreign_process_rtx6000_oom_during_model_load
+        - job_id: "461880"
+          model: qwen
+          lane: turkish_perplexity
+          status: failed_pre_scoring
+          cause: foreign_process_rtx6000_oom_during_model_transfer
       blockers: []
     m0_preflight:
       command: >-
