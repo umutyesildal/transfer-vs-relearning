@@ -147,8 +147,14 @@ def build_m0_parallel_plan(config_path: Path, *, repo_root: Path) -> dict[str, A
     route_policy = slurm.get(
         "gpu_route_selection_policy", "earliest_test_only_start_then_declared_order"
     )
-    if route_policy != "earliest_test_only_start_then_declared_order":
+    if route_policy not in {
+        "earliest_test_only_start_then_declared_order",
+        "earliest_start_window_then_declared_slots_per_lane",
+    }:
         raise ValueError("M0 requires the scheduler-probed GPU route selection policy")
+    max_route_start_skew_seconds = slurm.get("max_route_start_skew_seconds", 900)
+    if not isinstance(max_route_start_skew_seconds, int) or max_route_start_skew_seconds < 0:
+        raise ValueError("max_route_start_skew_seconds must be a non-negative integer")
     raw_gpu_routes = slurm.get("gpu_routes")
     if raw_gpu_routes is None and all(
         isinstance(slurm.get(key), str) and slurm[key]
@@ -186,6 +192,7 @@ def build_m0_parallel_plan(config_path: Path, *, repo_root: Path) -> dict[str, A
     slurm = {
         **slurm,
         "gpu_route_selection_policy": route_policy,
+        "max_route_start_skew_seconds": max_route_start_skew_seconds,
         "gpu_routes": gpu_routes,
     }
     environment_preparation = _mapping(

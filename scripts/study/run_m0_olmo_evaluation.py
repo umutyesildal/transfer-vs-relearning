@@ -7,6 +7,7 @@ import os
 import re
 import shlex
 import subprocess
+from datetime import datetime
 from pathlib import Path
 
 from transfer_vs_relearning.study.m0_parallel import (
@@ -97,9 +98,24 @@ def _select_gpu_route(plan: dict, *, output_root: Path) -> dict[str, str]:
 
 def _select_gpu_routes_for_lanes(plan: dict, *, output_root: Path) -> list[dict]:
     probes = [_probe_gpu_route(plan, route) for route in plan["slurm"]["gpu_routes"]]
+    eligible_probes = [probe for probe in probes if probe["eligible"]]
+    earliest_start = min(
+        (datetime.fromisoformat(probe["estimated_start"]) for probe in eligible_probes),
+        default=None,
+    )
+    max_start_skew_seconds = int(plan["slurm"]["max_route_start_skew_seconds"])
+    timely_probes = [
+        probe
+        for probe in eligible_probes
+        if earliest_start is not None
+        and (
+            datetime.fromisoformat(probe["estimated_start"]) - earliest_start
+        ).total_seconds()
+        <= max_start_skew_seconds
+    ]
     slots: list[tuple[str, int, int, dict]] = []
     for route_index, probe in enumerate(probes):
-        if not probe["eligible"]:
+        if probe not in timely_probes:
             continue
         for slot_index in range(int(probe["route"].get("parallel_slots", 1))):
             slots.append(
@@ -118,6 +134,13 @@ def _select_gpu_routes_for_lanes(plan: dict, *, output_root: Path) -> list[dict]
                 "schema_version": 2,
                 "policy": plan["slurm"]["gpu_route_selection_policy"],
                 "probes": probes,
+                "max_route_start_skew_seconds": max_start_skew_seconds,
+                "earliest_estimated_start": earliest_start.isoformat() if earliest_start else None,
+                "excluded_eligible_routes_outside_start_window": [
+                    probe["route"]["id"]
+                    for probe in eligible_probes
+                    if probe not in timely_probes
+                ],
                 "lane_assignments": [],
             },
         )
@@ -140,6 +163,13 @@ def _select_gpu_routes_for_lanes(plan: dict, *, output_root: Path) -> list[dict]
             "schema_version": 2,
             "policy": plan["slurm"]["gpu_route_selection_policy"],
             "probes": probes,
+            "max_route_start_skew_seconds": max_start_skew_seconds,
+            "earliest_estimated_start": earliest_start.isoformat() if earliest_start else None,
+            "excluded_eligible_routes_outside_start_window": [
+                probe["route"]["id"]
+                for probe in eligible_probes
+                if probe not in timely_probes
+            ],
             "lane_assignments": assignments,
         },
     )

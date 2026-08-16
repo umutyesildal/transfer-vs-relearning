@@ -206,6 +206,7 @@ def test_single_entrypoint_submits_one_parallel_array_and_afterany_finalizer(
         "account": "yesildau",
         "control_partition": "std",
         "gpu_route_selection_policy": "earliest_test_only_start_then_declared_order",
+        "max_route_start_skew_seconds": 900,
         "gpu_routes": [
             {
                 "id": "v10032gb",
@@ -289,6 +290,7 @@ def test_single_entrypoint_submits_independent_gpu_routed_lanes_and_one_finalize
         "account": "yesildau",
         "control_partition": "std",
         "gpu_route_selection_policy": "earliest_test_only_start_then_declared_order",
+        "max_route_start_skew_seconds": 900,
         "gpu_routes": [
             {
                 "id": "v10032gb",
@@ -304,6 +306,13 @@ def test_single_entrypoint_submits_independent_gpu_routed_lanes_and_one_finalize
                 "memory": "64G",
                 "parallel_slots": 3,
             },
+            {
+                "id": "rtxa6000",
+                "partition": "gpu",
+                "gres": "gpu:rtxa6000:1",
+                "memory": "64G",
+                "parallel_slots": 4,
+            },
         ],
         "cpus_per_task": 8,
         "time_limit": "04:00:00",
@@ -317,11 +326,16 @@ def test_single_entrypoint_submits_independent_gpu_routed_lanes_and_one_finalize
         return str(1000 + len(submissions))
 
     def fake_probe(_: dict, route: dict[str, str]) -> dict:
+        start = (
+            "2026-08-17T12:00:00"
+            if route["id"] == "rtxa6000"
+            else "2026-08-16T12:00:00"
+        )
         return {
             "route": route,
             "eligible": True,
             "returncode": 0,
-            "estimated_start": "2026-08-16T12:00:00",
+            "estimated_start": start,
             "probe_output": "test-only",
         }
 
@@ -357,6 +371,7 @@ def test_single_entrypoint_submits_independent_gpu_routed_lanes_and_one_finalize
     selection = json.loads((output_root / "gpu_route_selection.json").read_text(encoding="utf-8"))
     assert selection["schema_version"] == 2
     assert len(selection["lane_assignments"]) == plan["lane_count"]
+    assert selection["excluded_eligible_routes_outside_start_window"] == ["rtxa6000"]
     assert json.loads((output_root / "submission_manifest.json").read_text(encoding="utf-8")) == payload
 
 
