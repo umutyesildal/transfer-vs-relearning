@@ -24,7 +24,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
 
     assert state["schema_version"] == 1
     assert state["readiness"]["evaluation_contract"] == "frozen"
-    assert state["readiness"]["ready_to_measure"] is False
+    assert state["readiness"]["ready_to_measure"] is True
     assert state["readiness"]["ready_to_train"] is False
     assert state["readiness"]["selected_primary_model"] is None
     assert state["evaluation_target"]["status"] == "frozen_execution_not_authorized"
@@ -96,6 +96,10 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["pipeline"]["three_model_matrix"]["contract"],
         state["evaluation_target"]["pipeline"]["three_model_matrix"]["config"],
         state["evaluation_target"]["pipeline"]["three_model_matrix"]["entrypoint"],
+        state["evaluation_target"]["pipeline"]["scientific_m0_family"]["contract"],
+        state["evaluation_target"]["pipeline"]["scientific_m0_family"]["manifest"],
+        state["evaluation_target"]["pipeline"]["scientific_m0_family"]["config_source"],
+        state["evaluation_target"]["pipeline"]["scientific_m0_family"]["operator"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],
@@ -124,6 +128,16 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert matrix["training_node_count"] == 9
     assert matrix["state_evaluation_node_count"] == 12
     assert matrix["execution_authorized"] is False
+
+    scientific_m0 = state["evaluation_target"]["pipeline"]["scientific_m0_family"]
+    assert scientific_m0["status"] == "frozen_execution_not_authorized"
+    assert scientific_m0["models"] == ["olmo", "qwen", "smollm"]
+    assert scientific_m0["model_count"] == 3
+    assert scientific_m0["lanes_per_model"] == 8
+    assert scientific_m0["total_gpu_lanes"] == 24
+    assert scientific_m0["execution_ready"] is True
+    assert scientific_m0["execution_authorized"] is False
+    assert scientific_m0["scientific_work_started"] is False
 
 
 def test_active_entrypoints_stay_within_context_budget():

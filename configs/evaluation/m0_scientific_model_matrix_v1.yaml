@@ -1,0 +1,22 @@
+schema_version: 1
+name: m0-scientific-three-model-config-source-v1
+status: frozen_source
+as_of: "2026-08-16"
+family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1
+implementation_commit: ea4e01de68e80cd33136674aa3cb59dc4547cfbd
+models:
+  olmo:
+    repository: allenai/OLMo-2-0425-1B
+    revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+    manifest_path: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
+    manifest_sha256: 8702b80d5b7e4c996c8ce2ff5fe771ada08ab0080bde1926c0b1f53c607303dc
+  qwen:
+    repository: Qwen/Qwen2.5-1.5B
+    revision: 8faed761d45a263340a0528343f099c05c9a4323
+    manifest_path: /vol/tmp2/yesildau/m1_cross_family_screen_v1/models/Qwen__Qwen2.5-1.5B/model_manifest.json
+    manifest_sha256: c9d3562b717784251fe14c2b7972660fe4a20fe4687e15f69746bc1713d2d4fb
+  smollm:
+    repository: HuggingFaceTB/SmolLM2-1.7B
+    revision: effd688a12921b4cc83e3312b6feb579f70f9c71
+    manifest_path: /vol/fob-vol6/mi25/yesildau/transfer-vs-relearning/artifacts/models/HuggingFaceTB__SmolLM2-1.7B/model_manifest.json
+    manifest_sha256: e5d04302087b8b41828f734c1d88c4620a74bb80d6919de62df37b9d57dadbfc

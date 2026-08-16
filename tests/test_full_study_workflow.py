@@ -167,7 +167,6 @@ def test_m0_preflight_reports_current_contract_and_adapter_blockers() -> None:
     assert set(payload["blockers"]) == {
         "study_contract_frozen",
         "study_bindings_resolved",
-        "project_ready_to_measure",
     }
     checks = {row["id"]: row for row in payload["checks"]}
     assert checks["m0_evaluation_adapter_present"]["status"] == "pass"

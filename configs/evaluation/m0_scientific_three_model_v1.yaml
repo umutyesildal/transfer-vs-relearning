@@ -1,0 +1,35 @@
+schema_version: 1
+name: m0-scientific-three-model-eval-v1
+status: frozen
+as_of: '2026-08-16'
+execution_ready: true
+execution_authorized: false
+family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1
+model_order:
+- olmo
+- qwen
+- smollm
+models:
+  olmo:
+    repository: allenai/OLMo-2-0425-1B
+    revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+    config: configs/evaluation/m0_scientific/olmo_m0_eval_v1_scientific_v1.yaml
+    config_sha256: b6dc833f6a16da4c4bb95bb54e69f2f55c998b72066f748688f1043d44e8caf9
+  qwen:
+    repository: Qwen/Qwen2.5-1.5B
+    revision: 8faed761d45a263340a0528343f099c05c9a4323
+    config: configs/evaluation/m0_scientific/qwen_m0_eval_v1_scientific_v1.yaml
+    config_sha256: 2824e92044c6df7a82e698b012bd99d64e98f8c21684b0b2878f174e1177df76
+  smollm:
+    repository: HuggingFaceTB/SmolLM2-1.7B
+    revision: effd688a12921b4cc83e3312b6feb579f70f9c71
+    config: configs/evaluation/m0_scientific/smollm_m0_eval_v1_scientific_v1.yaml
+    config_sha256: 76311220bf15bd4965b3c26065df23b283a03a603e2f855cb339e95f01683c28
+parallelism:
+  models: 3
+  lanes_per_model: 8
+  total_lanes: 24
+  submission: all_model_preflights_then_three_independent_parallel_dags_then_one_family_finalizer
+operator: scripts/study/run_three_model_m0_evaluation.py
+implementation_commit: ea4e01de68e80cd33136674aa3cb59dc4547cfbd
+execution_note: frozen configuration is not execution authority

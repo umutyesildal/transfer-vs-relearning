@@ -18,7 +18,7 @@ packet per model/stage node.
 - implementation commit: `329afaa91b4b403b86eca82f60bb3649a6f38800`;
 - matrix config: `configs/studies/three_model_m0_to_m2_matrix_v1.yaml`;
 - matrix config SHA-256:
-  `2d1af87a99d50d2695c6f09f8947c64b0c68bc7bc17ce296a3adb74ca107a3ce`;
+  `c870189fb845f9740010872f5aab899b2b1396e68a1f2c06588dc656beaba9db`;
 - operator entrypoint: `scripts/study/run_model_matrix.py`;
 - operator entrypoint SHA-256:
   `ad4d64050c237630bb2b8a91e930f124fb7ac6284ca820d829c4de1b948c631e`;
@@ -27,7 +27,7 @@ packet per model/stage node.
   `68970821c389125f47e04effa6c74251a9efe1c58419bf49368922f4295c8074`;
 - tests: `tests/test_three_model_matrix.py`;
 - test SHA-256:
-  `96e06435fd70269a464c684ecdf6a5c56d9e33e2dbcb5fe3a2d2bfe83c08c321`;
+  `d893cbb39ca2d42b9f00ccb233ac6a329c440c7f56d6eb201a901125b79a437b`;
 - reused workflow-template SHA-256:
   `2fe1851eedd24061ad09f8d6db56ef82cd877c396d97dee38db2c1b6a1a4443c`.
 
@@ -73,8 +73,7 @@ The prepared matrix intentionally uses explicit `null` config paths and named bl
 scientific binding does not yet exist. It never substitutes placeholders or historical recipes.
 
 - eval-v1 is frozen but not execution-authorized;
-- OLMo has a completed non-scientific qualification bundle, not a scientific M0 config;
-- Qwen and SmolLM scientific M0 configs are not frozen;
+- all three scientific M0 configs are frozen but not execution-authorized;
 - the M1 corpus and per-model recipes are not frozen;
 - matched M2-A/M2-B corpus and per-model recipes are not frozen;
 - matrix-level execution is false.
@@ -101,7 +100,7 @@ does not authorize evaluation, HU, Slurm, training, Git publication or cleanup.
 ## Required order to open execution
 
 1. Close OLMo qualification parity and freeze eval-v1 semantics, dataset revisions and margins — complete in Documents 179/180.
-2. Freeze scientific M0 configs for all three exact model assets.
+2. Freeze scientific M0 configs for all three exact model assets — complete under the three-model M0 contract.
 3. Freeze one shared corpus contract and explicit per-model M1 recipes/hyperparameters.
 4. Freeze matched M2-A/M2-B construction and per-model recipes from each exact M1 parent.
 5. Replace the relevant `null` bindings with exact config paths and hashes.

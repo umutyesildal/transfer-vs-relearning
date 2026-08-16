@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m0-evaluation
-  status: eval_v1_frozen_three_model_scientific_m0_configs_open
+  status: eval_v1_and_three_model_scientific_m0_frozen_execution_not_authorized
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -94,7 +94,7 @@ readiness:
   corpus_contract: not_frozen
   m1_training_contract: not_frozen
   m2_training_contract: not_frozen
-  ready_to_measure: false
+  ready_to_measure: true
   ready_to_train: false
   selected_primary_model: null
 
@@ -214,7 +214,7 @@ evaluation_target:
   architecture: hybrid_harness_custom_factual_and_normalizer
   canonical_result_shape: long_tables_with_generated_checkpoint_view
   pipeline:
-    status: local_checkpoint_full_study_and_three_model_matrix_prepared
+    status: scientific_three_model_m0_frozen_not_authorized_later_stages_prepared
     documentation: documentation/pipeline/README.md
     prospective_template: configs/pipelines/eval_v1_olmo_epoch_trajectory_template.yaml
     full_study_template: configs/studies/m0_to_m2_eval_v1_template.yaml
@@ -222,15 +222,16 @@ evaluation_target:
     luna_packet_manifest: .agents/task-packets/study-v1/manifest.json
     full_study_stage_count: 15
     execution_adapter_ready: false
-    m0_adapter_status: qualification_bundle_complete_parity_pass
-    m0_parallel_entrypoint: scripts/study/run_m0_olmo_evaluation.py
+    m0_execution_adapter_ready: true
+    m0_adapter_status: scientific_three_model_24_lane_family_frozen_not_authorized
+    m0_parallel_entrypoint: scripts/study/run_three_model_m0_evaluation.py
     execution_authorized: false
     three_model_matrix:
       status: planned_not_authorized
       contract: documentation/contracts/three-model-study-matrix-v1.md
-      contract_sha256: cfcd04a424f342c7b51d710a1890b57fa698b14ebb2b4bacf524db1673830b2d
+      contract_sha256: 5e4094a7b39e0456784e7ba2ce4e57d58885a617d85381fd7dc34498e8356426
       config: configs/studies/three_model_m0_to_m2_matrix_v1.yaml
-      config_sha256: 2d1af87a99d50d2695c6f09f8947c64b0c68bc7bc17ce296a3adb74ca107a3ce
+      config_sha256: c870189fb845f9740010872f5aab899b2b1396e68a1f2c06588dc656beaba9db
       entrypoint: scripts/study/run_model_matrix.py
       implementation_commit: 329afaa91b4b403b86eca82f60bb3649a6f38800
       models: [olmo, qwen, smollm]
@@ -243,6 +244,31 @@ evaluation_target:
       luna_packet_count: 27
       hu_test_count: 29
       execution_authorized: false
+    scientific_m0_family:
+      status: frozen_execution_not_authorized
+      contract: documentation/contracts/evaluation/m0-three-model-scientific-v1.md
+      contract_sha256: 013f6f638176cbfd15fbe65c7d07a9dbb8d0029879e217f65e4e69bbeef765d9
+      manifest: configs/evaluation/m0_scientific_three_model_v1.yaml
+      manifest_sha256: 264525095a3f67b5899771069ad227a41ed431de14fd98c38168690787d2bf5d
+      config_source: configs/evaluation/m0_scientific_model_matrix_v1.yaml
+      implementation_commit: ea4e01de68e80cd33136674aa3cb59dc4547cfbd
+      operator: scripts/study/run_three_model_m0_evaluation.py
+      models: [olmo, qwen, smollm]
+      model_count: 3
+      lanes_per_model: 8
+      total_gpu_lanes: 24
+      parallel_models: 3
+      family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1
+      execution_ready: true
+      execution_authorized: false
+      preflight_command: >-
+        .venv/bin/python scripts/study/run_three_model_m0_evaluation.py preflight
+      latest_status: local_plan_valid_hu_read_only_preflight_pending
+      scientific_work_started: false
+      blockers:
+        - family_execution_not_authorized
+        - per_model_execution_not_authorized
+        - hu_identity_preflight_pending
     m0_preflight:
       command: >-
         .venv/bin/python scripts/study/run_study.py preflight-m0
@@ -310,8 +336,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: freeze_three_model_scientific_m0_configs
-  first_boundary: exact_olmo_qwen_smollm_m0_bindings_and_fail_closed_preflight
+  name: validate_then_separately_authorize_three_model_scientific_m0
+  first_boundary: hu_read_only_identity_preflight_then_exact_execution_authorization
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -333,15 +359,17 @@ active_priority:
     - eval_v1_pile_and_turkishmmlu_decisions
     - eval_v1_full_and_cheap_factual_registry_freeze
     - eval_v1_numeric_gate_and_checkpoint_policy_freeze
+    - three_model_scientific_m0_configs
+    - three_model_24_lane_parallel_operator
+    - turkish_cross_domain_bpb_lane
     - three_model_27_node_matrix_planner
     - three_model_luna_micro_packet_renderer
   required_outputs:
-    - olmo_scientific_m0_config
-    - qwen_scientific_m0_config
-    - smollm_scientific_m0_config
-    - three_model_m0_execution_contract
-    - exact_model_and_output_namespace_preflight
+    - hu_read_only_three_model_identity_preflight
+    - exact_execution_authorization_bound_to_frozen_family
     - separately_authorized_parallel_submission
+    - three_model_raw_bundle
+    - frozen_normalization_and_gate_result
 
 authorization:
   local_repository_changes: require_current_user_instruction
@@ -355,8 +383,8 @@ authorization:
   cleanup_or_deletion: false
 
 next_decision_required:
-  subject: three_model_scientific_m0_execution_binding
+  subject: three_model_scientific_m0_execution_authorization
   note: >-
-    eval-v1 is frozen and the qualification metrics remain non-scientific. Create and validate
-    exact OLMo, Qwen and SmolLM scientific M0 configs plus one bounded execution contract. No HU,
-    Slurm, scoring or training begins without a new explicit authorization.
+    eval-v1 and the exact OLMo, Qwen and SmolLM scientific M0 family are frozen. Verify all HU
+    identities read-only, then obtain one exact authorization before enabling the family and
+    per-model execution flags or submitting any Slurm/GPU/scoring work.

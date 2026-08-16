@@ -1,0 +1,29 @@
+schema_version: 1
+name: m0-olmo-scientific-generation-v1
+adapter_engine: general_capability
+run_classification: scientific
+run_name: m0_olmo_scientific_generation
+output_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1/olmo/lanes/generation_integrity/raw/general_capability
+model_manifest: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
+data:
+  corpus_file: /vol/tmp2/yesildau/general_capability_v1/wikitext2_raw_test.jsonl
+  prompts_file: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1/configs/general_capability/prompts_v1.jsonl
+  completions_file: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1/configs/general_capability/completions_v1.jsonl
+  synthetic_subjects_file: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1/artifacts/datasets/relation_v2_gate_v1/data/canonical_subject_profiles_5000.csv
+input_sha256:
+  corpus_file: 578a0879807f928e423f61631ee697a865af006df21e60e10e25a534c345097a
+  prompts_file: b21035ecf4819798dbf2807177e6bdd0b97a117f49fb77591e0e1602e67fb977
+  completions_file: 9c14631b8de651a2d7f698456d767f2126e30173116f5fb21c442b6af7002580
+  synthetic_subjects_file: 60dd741f8ef2815755beafa8bb5799f4112af3d94b1b8c4c171bfef28b07e6c1
+scoring:
+  block_size: 512
+  batch_size: 4
+  candidate_batch_size: 16
+  bootstrap_samples: 10000
+generation:
+  max_new_tokens: 64
+runtime:
+  device: cuda
+  bf16: false
+  seed: 42
+scientific_result: true

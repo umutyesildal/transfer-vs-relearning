@@ -1,7 +1,7 @@
 # Current project status
 
-**As of:** 2026-08-16 | **Phase:** three-model scientific M0 binding
-**Readiness:** `ready_to_measure = false`, `ready_to_train = false`
+**As of:** 2026-08-16 | **Phase:** three-model scientific M0 pre-execution validation
+**Readiness:** `ready_to_measure = true`, `ready_to_train = false`
 
 ## Executive state
 
@@ -13,7 +13,9 @@ The measurement-stability boundary is now closed. Document 180 freezes eval-v1's
 architecture, exact Harness environment/dataset identities, final task set, Pile cadence,
 full/cheap bilingual factual registries, normalized schema, numeric gates, uncertainty and
 checkpoint-binding policy. Any semantic change requires eval-v2. Freeze does not authorize
-scientific execution; exact three-model M0 configs and a bounded execution contract are next.
+scientific execution. The exact three-model M0 configs and bounded execution contract are now
+frozen with authorization false; HU identity preflight and a separate execution authorization are
+next.
 
 The local pipeline foundation is now opt-in and fail-closed. It derives an exact epoch/update/batch
 schedule, records tokenization and optimization traces, preserves model-only epoch snapshots behind
@@ -172,14 +174,17 @@ These are constraints and evidence, not reasons to throw away existing implement
 
 ## Active work boundary
 
-The valid next work is the three-model scientific M0 binding package:
+The three-model scientific M0 binding package is complete:
 
-1. bind exact OLMo, Qwen and SmolLM model/tokenizer manifests;
-2. generate one frozen scientific M0 config per model using unchanged eval-v1;
-3. make the controller use full datasets, the frozen full/cheap factual registries and immutable
-   offline inputs without qualification limits;
-4. run local/HU read-only fail-closed preflight and record runtime estimates;
-5. prepare one bounded parallel-execution contract; submit only after a new explicit authorization.
+1. exact OLMo, Qwen and SmolLM model/tokenizer manifests are bound;
+2. each model has one frozen scientific config using unchanged eval-v1;
+3. each model has eight full lanes, including Turkish BPB, with no scientific limits;
+4. one operator preflights all models before creating any job, then can submit 24 lanes and one
+   family finalizer without keeping an agent blocked;
+5. V100/A100 routes explicitly fall back to RTX3090 and then RTX6000/RTXA6000.
+
+The valid next action is HU read-only identity preflight. Scientific submission requires one new
+explicit authorization bound to the frozen family contract and manifest.
 
 M1/M2 training, corpus materialization and scientific scoring remain unauthorized. They must not be
 bypassed with ad-hoc commands.

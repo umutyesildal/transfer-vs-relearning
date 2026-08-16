@@ -1,6 +1,6 @@
 # Experiment pipeline v1
 
-**Status:** local foundation, planner-only | **Execution authorization:** none
+**Status:** scientific M0 operator frozen; later stages planner-only | **Execution authorization:** none
 
 This layer turns one reviewed experiment manifest into a deterministic sequence:
 
@@ -69,11 +69,11 @@ The historical OLMo family has weights only at parent and updates
 `42/84/126/168/210/252`, mapping to epochs `0/6/12/18/24/30/36`. The historical-backfill planner
 accepts only those points. It never interpolates or invents the missing epoch weights.
 
-## M0 parallel evaluation entrypoint
+## Historical M0 qualification evidence
 
 [`../../scripts/study/run_m0_olmo_evaluation.py`](../../scripts/study/run_m0_olmo_evaluation.py)
-is the single operator-facing M0 entrypoint. It partitions the bundle into seven independent GPU
-lanes:
+was the OLMo qualification entrypoint. It partitioned the qualification bundle into seven
+independent GPU lanes:
 
 | Lane | Work |
 |---|---|
@@ -91,9 +91,8 @@ GPU/model process; the controller does not multiplex model instances on one GPU.
 finalizer inventories every outcome, while complete normalization opens only after all required
 lanes finish with identical plan and classification identities.
 
-TurkishMMLU is excluded from qualification v1 because access is unresolved. This does not settle its
-eval-v1 role. A later inclusion would use a separate five-shot lane and new contract version; it is
-not merged into the zero-shot Turkish lane.
+TurkishMMLU is excluded from eval-v1 because the exact data is author-contact access only. Adding it
+later requires a separately frozen eval-v2; it is not merged into the current Turkish lane.
 
 The current draft can be inspected without evaluation:
 
@@ -106,17 +105,51 @@ The qualification config is frozen with exact implementation/environment hashes 
 limits. V8 completed six lanes; its `english_capability` lane encountered a foreign-process OOM
 before scoring. The separately frozen recovery reused the six hash-validated results, ran only that
 lane on a V100 after a 16 GiB free-memory gate, and produced a complete 7/7 composite bundle. The
-bundle remains `test_only_non_scientific`; WikiText and TurBLiMP parity still block eval-v1 freeze.
-See the
+bundle remains `test_only_non_scientific`. WikiText and TurBLiMP parity subsequently passed and
+eval-v1 was frozen by Documents 179 and 180. See the
 [`v8 recovery contract`](../contracts/evaluation/m0-olmo-v8-english-capability-recovery-v1.md).
+
+## Scientific three-model M0 entrypoint
+
+[`../../scripts/study/run_three_model_m0_evaluation.py`](../../scripts/study/run_three_model_m0_evaluation.py)
+is the current operator-facing scientific M0 entrypoint. It binds the exact OLMo, Qwen2.5-1.5B and
+SmolLM2-1.7B assets to the same frozen eval-v1 inputs. Every model receives eight independent lanes:
+
+| Lane | Work |
+|---|---|
+| `english_retention_wikitext` | full WikiText token loss and BPB |
+| `english_retention_pile_10k` | full Pile-10k token loss and BPB |
+| `english_grammar_blimp` | full 67-subtask BLiMP group |
+| `english_capability` | HellaSwag and three WinoGender slices |
+| `turkish_capability` | full 16-subtask TurBLiMP group |
+| `turkish_retention_trwiki` | frozen trwiki validation token loss and UTF-8 BPB |
+| `factual_access` | full 12,000-row bilingual factual suite |
+| `generation_integrity` | degeneration and frozen generic completions |
+
+That is 24 GPU lanes. Before submitting anything, the family controller runs every model's
+read-only identity preflight. A blocker in any model submits zero jobs. Once separately authorized,
+the three per-model DAGs are submitted independently and in parallel; a family finalizer records
+their raw states. V100-32GB and A100-80GB are preferred, with RTX3090, RTX6000 and RTXA6000 frozen
+as fallbacks inside a 900-second start window. The operator returns after submission and never
+waits for the evaluations.
+
+Inspect the exact plan and preflight without inference or scoring:
+
+```bash
+.venv/bin/python scripts/study/run_three_model_m0_evaluation.py plan
+.venv/bin/python scripts/study/run_three_model_m0_evaluation.py preflight
+```
+
+The frozen contract is
+[`m0-three-model-scientific-v1.md`](../contracts/evaluation/m0-three-model-scientific-v1.md).
+Both the family and all per-model configs deliberately remain `execution_authorized: false`.
 
 ## Remaining production boundary
 
 The planner, trace/artifact contracts and fail-closed M0 Harness/project/parallel adapters are
-implemented locally. The M0 qualification adapter is the only executable slice; its scientific
-normalizer and all later-state evaluator/training adapters remain blocked on eval-v1 qualification
-and separate contracts. The full-study plan therefore remains `execution_authorized: false` even
-though the isolated M0 qualification config is test-only authorized.
+implemented. The scientific three-model M0 raw-result layer is frozen and execution-ready but not
+authorized. Its canonical scientific normalizer and every M1/M2 training adapter remain separate
+work. The full-study plan therefore remains `execution_authorized: false`.
 
 ## Full M0→M2 study control
 
@@ -141,7 +174,7 @@ Render the complete 15-stage graph without scientific execution:
 ```
 
 The tested full-study runner accepts only registered Python adapters; it never executes arbitrary
-shell text from YAML. The dedicated M0 controller likewise maps only three fixed adapter types and
+shell text from YAML. The dedicated M0 controller likewise maps only four fixed adapter types and
 rejects submission until eval-v1 identities and exact authorization are frozen. Later training and
 branch adapters remain unregistered.
 
@@ -185,6 +218,7 @@ Generate 27 one-model/one-stage Luna packets with:
   --output-dir /tmp/three-model-luna-packets
 ```
 
-The current matrix is `planned_not_authorized`. Missing scientific M0 configs and M1/M2 recipes are
-explicit null bindings with named blockers; `run` refuses external work. See the
+The current matrix is `planned_not_authorized`. Its three scientific M0 bindings are frozen; the
+missing M1/M2 recipes remain explicit null bindings with named blockers, so `run` still refuses the
+full external workflow. See the
 [`three-model planning contract`](../contracts/three-model-study-matrix-v1.md).

@@ -1,0 +1,18 @@
+schema_version: 1
+name: m0-olmo-scientific-factual-v1
+adapter_engine: pre_m2_frozen
+run_classification: scientific
+model_label: m0_olmo_scientific
+model_manifest: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
+dataset_dir: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1/artifacts/datasets/relation_v2_gate_v1
+probe_registry: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1/configs/evaluation/registries/eval_v1_factual_full_bilingual_12000.csv
+output_dir: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1/olmo/lanes/factual_access/raw/frozen_suite
+input_sha256:
+  dataset_manifest: b37268d6f3afbb37f13ef746b80b99169c4d94ced3471aed2ae4aa09dc85b752
+  probe_registry: 5125850a2db24c6b570971a58e9ba8a8586cabdec9084eb0e99bbd639691d93f
+candidate_batch_size: 16
+checkpoint_interval: 100
+probe_limit: null
+device: cuda
+bf16: false
+scientific_result: true

@@ -52,11 +52,11 @@ models:
       sha256: 8702b80d5b7e4c996c8ce2ff5fe771ada08ab0080bde1926c0b1f53c607303dc
     bindings:
       m0_scientific_evaluation:
-        status: qualification_only
+        status: frozen
         execution_authorized: false
-        path: configs/evaluation/m0_olmo_eval_v1_qualification_v1.yaml
-        sha256: 79ef439adb445d49bdbef43a0f0993578b7e6ddf753b5f72664d942dd713153d
-        blocker: qualification_metrics_are_not_scientific_m0
+        path: configs/evaluation/m0_scientific/olmo_m0_eval_v1_scientific_v1.yaml
+        sha256: b6dc833f6a16da4c4bb95bb54e69f2f55c998b72066f748688f1043d44e8caf9
+        blocker: scientific_m0_execution_not_authorized
       m1_recipe:
         status: not_frozen
         execution_authorized: false
@@ -85,11 +85,11 @@ models:
       sha256: c9d3562b717784251fe14c2b7972660fe4a20fe4687e15f69746bc1713d2d4fb
     bindings:
       m0_scientific_evaluation:
-        status: not_frozen
+        status: frozen
         execution_authorized: false
-        path: null
-        sha256: null
-        blocker: qwen_m0_eval_v1_config_not_frozen
+        path: configs/evaluation/m0_scientific/qwen_m0_eval_v1_scientific_v1.yaml
+        sha256: 2824e92044c6df7a82e698b012bd99d64e98f8c21684b0b2878f174e1177df76
+        blocker: scientific_m0_execution_not_authorized
       m1_recipe:
         status: not_frozen
         execution_authorized: false
@@ -118,11 +118,11 @@ models:
       sha256: e5d04302087b8b41828f734c1d88c4620a74bb80d6919de62df37b9d57dadbfc
     bindings:
       m0_scientific_evaluation:
-        status: not_frozen
+        status: frozen
         execution_authorized: false
-        path: null
-        sha256: null
-        blocker: smollm_m0_eval_v1_config_not_frozen
+        path: configs/evaluation/m0_scientific/smollm_m0_eval_v1_scientific_v1.yaml
+        sha256: 76311220bf15bd4965b3c26065df23b283a03a603e2f855cb339e95f01683c28
+        blocker: scientific_m0_execution_not_authorized
       m1_recipe:
         status: not_frozen
         execution_authorized: false

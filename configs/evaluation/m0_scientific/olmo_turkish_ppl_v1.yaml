@@ -1,0 +1,21 @@
+schema_version: 1
+name: m0-olmo-scientific-turkish-ppl-v1
+adapter_engine: corpora_perplexity
+run_classification: scientific
+model_label: m0_olmo_scientific
+model_manifest: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
+corpora:
+  trwiki_cross_domain: /vol/tmp2/yesildau/turkish_bridge_v1/corpus/trwiki_20260601_bridge_v1/splits/validation_documents.jsonl
+input_sha256:
+  trwiki_cross_domain: 15480c1f543acf6df7aac1b2a2ee15fdcb3a544814f0063a181bd7a9cb0ca4f8
+output_dir: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1/olmo/lanes/turkish_perplexity/raw/corpora
+scoring:
+  block_size: 512
+  batch_size: 4
+  bootstrap_samples: 10000
+runtime:
+  device: cuda
+  bf16: false
+  seed: 42
+primary_metric: bits_per_byte
+scientific_result: true

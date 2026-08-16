@@ -91,9 +91,10 @@ Current local evidence: [`../pipeline/README.md`](../pipeline/README.md), the pi
 `configs/pipelines/`, the full-study config under `configs/studies/`, the M0 entrypoint under
 `scripts/study/`, the
 [`three-model planning contract`](../contracts/three-model-study-matrix-v1.md), and fail-closed
-planner/trace/artifact/study tests. Remaining work is to freeze three scientific M0 bindings, then
-implement later-state training/evaluation adapters plus complete-result normalization and figure
-rendering without changing eval-v1 semantics.
+planner/trace/artifact/study tests. The three scientific M0 bindings and one 24-lane family
+operator are now frozen but not execution-authorized. Remaining work is HU read-only identity
+preflight, a separate exact M0 authorization, complete-result normalization and figure rendering;
+later-state training adapters remain blocked without changing eval-v1 semantics.
 
 ## R4 — Corpus contract
 

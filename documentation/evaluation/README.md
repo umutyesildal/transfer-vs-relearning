@@ -25,6 +25,8 @@ The completed OLMo qualification and parity evidence is summarized in
 [`../179_M0_OLMO_EVAL_V1_PARITY_EXECUTION_RESULT_AND_FREEZE_GATE_TR.md`](../179_M0_OLMO_EVAL_V1_PARITY_EXECUTION_RESULT_AND_FREEZE_GATE_TR.md).
 The final input/gate closure is recorded in
 [`../180_EVAL_V1_SCIENTIFIC_INPUT_AND_PROTOCOL_FREEZE_TR.md`](../180_EVAL_V1_SCIENTIFIC_INPUT_AND_PROTOCOL_FREEZE_TR.md).
+The frozen three-model scientific M0 binding is
+[`../contracts/evaluation/m0-three-model-scientific-v1.md`](../contracts/evaluation/m0-three-model-scientific-v1.md).
 
 `eval-v1` is frozen, but this directory grants no evaluation, download, HU, Slurm, training, or
 publication authority.
