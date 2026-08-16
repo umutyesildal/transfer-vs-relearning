@@ -1,6 +1,6 @@
 # M0 OLMo eval-v1 qualification wave v1
 
-**Status:** `data_materialization_repair_binding_pending` | **Owner:** project | **Created:** 2026-08-16
+**Status:** `frozen_data_materialization_repair_test_only_authorized` | **Owner:** project | **Created:** 2026-08-16
 **Supersedes:** none
 
 ## Purpose and estimand
@@ -167,6 +167,24 @@ final metadata-name gate compared upstream `lm_eval` without normalizing it to d
 `lm-eval`; the command stopped before writing a completed environment identity. The v2 root is also
 preserved, immutable and excluded from reuse. No data preflight, model load, GPU job or scoring used
 it.
+
+The v3 repair bindings are frozen:
+
+- implementation commit: `28589d1c3f01a1824ae3e4c30b357ccb340a0935`;
+- parallel materializer/controller SHA-256:
+  `a012ed1d6dbe76112e9e16c6584f70ee27b725134f339653ac2e83a37c99daf9`;
+- project-input adapter SHA-256:
+  `5b8a49003e151454c3028c2eb135fda943a9169037a1a4b9d04ae5a0810fcde6`;
+- factual config SHA-256:
+  `e9193dddc87ae7143b015378205461e941d9b748da615fb5ba836f78fe92fbbf`;
+- generation config SHA-256:
+  `bc15f21b15906806cf605138473bd829dadbaa25d4abb844532af203235caf79`;
+- repaired companion config SHA-256:
+  `d29ebf6c9e0fd55b7ea529a4a4d75739860575371ee18a57b0ae72648a39cbad`.
+
+The original user authorization remains limited to this test-only, non-scientific qualification
+attempt. V3 is fail-closed and may release the GPU dependency only after materialized-cache,
+offline-reload and project-input gates all pass.
 
 The corrected repair uses the dedicated root
 `/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3`, preserves the parent compat

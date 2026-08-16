@@ -1,11 +1,11 @@
 schema_version: 1
 name: m0-olmo-eval-v1-qualification-v1-data-repair-v1
-status: data_materialization_repair_binding_pending
+status: frozen
 as_of: "2026-08-16"
 classification: qualification_only
 scientific_result: false
-execution_ready: false
-execution_authorized: false
+execution_ready: true
+execution_authorized: true
 
 contract: documentation/contracts/evaluation/m0-olmo-qualification-v1.md
 parent_evaluation_contract: documentation/contracts/evaluation/eval-v1.md
@@ -77,12 +77,12 @@ parallel_evaluation:
     lane completed with the identical plan and run classification.
   runtime:
     python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
-    implementation_commit: 31686cf07b6edb2d64cdb0b9ec44ba838a0ada84
+    implementation_commit: 28589d1c3f01a1824ae3e4c30b357ccb340a0935
     implementation_files:
       scripts/study/run_m0_olmo_evaluation.py: 3d21321941628b83c31ac6f7da28efa6b8fe782447676c0d66e907f2ec2c9fd1
-      src/transfer_vs_relearning/study/m0_parallel.py: 9c3f6aafcf0b00c56102f60b3956bfeec856770099cbe973a358a6ba389cd869
+      src/transfer_vs_relearning/study/m0_parallel.py: a012ed1d6dbe76112e9e16c6584f70ee27b725134f339653ac2e83a37c99daf9
       src/transfer_vs_relearning/study/adapters/m0_evaluation.py: 917e63abab19cb0a7bb86e054040abf24658f83ff9939c742b802bc7de6ee883
-      src/transfer_vs_relearning/study/adapters/m0_probing.py: 279d3adc7916919d8507df472ecb1457b315ad8e263343b53709d70116fc2dd3
+      src/transfer_vs_relearning/study/adapters/m0_probing.py: 5b8a49003e151454c3028c2eb135fda943a9169037a1a4b9d04ae5a0810fcde6
     environment_lock_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/environment.lock.txt
     environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
     device: cuda:0
@@ -228,10 +228,7 @@ forbidden_claims:
   - ready_to_train
   - selected_primary_model
 
-freeze_blockers:
-  - repaired_materializer_and_project_adapter_commit_hashes
-  - repaired_project_config_hashes
-  - repaired_contract_and_config_hashes
+freeze_blockers: []
 
 freeze_authority:
   user_instruction: run_and_try_current_m0_qualification_wave

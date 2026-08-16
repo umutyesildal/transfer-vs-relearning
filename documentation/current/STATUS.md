@@ -69,6 +69,10 @@ generation lane after weight load but before a completed result. The finalizer r
 perform online task instantiation, non-empty cache inventory, offline re-instantiation and exact
 project-input hash checks before another GPU dependency can open.
 
+The v3 materializer/project-input repair is now hash-frozen under the existing test-only
+authorization. The next action is final HU fast-forward plus readiness preflight; only then may its
+fresh namespace submit the online-materialize → offline-reload → dependent V100 chain.
+
 ## Evaluation design result
 
 - LM Evaluation Harness is pinned prospectively to v0.4.12 commit
