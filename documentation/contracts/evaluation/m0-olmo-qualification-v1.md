@@ -278,9 +278,27 @@ lanes remain unchanged. XNLI is absent from the active registry, task matrix, co
 The compatibility evidence and a bounded future upstream-repair outline are preserved separately in
 [`../../evaluation/XNLI_HARNESS_COMPATIBILITY_INCIDENT.md`](../../evaluation/XNLI_HARNESS_COMPATIBILITY_INCIDENT.md).
 
-V5 requires a fresh namespace, new implementation/project-config hashes and a new frozen companion
-config before submission. The existing bounded test-only authorization does not convert v5 into a
-scientific M0 run.
+The v5 replacement bindings are frozen:
+
+- implementation commit: `1c3791a9c140777df0fc3df66a817fcafcfd4bc6`;
+- operator entrypoint SHA-256:
+  `ae2c0b4a595250c404cc1e7e3778c8f6a5efdb4be298ffb51e2c3dc03cb8e3bd`;
+- parallel controller/materializer SHA-256:
+  `2fd4caa8c686c59925957ed41b9c6b4423e17ab42c3f0fa3d95ec5a100349e68`;
+- Harness adapter SHA-256:
+  `5480e4f01ef89047d979ca5a00511514283da11487ea8d2842e2e46eb38d8598`;
+- project adapter SHA-256:
+  `5b8a49003e151454c3028c2eb135fda943a9169037a1a4b9d04ae5a0810fcde6`;
+- factual qualification config SHA-256:
+  `7c2919fef13fa95f069cba94b919134becf749fc692a6193879322f321dc3502`;
+- generation qualification config SHA-256:
+  `9f34d8d825823dffe6ed714f9e369b1bddc71ad49faf7cddca5d393211017eee`;
+- companion config SHA-256:
+  `37640365560929e1a62ee216a246a2738061964e9c65d82698ef28ee52eec1a2`;
+- fresh execution root: `/vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v5`.
+
+The existing bounded test-only authorization permits this reduced replacement wave; it does not
+convert v5 into a scientific M0 run.
 
 The corrected repair uses the dedicated root
 `/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3`, preserves the parent compat

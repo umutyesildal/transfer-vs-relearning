@@ -81,7 +81,9 @@ that task family from the thesis protocol before v4 CPU materialization complete
 and `461254` were cancelled before GPU work; finalizer `461255` recorded 0/7 lanes, no scientific
 result and a blocked gate. The 18-file root is preserved. V5 keeps the same seven-lane topology but
 uses eight standard Harness task IDs and no local task overlay. The compatibility failure and a
-possible future upstream repair are isolated in the evaluation incident note.
+possible future upstream repair are isolated in the evaluation incident note. V5 implementation,
+project configs, task set and fresh namespace are now hash-frozen under the existing bounded
+test-only authorization; HU readiness preflight is the next action.
 
 ## Evaluation design result
 
