@@ -392,9 +392,43 @@ def prepare_m0_environment(plan: dict[str, Any], *, repo_root: Path) -> dict[str
         raise ValueError(f"Dedicated environment is outside approved scratch: {environment_root}")
     if environment_root.exists():
         raise FileExistsError(f"Dedicated environment root already exists: {environment_root}")
-    base_python = Path(str(preparation["base_python"])).resolve()
+    base_python = Path(os.path.abspath(str(preparation["base_python"])))
     if not base_python.is_file() or not os.access(base_python, os.X_OK):
         raise FileNotFoundError(f"Base Python is missing or not executable: {base_python}")
+    identity_code = (
+        "import importlib.metadata,json,platform,torch,transformers,datasets,accelerate;"
+        "d=importlib.metadata.distribution('lm-eval') if "
+        "any(x.metadata['Name']=='lm-eval' for x in importlib.metadata.distributions()) else None;"
+        "u=json.loads(d.read_text('direct_url.json') or '{}') if d else {};"
+        "print(json.dumps({'python':platform.python_version(),'torch':torch.__version__,"
+        "'cuda':torch.version.cuda,'transformers':transformers.__version__,"
+        "'datasets':datasets.__version__,'accelerate':accelerate.__version__,"
+        "'lm_eval_version':d.version if d else None,"
+        "'lm_eval_commit':u.get('vcs_info',{}).get('commit_id','')}))"
+    )
+    base_observed = json.loads(
+        subprocess.run(
+            [str(base_python), "-c", identity_code],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+    )
+    expected_base = _mapping(
+        preparation.get("expected_base_identity"), "expected_base_identity"
+    )
+    base_mismatches = {
+        key: {"expected": expected, "observed": base_observed.get(key)}
+        for key, expected in expected_base.items()
+        if base_observed.get(key) != expected
+    }
+    if base_mismatches:
+        raise ValueError(f"V100 compatibility base identity mismatch: {base_mismatches}")
+    compat_site_packages = Path(str(preparation["compat_site_packages"]))
+    if not compat_site_packages.is_dir():
+        raise FileNotFoundError(
+            f"V100 compatibility site-packages is missing: {compat_site_packages}"
+        )
     requirements = _strings(preparation.get("requirements"), "environment requirements")
     environment_root.parent.mkdir(parents=True, exist_ok=True)
     started = datetime.now(timezone.utc).isoformat()
@@ -425,6 +459,23 @@ def prepare_m0_environment(plan: dict[str, Any], *, repo_root: Path) -> dict[str
         check=True,
         env=install_environment,
     )
+    purelib = Path(
+        subprocess.run(
+            [
+                str(python),
+                "-c",
+                "import sysconfig; print(sysconfig.get_paths()['purelib'])",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+    )
+    compatibility_path = purelib / "00_v100_compat_parent.pth"
+    compatibility_path.write_text(
+        f"{compat_site_packages}\n",
+        encoding="utf-8",
+    )
     subprocess.run([*pip, "check"], check=True, env=install_environment)
     freeze = subprocess.run(
         [*pip, "freeze", "--all"],
@@ -437,15 +488,6 @@ def prepare_m0_environment(plan: dict[str, Any], *, repo_root: Path) -> dict[str
     temporary = lock_path.with_suffix(".txt.tmp")
     temporary.write_text(freeze, encoding="utf-8")
     os.replace(temporary, lock_path)
-    identity_code = (
-        "import importlib.metadata,json,platform,torch,transformers,datasets,accelerate;"
-        "d=importlib.metadata.distribution('lm-eval');"
-        "u=json.loads(d.read_text('direct_url.json') or '{}');"
-        "print(json.dumps({'python':platform.python_version(),'torch':torch.__version__,"
-        "'cuda':torch.version.cuda,'transformers':transformers.__version__,"
-        "'datasets':datasets.__version__,'accelerate':accelerate.__version__,"
-        "'lm_eval_version':d.version,'lm_eval_commit':u.get('vcs_info',{}).get('commit_id','')}))"
-    )
     observed = json.loads(
         subprocess.run(
             [str(python), "-c", identity_code],
@@ -454,12 +496,18 @@ def prepare_m0_environment(plan: dict[str, Any], *, repo_root: Path) -> dict[str
             text=True,
         ).stdout
     )
-    expected_version = str(plan["harness"]["release"]).removeprefix("v")
-    if (
-        observed.get("lm_eval_version") != expected_version
-        or observed.get("lm_eval_commit") != plan["harness"]["git_commit"]
-    ):
-        raise ValueError(f"Installed LM Evaluation Harness identity mismatch: {observed}")
+    expected_runtime = {
+        **_mapping(preparation.get("expected_runtime_identity"), "expected_runtime_identity"),
+        "lm_eval_version": str(plan["harness"]["release"]).removeprefix("v"),
+        "lm_eval_commit": plan["harness"]["git_commit"],
+    }
+    runtime_mismatches = {
+        key: {"expected": expected, "observed": observed.get(key)}
+        for key, expected in expected_runtime.items()
+        if observed.get(key) != expected
+    }
+    if runtime_mismatches:
+        raise ValueError(f"Installed M0 runtime identity mismatch: {runtime_mismatches}")
     environment_files = [path for path in environment_root.rglob("*") if path.is_file()]
     environment_bytes = sum(path.stat().st_size for path in environment_files)
     if environment_bytes > int(preparation["max_environment_bytes"]):
@@ -473,6 +521,9 @@ def prepare_m0_environment(plan: dict[str, Any], *, repo_root: Path) -> dict[str
         "started_at": started,
         "ended_at": datetime.now(timezone.utc).isoformat(),
         "base_python": str(base_python),
+        "base_identity": base_observed,
+        "compat_site_packages": str(compat_site_packages),
+        "compatibility_path_file": str(compatibility_path),
         "environment_root": str(environment_root),
         "python": str(python),
         "environment_lock_path": str(lock_path),

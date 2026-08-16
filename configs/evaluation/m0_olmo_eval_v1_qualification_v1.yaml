@@ -74,14 +74,14 @@ parallel_evaluation:
     Always inventory lane outcomes; emit the complete bundle manifest only when every required
     lane completed with the identical plan and run classification.
   runtime:
-    python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v1/bin/python
+    python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v2/bin/python
     implementation_commit: __FROZEN_IMPLEMENTATION_COMMIT__
     implementation_files:
       scripts/study/run_m0_olmo_evaluation.py: __FROZEN_ENTRYPOINT_SHA256__
       src/transfer_vs_relearning/study/m0_parallel.py: __FROZEN_PARALLEL_CONTROLLER_SHA256__
       src/transfer_vs_relearning/study/adapters/m0_evaluation.py: __FROZEN_HARNESS_ADAPTER_SHA256__
       src/transfer_vs_relearning/study/adapters/m0_probing.py: __FROZEN_PROJECT_ADAPTER_SHA256__
-    environment_lock_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v1/environment.lock.txt
+    environment_lock_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v2/environment.lock.txt
     environment_lock_sha256: __FROZEN_ENVIRONMENT_LOCK_SHA256__
     device: cuda:0
     precision: float16
@@ -90,8 +90,27 @@ parallel_evaluation:
     log_samples: true
   environment_preparation:
     authorized: true
-    root: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v1
+    root: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v2
     base_python: /vol/tmp2/yesildau/m1_provenance_screen_v3/compat_envs/torch260_cu124_v1/bin/python
+    compat_site_packages: /vol/tmp2/yesildau/m1_provenance_screen_v3/compat_envs/torch260_cu124_v1/lib/python3.11/site-packages
+    expected_base_identity:
+      python: 3.11.15
+      torch: 2.6.0+cu124
+      cuda: "12.4"
+      transformers: 5.13.0
+      datasets: 5.0.0
+      accelerate: 1.14.0
+    expected_runtime_identity:
+      python: 3.11.15
+      torch: 2.6.0+cu124
+      cuda: "12.4"
+      transformers: 5.13.0
+      datasets: 5.0.0
+      accelerate: 1.14.0
+    rejected_environment_roots:
+      - path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v1
+        reason: nested_venv_resolved_to_shared_torch_2_7_cuda_12_8
+        preservation: immutable_no_reuse_no_cleanup
     max_environment_bytes: 2147483648
     requirements:
       - evaluate==0.4.6

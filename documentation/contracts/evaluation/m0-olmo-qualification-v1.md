@@ -85,8 +85,16 @@ project jobs. HU home, the dirty legacy checkout and all previous evidence roots
 
 ### Q2 — environment and task-data qualification
 
-In the fresh dedicated root
-`/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v1`:
+The first prepared environment root
+`/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v1` is preserved and rejected: a
+nested-venv path-resolution bug inherited shared Torch 2.7/CUDA 12.8 instead of the requested
+Torch 2.6/CUDA 12.4 compatibility packages. No data preflight, model load, GPU job or scoring used
+that environment. It is immutable and must not be reused or cleaned by this wave.
+
+The repair uses the fresh dedicated root
+`/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v2`, preserves the parent compat
+prefix path without resolving it to the shared interpreter and asserts the exact base and final
+runtime identities before accepting its lock:
 
 - prove the installed `lm_eval` source identity equals the pinned commit;
 - record Python, Torch, Transformers, Datasets, tokenizers, CUDA and GPU identities;
