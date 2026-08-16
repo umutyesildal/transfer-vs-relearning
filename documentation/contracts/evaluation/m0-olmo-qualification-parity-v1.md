@@ -1,6 +1,6 @@
 # M0 OLMo qualification parity v1
 
-**Status:** `frozen / execution-authorized` | **Owner:** project | **Created:** 2026-08-16
+**Status:** `prepared correction / not executable` | **Owner:** project | **Created:** 2026-08-16
 **Parent:** `m0-olmo-qualification-v1`
 
 ## Purpose
@@ -93,8 +93,9 @@ corpus work, cleanup, deletion, threshold change or eval-v1 freeze is authorized
 
 ## Freeze blockers
 
-None for this bounded test-only parity wave. A blocked runtime or parity result does not authorize
-an automatic retry or any semantic repair.
+The original v1 binding was consumed by the pre-submission structural check described below. The
+prepared v2 correction requires a new implementation commit, exact file hashes and a corrected
+companion-config hash before execution.
 
 ## Append-only source plan-ID binding correction
 
@@ -110,3 +111,37 @@ companion config SHA-256 is
 `49876c2f5240c0249ae374da5ac62b15aab15bb60ee0699ac47b279d4f6f88c4`. The user's bounded
 test-only authorization remains applicable to this identity-only correction; it does not authorize
 an outcome-aware scientific rerun.
+
+## Append-only upstream `acc_norm` semantic correction
+
+The corrected-plan preflight passed every gate. Submission initialization created the v1 parity
+root and copied the already materialized offline cache. Before probing a GPU route or calling
+`sbatch`, structural validation produced:
+
+- WikiText canonical count/result parity: PASS, with exact reproduction of word PPL
+  `13.325301724411347`, byte PPL `1.6503868248492586` and BPB `0.722804209249961`;
+- TurBLiMP task ordering, duplicated-key observation, group sample count and 16-subtask discovery:
+  PASS; and
+- TurBLiMP `acc_norm` recomputation: BLOCKED, `0.34375` versus Harness `0.40625`.
+
+No Slurm job ID, GPU allocation, model load or new scoring run was created. The v1 parity root is
+preserved read-only with 406 files / 413,897,338 bytes. Its `structural_parity.json` SHA-256 is
+`8bf52585239d6bd61f076ba09a4a8814755d78a46e74fed598081a7a4273e370`; its
+`parity_plan.json` SHA-256 is
+`d9bee3dda03942767dd12bc567a21e4712207bed45b133839abbe39a6e6a6554`.
+
+The mismatch exposed an implementation error in this contract's prepared interpretation, not a
+model outcome. Pinned lm-eval v0.4.12 `api/task.py` computes both lengths, but defines `acc_norm`
+with `len(choice)` and defines a separate `acc_bytes` with `len(choice.encode("utf-8"))`.
+TurBLiMP declares `acc_norm` and does not declare `acc_bytes`. Therefore the parity validator must
+use Python Unicode string length for its decision metric. Byte normalization may be retained only
+as a labelled descriptive sensitivity. The upstream `task.py` SHA-256 is
+`310d5e10c44a3e66683db374a4be955bee8b697ab9675a47a12bd8330e085784`.
+
+The prepared correction changes only this denominator binding, adds the pinned `task.py` identity,
+records byte-normalized sensitivity separately, persists a no-job submission manifest when a
+future structural gate blocks, and proposes fresh root
+`/vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_parity_v2`. All source artifacts, task order,
+sample counts, model/runtime identities, tolerance, heading sensitivity and scientific
+prohibitions remain unchanged. It is not executable until the corrected implementation and config
+are frozen.

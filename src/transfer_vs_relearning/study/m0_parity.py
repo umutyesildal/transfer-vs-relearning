@@ -269,6 +269,7 @@ def validate_turblimp_macro(
         rows = _read_jsonl(path)
         correct_acc: list[float] = []
         correct_norm: list[float] = []
+        correct_bytes: list[float] = []
         row_match = len(rows) == expected_samples_per_subtask
         for row in rows:
             responses = row.get("filtered_resps")
@@ -278,17 +279,23 @@ def validate_turblimp_macro(
             loglikelihoods = [_choice_loglikelihood(value) for value in responses]
             doc = _mapping(row.get("doc"), f"{task_id} sample doc")
             choices = [str(doc["sentence_good"]), str(doc["sentence_bad"])]
+            completion_lengths = [len(choice) for choice in choices]
             byte_lengths = [len(choice.encode("utf-8")) for choice in choices]
             predicted = max(range(2), key=lambda index: loglikelihoods[index])
             predicted_norm = max(
+                range(2), key=lambda index: loglikelihoods[index] / completion_lengths[index]
+            )
+            predicted_bytes = max(
                 range(2), key=lambda index: loglikelihoods[index] / byte_lengths[index]
             )
             expected_acc = float(predicted == 0)
             expected_norm = float(predicted_norm == 0)
+            expected_bytes = float(predicted_bytes == 0)
             row_match = row_match and float(row.get("acc")) == expected_acc
             row_match = row_match and float(row.get("acc_norm")) == expected_norm
             correct_acc.append(expected_acc)
             correct_norm.append(expected_norm)
+            correct_bytes.append(expected_bytes)
         if not correct_acc:
             sample_checks[task_id] = False
             continue
@@ -303,12 +310,19 @@ def validate_turblimp_macro(
         )
         row_match = row_match and reported.get("sample_len") == expected_samples_per_subtask
         sample_checks[task_id] = row_match
-        per_subtask[task_id] = {"acc": recomputed_acc, "acc_norm": recomputed_norm}
+        per_subtask[task_id] = {
+            "acc": recomputed_acc,
+            "acc_norm": recomputed_norm,
+            "acc_bytes_sensitivity": sum(correct_bytes) / len(correct_bytes),
+        }
     record("per_sample_and_subtask_metric_parity", all(sample_checks.values()), sample_checks)
     complete_subtask_set = set(per_subtask) == set(subtask_ids)
     record("all_16_subtasks_recomputed", complete_subtask_set, sorted(per_subtask))
     macro_acc = sum(row["acc"] for row in per_subtask.values()) / len(subtask_ids)
     macro_norm = sum(row["acc_norm"] for row in per_subtask.values()) / len(subtask_ids)
+    macro_bytes = sum(row["acc_bytes_sensitivity"] for row in per_subtask.values()) / len(
+        subtask_ids
+    )
     group = reported_results.get("turblimp_core", {})
     group_metric = float(group.get("acc_norm,none"))
     record(
@@ -337,6 +351,7 @@ def validate_turblimp_macro(
         "per_subtask": per_subtask,
         "recomputed_macro_acc_sensitivity": macro_acc,
         "recomputed_macro_acc_norm": macro_norm,
+        "recomputed_macro_acc_bytes_sensitivity": macro_bytes,
         "reported_macro_acc_norm": group_metric,
         "checks": checks,
         "blockers": blockers,

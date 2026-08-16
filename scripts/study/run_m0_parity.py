@@ -232,7 +232,19 @@ def run_gpu_memory_guard(output_root: Path, *, minimum: int) -> dict[str, Any]:
 def submit_parity(
     plan: dict[str, Any], *, config_path: Path, repo_root: Path, output_root: Path
 ) -> dict[str, Any]:
-    structural = run_structural_parity(plan, output_root)
+    try:
+        structural = run_structural_parity(plan, output_root)
+    except RuntimeError as exc:
+        payload = {
+            "schema_version": 1,
+            "status": "no_job_submitted_structural_parity_blocked",
+            "plan_id": plan["plan_id"],
+            "heading_job_id": None,
+            "finalizer_job_id": None,
+            "error": str(exc),
+        }
+        write_json(output_root / "submission_manifest.json", payload)
+        raise
     probe = _probe_route(plan)
     write_json(
         output_root / "gpu_route_selection.json",

@@ -1,8 +1,8 @@
 schema_version: 1
 name: m0-olmo-eval-v1-qualification-parity-v1
-status: frozen
+status: prepared
 as_of: "2026-08-16"
-execution_authorized: true
+execution_authorized: false
 contract: documentation/contracts/evaluation/m0-olmo-qualification-parity-v1.md
 
 source:
@@ -32,12 +32,8 @@ runtime:
   precision: float16
   batch_size: auto:4
   max_batch_size: 16
-  implementation_commit: b503d9ca6471bd6e40a59ca823d6a2c9d963b8a7
-  implementation_files:
-    scripts/study/run_m0_parity.py: 63cd9bb33bfc2640ea628c4880b33afcd6e047928db82a0a5acc09b117b85ca6
-    src/transfer_vs_relearning/study/m0_parity.py: 3583e0916bd0f151d96993ad2bae64d7484f8e586f4e9fa8378c0c1b95868d78
-    configs/evaluation/task_overlays/wikitext_heading_sensitivity_v1/preprocess_wikitext_heading.py: 9f331af3df4da84fdd5bfc6b2b52cbbfc4a0fb87d1bf51d4e3de4b01c4f59829
-    configs/evaluation/task_overlays/wikitext_heading_sensitivity_v1/wikitext_heading_sensitivity_v1.yaml: b8b66fa5ff4ef376596f1d1e046633193f1e261bb77ad40ac9831564a19a7eaa
+  implementation_commit: null
+  implementation_files: {}
   upstream_task_files:
     wikitext_config:
       path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/lib/python3.11/site-packages/lm_eval/tasks/wikitext/wikitext.yaml
@@ -51,6 +47,9 @@ runtime:
     turblimp_template:
       path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/lib/python3.11/site-packages/lm_eval/tasks/turblimp/_template_yaml
       sha256: 26e9fe58fd8fb83dd86b6669f152964167e84a5ee56ad8ef87c78e1a0c10f388
+    lm_eval_task_api:
+      path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/lib/python3.11/site-packages/lm_eval/api/task.py
+      sha256: 310d5e10c44a3e66683db374a4be955bee8b697ab9675a47a12bd8330e085784
 
 wikitext:
   expected_sample_count: 2
@@ -66,7 +65,8 @@ turblimp:
   expected_samples_per_subtask: 2
   aggregation: unweighted_macro_over_16_equal_size_subtasks
   decision_metric: acc_norm
-  normalization: loglikelihood_divided_by_utf8_byte_length
+  normalization: loglikelihood_divided_by_python_unicode_string_length
+  byte_normalization_role: descriptive_sensitivity_only_not_emitted_by_upstream_task
   subtask_ids:
     - turblimp_anaphor_agreement
     - turblimp_argument_structure_ditransitive
@@ -101,7 +101,7 @@ slurm:
   min_free_gpu_bytes: 17179869184
 
 storage:
-  proposed_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_parity_v1
+  proposed_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_parity_v2
   fresh_root_required: true
   hu_home_read_only: true
   prior_evidence_roots_read_only: true
@@ -109,7 +109,9 @@ storage:
 run_classification: test_only_non_scientific
 scientific_result: false
 eval_v1_frozen_by_this_wave: false
-freeze_blockers: []
+freeze_blockers:
+  - corrected_implementation_identity_not_frozen
+  - corrected_execution_not_authorized
 
 freeze_authority:
   user_instruction: continue_the_agreed_parity_then_eval_v1_sequence

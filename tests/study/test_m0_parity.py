@@ -129,23 +129,23 @@ def test_turblimp_recomputes_byte_normalized_16_subtask_macro(tmp_path: Path) ->
     for task in SUBTASKS:
         rows = [
             {
-                "doc": {"sentence_good": "iyi cümle", "sentence_bad": "kötü cümle"},
-                "filtered_resps": [["-1.0", "False"], ["-3.0", "False"]],
+                "doc": {"sentence_good": "ş", "sentence_bad": "aa"},
+                "filtered_resps": [["-1.5", "False"], ["-2.0", "False"]],
                 "acc": 1.0,
-                "acc_norm": 1.0,
+                "acc_norm": 0.0,
             },
             {
-                "doc": {"sentence_good": "iyi cümle", "sentence_bad": "kötü cümle"},
-                "filtered_resps": [["-4.0", "False"], ["-1.0", "False"]],
-                "acc": 0.0,
+                "doc": {"sentence_good": "ş", "sentence_bad": "aa"},
+                "filtered_resps": [["-1.5", "False"], ["-2.0", "False"]],
+                "acc": 1.0,
                 "acc_norm": 0.0,
             },
         ]
         path = tmp_path / f"samples_{task}_2026-fixture.jsonl"
         _write_jsonl(path, rows)
         sample_paths.append(path)
-        results[task] = {"sample_len": 2, "acc,none": 0.5, "acc_norm,none": 0.5}
-    results["turblimp_core"] = {"sample_len": 32, "acc_norm,none": 0.5}
+        results[task] = {"sample_len": 2, "acc,none": 1.0, "acc_norm,none": 0.0}
+    results["turblimp_core"] = {"sample_len": 32, "acc_norm,none": 0.0}
     result_path = tmp_path / "results_turblimp_fixture.json"
     write_json(
         result_path,
@@ -170,7 +170,8 @@ def test_turblimp_recomputes_byte_normalized_16_subtask_macro(tmp_path: Path) ->
         group_yaml_path=group_path,
     )
     assert validation["status"] == "pass"
-    assert validation["recomputed_macro_acc_norm"] == 0.5
+    assert validation["recomputed_macro_acc_norm"] == 0.0
+    assert validation["recomputed_macro_acc_bytes_sensitivity"] == 1.0
     assert validation["subtask_count"] == 16
 
 
@@ -212,10 +213,10 @@ def test_heading_sensitivity_requires_same_documents_but_no_numeric_delta_gate(
     }
 
 
-def test_frozen_plan_binds_exact_16_subtasks_and_test_only_scope() -> None:
+def test_prepared_repair_plan_binds_exact_16_subtasks_and_test_only_scope() -> None:
     plan = build_parity_plan(CONFIG, repo_root=ROOT)
-    assert plan["status"] == "frozen"
-    assert plan["execution_authorized"] is True
+    assert plan["status"] == "prepared"
+    assert plan["execution_authorized"] is False
     assert plan["turblimp"]["subtask_ids"] == SUBTASKS
     assert plan["run_classification"] == "test_only_non_scientific"
 
