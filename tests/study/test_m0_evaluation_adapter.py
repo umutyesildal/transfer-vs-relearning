@@ -106,11 +106,20 @@ def test_parallel_plan_rejects_duplicate_tasks_and_scientific_limits(tmp_path: P
         build_m0_parallel_plan(_write_yaml(tmp_path / "scientific.yaml", scientific), repo_root=ROOT)
 
 
-def test_frozen_materializer_repair_is_blocked_only_by_local_runtime_identity() -> None:
+def test_frozen_materializer_repair_is_blocked_only_by_local_runtime_identity(
+    tmp_path: Path,
+) -> None:
+    payload_config = yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
+    payload_config["parallel_evaluation"]["runtime"]["python"] = str(
+        tmp_path / "intentionally-missing-runtime" / "bin" / "python"
+    )
+    isolated_config = _write_yaml(tmp_path / "qualification.yaml", payload_config)
     payload = assess_m0_parallel_readiness(
-        CONFIG,
+        isolated_config,
         repo_root=ROOT,
         project_state_path=ROOT / "documentation/current/PROJECT_STATE.yaml",
+        output_root=Path("/vol/tmp2/yesildau")
+        / f"pytest-fresh-qualification-{tmp_path.name}",
     )
     assert payload["status"] == "blocked_pre_scoring"
     assert payload["scientific_work_started"] is False
