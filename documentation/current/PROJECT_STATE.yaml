@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m0-evaluation
-  status: m0_qualification_7_of_7_matrix_planner_prepared
+  status: m0_qualification_and_parity_complete_eval_v1_freeze_open
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -24,7 +24,7 @@ repository:
       path: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1
       branch: agent/m0-evaluation
       sync_mode: git_pull_ff_only
-      dependency_commit_verified: 329afaa91b4b403b86eca82f60bb3649a6f38800
+      dependency_commit_verified: c3f3c30a31855de920eb268b74bc94d71e9c246d
       clean_at_verification: true
     legacy_checkout:
       path: /vol/fob-vol6/mi25/yesildau/transfer-vs-relearning
@@ -100,14 +100,14 @@ readiness:
 
 evaluation_target:
   contract_name: eval-v1
-  status: draft_upstream_semantics_qualified
+  status: draft_olmo_qualification_and_parity_complete_freeze_inputs_open
   draft_contract: documentation/contracts/evaluation/eval-v1.md
   registry: configs/evaluation/eval_v1_registry.yaml
   inventory: documentation/evaluation/EVALUATOR_INVENTORY_V1.md
   task_qualification: documentation/evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md
   result_schema: documentation/evaluation/RESULT_SCHEMA_V1.md
   m0_qualification_wave:
-    status: qualification_bundle_complete_parity_blocked
+    status: qualification_bundle_complete_parity_pass
     classification: qualification_only
     scientific_result: false
     model: allenai/OLMo-2-0425-1B
@@ -133,10 +133,21 @@ evaluation_target:
     consolidated_result: evaluation_results.json
     completed_lane_count: 7
     normalization_allowed: true
-    qualification_gate: blocked
-    qualification_blockers:
-      - wikitext_count_result_and_heading_parity
-      - turblimp_16_subtask_macro_parity
+    qualification_gate: qualified_for_eval_v1_freeze_review
+    qualification_blockers: []
+    parity:
+      status: completed_pass
+      contract: documentation/contracts/evaluation/m0-olmo-qualification-parity-v1.md
+      record: documentation/179_M0_OLMO_EVAL_V1_PARITY_EXECUTION_RESULT_AND_FREEZE_GATE_TR.md
+      output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_parity_v2
+      implementation_commit: cb48fddadcbaa1e6ef145d6be7d7568359723573
+      heading_job_id: "461668"
+      finalizer_job_id: "461669"
+      result_sha256: b50b5d2282464fa5890a11297550502753daaf39708b9ed9eff5e1a269ae266e
+      final_inventory_sha256: 683f5bd5158a28bf23b0d23bfa0d6710fe3e0d4373c60bc35bd884d7138a4c20
+      file_count: 422
+      total_bytes: 414036276
+      scientific_result: false
     recovery:
       status: completed
       contract: documentation/contracts/evaluation/m0-olmo-v8-english-capability-recovery-v1.md
@@ -205,7 +216,7 @@ evaluation_target:
     luna_packet_manifest: .agents/task-packets/study-v1/manifest.json
     full_study_stage_count: 15
     execution_adapter_ready: false
-    m0_adapter_status: qualification_bundle_complete_parity_pending
+    m0_adapter_status: qualification_bundle_complete_parity_pass
     m0_parallel_entrypoint: scripts/study/run_m0_olmo_evaluation.py
     execution_authorized: false
     three_model_matrix:
@@ -255,10 +266,8 @@ evaluation_target:
       - presentation_bundle
   freeze_blockers:
     - dataset_revisions_and_content_manifests
-    - environment_lock_and_olmo_task_smoke
-    - wikitext_parity_and_heading_sensitivity
+    - final_scientific_environment_binding
     - pile_10k_runtime_and_cadence
-    - turblimp_group_aggregation_parity
     - turkishmmlu_access_decision
     - cheap_factual_probe_registry
     - numeric_scientific_margins
@@ -303,7 +312,7 @@ current_evidence:
 
 active_priority:
   name: qualify_and_freeze_eval_v1
-  first_boundary: task_data_runtime_and_parity_qualification
+  first_boundary: remaining_scientific_eval_v1_freeze_inputs
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -320,12 +329,14 @@ active_priority:
     - m0_parallel_evaluation_controller
     - m0_harness_and_project_adapter_scaffold
     - m0_olmo_qualification_bundle_7_of_7
+    - m0_olmo_wikitext_and_turblimp_parity_pass
     - three_model_27_node_matrix_planner
     - three_model_luna_micro_packet_renderer
   required_outputs:
     - exact_dataset_revision_and_access_evidence
-    - lm_eval_validation_and_runtime_evidence
-    - wikitext_and_turblimp_parity_evidence
+    - final_scientific_environment_binding
+    - pile_10k_runtime_and_cadence_decision
+    - turkishmmlu_inclusion_or_exclusion_decision
     - cheap_factual_panel_hash
     - numeric_gate_review
     - parity_and_resume_test_plan
@@ -343,9 +354,9 @@ authorization:
   cleanup_or_deletion: false
 
 next_decision_required:
-  subject: eval_v1_parity_and_scientific_freeze
+  subject: remaining_eval_v1_scientific_freeze_inputs
   note: >-
-    The OLMo non-scientific qualification bundle is complete 7/7 and the three-model matrix is
-    prepared but not executable. Prove WikiText count/result/heading and TurBLiMP 16-subtask macro
-    parity, then freeze dataset identities, the cheap factual panel and numeric margins before
+    The OLMo non-scientific qualification bundle and both parity checks are complete. Freeze exact
+    scientific dataset identities, the final environment binding, Pile-10k cadence, TurkishMMLU
+    disposition, the cheap factual panel, numeric margins and checkpoint-binding policy before
     scientific M0 configs or any M1/M2 training contract can open.

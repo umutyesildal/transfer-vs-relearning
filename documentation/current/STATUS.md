@@ -115,6 +115,16 @@ normalization enabled. The bundle is still `test_only_non_scientific`; its quali
 blocked only by WikiText count/result/heading parity and TurBLiMP 16-subtask macro parity. No
 scientific M0 result or training authority follows.
 
+That parity boundary is now closed. The frozen v2 parity wave reproduced canonical WikiText word
+PPL, byte PPL and BPB exactly, reproduced TurBLiMP's 16-subtask `acc_norm` macro at `0.40625`, and
+completed the predefined Markdown-heading sensitivity on V100 job `461668`; finalizer `461669`
+reported `parity_pass`. An earlier pre-submission root is preserved because it exposed and stopped
+on a validator error: upstream `acc_norm` uses Python Unicode string length, while byte-normalized
+accuracy is a distinct descriptive sensitivity. Document 179 records both roots and hashes. The
+qualification gate is now `qualified_for_eval_v1_freeze_review`, but eval-v1 remains draft pending
+scientific dataset identities, final environment binding, Pile cadence, TurkishMMLU disposition,
+cheap factual panel hash, numeric margins and checkpoint-binding policy.
+
 ## Evaluation design result
 
 - LM Evaluation Harness is pinned prospectively to v0.4.12 commit
@@ -161,22 +171,22 @@ These are constraints and evidence, not reasons to throw away existing implement
 
 ## Active work boundary
 
-The valid next work is bounded evaluation parity and freeze:
+The valid next work is the remaining eval-v1 freeze package:
 
-1. freeze exact dataset revisions/content manifests and the dedicated environment;
-2. prove canonical WikiText and TurBLiMP normalization parity;
-3. decide Pile-10k cadence and TurkishMMLU inclusion;
-4. freeze the cheap factual probe registry and numeric scientific margins;
-5. add deterministic parity, identity, normalization and resume tests;
-6. only then freeze `eval-v1` and the three scientific M0 configs.
+1. freeze exact scientific dataset revisions/content manifests and bind the qualified environment;
+2. decide Pile-10k cadence and TurkishMMLU inclusion;
+3. freeze the cheap factual probe registry and numeric scientific margins;
+4. freeze the per-training-contract checkpoint-binding rule;
+5. only then freeze `eval-v1` and the three scientific M0 configs.
 
 The planner/tracing and M0 adapter implementation may be tested and reviewed locally. Exact runtime,
 dataset, project-evaluator and resource bindings remain before qualification execution; they must
 not be bypassed with ad-hoc commands.
 
-The 2026-08-16 qualification/recovery authorization has been consumed. No further evaluation,
-scientific M0, training, corpus materialization, cleanup, deletion or writes to prior evidence roots
-are authorized by it. The matrix planning contract likewise grants no external execution.
+The 2026-08-16 qualification/recovery/parity authorization has been consumed. No further
+evaluation, scientific M0, training, corpus materialization, cleanup, deletion or writes to prior
+evidence roots are authorized by it. The matrix planning contract likewise grants no external
+execution.
 
 ## Repository state
 

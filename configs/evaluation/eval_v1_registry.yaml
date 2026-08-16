@@ -1,7 +1,7 @@
 schema_version: 1
 name: eval-v1
 status: draft
-as_of: "2026-08-15"
+as_of: "2026-08-16"
 execution_ready: false
 execution_authorized: false
 
@@ -26,6 +26,15 @@ harness:
     fewshot: 42
   project_bootstrap_samples: 10000
   project_bootstrap_seed: 42
+
+qualification_evidence:
+  status: olmo_7_of_7_bundle_and_two_parity_checks_complete
+  classification: test_only_non_scientific
+  parity_record: documentation/179_M0_OLMO_EVAL_V1_PARITY_EXECUTION_RESULT_AND_FREEZE_GATE_TR.md
+  parity_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_parity_v2
+  parity_result_sha256: b50b5d2282464fa5890a11297550502753daaf39708b9ed9eff5e1a269ae266e
+  final_inventory_sha256: 683f5bd5158a28bf23b0d23bfa0d6710fe3e0d4373c60bc35bd884d7138a4c20
+  scientific_result: false
 
 cadence:
   dense:
@@ -59,7 +68,7 @@ cadence:
 standard_tasks:
   - id: wikitext
     inclusion: core
-    status: upstream_semantics_verified_dataset_revision_unresolved
+    status: upstream_semantics_and_count_result_heading_parity_verified_dataset_revision_unresolved
     role: english_retention_primary
     cadence: dense
     fewshot: 0
@@ -123,12 +132,13 @@ standard_tasks:
 
   - id: turblimp_core
     inclusion: core
-    status: upstream_semantics_verified_group_yaml_duplicate_key_requires_parity_test
+    status: upstream_semantics_and_16_subtask_macro_parity_verified_dataset_revision_unresolved
     role: turkish_grammar_manipulation_check
     cadence: full
     fewshot: 0
     primary_metric: acc_norm
     sensitivity_metric: acc
+    byte_normalized_metric_role: descriptive_sensitivity_not_upstream_acc_norm
     aggregation: unweighted_macro_over_16_subtasks
     dataset: juletxara/turblimp
     split: train_as_test
@@ -264,11 +274,8 @@ pipeline:
 
 freeze_blockers:
   - exact_huggingface_dataset_revisions_and_local_content_manifests
-  - dedicated_environment_lock_and_olmo_compatibility_smoke
-  - lm_eval_ls_and_validate_evidence_for_the_final_task_set
-  - canonical_wikitext_parity_and_heading_sensitivity_result
+  - final_scientific_environment_binding_from_qualified_lock
   - pile_10k_runtime_and_cadence_decision
-  - turblimp_duplicate_key_result_normalization_test
   - turkishmmlu_access_inclusion_or_exclusion_decision
   - cheap_factual_panel_ids_and_hash
   - numeric_acquisition_retention_manipulation_and_noninferiority_margins

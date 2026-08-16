@@ -65,6 +65,11 @@ BPB ratio is diagnostic-only because BPB is already logarithmic. `100 / PPL rati
 `retention_score` in plot data only; it is not a percentage of retained facts and never defines a
 scientific gate.
 
+Pinned Harness v0.4.12 defines TurBLiMP `acc_norm` using log-likelihood divided by Python Unicode
+string length. UTF-8-byte-normalized accuracy is a separately labelled sensitivity and must never
+be substituted for upstream `acc_norm`. The group decision metric is the unweighted macro across
+the exact 16 equal-size subtasks.
+
 ### Project factual lane
 
 - mean answer-token log probability is the primary candidate score;
@@ -167,6 +172,11 @@ open.
 6. Cheap/full factual registry hashes and denominator tests.
 7. Harness-to-normalized golden fixture, resume mismatch and partial-result tests.
 8. Reviewed numerical margins and exact training checkpoint bindings.
+
+Items 2 and 4 are complete in Document 179. The bounded OLMo qualification also proves the pinned
+runtime, final active task discovery, offline reload and base task smokes, but its metrics remain
+test-only. The remaining items are tracked machine-readably in `eval_v1_registry.yaml`; no parity
+PASS promotes this draft automatically.
 
 ## Authority boundary
 

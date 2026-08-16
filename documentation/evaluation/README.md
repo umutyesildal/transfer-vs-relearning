@@ -21,5 +21,8 @@ The machine-readable draft registry is
 Documents 177 and 178 remain the supervisor/design inputs. Historical numbered evaluation reports
 remain evidence and are not rewritten by this layer.
 
+The completed OLMo qualification and parity evidence is summarized in
+[`../179_M0_OLMO_EVAL_V1_PARITY_EXECUTION_RESULT_AND_FREEZE_GATE_TR.md`](../179_M0_OLMO_EVAL_V1_PARITY_EXECUTION_RESULT_AND_FREEZE_GATE_TR.md).
+
 `eval-v1` is not frozen and this directory grants no evaluation, download, HU, Slurm, training, or
 publication authority.

@@ -27,7 +27,9 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert state["readiness"]["ready_to_measure"] is False
     assert state["readiness"]["ready_to_train"] is False
     assert state["readiness"]["selected_primary_model"] is None
-    assert state["evaluation_target"]["status"] == "draft_upstream_semantics_qualified"
+    assert state["evaluation_target"]["status"] == (
+        "draft_olmo_qualification_and_parity_complete_freeze_inputs_open"
+    )
     assert state["evaluation_target"]["harness"]["git_commit"] == (
         "6d642546f4688648fced259eb3302efd36ece5af"
     )
@@ -42,7 +44,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         "path": "/vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1",
         "branch": "agent/m0-evaluation",
         "sync_mode": "git_pull_ff_only",
-        "dependency_commit_verified": "329afaa91b4b403b86eca82f60bb3649a6f38800",
+        "dependency_commit_verified": "c3f3c30a31855de920eb268b74bc94d71e9c246d",
         "clean_at_verification": True,
     }
     assert state["repository"]["hu_checkouts"]["legacy_checkout"]["status"] == (
@@ -82,6 +84,8 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["result_schema"],
         state["evaluation_target"]["m0_qualification_wave"]["contract"],
         state["evaluation_target"]["m0_qualification_wave"]["recovery"]["contract"],
+        state["evaluation_target"]["m0_qualification_wave"]["parity"]["contract"],
+        state["evaluation_target"]["m0_qualification_wave"]["parity"]["record"],
         state["evaluation_target"]["m0_qualification_wave"]["config"],
         state["evaluation_target"]["pipeline"]["documentation"],
         state["evaluation_target"]["pipeline"]["prospective_template"],
@@ -99,11 +103,14 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         assert (ROOT / relative).is_file(), relative
 
     qualification = state["evaluation_target"]["m0_qualification_wave"]
-    assert qualification["status"] == "qualification_bundle_complete_parity_blocked"
+    assert qualification["status"] == "qualification_bundle_complete_parity_pass"
     assert qualification["scientific_result"] is False
     assert qualification["completed_lane_count"] == 7
     assert qualification["normalization_allowed"] is True
-    assert qualification["qualification_gate"] == "blocked"
+    assert qualification["qualification_gate"] == "qualified_for_eval_v1_freeze_review"
+    assert qualification["qualification_blockers"] == []
+    assert qualification["parity"]["heading_job_id"] == "461668"
+    assert qualification["parity"]["finalizer_job_id"] == "461669"
     assert qualification["execution_ready"] is False
     assert qualification["execution_authorized"] is False
     assert qualification["recovery"]["lane_job_id"] == "461595"

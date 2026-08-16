@@ -1,6 +1,6 @@
 # M0 OLMo qualification parity v1
 
-**Status:** `frozen v2 correction / execution-authorized` | **Owner:** project | **Created:** 2026-08-16
+**Status:** `frozen v2 completed / authorization consumed` | **Owner:** project | **Created:** 2026-08-16
 **Parent:** `m0-olmo-qualification-v1`
 
 ## Purpose
@@ -162,3 +162,21 @@ Those corrected bindings are now frozen:
 The user's 2026-08-16 instruction to continue the agreed parity → eval-v1 sequence authorizes this
 single fresh v2 test-only correction because it restores the exact pinned upstream definition and
 does not select a denominator after observing a scientific model outcome. It authorizes no v3.
+
+## Append-only v2 execution result
+
+V2 preflight passed with no blockers. Structural WikiText parity and TurBLiMP parity both passed
+before submission. Heading job `461668` completed on V100 `gruenau1`, and `afterany` finalizer
+`461669` emitted `parity_pass`. The final result has no blockers, is explicitly
+`test_only_non_scientific`, and records `scientific_work_started=false` and
+`eval_v1_frozen=false`.
+
+The canonical WikiText recomputation exactly matched Harness word PPL `13.325301724411347`, byte
+PPL `1.6503868248492586` and BPB `0.722804209249961`. TurBLiMP's exact 16-subtask `acc_norm`
+macro reproduced `0.40625`; byte-normalized sensitivity was `0.34375`. Markdown heading sensitivity
+passed identity and algebra gates and remained descriptive-only.
+
+The complete result and gate are recorded in
+[`../../179_M0_OLMO_EVAL_V1_PARITY_EXECUTION_RESULT_AND_FREEZE_GATE_TR.md`](../../179_M0_OLMO_EVAL_V1_PARITY_EXECUTION_RESULT_AND_FREEZE_GATE_TR.md).
+The v2 root is immutable. This contract's execution authority is consumed and authorizes no retry,
+scientific M0 evaluation, eval-v1 freeze, training, corpus work, cleanup or deletion.

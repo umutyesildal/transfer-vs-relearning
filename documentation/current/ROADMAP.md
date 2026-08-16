@@ -49,8 +49,8 @@ architecture and normalized schema own the previously missing integration surfac
 
 ## R2 — Evaluation qualification and freeze
 
-Status: active; upstream task semantics, draft protocol and a complete 7/7 non-scientific OLMo
-qualification bundle exist; parity and scientific freeze remain open.
+Status: active; upstream task semantics, a complete 7/7 non-scientific OLMo qualification bundle
+and WikiText/TurBLiMP parity PASS exist; the scientific freeze inputs remain open.
 
 - pin LM Evaluation Harness and exact task/dataset revisions;
 - validate task IDs, prompts, few-shot settings, metrics, and availability;
@@ -69,8 +69,9 @@ Current draft evidence:
 - [`../contracts/evaluation/eval-v1.md`](../contracts/evaluation/eval-v1.md);
 - [`../../configs/evaluation/eval_v1_registry.yaml`](../../configs/evaluation/eval_v1_registry.yaml).
 
-Remaining boundary: exact scientific dataset revisions/access, WikiText and TurBLiMP parity,
-Pile-10k cadence, cheap-panel hash and reviewed numerical margins.
+Remaining boundary: exact scientific dataset revisions/access, final environment binding,
+Pile-10k cadence, TurkishMMLU disposition, cheap-panel hash, reviewed numerical margins and the
+per-training-contract checkpoint-binding rule.
 
 ## R3 — Pipeline productionization
 
