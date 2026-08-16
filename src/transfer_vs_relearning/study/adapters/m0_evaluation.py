@@ -43,6 +43,9 @@ def build_lm_eval_command(
         raise ValueError(f"Lane {lane['id']} is not an LM Evaluation Harness lane")
     _, model_path, tokenizer_path = verify_m0_model_manifest(plan, repo_root=repo_root)
     runtime = plan["runtime"]
+    include_path = repo_root / str(plan["harness"]["include_path"])
+    if not include_path.is_dir():
+        raise FileNotFoundError(f"M0 Harness include path is missing: {include_path}")
     command = [
         runtime["python"],
         "-m",
@@ -58,6 +61,8 @@ def build_lm_eval_command(
         "local_files_only=True",
         "--tasks",
         *lane["task_ids"],
+        "--include_path",
+        str(include_path),
         "--num_fewshot",
         str(lane["fewshot"]),
         "--batch_size",

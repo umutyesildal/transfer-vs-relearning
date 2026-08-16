@@ -73,6 +73,13 @@ The v3 materializer/project-input repair is now hash-frozen under the existing t
 authorization. The next action is final HU fast-forward plus readiness preflight; only then may its
 fresh namespace submit the online-materialize → offline-reload → dependent V100 chain.
 
+V3 then proved that the new materializer gate works: it created 338 cache files / 409,436,401 bytes
+and kept the GPU array closed when offline reload failed. The remaining blocker is upstream XNLI's
+legacy `dataset_path: xnli`, incompatible with the current Hub's official `facebook/xnli` identity.
+No v3 GPU/model/scoring work ran. A v4 compatibility overlay preserves the exact EN/TR prompt and
+metric semantics while pinning only the official repository name and observed revision; it remains
+binding-pending until its implementation/config hashes are frozen.
+
 ## Evaluation design result
 
 - LM Evaluation Harness is pinned prospectively to v0.4.12 commit

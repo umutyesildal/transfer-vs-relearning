@@ -1,0 +1,7 @@
+# Prompt copied byte-for-byte in meaning from Harness v0.4.12 xnli_tr.
+dataset_name: tr
+doc_to_choice: '{{[premise+", doğru? Evet, "+hypothesis,premise+", doğru? Böylece,
+  "+hypothesis,premise+", doğru? Hayır, "+hypothesis]}}'
+doc_to_text: ''
+include: xnli_facebook_common_yaml
+task: xnli_tr_facebook_v1

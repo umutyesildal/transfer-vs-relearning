@@ -1,6 +1,6 @@
 # M0 OLMo eval-v1 qualification wave v1
 
-**Status:** `frozen_data_materialization_repair_test_only_authorized` | **Owner:** project | **Created:** 2026-08-16
+**Status:** `xnli_overlay_repair_binding_pending` | **Owner:** project | **Created:** 2026-08-16
 **Supersedes:** none
 
 ## Purpose and estimand
@@ -185,6 +185,25 @@ The v3 repair bindings are frozen:
 The original user authorization remains limited to this test-only, non-scientific qualification
 attempt. V3 is fail-closed and may release the GPU dependency only after materialized-cache,
 offline-reload and project-input gates all pass.
+
+### Append-only XNLI repository-identity compatibility correction
+
+V3 data preflight `460959` correctly materialized 338 files / 409,436,401 bytes and verified both
+project-input lanes before model load. It then failed closed during TaskManager construction because
+Harness v0.4.12's XNLI common YAML uses legacy single-segment `dataset_path: xnli`. The current Hub
+resolves the official dataset as `facebook/xnli`; the existing path produced an invalid `hf://`
+URI under the pinned environment. Offline reload consequently failed as well. Array `460960` never
+received a GPU and no model load or scoring occurred; dependency-dead array cancellation allowed
+finalizer `460961` to record 0/7 lanes, normalization disabled and gate `blocked`. The entire v3
+root is preserved without reuse or cleanup.
+
+The v4 correction introduces only two pinned local task IDs,
+`xnli_en_facebook_v1` and `xnli_tr_facebook_v1`. Their prompts, choices, label target, splits,
+accuracy metric and zero-shot settings reproduce Harness v0.4.12 XNLI EN/TR; the overlay changes
+only `dataset_path` to `facebook/xnli`, pins Hub revision
+`b8dd5d7af51114dbda02c0e3f6133f332186418e`, and renames the task IDs so the compatibility variant
+cannot be confused with upstream. The other eight required task IDs are unchanged. Overlay file
+hashes, adapter hashes, project configs and the fresh v4 namespace must be frozen before execution.
 
 The corrected repair uses the dedicated root
 `/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3`, preserves the parent compat

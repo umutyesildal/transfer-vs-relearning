@@ -98,7 +98,12 @@ def test_current_parallel_preflight_fails_before_scoring() -> None:
     assert payload["status"] == "blocked_pre_scoring"
     assert payload["scientific_work_started"] is False
     assert payload["lane_count"] == 7
-    assert payload["blockers"] == ["runtime_and_artifact_identity"]
+    assert {
+        "qualification_contract_frozen",
+        "qualification_execution_ready",
+        "qualification_execution_authorized",
+        "runtime_and_artifact_identity",
+    }.issubset(payload["blockers"])
     assert "project_ready_to_measure" not in payload["blockers"]
 
 
