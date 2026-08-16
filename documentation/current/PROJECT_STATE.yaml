@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m0-evaluation
-  status: main_published_m0_v7_frozen_execution_ready
+  status: m0_qualification_7_of_7_matrix_planner_prepared
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -24,7 +24,7 @@ repository:
       path: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1
       branch: agent/m0-evaluation
       sync_mode: git_pull_ff_only
-      dependency_commit_verified: 562f1d3ed4a1918403845ea8d12cf65f57c60dd5
+      dependency_commit_verified: 329afaa91b4b403b86eca82f60bb3649a6f38800
       clean_at_verification: true
     legacy_checkout:
       path: /vol/fob-vol6/mi25/yesildau/transfer-vs-relearning
@@ -107,7 +107,7 @@ evaluation_target:
   task_qualification: documentation/evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md
   result_schema: documentation/evaluation/RESULT_SCHEMA_V1.md
   m0_qualification_wave:
-    status: frozen_execution_ready
+    status: qualification_bundle_complete_parity_blocked
     classification: qualification_only
     scientific_result: false
     model: allenai/OLMo-2-0425-1B
@@ -128,8 +128,33 @@ evaluation_target:
     gpu_route_candidates: [v10032gb, a10080gb, rtx3090, rtx6000, rtxa6000]
     environment_root: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3
     environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
-    output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8
+    source_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8
+    output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8_english_capability_recovery_v1
     consolidated_result: evaluation_results.json
+    completed_lane_count: 7
+    normalization_allowed: true
+    qualification_gate: blocked
+    qualification_blockers:
+      - wikitext_count_result_and_heading_parity
+      - turblimp_16_subtask_macro_parity
+    recovery:
+      status: completed
+      contract: documentation/contracts/evaluation/m0-olmo-v8-english-capability-recovery-v1.md
+      contract_sha256: 6cc09cb48f3c406d41b52461571f51d005d75bfbe6c6d77f9304aafa4bf5a92d
+      implementation_commit: 383c44ea4e689194b962308e56310d5c64346ab1
+      source_bundle_status_sha256: 8bc66ee20fba02c0052de8ea8bf83134e93c3b2459681ffc5da28af8873fa4c8
+      lane_job_id: "461595"
+      finalizer_job_id: "461596"
+      recovered_lane: english_capability
+      route: v10032gb
+      gpu_free_memory_gate_bytes: 17179869184
+      observed_free_gpu_bytes: 33740357632
+      lane_result_sha256: 89da20e65293a71c87aba43b5fd0f3badf6d85e8f22a033eab81032b61dd28ff
+      evaluation_manifest_sha256: d0daa335a391e22aac958cffdd48deacb5524002522b04fb144cda57fe1cfb26
+      evaluation_results_sha256: c0ea0e3178a21ce1b7cbe6c1c6b4e2bff2b11c13fb6af78399f8fa1923a0e350
+      final_inventory_sha256: 3291e6f1dcb4dd5abb7dff1474ebe0f588dee8bba90cc1d9976401102f1c748f
+      file_count: 442
+      total_bytes: 418196673
     prior_not_run_roots:
       - /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v1
       - /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v2
@@ -138,9 +163,10 @@ evaluation_target:
       - /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v5
       - /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v6
       - /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v7
-    execution_ready: true
-    execution_authorized: true
-    user_authorization: earliest_route_window_repair_and_rerun_requested_2026_08_16
+    execution_ready: false
+    execution_authorized: false
+    config_execution_flag_is_historical: true
+    user_authorization: consumed_by_v8_and_single_lane_recovery_on_2026_08_16
   applies_to:
     - M0
     - M1
@@ -171,7 +197,7 @@ evaluation_target:
   architecture: hybrid_harness_custom_factual_and_normalizer
   canonical_result_shape: long_tables_with_generated_checkpoint_view
   pipeline:
-    status: local_checkpoint_and_full_study_foundation_prepared
+    status: local_checkpoint_full_study_and_three_model_matrix_prepared
     documentation: documentation/pipeline/README.md
     prospective_template: configs/pipelines/eval_v1_olmo_epoch_trajectory_template.yaml
     full_study_template: configs/studies/m0_to_m2_eval_v1_template.yaml
@@ -179,14 +205,32 @@ evaluation_target:
     luna_packet_manifest: .agents/task-packets/study-v1/manifest.json
     full_study_stage_count: 15
     execution_adapter_ready: false
-    m0_adapter_status: frozen_execution_ready
+    m0_adapter_status: qualification_bundle_complete_parity_pending
     m0_parallel_entrypoint: scripts/study/run_m0_olmo_evaluation.py
-    execution_authorized: true
+    execution_authorized: false
+    three_model_matrix:
+      status: planned_not_authorized
+      contract: documentation/contracts/three-model-study-matrix-v1.md
+      contract_sha256: 9dd8b1ec6d6b8ba9885930ec11472b59393dcc718a9b66670de62d2760582d30
+      config: configs/studies/three_model_m0_to_m2_matrix_v1.yaml
+      config_sha256: 788549a9d57b36886359e5a46f0d5a661268c7b0b935462b90ed23217af16917
+      entrypoint: scripts/study/run_model_matrix.py
+      implementation_commit: 329afaa91b4b403b86eca82f60bb3649a6f38800
+      models: [olmo, qwen, smollm]
+      model_count: 3
+      wave_count: 9
+      max_concurrent_jobs: 3
+      node_count: 27
+      training_node_count: 9
+      state_evaluation_node_count: 12
+      luna_packet_count: 27
+      hu_test_count: 29
+      execution_authorized: false
     m0_preflight:
       command: >-
         .venv/bin/python scripts/study/run_study.py preflight-m0
         --config configs/studies/m0_to_m2_eval_v1_template.yaml
-      latest_status: blocked_pre_scoring
+      latest_status: superseded_by_completed_recovery_preflight
       scientific_work_started: false
       blockers:
         - study_contract_frozen
@@ -201,8 +245,7 @@ evaluation_target:
         --config configs/evaluation/m0_olmo_eval_v1_qualification_v1.yaml
       latest_status: blocked_pre_scoring
       scientific_work_started: false
-      blockers:
-        - runtime_and_artifact_identity
+      blockers: []
     stage_order:
       - identity_preflight
       - train_and_trace
@@ -276,6 +319,9 @@ active_priority:
     - m0_olmo_qualification_draft
     - m0_parallel_evaluation_controller
     - m0_harness_and_project_adapter_scaffold
+    - m0_olmo_qualification_bundle_7_of_7
+    - three_model_27_node_matrix_planner
+    - three_model_luna_micro_packet_renderer
   required_outputs:
     - exact_dataset_revision_and_access_evidence
     - lm_eval_validation_and_runtime_evidence
@@ -297,9 +343,9 @@ authorization:
   cleanup_or_deletion: false
 
 next_decision_required:
-  subject: eval_v1_bounded_qualification_wave
+  subject: eval_v1_parity_and_scientific_freeze
   note: >-
-    The local inventory, upstream v0.4.12 task semantics, draft cadence and normalized schema now
-    exist. A separate bounded qualification wave must freeze dataset revisions, validate the final
-    task set, measure runtime, prove WikiText/TurBLiMP parity, choose TurkishMMLU inclusion, hash
-    the cheap factual panel and review numeric margins before eval-v1 can be frozen.
+    The OLMo non-scientific qualification bundle is complete 7/7 and the three-model matrix is
+    prepared but not executable. Prove WikiText count/result/heading and TurBLiMP 16-subtask macro
+    parity, then freeze dataset identities, the cheap factual panel and numeric margins before
+    scientific M0 configs or any M1/M2 training contract can open.

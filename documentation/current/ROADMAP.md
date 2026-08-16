@@ -49,8 +49,8 @@ architecture and normalized schema own the previously missing integration surfac
 
 ## R2 — Evaluation qualification and freeze
 
-Status: active; upstream task semantics, draft protocol and fail-closed parallel M0 controller
-complete locally; execution qualification open.
+Status: active; upstream task semantics, draft protocol and a complete 7/7 non-scientific OLMo
+qualification bundle exist; parity and scientific freeze remain open.
 
 - pin LM Evaluation Harness and exact task/dataset revisions;
 - validate task IDs, prompts, few-shot settings, metrics, and availability;
@@ -69,14 +69,15 @@ Current draft evidence:
 - [`../contracts/evaluation/eval-v1.md`](../contracts/evaluation/eval-v1.md);
 - [`../../configs/evaluation/eval_v1_registry.yaml`](../../configs/evaluation/eval_v1_registry.yaml).
 
-Remaining boundary: exact dataset revisions/access, locked environment, OLMo task smoke, WikiText
-and TurBLiMP parity, Pile-10k runtime, cheap-panel hash and reviewed numerical margins.
+Remaining boundary: exact scientific dataset revisions/access, WikiText and TurBLiMP parity,
+Pile-10k cadence, cheap-panel hash and reviewed numerical margins.
 
 ## R3 — Pipeline productionization
 
-Status: local checkpoint planner, full 15-stage study controller, training trace, typed artifact
-scaffold, presentation contract, Luna micro-packets and seven-lane M0 parallel adapters prepared;
-frozen bindings and all later-state execution adapters remain blocked on R2 freeze.
+Status: local checkpoint planner, full 15-stage study controller, 27-node OLMo/Qwen/SmolLM matrix,
+training trace, typed artifact scaffold, presentation contract, Luna micro-packets and seven-lane
+M0 parallel adapters prepared; frozen bindings and all later-state execution adapters remain
+blocked on R2 freeze.
 
 - expose one validated pipeline interface for state/checkpoint evaluation;
 - make manifests, resume, failure states, and output namespaces deterministic;
@@ -88,9 +89,11 @@ Exit condition: the same command/config family can evaluate M0, M1, M2-A, and M2
 
 Current local evidence: [`../pipeline/README.md`](../pipeline/README.md), the pipeline config under
 `configs/pipelines/`, the full-study config under `configs/studies/`, the M0 entrypoint under
-`scripts/study/`, and fail-closed planner/trace/artifact/study tests. Remaining work is to bind and
-qualify the M0 adapters, then implement later-state training/evaluation adapters plus complete-result
-normalization and figure rendering without changing eval-v1 semantics.
+`scripts/study/`, the
+[`three-model planning contract`](../contracts/three-model-study-matrix-v1.md), and fail-closed
+planner/trace/artifact/study tests. Remaining work is to freeze three scientific M0 bindings, then
+implement later-state training/evaluation adapters plus complete-result normalization and figure
+rendering without changing eval-v1 semantics.
 
 ## R4 — Corpus contract
 

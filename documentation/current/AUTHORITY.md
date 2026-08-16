@@ -30,6 +30,7 @@ boundary.
 | Repository orientation | root `README.md` |
 | Scientific interpretation | `current/STATUS.md` and cited result/gate records |
 | Evaluation design | `evaluation/README.md`, then only the named inventory/registry/contract section |
+| Three-model matrix | `contracts/three-model-study-matrix-v1.md`, matrix config, then one named node packet |
 | Execute a frozen local contract | that exact contract plus named inputs and acceptance tests |
 | HU/Slurm work | exact authorized contract, `ssh-client/README.md`, relevant launcher/preflight |
 | Corpus work | exact corpus contract, provenance manifest, contamination policy, relevant scripts |

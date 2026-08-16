@@ -42,7 +42,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         "path": "/vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1",
         "branch": "agent/m0-evaluation",
         "sync_mode": "git_pull_ff_only",
-        "dependency_commit_verified": "562f1d3ed4a1918403845ea8d12cf65f57c60dd5",
+        "dependency_commit_verified": "329afaa91b4b403b86eca82f60bb3649a6f38800",
         "clean_at_verification": True,
     }
     assert state["repository"]["hu_checkouts"]["legacy_checkout"]["status"] == (
@@ -81,12 +81,16 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["task_qualification"],
         state["evaluation_target"]["result_schema"],
         state["evaluation_target"]["m0_qualification_wave"]["contract"],
+        state["evaluation_target"]["m0_qualification_wave"]["recovery"]["contract"],
         state["evaluation_target"]["m0_qualification_wave"]["config"],
         state["evaluation_target"]["pipeline"]["documentation"],
         state["evaluation_target"]["pipeline"]["prospective_template"],
         state["evaluation_target"]["pipeline"]["full_study_template"],
         state["evaluation_target"]["pipeline"]["full_study_entrypoint"],
         state["evaluation_target"]["pipeline"]["luna_packet_manifest"],
+        state["evaluation_target"]["pipeline"]["three_model_matrix"]["contract"],
+        state["evaluation_target"]["pipeline"]["three_model_matrix"]["config"],
+        state["evaluation_target"]["pipeline"]["three_model_matrix"]["entrypoint"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],
@@ -95,10 +99,23 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         assert (ROOT / relative).is_file(), relative
 
     qualification = state["evaluation_target"]["m0_qualification_wave"]
-    assert qualification["status"] == "frozen_execution_ready"
+    assert qualification["status"] == "qualification_bundle_complete_parity_blocked"
     assert qualification["scientific_result"] is False
-    assert qualification["execution_ready"] is True
-    assert qualification["execution_authorized"] is True
+    assert qualification["completed_lane_count"] == 7
+    assert qualification["normalization_allowed"] is True
+    assert qualification["qualification_gate"] == "blocked"
+    assert qualification["execution_ready"] is False
+    assert qualification["execution_authorized"] is False
+    assert qualification["recovery"]["lane_job_id"] == "461595"
+    assert qualification["recovery"]["finalizer_job_id"] == "461596"
+
+    matrix = state["evaluation_target"]["pipeline"]["three_model_matrix"]
+    assert matrix["status"] == "planned_not_authorized"
+    assert matrix["model_count"] == 3
+    assert matrix["node_count"] == 27
+    assert matrix["training_node_count"] == 9
+    assert matrix["state_evaluation_node_count"] == 12
+    assert matrix["execution_authorized"] is False
 
 
 def test_active_entrypoints_stay_within_context_budget():

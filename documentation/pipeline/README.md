@@ -86,10 +86,10 @@ lanes:
 | `generation_integrity` | project-native degeneration/integrity panel |
 
 One online CPU/data preflight resolves and caches every included Harness task. Only after that job
-passes does one Slurm array run the seven lanes with at most three V100-32GB GPUs concurrently.
-Each active lane owns one GPU/model process; the controller does not multiplex model instances on
-one GPU. An `afterany` finalizer inventories every outcome, while complete normalization opens only
-after all required lanes finish with identical plan and classification identities.
+passes do seven independent, scheduler-routed Slurm jobs run the lanes. Each active lane owns one
+GPU/model process; the controller does not multiplex model instances on one GPU. An `afterany`
+finalizer inventories every outcome, while complete normalization opens only after all required
+lanes finish with identical plan and classification identities.
 
 TurkishMMLU is excluded from qualification v1 because access is unresolved. This does not settle its
 eval-v1 role. A later inclusion would use a separate five-shot lane and new contract version; it is
@@ -102,11 +102,13 @@ The current draft can be inspected without evaluation:
 .venv/bin/python scripts/study/run_m0_olmo_evaluation.py preflight
 ```
 
-The qualification config is now frozen and authorized with exact implementation/environment hashes,
-bounded cache limits and a three-V100 concurrency cap. `submit` still performs a fresh remote
-identity/output-root preflight before it can create the CPU/data job and dependent GPU array.
-Qualification and the later scientific M0 wave use the same controller but separate frozen
-configs/namespaces; success of a limited qualification array never becomes a scientific M0 score.
+The qualification config is frozen with exact implementation/environment hashes and bounded cache
+limits. V8 completed six lanes; its `english_capability` lane encountered a foreign-process OOM
+before scoring. The separately frozen recovery reused the six hash-validated results, ran only that
+lane on a V100 after a 16 GiB free-memory gate, and produced a complete 7/7 composite bundle. The
+bundle remains `test_only_non_scientific`; WikiText and TurBLiMP parity still block eval-v1 freeze.
+See the
+[`v8 recovery contract`](../contracts/evaluation/m0-olmo-v8-english-capability-recovery-v1.md).
 
 ## Remaining production boundary
 
@@ -152,3 +154,37 @@ Before implementing or starting the first M0 lane, inspect every machine-readabl
 
 The command performs no inference or scoring and exits nonzero while any contract, binding,
 environment or adapter prerequisite is unresolved.
+
+## Three-model cohort control
+
+[`../../scripts/study/run_model_matrix.py`](../../scripts/study/run_model_matrix.py) expands the
+single-model workflow across the exact OLMo, Qwen2.5-1.5B and SmolLM2-1.7B assets. It produces nine
+three-job waves and keeps a barrier between waves:
+
+```text
+3× M0 evaluation
+→ 3× M1 training → 3× M1 evaluation
+→ 3× M2 sibling preflight
+→ 3× M2-A training → 3× M2-B training
+→ 3× M2-A evaluation → 3× M2-B evaluation
+→ 3× paired branch analysis
+```
+
+That is 27 nodes: 12 state-evaluation nodes, 9 training nodes and 6 local preflight/analysis
+nodes. M2-A and M2-B remain siblings from the same exact M1 parent with matched budgets. Inspect the
+whole graph without execution:
+
+```bash
+.venv/bin/python scripts/study/run_model_matrix.py run --dry-run
+```
+
+Generate 27 one-model/one-stage Luna packets with:
+
+```bash
+.venv/bin/python scripts/study/run_model_matrix.py packets \
+  --output-dir /tmp/three-model-luna-packets
+```
+
+The current matrix is `planned_not_authorized`. Missing scientific M0 configs and M1/M2 recipes are
+explicit null bindings with named blockers; `run` refuses external work. See the
+[`three-model planning contract`](../contracts/three-model-study-matrix-v1.md).

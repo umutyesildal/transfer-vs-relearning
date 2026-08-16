@@ -66,7 +66,12 @@ schema now exist. The prospective protocol is
 [`evaluation/eval-v1.md`](evaluation/eval-v1.md). Its exact dataset revisions, environment/runtime
 evidence, parity checks, cheap-panel identity and numerical margins remain freeze blockers.
 
-The bounded first qualification design is
-[`evaluation/m0-olmo-qualification-v1.md`](evaluation/m0-olmo-qualification-v1.md). It is a
-`draft_not_executable` engineering contract: reduced/limited smokes are explicitly non-scientific,
-and a later frozen, hash-bound authorization is required before HU, retrieval, Slurm or scoring.
+The bounded qualification design is
+[`evaluation/m0-olmo-qualification-v1.md`](evaluation/m0-olmo-qualification-v1.md). Its v8
+single-lane recovery is recorded by
+[`evaluation/m0-olmo-v8-english-capability-recovery-v1.md`](evaluation/m0-olmo-v8-english-capability-recovery-v1.md).
+The composite qualification bundle is complete 7/7 but remains non-scientific and parity-blocked.
+
+The frozen planning-only three-model control graph is
+[`three-model-study-matrix-v1.md`](three-model-study-matrix-v1.md). It binds model assets and the
+27-node cohort graph, but authorizes no evaluation or training.

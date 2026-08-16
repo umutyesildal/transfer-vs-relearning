@@ -29,6 +29,12 @@ full-study CLI remains dry-run because all later-state adapters/execution author
 The former flat entrypoint roots were losslessly grouped: 129 scripts and 135 Slurm files are mapped
 by `configs/entrypoints/catalog.json`; historical numbered documents were not rewritten.
 
+The three-model matrix now expands that workflow across the exact OLMo, Qwen2.5-1.5B and
+SmolLM2-1.7B assets. It contains 27 nodes in nine three-job waves: 12 state-evaluation nodes, nine
+training nodes and six local preflight/analysis nodes. Its local/HU suite passed 29/29 and it can
+render 27 one-model/one-stage Luna packets. The matrix is `planned_not_authorized`; missing
+scientific M0 and M1/M2 recipe configs remain explicit blockers, not inferred placeholders.
+
 The first machine-readable M0 preflight has now run on the new M0 branch. It stopped before model
 load, inference or scoring, as designed. The current blockers are the draft study/eval contracts,
 unresolved model/output bindings, `ready_to_measure = false`, the absent dedicated `lm_eval`
@@ -101,7 +107,13 @@ hours later. The entire v7 chain was cancelled during incomplete CPU preflight a
 lane, model load or scoring; its seven control files are preserved. V8 adds a frozen 900-second
 earliest-start window: later eligible routes remain audited but are excluded, and near-term declared
 slots are reused for overflow lanes. The one-command evaluation/result behavior is unchanged and the
-fresh v8 namespace is execution-ready.
+fresh v8 namespace was executed once. Six lanes completed; `english_capability` failed before
+scoring on an RTX6000 occupied by a foreign 20.41 GiB process. The frozen recovery verified all six
+source lanes by identity/hash, reused the existing offline cache, required 16 GiB free VRAM and ran
+only the missing lane on V100 job `461595`. Finalizer `461596` produced a 7/7 composite bundle with
+normalization enabled. The bundle is still `test_only_non_scientific`; its qualification gate is
+blocked only by WikiText count/result/heading parity and TurBLiMP 16-subtask macro parity. No
+scientific M0 result or training authority follows.
 
 ## Evaluation design result
 
@@ -149,24 +161,22 @@ These are constraints and evidence, not reasons to throw away existing implement
 
 ## Active work boundary
 
-The valid next work is bounded evaluation qualification:
+The valid next work is bounded evaluation parity and freeze:
 
 1. freeze exact dataset revisions/content manifests and the dedicated environment;
-2. run task validation and bounded OLMo base/runtime smoke under separate authority;
-3. prove canonical WikiText and TurBLiMP normalization parity;
-4. decide Pile-10k cadence and TurkishMMLU inclusion;
-5. freeze the cheap factual probe registry and numeric scientific margins;
-6. add deterministic parity, identity, normalization and resume tests;
-7. only then freeze `eval-v1`.
+2. prove canonical WikiText and TurBLiMP normalization parity;
+3. decide Pile-10k cadence and TurkishMMLU inclusion;
+4. freeze the cheap factual probe registry and numeric scientific margins;
+5. add deterministic parity, identity, normalization and resume tests;
+6. only then freeze `eval-v1` and the three scientific M0 configs.
 
 The planner/tracing and M0 adapter implementation may be tested and reviewed locally. Exact runtime,
 dataset, project-evaluator and resource bindings remain before qualification execution; they must
 not be bypassed with ad-hoc commands.
 
-The 2026-08-16 authorization is limited to the qualification implementation, bounded HU preflight,
-fresh scratch environment/task cache and test-only Slurm wave described above. It does not authorize
-scientific M0 evaluation, training, corpus materialization, cleanup, deletion or writes to prior
-evidence roots.
+The 2026-08-16 qualification/recovery authorization has been consumed. No further evaluation,
+scientific M0, training, corpus materialization, cleanup, deletion or writes to prior evidence roots
+are authorized by it. The matrix planning contract likewise grants no external execution.
 
 ## Repository state
 

@@ -28,8 +28,12 @@ A local planner/tracing foundation now renders the future
 preflight→train→epoch-eval→normalize→presentation sequence without executing it. See
 [`documentation/pipeline/README.md`](documentation/pipeline/README.md).
 
+The bounded OLMo qualification bundle is complete 7/7 but remains non-scientific and blocked on
+WikiText/TurBLiMP parity. A fail-closed 27-node OLMo/Qwen/SmolLM matrix now exposes the future
+three-model waves and Luna micro-packets; no matrix evaluation or training is authorized.
+
 The verified monorepo is now published on `main`. Active evaluation-foundation work continues on
-`agent/eval-harness`. Both source histories and all workspace material were preserved; the
+`agent/m0-evaluation`. Both source histories and all workspace material were preserved; the
 original worktrees and private pre-filter bundle remain rollback sources.
 
 Read the concise live state in
