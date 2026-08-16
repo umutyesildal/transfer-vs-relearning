@@ -5,7 +5,19 @@ as_of: '2026-08-16'
 classification: scientific_evaluation
 scientific_result: true
 execution_ready: true
-execution_authorized: false
+execution_authorized: true
+execution_authorization:
+  status: authorized_single_wave
+  execution_authorized: true
+  authorized_at: '2026-08-16'
+  authorized_contract_sha256: 013f6f638176cbfd15fbe65c7d07a9dbb8d0029879e217f65e4e69bbeef765d9
+  pre_authorization_manifest_sha256: 264525095a3f67b5899771069ad227a41ed431de14fd98c38168690787d2bf5d
+  authorization_record: documentation/contracts/evaluation/m0-three-model-scientific-v1-authorization-2026-08-16.md
+  authorization_record_sha256: f682751fd22311f664821d486f052d8fdaaee2e536939df0a3a4221fda3f7c92
+  wave_limit: 1
+  automatic_retry_authorized: false
+  m1_or_m2_authorized: false
+  cleanup_or_deletion_authorized: false
 contract: documentation/contracts/evaluation/eval-v1.md
 contract_sha256: 72403598d7f9c8ba35bdfcc3e4791d097d41c6ef8f4e79c55cf9a6f34a37479e
 evaluation_registry: configs/evaluation/eval_v1_registry.yaml
@@ -53,7 +65,7 @@ parallel_evaluation:
     implementation_commit: ea4e01de68e80cd33136674aa3cb59dc4547cfbd
     implementation_files:
       scripts/study/run_m0_olmo_evaluation.py: 5f376bc36a33004e459405a764bf78c8ef47fa0f512719ba6ab8ab1fd9769e90
-      scripts/study/run_three_model_m0_evaluation.py: 12359d5f06af586bc6f7912d62aef7519f4860ada1d93d281f671d65b7fce2f3
+      scripts/study/run_three_model_m0_evaluation.py: e8293c6ec6103b9a797bf8550a45e3b7f62fbd0d130f104f4f94378b375557a3
       src/transfer_vs_relearning/study/m0_parallel.py: 003077ee9034a1ed29bf293d7bb5d6128861d2527ac0ff6086ea1fe905e3cbda
       src/transfer_vs_relearning/study/adapters/m0_evaluation.py: 953f1958b6051be33e96c2b94ecb86ae79c5b19ce9a9376cd00f16af7ecdcfa5
       src/transfer_vs_relearning/study/adapters/m0_probing.py: 8c331dd8a18948343af255c337228c1f98bd2c73e78ff84a70a94b752b350744
@@ -185,6 +197,8 @@ storage:
   proposed_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1/olmo
   fresh_root_required: true
   hu_home_read_only: true
+  hu_home_path: /vol/fob-vol6/mi25/yesildau
+  hu_home_limit_bytes: 32212254720
   previous_evidence_roots_read_only: true
   source_dataset_cache_read_only: true
   atomic_writes_required: true

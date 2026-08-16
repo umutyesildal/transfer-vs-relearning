@@ -73,7 +73,7 @@ def test_matrix_has_explicit_blockers_instead_of_placeholder_execution() -> None
     assert olmo_m0["status"] == "blocked_not_authorized"
     assert "evaluation_contract_not_authorized" in olmo_m0["execution_blockers"]
     assert "evaluation_contract_not_frozen" not in olmo_m0["execution_blockers"]
-    assert "m0_scientific_evaluation_not_authorized" in olmo_m0["execution_blockers"]
+    assert "m0_scientific_evaluation_not_authorized" not in olmo_m0["execution_blockers"]
     assert "m0_scientific_evaluation_not_frozen" not in olmo_m0["execution_blockers"]
     assert "matrix_not_authorized" in olmo_m0["execution_blockers"]
     qwen_m1 = nodes["qwen__m1_training"]

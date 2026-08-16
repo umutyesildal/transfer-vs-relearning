@@ -148,11 +148,13 @@ def _main_config(
     *,
     family_root: Path,
     implementation_commit: str,
+    authorization: dict[str, Any],
+    hu_home_gate: dict[str, Any],
 ) -> dict[str, Any]:
     model_root = family_root / model_id
     runtime_files = {
         "scripts/study/run_m0_olmo_evaluation.py": "5f376bc36a33004e459405a764bf78c8ef47fa0f512719ba6ab8ab1fd9769e90",
-        "scripts/study/run_three_model_m0_evaluation.py": "12359d5f06af586bc6f7912d62aef7519f4860ada1d93d281f671d65b7fce2f3",
+        "scripts/study/run_three_model_m0_evaluation.py": "e8293c6ec6103b9a797bf8550a45e3b7f62fbd0d130f104f4f94378b375557a3",
         "src/transfer_vs_relearning/study/m0_parallel.py": "003077ee9034a1ed29bf293d7bb5d6128861d2527ac0ff6086ea1fe905e3cbda",
         "src/transfer_vs_relearning/study/adapters/m0_evaluation.py": "953f1958b6051be33e96c2b94ecb86ae79c5b19ce9a9376cd00f16af7ecdcfa5",
         "src/transfer_vs_relearning/study/adapters/m0_probing.py": "8c331dd8a18948343af255c337228c1f98bd2c73e78ff84a70a94b752b350744",
@@ -175,7 +177,8 @@ def _main_config(
         "classification": "scientific_evaluation",
         "scientific_result": True,
         "execution_ready": True,
-        "execution_authorized": False,
+        "execution_authorized": authorization["execution_authorized"] is True,
+        "execution_authorization": dict(authorization),
         "contract": "documentation/contracts/evaluation/eval-v1.md",
         "contract_sha256": "72403598d7f9c8ba35bdfcc3e4791d097d41c6ef8f4e79c55cf9a6f34a37479e",
         "evaluation_registry": "configs/evaluation/eval_v1_registry.yaml",
@@ -265,6 +268,8 @@ def _main_config(
             "proposed_root": str(model_root),
             "fresh_root_required": True,
             "hu_home_read_only": True,
+            "hu_home_path": hu_home_gate["path"],
+            "hu_home_limit_bytes": hu_home_gate["limit_bytes"],
             "previous_evidence_roots_read_only": True,
             "source_dataset_cache_read_only": True,
             "atomic_writes_required": True,
@@ -299,6 +304,31 @@ def build_configs(repo_root: Path, source_path: Path) -> Path:
     if source.get("schema_version") != 1 or tuple(source.get("models", {})) != MODEL_ORDER:
         raise ValueError("Invalid three-model M0 config source")
     family_root = Path(source["family_root"])
+    authorization = source.get("authorization")
+    hu_home_gate = source.get("hu_home_gate")
+    if not isinstance(authorization, dict) or authorization != {
+        "status": "authorized_single_wave",
+        "execution_authorized": True,
+        "authorized_at": "2026-08-16",
+        "authorized_contract_sha256": "013f6f638176cbfd15fbe65c7d07a9dbb8d0029879e217f65e4e69bbeef765d9",
+        "pre_authorization_manifest_sha256": "264525095a3f67b5899771069ad227a41ed431de14fd98c38168690787d2bf5d",
+        "authorization_record": "documentation/contracts/evaluation/m0-three-model-scientific-v1-authorization-2026-08-16.md",
+        "authorization_record_sha256": "f682751fd22311f664821d486f052d8fdaaee2e536939df0a3a4221fda3f7c92",
+        "wave_limit": 1,
+        "automatic_retry_authorized": False,
+        "m1_or_m2_authorized": False,
+        "cleanup_or_deletion_authorized": False,
+    }:
+        raise ValueError("Invalid or broadened three-model M0 execution authorization")
+    if not isinstance(hu_home_gate, dict) or hu_home_gate != {
+        "path": "/vol/fob-vol6/mi25/yesildau",
+        "limit_bytes": 32_212_254_720,
+        "require_exact_measurement_before_submission": True,
+        "writes_authorized": False,
+        "preparation_measurement_bytes": 14_545_990_549,
+        "preparation_measurement_date": "2026-08-16",
+    }:
+        raise ValueError("Invalid HU-home 30 GiB execution gate")
     output_dir = repo_root / "configs/evaluation/m0_scientific"
     family_models: dict[str, Any] = {}
     for model_id in MODEL_ORDER:
@@ -316,6 +346,8 @@ def build_configs(repo_root: Path, source_path: Path) -> Path:
             project,
             family_root=family_root,
             implementation_commit=source["implementation_commit"],
+            authorization=authorization,
+            hu_home_gate=hu_home_gate,
         )
         main_path = output_dir / f"{model_id}_m0_eval_v1_scientific_v1.yaml"
         _write_yaml(main_path, main)
@@ -331,7 +363,9 @@ def build_configs(repo_root: Path, source_path: Path) -> Path:
         "status": "frozen",
         "as_of": "2026-08-16",
         "execution_ready": True,
-        "execution_authorized": False,
+        "execution_authorized": authorization["execution_authorized"] is True,
+        "execution_authorization": dict(authorization),
+        "hu_home_gate": dict(hu_home_gate),
         "family_root": str(family_root),
         "model_order": list(MODEL_ORDER),
         "models": family_models,
@@ -343,7 +377,7 @@ def build_configs(repo_root: Path, source_path: Path) -> Path:
         },
         "operator": "scripts/study/run_three_model_m0_evaluation.py",
         "implementation_commit": source["implementation_commit"],
-        "execution_note": "frozen configuration is not execution authority",
+        "execution_note": "single wave authorized; root freshness prevents reuse",
     }
     manifest_path = repo_root / "configs/evaluation/m0_scientific_three_model_v1.yaml"
     _write_yaml(manifest_path, family_manifest)

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import importlib.util
+import subprocess
 from pathlib import Path
 
 import yaml
@@ -101,7 +102,10 @@ def test_committed_scientific_family_has_three_models_and_24_parallel_lanes() ->
     module = _module()
     family = module.build_three_model_plan(SCIENTIFIC_MANIFEST, repo_root=ROOT)
     assert family["status"] == "frozen"
-    assert family["execution_authorized"] is False
+    assert family["execution_authorized"] is True
+    assert family["execution_authorization"]["wave_limit"] == 1
+    assert family["hu_home_gate"]["limit_bytes"] == 30 * 1024**3
+    assert family["hu_home_gate"]["writes_authorized"] is False
     assert family["model_count"] == 3
     assert family["total_lane_count"] == 24
     assert family["parallel_models"] == 3
@@ -109,7 +113,8 @@ def test_committed_scientific_family_has_three_models_and_24_parallel_lanes() ->
         config = yaml.safe_load(Path(row["config_path"]).read_text(encoding="utf-8"))
         assert config["classification"] == "scientific_evaluation"
         assert config["execution_ready"] is True
-        assert config["execution_authorized"] is False
+        assert config["execution_authorized"] is True
+        assert config["execution_authorization"]["automatic_retry_authorized"] is False
         assert config["parallel_evaluation"]["data_preflight"]["mode"] == (
             "frozen_offline_reuse"
         )
@@ -125,6 +130,48 @@ def test_committed_scientific_family_has_three_models_and_24_parallel_lanes() ->
             "project_factual",
             "project_generation_integrity",
         }
+
+
+def test_hu_home_gate_is_exact_and_fail_closed(monkeypatch) -> None:
+    module = _module()
+
+    monkeypatch.setattr(
+        module.subprocess,
+        "run",
+        lambda *args, **kwargs: subprocess.CompletedProcess(
+            args[0],
+            0,
+            stdout="14545990549\t/vol/fob-vol6/mi25/yesildau\n",
+            stderr="",
+        ),
+    )
+    passed = module.measure_hu_home_gate(
+        {
+            "path": "/vol/fob-vol6/mi25/yesildau",
+            "limit_bytes": 30 * 1024**3,
+        }
+    )
+    assert passed["status"] == "pass"
+    assert passed["headroom_bytes"] == 17_666_264_171
+
+    monkeypatch.setattr(
+        module.subprocess,
+        "run",
+        lambda *args, **kwargs: subprocess.CompletedProcess(
+            args[0],
+            0,
+            stdout=f"{30 * 1024**3 + 1}\t/vol/fob-vol6/mi25/yesildau\n",
+            stderr="",
+        ),
+    )
+    blocked = module.measure_hu_home_gate(
+        {
+            "path": "/vol/fob-vol6/mi25/yesildau",
+            "limit_bytes": 30 * 1024**3,
+        }
+    )
+    assert blocked["status"] == "blocked"
+    assert blocked["blocker"] == "hu_home_30_gib_limit"
 
 
 def test_scientific_config_generator_reproduces_committed_bytes(tmp_path: Path) -> None:

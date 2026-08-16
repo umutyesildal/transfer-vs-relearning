@@ -53,10 +53,10 @@ models:
     bindings:
       m0_scientific_evaluation:
         status: frozen
-        execution_authorized: false
+        execution_authorized: true
         path: configs/evaluation/m0_scientific/olmo_m0_eval_v1_scientific_v1.yaml
-        sha256: b6dc833f6a16da4c4bb95bb54e69f2f55c998b72066f748688f1043d44e8caf9
-        blocker: scientific_m0_execution_not_authorized
+        sha256: 6727b56ea1aa2784ad8fd3ce658289dd3d1ef136b83507b8390a20c1cc871187
+        blocker: null
       m1_recipe:
         status: not_frozen
         execution_authorized: false
@@ -86,10 +86,10 @@ models:
     bindings:
       m0_scientific_evaluation:
         status: frozen
-        execution_authorized: false
+        execution_authorized: true
         path: configs/evaluation/m0_scientific/qwen_m0_eval_v1_scientific_v1.yaml
-        sha256: 2824e92044c6df7a82e698b012bd99d64e98f8c21684b0b2878f174e1177df76
-        blocker: scientific_m0_execution_not_authorized
+        sha256: c797cfba1046b482b6b8e2df0987a4c371782ab4989d90e202fcacab3fef67fc
+        blocker: null
       m1_recipe:
         status: not_frozen
         execution_authorized: false
@@ -119,10 +119,10 @@ models:
     bindings:
       m0_scientific_evaluation:
         status: frozen
-        execution_authorized: false
+        execution_authorized: true
         path: configs/evaluation/m0_scientific/smollm_m0_eval_v1_scientific_v1.yaml
-        sha256: 76311220bf15bd4965b3c26065df23b283a03a603e2f855cb339e95f01683c28
-        blocker: scientific_m0_execution_not_authorized
+        sha256: 2cde6f871f97f82d4fef94d56fa688126e923d952e47cbac056971a3b95858c4
+        blocker: null
       m1_recipe:
         status: not_frozen
         execution_authorized: false

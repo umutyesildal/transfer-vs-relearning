@@ -5,6 +5,7 @@ import argparse
 import importlib.util
 import json
 import shlex
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +22,14 @@ from transfer_vs_relearning.utils.io import sha256_file, write_json
 DEFAULT_MANIFEST = Path("configs/evaluation/m0_scientific_three_model_v1.yaml")
 DEFAULT_STATE = Path("documentation/current/PROJECT_STATE.yaml")
 MODEL_ORDER = ("olmo", "qwen", "smollm")
+AUTHORIZED_CONTRACT_SHA256 = (
+    "013f6f638176cbfd15fbe65c7d07a9dbb8d0029879e217f65e4e69bbeef765d9"
+)
+PRE_AUTHORIZATION_MANIFEST_SHA256 = (
+    "264525095a3f67b5899771069ad227a41ed431de14fd98c38168690787d2bf5d"
+)
+HU_HOME_PATH = "/vol/fob-vol6/mi25/yesildau"
+HU_HOME_LIMIT_BYTES = 30 * 1024**3
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:
@@ -47,6 +56,29 @@ def build_three_model_plan(manifest_path: Path, *, repo_root: Path) -> dict[str,
         raise ValueError("Three-model M0 execution_authorized must be boolean")
     if manifest.get("model_order") != list(MODEL_ORDER):
         raise ValueError("Three-model M0 model_order must be olmo/qwen/smollm")
+    authorization = manifest.get("execution_authorization")
+    hu_home_gate = manifest.get("hu_home_gate")
+    if manifest["execution_authorized"] is True:
+        if not isinstance(authorization, dict) or (
+            authorization.get("status") != "authorized_single_wave"
+            or authorization.get("execution_authorized") is not True
+            or authorization.get("authorized_contract_sha256")
+            != AUTHORIZED_CONTRACT_SHA256
+            or authorization.get("pre_authorization_manifest_sha256")
+            != PRE_AUTHORIZATION_MANIFEST_SHA256
+            or authorization.get("wave_limit") != 1
+            or authorization.get("automatic_retry_authorized") is not False
+            or authorization.get("m1_or_m2_authorized") is not False
+            or authorization.get("cleanup_or_deletion_authorized") is not False
+        ):
+            raise ValueError("Three-model M0 authorization is missing, invalid or broadened")
+        if not isinstance(hu_home_gate, dict) or (
+            hu_home_gate.get("path") != HU_HOME_PATH
+            or hu_home_gate.get("limit_bytes") != HU_HOME_LIMIT_BYTES
+            or hu_home_gate.get("require_exact_measurement_before_submission") is not True
+            or hu_home_gate.get("writes_authorized") is not False
+        ):
+            raise ValueError("Three-model M0 requires the exact 30 GiB read-only HU-home gate")
     family_root = Path(str(manifest.get("family_root", ""))).resolve()
     if not str(family_root).startswith("/vol/tmp2/yesildau/"):
         raise ValueError("Three-model M0 family root must be under approved scratch")
@@ -90,11 +122,15 @@ def build_three_model_plan(manifest_path: Path, *, repo_root: Path) -> dict[str,
         )
     if len(plan_ids) != 3 or len(output_roots) != 3:
         raise ValueError("Every model requires a distinct plan and output namespace")
+    if any(row["execution_authorized"] != manifest["execution_authorized"] for row in rows):
+        raise ValueError("Family and per-model execution authorization must match")
     return {
         "schema_version": 1,
         "name": manifest["name"],
         "status": manifest["status"],
         "execution_authorized": manifest["execution_authorized"],
+        "execution_authorization": authorization,
+        "hu_home_gate": hu_home_gate,
         "manifest_path": str(manifest_path),
         "manifest_sha256": sha256_file(manifest_path),
         "family_root": str(family_root),
@@ -106,10 +142,65 @@ def build_three_model_plan(manifest_path: Path, *, repo_root: Path) -> dict[str,
     }
 
 
+def measure_hu_home_gate(gate: dict[str, Any] | None) -> dict[str, Any]:
+    if not isinstance(gate, dict):
+        return {
+            "status": "blocked",
+            "blocker": "hu_home_gate_missing",
+            "measured_bytes": None,
+        }
+    path = str(gate.get("path", ""))
+    limit_bytes = int(gate.get("limit_bytes", 0))
+    if path != HU_HOME_PATH or limit_bytes != HU_HOME_LIMIT_BYTES:
+        return {
+            "status": "blocked",
+            "blocker": "hu_home_gate_identity_mismatch",
+            "path": path,
+            "limit_bytes": limit_bytes,
+            "measured_bytes": None,
+        }
+    try:
+        completed = subprocess.run(
+            ["du", "-sb", path],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=600,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return {
+            "status": "blocked",
+            "blocker": "hu_home_exact_measurement_failed",
+            "path": path,
+            "limit_bytes": limit_bytes,
+            "measured_bytes": None,
+            "detail": str(exc),
+        }
+    fields = completed.stdout.strip().split()
+    measured = (
+        int(fields[0])
+        if completed.returncode == 0 and fields and fields[0].isdigit()
+        else None
+    )
+    passed = measured is not None and measured <= limit_bytes
+    return {
+        "status": "pass" if passed else "blocked",
+        "blocker": None if passed else "hu_home_30_gib_limit",
+        "path": path,
+        "limit_bytes": limit_bytes,
+        "measured_bytes": measured,
+        "headroom_bytes": limit_bytes - measured if measured is not None else None,
+        "writes_authorized": False,
+        "command_returncode": completed.returncode,
+        "stderr": completed.stderr.strip(),
+    }
+
+
 def assess_three_model_readiness(
     manifest_path: Path, *, repo_root: Path, project_state_path: Path
 ) -> dict[str, Any]:
     family = build_three_model_plan(manifest_path, repo_root=repo_root)
+    home_gate = measure_hu_home_gate(family.get("hu_home_gate"))
     rows = []
     for row in family["models"]:
         readiness = assess_m0_parallel_readiness(
@@ -126,12 +217,15 @@ def assess_three_model_readiness(
     ]
     if family["execution_authorized"] is not True:
         blockers.append("family_execution_not_authorized")
+    if home_gate["status"] != "pass":
+        blockers.append(str(home_gate["blocker"]))
     return {
         "schema_version": 1,
         "scope": "three_model_scientific_m0_preflight",
         "status": "ready" if not blockers else "blocked_pre_scoring",
         "scientific_work_started": False,
         "family": family,
+        "hu_home_gate": home_gate,
         "models": rows,
         "blockers": blockers,
     }
@@ -184,6 +278,7 @@ def submit_three_model_family(
                 "schema_version": 1,
                 "status": "partial_submission_preserved_no_automatic_cancellation",
                 "family": family,
+                "hu_home_gate_pre_submit": readiness["hu_home_gate"],
                 "submissions": submissions,
                 "error": str(exc),
             },
@@ -224,6 +319,7 @@ def submit_three_model_family(
         "schema_version": 1,
         "status": "submitted",
         "family": family,
+        "hu_home_gate_pre_submit": readiness["hu_home_gate"],
         "submissions": submissions,
         "child_finalizer_job_ids": child_finalizers,
         "family_finalizer_job_id": family_finalizer_id,
