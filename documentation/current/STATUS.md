@@ -31,8 +31,8 @@ by `configs/entrypoints/catalog.json`; historical numbered documents were not re
 The first machine-readable M0 preflight has now run on the new M0 branch. It stopped before model
 load, inference or scoring, as designed. The current blockers are the draft study/eval contracts,
 unresolved model/output bindings, `ready_to_measure = false`, the absent dedicated `lm_eval`
-HU environment and, at that time, the absent M0 standard/factual adapters. Those two adapter files
-are now locally implemented, but they remain unqualified and unexecutable. The local dependency is
+HU environment and, at that time, the absent M0 standard/factual adapters. Those adapters are now
+implemented and frozen for the bounded qualification wave. The local dependency is
 locked and installed directly from Harness v0.4.12 commit
 `6d642546f4688648fced259eb3302efd36ece5af`; its installed VCS identity passed preflight. This is
 `blocked_pre_scoring`, not an M0 scientific result.
@@ -45,9 +45,11 @@ English capability, Turkish capability, factual access and generation integrityâ
 V100 lanes active, followed by an `afterany` evidence finalizer. It binds the
 exact OLMo and Harness revisions, separates limited smokes from scientific scores, requires fresh
 immutable artifacts, and enumerates the environment/data/parity/resource fields still needed for
-freeze. The user authorized the bounded qualification attempt on 2026-08-16. Environment preparation
-may proceed; task retrieval and test-only scoring remain fail-closed until the exact implementation
-and environment identities are inserted into a frozen config.
+freeze. The user authorized the bounded qualification attempt on 2026-08-16. Two rejected scratch
+environment attempts were retained before any data/model/GPU work; the accepted v3 environment
+proves Torch 2.6.0+cu124, CUDA 12.4 and exact Harness commit identity. Implementation hashes,
+environment lock, V100 route, limits and resources are now inserted into the frozen config. The
+CPU/data preflight and dependent test-only array are the next executable action.
 
 ## Evaluation design result
 

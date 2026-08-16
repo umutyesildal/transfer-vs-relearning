@@ -1,6 +1,6 @@
 # M0 OLMo eval-v1 qualification wave v1
 
-**Status:** `implementation_ready_environment_binding_pending` | **Owner:** project | **Created:** 2026-08-16
+**Status:** `frozen_test_only_execution_authorized` | **Owner:** project | **Created:** 2026-08-16
 **Supersedes:** none
 
 ## Purpose and estimand
@@ -47,10 +47,27 @@ materialization, cleanup or deletion. Prior model, corpus and evaluation roots s
 - Python, NumPy, Torch and few-shot seeds: 42;
 - proposed new root: `/vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v1`.
 
-The implementation commit, adapter hashes and complete environment lock remain unresolved until the
-preparatory commit and environment creation finish. The selected qualification route is one
-V100-32GB per lane, FP16, at most three concurrent lanes. Dataset content manifests are outputs of
-the authorized online data preflight, not circular prerequisites for starting that preflight.
+The qualification execution bindings are frozen as follows:
+
+- implementation commit: `7ba5099215103266afc17cfad1b45b7cfcc399b2`;
+- operator entrypoint SHA-256:
+  `800127f937f2e2128eb45a1aabd27c38ce09137abfae2d568171ddb58ac02785`;
+- parallel controller SHA-256:
+  `9c3f6aafcf0b00c56102f60b3956bfeec856770099cbe973a358a6ba389cd869`;
+- Harness adapter SHA-256:
+  `917e63abab19cb0a7bb86e054040abf24658f83ff9939c742b802bc7de6ee883`;
+- project adapter SHA-256:
+  `279d3adc7916919d8507df472ecb1457b315ad8e263343b53709d70116fc2dd3`;
+- v3 environment lock SHA-256:
+  `f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942`;
+- v3 environment identity SHA-256:
+  `9061cbc59d021676ca6b768f7688eb7da10e5460bf4919b963c9931eefcc7d71`;
+- companion config SHA-256:
+  `85caf5157338e1aa2a6e2f8185ebcc9bf386395ddbc88cd7e5ff2ed5996e009b`.
+
+The selected route is one V100-32GB per active lane, FP16, with at most three concurrent lanes.
+Dataset content manifests are outputs of the authorized online data preflight, not circular
+prerequisites for starting that preflight.
 
 ## Protocol
 
@@ -97,10 +114,12 @@ final metadata-name gate compared upstream `lm_eval` without normalizing it to d
 preserved, immutable and excluded from reuse. No data preflight, model load, GPU job or scoring used
 it.
 
-The corrected repair uses the fresh dedicated root
+The corrected repair uses the dedicated root
 `/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3`, preserves the parent compat
 prefix path without resolving it to the shared interpreter, normalizes distribution names and
-asserts the exact base/final runtime identities before accepting its lock:
+asserts the exact base/final runtime identities before accepting its lock. That preparation passed
+with Python 3.11.15, Torch 2.6.0+cu124, CUDA 12.4, Transformers 5.13.0, Datasets 5.0.0,
+Accelerate 1.14.0 and Harness 0.4.12 at the pinned commit:
 
 - prove the installed `lm_eval` source identity equals the pinned commit;
 - record Python, Torch, Transformers, Datasets, tokenizers, CUDA and GPU identities;
@@ -207,10 +226,10 @@ fresh output root are fixed in the companion config.
 
 ## Authority boundary
 
-Environment preparation may run under the 2026-08-16 user authorization. The CPU/data preflight and
-GPU array may run only after the remaining execution bindings are recorded and the config becomes
-`frozen`. Any semantic or resource change after that freeze needs new user authorization and a new
-namespace. Scientific M0 evaluation always requires a later, separate frozen execution contract.
+Environment preparation completed under the 2026-08-16 user authorization. The CPU/data preflight
+and test-only GPU array may now run through the frozen companion config. Any semantic or resource
+change after this freeze needs new user authorization and a new namespace. Scientific M0 evaluation
+always requires a later, separate frozen execution contract.
 
 ## Change policy
 

@@ -1,11 +1,11 @@
 schema_version: 1
 name: m0-olmo-eval-v1-qualification-v1
-status: draft_not_executable
+status: frozen
 as_of: "2026-08-16"
 classification: qualification_only
 scientific_result: false
-execution_ready: false
-execution_authorized: false
+execution_ready: true
+execution_authorized: true
 
 contract: documentation/contracts/evaluation/m0-olmo-qualification-v1.md
 parent_evaluation_contract: documentation/contracts/evaluation/eval-v1.md
@@ -25,7 +25,9 @@ harness:
   package: lm_eval
   release: v0.4.12
   git_commit: 6d642546f4688648fced259eb3302efd36ece5af
-  environment_lock: unresolved_until_implementation_freeze
+  environment_lock_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/environment.lock.txt
+  environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
+  environment_identity_sha256: 9061cbc59d021676ca6b768f7688eb7da10e5460bf4919b963c9931eefcc7d71
 
 seeds:
   python: 42
@@ -75,14 +77,14 @@ parallel_evaluation:
     lane completed with the identical plan and run classification.
   runtime:
     python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
-    implementation_commit: __FROZEN_IMPLEMENTATION_COMMIT__
+    implementation_commit: 7ba5099215103266afc17cfad1b45b7cfcc399b2
     implementation_files:
-      scripts/study/run_m0_olmo_evaluation.py: __FROZEN_ENTRYPOINT_SHA256__
-      src/transfer_vs_relearning/study/m0_parallel.py: __FROZEN_PARALLEL_CONTROLLER_SHA256__
-      src/transfer_vs_relearning/study/adapters/m0_evaluation.py: __FROZEN_HARNESS_ADAPTER_SHA256__
-      src/transfer_vs_relearning/study/adapters/m0_probing.py: __FROZEN_PROJECT_ADAPTER_SHA256__
+      scripts/study/run_m0_olmo_evaluation.py: 800127f937f2e2128eb45a1aabd27c38ce09137abfae2d568171ddb58ac02785
+      src/transfer_vs_relearning/study/m0_parallel.py: 9c3f6aafcf0b00c56102f60b3956bfeec856770099cbe973a358a6ba389cd869
+      src/transfer_vs_relearning/study/adapters/m0_evaluation.py: 917e63abab19cb0a7bb86e054040abf24658f83ff9939c742b802bc7de6ee883
+      src/transfer_vs_relearning/study/adapters/m0_probing.py: 279d3adc7916919d8507df472ecb1457b315ad8e263343b53709d70116fc2dd3
     environment_lock_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/environment.lock.txt
-    environment_lock_sha256: __FROZEN_ENVIRONMENT_LOCK_SHA256__
+    environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
     device: cuda:0
     precision: float16
     batch_size: auto:4
@@ -222,10 +224,12 @@ forbidden_claims:
   - ready_to_train
   - selected_primary_model
 
-freeze_blockers:
-  - implementation_commit_and_adapter_hashes
-  - exact_environment_lock_sha256
-  - final_contract_config_hashes
+freeze_blockers: []
+
+freeze_authority:
+  user_instruction: run_and_try_current_m0_qualification_wave
+  authorized_on: "2026-08-16"
+  scope: bounded_test_only_non_scientific_qualification
 
 eval_v1_promotion_blockers:
   - dataset_revisions_and_content_manifests

@@ -102,18 +102,19 @@ The current draft can be inspected without evaluation:
 .venv/bin/python scripts/study/run_m0_olmo_evaluation.py preflight
 ```
 
-`submit` rejects the current config because qualification limits, environment/model/config hashes,
-Slurm resources, contract freeze and exact authorization are unresolved. Qualification and the
-later scientific M0 wave use the same controller but separate frozen configs/namespaces; success of
-a limited qualification array never becomes a scientific M0 score.
+The qualification config is now frozen and authorized with exact implementation/environment hashes,
+bounded cache limits and a three-V100 concurrency cap. `submit` still performs a fresh remote
+identity/output-root preflight before it can create the CPU/data job and dependent GPU array.
+Qualification and the later scientific M0 wave use the same controller but separate frozen
+configs/namespaces; success of a limited qualification array never becomes a scientific M0 score.
 
 ## Remaining production boundary
 
 The planner, trace/artifact contracts and fail-closed M0 Harness/project/parallel adapters are
-implemented locally. Their final evaluator configs, environment, resource values and complete-result
-normalizer remain blocked on eval-v1 qualification and a separately authorized execution contract.
-Until then every rendered plan has `execution_authorized: false` and
-`status: planned_not_authorized`.
+implemented locally. The M0 qualification adapter is the only executable slice; its scientific
+normalizer and all later-state evaluator/training adapters remain blocked on eval-v1 qualification
+and separate contracts. The full-study plan therefore remains `execution_authorized: false` even
+though the isolated M0 qualification config is test-only authorized.
 
 ## Full M0→M2 study control
 
