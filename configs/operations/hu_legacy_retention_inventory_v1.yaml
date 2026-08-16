@@ -1,0 +1,39 @@
+schema_version: 1
+name: hu-legacy-retention-inventory-v1
+status: bounded_inventory_only
+delete_enabled: false
+
+allowed_source_prefixes:
+  - /vol/tmp/yesildau/transfer-vs-relearning
+  - /vol/fob-vol6/mi25/yesildau/transfer-vs-relearning
+
+source_roots:
+  - id: legacy_artifacts
+    path: /vol/tmp/yesildau/transfer-vs-relearning/artifacts
+  - id: legacy_runs
+    path: /vol/tmp/yesildau/transfer-vs-relearning/runs
+  - id: legacy_pre_pull_backup
+    path: /vol/fob-vol6/mi25/yesildau/transfer-vs-relearning/.codex_pre_pull_backup_20260707T142553Z
+
+hash_policy:
+  max_file_bytes: 67108864
+  max_total_bytes: 2147483648
+
+scan_policy:
+  max_entries: 500000
+  max_inventory_bytes: 268435456
+
+output:
+  fresh_root: /vol/tmp2/yesildau/hu_legacy_retention_inventory_v1
+  required_files:
+    - retention_inventory.jsonl
+    - summary.json
+
+prohibitions:
+  - delete_source_file
+  - mutate_source_file
+  - follow_source_symlink
+  - model_load
+  - evaluation
+  - training
+  - slurm

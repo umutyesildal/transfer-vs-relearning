@@ -9,7 +9,7 @@ Use the smallest relevant directory; do not scan every historical workflow by de
 | `evaluation/` | Generic reusable evaluation entrypoints |
 | `data/` | Generic dataset validation/selection/synchronization |
 | `corpora/` | Corpus preparation, sampling and transport |
-| `operations/` | Model manifests, downloads, checks and bounded operational helpers |
+| `operations/` | Model manifests, downloads, checks, storage retention audits and bounded operational helpers |
 | `m1/` | M1-specific historical workflows; see its local family index |
 | `m2/` | pre-M2, Qwen pilot and Turkish-bridge workflows; see its local family index |
 
