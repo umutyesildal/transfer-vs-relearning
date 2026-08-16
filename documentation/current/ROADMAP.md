@@ -92,9 +92,9 @@ Current local evidence: [`../pipeline/README.md`](../pipeline/README.md), the pi
 `scripts/study/`, the
 [`three-model planning contract`](../contracts/three-model-study-matrix-v1.md), and fail-closed
 planner/trace/artifact/study tests. The three scientific M0 bindings and one 24-lane family
-operator are frozen, and exactly one standalone wave is authorized. HU read-only identity preflight
-and the 30 GiB home gate passed. Remaining work is push/fast-forward, repeated preflight, one
-submission, complete-result normalization and figure rendering; later-state training adapters
+operator are frozen. The exact standalone wave was submitted once after HU read-only identity and
+30 GiB home gates passed; its authorization is consumed. Remaining work is read-only monitoring,
+raw completion, complete-result normalization and figure rendering. Later-state training adapters
 remain blocked without changing eval-v1 semantics.
 
 ## R4 — Corpus contract

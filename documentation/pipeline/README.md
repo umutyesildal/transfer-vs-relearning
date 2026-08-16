@@ -148,6 +148,11 @@ The authorized operator repeats an exact 30 GiB HU-home measurement before submi
 HU-home writes forbidden and cannot reuse the authorization because the fixed family root must be
 fresh.
 
+That single wave was submitted on 2026-08-16. Its 24 GPU lane IDs are `461861`–`461868`,
+`461875`–`461882` and `461889`–`461896`; family finalizer `461898` joins the three model finalizers.
+The authorization is consumed. Status inspection is read-only and no second submit or automatic
+reroute is allowed.
+
 ## Remaining production boundary
 
 The planner, trace/artifact contracts and fail-closed M0 Harness/project/parallel adapters are

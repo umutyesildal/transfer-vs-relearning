@@ -102,6 +102,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["pipeline"]["scientific_m0_family"]["operator"],
         state["evaluation_target"]["pipeline"]["scientific_m0_family"]["authorization_record"],
         state["evaluation_target"]["pipeline"]["scientific_m0_family"]["preflight_record"],
+        state["evaluation_target"]["pipeline"]["scientific_m0_family"]["submission_record"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],
@@ -132,7 +133,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert matrix["execution_authorized"] is False
 
     scientific_m0 = state["evaluation_target"]["pipeline"]["scientific_m0_family"]
-    assert scientific_m0["status"] == "authorized_single_wave_pre_submission"
+    assert scientific_m0["status"] == "submitted_results_pending"
     assert scientific_m0["models"] == ["olmo", "qwen", "smollm"]
     assert scientific_m0["model_count"] == 3
     assert scientific_m0["lanes_per_model"] == 8
@@ -141,11 +142,19 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert scientific_m0["execution_authorized"] is True
     assert scientific_m0["wave_limit"] == 1
     assert scientific_m0["automatic_retry_authorized"] is False
+    assert scientific_m0["authorization_consumed"] is True
+    assert scientific_m0["resubmission_authorized"] is False
+    assert len(scientific_m0["job_ledger"]["olmo"]["lanes"]) == 8
+    assert len(scientific_m0["job_ledger"]["qwen"]["lanes"]) == 8
+    assert len(scientific_m0["job_ledger"]["smollm"]["lanes"]) == 8
+    assert scientific_m0["job_ledger"]["family_finalizer"] == "461898"
     assert scientific_m0["hu_home_gate"]["limit_bytes"] == 30 * 1024**3
     assert scientific_m0["hu_home_gate"]["writes_authorized"] is False
     assert scientific_m0["hu_identity_checks_passed_for_all_models"] is True
     assert scientific_m0["hu_focused_tests"] == 39
-    assert scientific_m0["scientific_work_started"] is False
+    assert scientific_m0["scientific_work_started"] is True
+    assert scientific_m0["scientific_metrics_available"] is False
+    assert len(scientific_m0["known_operational_failures"]) == 2
 
 
 def test_active_entrypoints_stay_within_context_budget():

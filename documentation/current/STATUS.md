@@ -1,6 +1,6 @@
 # Current project status
 
-**As of:** 2026-08-16 | **Phase:** authorized three-model scientific M0 submission
+**As of:** 2026-08-16 | **Phase:** three-model scientific M0 submitted; results pending
 **Readiness:** `ready_to_measure = true`, `ready_to_train = false`
 
 ## Executive state
@@ -14,8 +14,8 @@ architecture, exact Harness environment/dataset identities, final task set, Pile
 full/cheap bilingual factual registries, normalized schema, numeric gates, uncertainty and
 checkpoint-binding policy. Any semantic change requires eval-v2. Freeze does not authorize
 scientific execution. The exact three-model M0 configs and bounded execution contract are now
-frozen. HU read-only identity preflight passed for all three models, and the user authorized exactly
-one 24-lane wave bound to the frozen contract and pre-authorization manifest. M1/M2 remain blocked.
+frozen. HU read-only identity preflight passed for all three models, and the exactly authorized
+24-lane wave was submitted once. Its authorization is consumed; M1/M2 remain blocked.
 
 The local pipeline foundation is now opt-in and fail-closed. It derives an exact epoch/update/batch
 schedule, records tokenization and optimization traces, preserves model-only epoch snapshots behind
@@ -186,17 +186,25 @@ The three-model scientific M0 binding package is complete:
 
 HU read-only identity preflight passed: 39/39 focused tests plus model-manifest, environment, cache,
 config, commit, task-overlay and fresh-output checks for all three models. The single-wave
-authorization is now published locally. Exact HU home use is 14,545,990,549 bytes against the
-32,212,254,720-byte hard limit; home writes remain forbidden. The next action is push, HU
-fast-forward, repeated fail-closed preflight and one submission.
+authorization was published and the final preflight returned no blockers. Exact HU home use was
+14,545,990,549 bytes against the 32,212,254,720-byte hard limit at submit time; home writes remain
+forbidden. CPU/data preflights `461860`, `461874` and `461888` started concurrently. The 24 GPU lanes
+are dependency-bound to those checks, model finalizers are `461869`/`461883`/`461897`, and family
+finalizer is `461898`.
+
+All three data preflights subsequently passed 8/8 task resolution and the exact frozen cache gate.
+OLMo `461864` and SmolLM `461892` then failed before scoring on `gruenau2`: a foreign process used
+approximately 20.41 GiB of each exposed RTX6000 allocation, leaving 1.39 GiB free during model-load
+warm-up. No scientific metric came from those lanes. Other lanes continue running or queued; no
+automatic retry, reroute or foreign-process intervention is authorized.
 
 M1/M2 training, corpus materialization and scientific scoring remain unauthorized. They must not be
 bypassed with ad-hoc commands.
 
 The 2026-08-16 qualification/recovery/parity authorization remains consumed. A separate 2026-08-16
-overlay authorizes exactly one scientific three-model M0 wave. It grants no automatic retry,
-second wave, M1/M2, corpus materialization, cleanup, deletion or HU-home writes. The matrix planning
-contract itself still grants no external execution.
+overlay authorized exactly one scientific three-model M0 wave and was consumed by the recorded
+submission. It grants no automatic retry, second wave, M1/M2, corpus materialization, cleanup,
+deletion or HU-home writes. The matrix planning contract itself still grants no external execution.
 
 ## Repository state
 
