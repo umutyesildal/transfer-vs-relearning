@@ -1,6 +1,6 @@
 # M0 OLMo qualification parity v1
 
-**Status:** `prepared / not executable` | **Owner:** project | **Created:** 2026-08-16  
+**Status:** `frozen / execution-authorized` | **Owner:** project | **Created:** 2026-08-16
 **Parent:** `m0-olmo-qualification-v1`
 
 ## Purpose
@@ -45,9 +45,28 @@ result. The duplicated upstream `aggregate_metric_list` key and its effective la
 
 ## Execution boundary
 
-The user authorized continuing this sequence on 2026-08-16. Execution nevertheless remains
-fail-closed until a first implementation commit, exact implementation-file hashes and a frozen
-companion config are committed and published. The executable wave will use:
+The user authorized continuing this sequence on 2026-08-16. The implementation and companion
+config are now frozen as follows:
+
+- implementation commit: `b503d9ca6471bd6e40a59ca823d6a2c9d963b8a7`;
+- operator entrypoint SHA-256:
+  `63cd9bb33bfc2640ea628c4880b33afcd6e047928db82a0a5acc09b117b85ca6`;
+- parity module SHA-256:
+  `3583e0916bd0f151d96993ad2bae64d7484f8e586f4e9fa8378c0c1b95868d78`;
+- WikiText heading preprocessor SHA-256:
+  `9f331af3df4da84fdd5bfc6b2b52cbbfc4a0fb87d1bf51d4e3de4b01c4f59829`;
+- WikiText heading task YAML SHA-256:
+  `b8b66fa5ff4ef376596f1d1e046633193f1e261bb77ad40ac9831564a19a7eaa`;
+- companion config SHA-256:
+  `cf2191108a3a7c28f6cedd747ebd531496e473a366147677ec0339a897a7ca1a`;
+- completed seven-lane recovery result SHA-256:
+  `a5e8dcc72e0a7303505be975b0bc2f8422c02b6b17ca7d08a182adecd54d00c8`;
+- source WikiText lane-result SHA-256:
+  `23bbf0ca68202abc1633dc132cf803b537e341e4129ee14192bef7b9be1afbde`;
+- source TurBLiMP lane-result SHA-256:
+  `c1da6b48bed624c49088c2add56eb9c051ab37f9b163b5a0cd201f9911631ab4`.
+
+The executable wave uses:
 
 - one fresh root: `/vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_parity_v1`;
 - the pinned lm-eval v0.4.12 environment and exact OLMo manifest;
@@ -74,6 +93,5 @@ corpus work, cleanup, deletion, threshold change or eval-v1 freeze is authorized
 
 ## Freeze blockers
 
-- implementation commit not bound;
-- exact implementation-file hashes not bound;
-- companion config not frozen and execution-authorized.
+None for this bounded test-only parity wave. A blocked runtime or parity result does not authorize
+an automatic retry or any semantic repair.
