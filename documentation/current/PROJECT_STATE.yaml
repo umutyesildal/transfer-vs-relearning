@@ -35,6 +35,18 @@ repository:
       path: /vol/fob-vol6/mi25/yesildau/.conda/envs/xfer-relearn
       lm_eval_installed: false
       mutation_authorized: false
+    legacy_retention:
+      status: inventory_complete_cleanup_not_authorized
+      current_status: documentation/current/HU_RETENTION_STATUS.md
+      inventory_root: /vol/tmp2/yesildau/hu_legacy_retention_inventory_v1
+      inventory_sha256: daad386c19a74186f37e1319f7cf07a39161d5571c2478549710d7a25d138966
+      analysis_root: /vol/tmp2/yesildau/hu_legacy_retention_analysis_v1
+      cleanup_proposal: configs/operations/hu_legacy_cleanup_proposal_v1.yaml
+      total_files: 9825
+      total_bytes: 742915363463
+      optimizer_candidate_files: 203
+      optimizer_candidate_bytes: 426066757577
+      delete_authorized: false
   publication_blockers: []
   main_cutover:
     remote: https://github.com/umutyesildal/transfer-vs-relearning

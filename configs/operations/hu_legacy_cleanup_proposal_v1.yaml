@@ -1,0 +1,91 @@
+schema_version: 1
+name: hu-legacy-cleanup-proposal-v1
+status: proposal_not_authorized
+delete_authorized: false
+scientific_files_deleted: 0
+
+source_inventory:
+  root: /vol/tmp2/yesildau/hu_legacy_retention_inventory_v1
+  manifest: /vol/tmp2/yesildau/hu_legacy_retention_inventory_v1/retention_inventory.jsonl
+  manifest_sha256: daad386c19a74186f37e1319f7cf07a39161d5571c2478549710d7a25d138966
+  total_files: 9825
+  total_bytes: 742915363463
+
+derived_analysis:
+  root: /vol/tmp2/yesildau/hu_legacy_retention_analysis_v1
+  total_training_namespaces: 36
+  closed_training_namespaces: 34
+  lists:
+    optimizer_cleanup_candidates:
+      path: /vol/tmp2/yesildau/hu_legacy_retention_analysis_v1/optimizer_cleanup_candidates.txt
+      sha256: be478f138f7869231a5ff3f1c9c4993e444ceb98ae04ca0cd9b39ab28c525cc2
+      files: 203
+      bytes: 426066757577
+    optimizer_preserve:
+      path: /vol/tmp2/yesildau/hu_legacy_retention_analysis_v1/optimizer_preserve.txt
+      sha256: 32ab87e5b2120d25532bf53804e8e2d07f3e618bf18e4cb86281149f53f6688c
+      files: 1
+      bytes: 6290866176
+    cache_candidates:
+      path: /vol/tmp2/yesildau/hu_legacy_retention_analysis_v1/cache_candidates.txt
+      sha256: 3aaa50c4a279bf7e4f610f8f840f410a273773b0a1d37bddf731f5b1d10e9a42
+      files: 55
+      bytes: 12995
+    empty_marker_candidates:
+      path: /vol/tmp2/yesildau/hu_legacy_retention_analysis_v1/empty_marker_candidates.txt
+      sha256: 47419a8425cc77aa54254d5d6ee1b11dcac95bf14f94912295ee0e477289e2a4
+      files: 14
+      bytes: 14
+
+mandatory_keep:
+  scientific_evidence:
+    files: 8590
+    bytes: 2030136356
+  artifact_models:
+    files: 5
+    bytes: 11540113939
+  final_models_pending_equivalence_review:
+    files: 34
+    bytes: 31798653312
+  nonclosed_run_optimizer:
+    files: 1
+    bytes: 6290866176
+  scheduler_rng_and_small_training_state:
+    files: 637
+    bytes: 4556113
+  incomplete_and_review_evidence:
+    files: 6
+    bytes: 16136
+
+separate_review_required:
+  checkpoint_models:
+    files: 264
+    bytes: 259859746176
+    reason: exact_selected_checkpoint_and_trajectory_retention_mapping_not_frozen
+  other_model_state:
+    files: 16
+    bytes: 5324504669
+    reason: source_role_and_retrievability_not_yet_proven
+  legacy_pre_pull_backup:
+    files: 8
+    bytes: 11906
+    evidence: all_eight_files_byte_identical_to_current_monorepo
+    reason: deletion_is_low_value_and_still_requires_explicit_cleanup_wave
+
+optimizer_cleanup_requirements:
+  - exact_candidate_list_sha256_matches
+  - source_inventory_file_counts_and_bytes_unchanged
+  - every_candidate_run_has_final_model_and_manifest
+  - selected_or_frozen_model_mapping_is_recorded_per_run
+  - no_active_resume_or_dependency_uses_optimizer_state
+  - nonclosed_run_optimizer_is_excluded
+  - separate_exact_user_authorization
+  - post_cleanup_inventory_and_storage_evidence
+
+prohibitions:
+  - automatic_delete
+  - delete_scientific_evidence
+  - delete_final_or_artifact_model
+  - delete_nonclosed_run_state
+  - delete_checkpoint_model_without_selection_mapping
+  - mutate_legacy_runs_before_separate_authorization

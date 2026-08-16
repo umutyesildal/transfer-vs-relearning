@@ -48,6 +48,14 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert state["repository"]["hu_checkouts"]["legacy_checkout"]["status"] == (
         "preserved_dirty_do_not_pull"
     )
+    retention = state["repository"]["hu_checkouts"]["legacy_retention"]
+    assert retention["status"] == "inventory_complete_cleanup_not_authorized"
+    assert retention["inventory_sha256"] == (
+        "daad386c19a74186f37e1319f7cf07a39161d5571c2478549710d7a25d138966"
+    )
+    assert retention["optimizer_candidate_files"] == 203
+    assert retention["optimizer_candidate_bytes"] == 426066757577
+    assert retention["delete_authorized"] is False
     assert state["scientific_design"]["sibling_arms"] == {
         "parent": "M1",
         "arms": ["M2-A", "M2-B"],
@@ -63,6 +71,8 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["repository"]["history_sanitization"]["record"],
         state["repository"]["entrypoint_layout"]["record"],
         state["repository"]["entrypoint_layout"]["catalog"],
+        state["repository"]["hu_checkouts"]["legacy_retention"]["current_status"],
+        state["repository"]["hu_checkouts"]["legacy_retention"]["cleanup_proposal"],
         state["scientific_design"]["current_design_plan"],
         *state["scientific_design"]["supervisor_realignments"],
         state["evaluation_target"]["draft_contract"],

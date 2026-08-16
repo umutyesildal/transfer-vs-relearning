@@ -119,6 +119,13 @@ fast-forward-only pulls. The legacy HU `corpus-update` checkout is dirty and rem
 preserved state. The shared HU Python environment has not been modified and does not yet contain
 `lm-eval`; eval-v1 will use a separately frozen dedicated environment.
 
+The legacy HU `artifacts`/`runs` retention inventory is complete and source-preserving. It records
+9,825 files / 742,915,363,463 bytes with manifest SHA-256
+`daad386c19a74186f37e1319f7cf07a39161d5571c2478549710d7a25d138966`. The meaningful reclaim
+candidate is not cache: 203 optimizer files from 34 closed training namespaces total
+426,066,757,577 bytes. They remain proposal-only until every run has a selected/frozen model map
+and separate exact cleanup authorization. See [`HU retention status`](HU_RETENTION_STATUS.md).
+
 The reachable monorepo history now contains zero blobs at or above 10 MiB. Before filtering, the
 exact 249-commit branch was preserved in a verified private Git bundle; the original source repos
 were not changed. See the

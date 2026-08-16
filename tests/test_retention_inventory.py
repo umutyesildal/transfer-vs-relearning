@@ -5,8 +5,12 @@ import os
 from pathlib import Path
 
 import pytest
+import yaml
 
 from transfer_vs_relearning.storage.retention_inventory import create_retention_inventory
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def _config(root: Path, *, max_file_bytes: int = 64, max_total_bytes: int = 128) -> dict:
@@ -96,3 +100,25 @@ def test_inventory_is_fresh_and_rejects_unsafe_scope(tmp_path: Path) -> None:
     deleting["delete_enabled"] = True
     with pytest.raises(ValueError, match="delete_enabled=false"):
         create_retention_inventory(deleting, tmp_path / "deleting")
+
+
+def test_hu_cleanup_proposal_is_hash_bound_and_not_authorized() -> None:
+    proposal = yaml.safe_load(
+        (ROOT / "configs/operations/hu_legacy_cleanup_proposal_v1.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert proposal["status"] == "proposal_not_authorized"
+    assert proposal["delete_authorized"] is False
+    assert proposal["scientific_files_deleted"] == 0
+    assert proposal["source_inventory"]["manifest_sha256"] == (
+        "daad386c19a74186f37e1319f7cf07a39161d5571c2478549710d7a25d138966"
+    )
+    optimizer = proposal["derived_analysis"]["lists"]["optimizer_cleanup_candidates"]
+    assert optimizer["files"] == 203
+    assert optimizer["bytes"] == 426066757577
+    assert optimizer["sha256"] == (
+        "be478f138f7869231a5ff3f1c9c4993e444ceb98ae04ca0cd9b39ab28c525cc2"
+    )
+    assert "automatic_delete" in proposal["prohibitions"]
