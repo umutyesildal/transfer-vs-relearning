@@ -24,7 +24,7 @@ repository:
       path: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1
       branch: agent/m0-evaluation
       sync_mode: git_pull_ff_only
-      dependency_commit_verified: e227fba0df311c5149b12c6bb8cca39522156985
+      dependency_commit_verified: 24795de90b65abe508d10b9268523960b52ae510
       clean_at_verification: true
     legacy_checkout:
       path: /vol/fob-vol6/mi25/yesildau/transfer-vs-relearning
@@ -115,13 +115,15 @@ evaluation_target:
     contract: documentation/contracts/evaluation/m0-olmo-qualification-v1.md
     config: configs/evaluation/m0_olmo_eval_v1_qualification_v1.yaml
     entrypoint: scripts/study/run_m0_olmo_evaluation.py
-    parallel_topology: preflight_then_single_slurm_array_plus_afterany_finalizer
+    parallel_topology: gpu_route_selection_then_preflight_then_single_slurm_array_plus_afterany_finalizer
     lane_count: 7
     max_parallel_lanes: 3
     local_adapters_implemented: true
-    implementation_commit: e227fba0df311c5149b12c6bb8cca39522156985
-    contract_sha256: 9ff2df783fdc9850d53b905849ea201533ad295c0fb8a6639fc30475011f7121
-    config_sha256: d4efdaf7713a860c96d151d9734c4d7303f77d8a498686d0bb31a81355b6462f
+    implementation_commit: 24795de90b65abe508d10b9268523960b52ae510
+    contract_sha256: 562986cf77d1fb3f937536eba5cf94d1a0f6fa9194a6814b41553c9bf3d5df02
+    config_sha256: 5593c566755e06c658cf23be331a2484e7d2d1abcc1df8a26a398fb806cb5466
+    gpu_route_policy: earliest_test_only_start_then_declared_order
+    gpu_route_candidates: [v10032gb, a10080gb, rtx3090, rtx6000, rtxa6000]
     environment_root: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3
     environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
     output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v4

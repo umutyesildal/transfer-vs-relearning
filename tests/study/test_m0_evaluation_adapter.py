@@ -67,14 +67,19 @@ def test_parallel_plan_covers_every_required_family_and_harness_task_once() -> N
     assert plan["lane_count"] == 7
     assert plan["max_parallel_lanes"] == 3
     assert plan["run_classification"] == "test_only_non_scientific"
-    assert plan["slurm"]["gpu_routes"] == [
-        {
-            "id": "legacy_frozen_route",
-            "partition": "gpu",
-            "gres": "gpu:v10032gb:1",
-            "memory": "64G",
-        }
+    assert [route["id"] for route in plan["slurm"]["gpu_routes"]] == [
+        "v10032gb",
+        "a10080gb",
+        "rtx3090",
+        "rtx6000",
+        "rtxa6000",
     ]
+    assert plan["slurm"]["gpu_routes"][2] == {
+        "id": "rtx3090",
+        "partition": "wbimlgpu",
+        "gres": "gpu:rtx3090:1",
+        "memory": "64G",
+    }
     families = {family for lane in plan["lanes"] for family in lane["families"]}
     assert REQUIRED_FAMILIES.issubset(families)
     tasks = [task for lane in plan["lanes"] for task in lane.get("task_ids", [])]

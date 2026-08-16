@@ -1,5 +1,5 @@
 schema_version: 1
-name: m0-olmo-eval-v1-qualification-v1-xnli-overlay-repair-v1
+name: m0-olmo-eval-v1-qualification-v1-auto-gpu-route-repair-v1
 status: frozen
 as_of: "2026-08-16"
 classification: qualification_only
@@ -74,7 +74,7 @@ phases:
   - q4_qualification_result_and_freeze_gate
 
 parallel_evaluation:
-  topology: preflight_then_single_slurm_array_plus_afterany_finalizer
+  topology: gpu_route_selection_then_preflight_then_single_slurm_array_plus_afterany_finalizer
   one_model_instance_per_lane: true
   max_parallel_lanes: 3
   finalizer_policy: >-
@@ -82,10 +82,10 @@ parallel_evaluation:
     lane completed with the identical plan and run classification.
   runtime:
     python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
-    implementation_commit: e227fba0df311c5149b12c6bb8cca39522156985
+    implementation_commit: 24795de90b65abe508d10b9268523960b52ae510
     implementation_files:
-      scripts/study/run_m0_olmo_evaluation.py: 3d21321941628b83c31ac6f7da28efa6b8fe782447676c0d66e907f2ec2c9fd1
-      src/transfer_vs_relearning/study/m0_parallel.py: 3e1d77068239dec45521777e274d60e548fca7618c7f958118bd91a7e39aae9a
+      scripts/study/run_m0_olmo_evaluation.py: ae2c0b4a595250c404cc1e7e3778c8f6a5efdb4be298ffb51e2c3dc03cb8e3bd
+      src/transfer_vs_relearning/study/m0_parallel.py: 7d3971849df0af8ce8e32d5eeae61f8118f2dc3de0d39c816a4a3144788cfb38
       src/transfer_vs_relearning/study/adapters/m0_evaluation.py: 0e8ee7a842e2cdb93c0f1bee6ce59dda773e3fe3ba10c01e1e6a9c246c6d5499
       src/transfer_vs_relearning/study/adapters/m0_probing.py: 5b8a49003e151454c3028c2eb135fda943a9169037a1a4b9d04ae5a0810fcde6
     environment_lock_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/environment.lock.txt
@@ -142,11 +142,30 @@ parallel_evaluation:
     time_limit: 02:00:00
   slurm:
     account: yesildau
-    partition: gpu
     control_partition: std
-    gres: gpu:v10032gb:1
+    gpu_route_selection_policy: earliest_test_only_start_then_declared_order
+    gpu_routes:
+      - id: v10032gb
+        partition: gpu
+        gres: gpu:v10032gb:1
+        memory: 64G
+      - id: a10080gb
+        partition: gpu
+        gres: gpu:a10080gb:1
+        memory: 64G
+      - id: rtx3090
+        partition: wbimlgpu
+        gres: gpu:rtx3090:1
+        memory: 64G
+      - id: rtx6000
+        partition: gpu
+        gres: gpu:rtx6000:1
+        memory: 64G
+      - id: rtxa6000
+        partition: gpu
+        gres: gpu:rtxa6000:1
+        memory: 64G
     cpus_per_task: 8
-    memory: 64G
     time_limit: 04:00:00
   lanes:
     - id: english_retention_wikitext

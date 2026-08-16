@@ -79,8 +79,11 @@ legacy `dataset_path: xnli`, incompatible with the current Hub's official `faceb
 No v3 GPU/model/scoring work ran. A v4 compatibility overlay preserves the exact EN/TR prompt and
 metric semantics while pinning only the official repository name and observed revision. Its
 implementation, overlay, adapter, project-config and fresh-root bindings are now hash-frozen under
-the existing bounded test-only authorization. The next action is HU readiness preflight followed,
-only on PASS, by CPU materialization and the dependency-gated parallel V100 array.
+the existing bounded test-only authorization. The operator now probes the frozen V100, A100,
+RTX3090, RTX6000 and RTX A6000 routes with Slurm `--test-only`, records every rejection/estimate,
+chooses the earliest eligible route and submits exactly one array. The next action is HU readiness
+preflight followed, only on PASS, by one-command CPU materialization and the dependency-gated GPU
+array; Slurm owns waiting after submission.
 
 ## Evaluation design result
 

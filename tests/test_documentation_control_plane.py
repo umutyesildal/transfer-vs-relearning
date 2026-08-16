@@ -42,7 +42,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         "path": "/vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1",
         "branch": "agent/m0-evaluation",
         "sync_mode": "git_pull_ff_only",
-        "dependency_commit_verified": "e227fba0df311c5149b12c6bb8cca39522156985",
+        "dependency_commit_verified": "24795de90b65abe508d10b9268523960b52ae510",
         "clean_at_verification": True,
     }
     assert state["repository"]["hu_checkouts"]["legacy_checkout"]["status"] == (

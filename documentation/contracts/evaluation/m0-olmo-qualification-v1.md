@@ -232,6 +232,37 @@ hashes, adapter hashes, project configs and the fresh v4 namespace are frozen as
 The v4 wave is execution-ready and authorized only as bounded `test_only_non_scientific`
 qualification. The v1--v3 roots remain immutable evidence and are not reused.
 
+### Append-only automatic GPU-route correction
+
+The first v4 binding above was not submitted and its proposed root remained absent. Before
+execution, the user required the one-command evaluator to avoid manual GPU rerouting. The current
+operational binding therefore replaces only the fixed single-V100 submission route with a
+scheduler-probed candidate table. Every candidate is checked with `sbatch --test-only`; rejected
+routes and their scheduler messages are written to `gpu_route_selection.json`. Exactly one route is
+selected by earliest estimated start time, with declared order as the tie-breaker, and exactly one
+seven-lane array is submitted. No duplicate/racing evaluation arrays are allowed.
+
+The frozen candidate order is V100-32GB, A100-80GB, RTX3090, RTX6000 and RTX A6000. V100, A100,
+RTX6000 and RTX A6000 use partition `gpu`; RTX3090 uses `wbimlgpu`. Each route requests one GPU and
+64 GiB host memory. Live qualification inspection showed the current `yesildau` association is not
+permitted on `wbimlgpu`; this does not abort the wave when another candidate passes, and the denial
+must remain visible in the route ledger. The selector does not bypass Slurm permissions or inspect
+foreign GPU processes.
+
+The current automatic-route bindings are:
+
+- implementation commit: `24795de90b65abe508d10b9268523960b52ae510`;
+- operator entrypoint SHA-256:
+  `ae2c0b4a595250c404cc1e7e3778c8f6a5efdb4be298ffb51e2c3dc03cb8e3bd`;
+- parallel controller/materializer SHA-256:
+  `7d3971849df0af8ce8e32d5eeae61f8118f2dc3de0d39c816a4a3144788cfb38`;
+- companion config SHA-256:
+  `5593c566755e06c658cf23be331a2484e7d2d1abcc1df8a26a398fb806cb5466`;
+- fresh execution root: `/vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v4`.
+
+The CPU data preflight, selected GPU array and `afterany` finalizer are submitted by one command.
+After submission, Slurm owns dependency waiting; no interactive agent wait is required.
+
 The corrected repair uses the dedicated root
 `/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3`, preserves the parent compat
 prefix path without resolving it to the shared interpreter, normalizes distribution names and
