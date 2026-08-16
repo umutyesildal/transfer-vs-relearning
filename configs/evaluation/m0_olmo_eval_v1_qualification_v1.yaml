@@ -1,11 +1,11 @@
 schema_version: 1
 name: m0-olmo-eval-v1-qualification-v1-xnli-overlay-repair-v1
-status: xnli_overlay_repair_binding_pending
+status: frozen
 as_of: "2026-08-16"
 classification: qualification_only
 scientific_result: false
-execution_ready: false
-execution_authorized: false
+execution_ready: true
+execution_authorized: true
 
 contract: documentation/contracts/evaluation/m0-olmo-qualification-v1.md
 parent_evaluation_contract: documentation/contracts/evaluation/eval-v1.md
@@ -82,11 +82,11 @@ parallel_evaluation:
     lane completed with the identical plan and run classification.
   runtime:
     python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
-    implementation_commit: 28589d1c3f01a1824ae3e4c30b357ccb340a0935
+    implementation_commit: e227fba0df311c5149b12c6bb8cca39522156985
     implementation_files:
       scripts/study/run_m0_olmo_evaluation.py: 3d21321941628b83c31ac6f7da28efa6b8fe782447676c0d66e907f2ec2c9fd1
-      src/transfer_vs_relearning/study/m0_parallel.py: a012ed1d6dbe76112e9e16c6584f70ee27b725134f339653ac2e83a37c99daf9
-      src/transfer_vs_relearning/study/adapters/m0_evaluation.py: 917e63abab19cb0a7bb86e054040abf24658f83ff9939c742b802bc7de6ee883
+      src/transfer_vs_relearning/study/m0_parallel.py: 3e1d77068239dec45521777e274d60e548fca7618c7f958118bd91a7e39aae9a
+      src/transfer_vs_relearning/study/adapters/m0_evaluation.py: 0e8ee7a842e2cdb93c0f1bee6ce59dda773e3fe3ba10c01e1e6a9c246c6d5499
       src/transfer_vs_relearning/study/adapters/m0_probing.py: 5b8a49003e151454c3028c2eb135fda943a9169037a1a4b9d04ae5a0810fcde6
     environment_lock_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/environment.lock.txt
     environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
@@ -233,10 +233,7 @@ forbidden_claims:
   - ready_to_train
   - selected_primary_model
 
-freeze_blockers:
-  - xnli_overlay_adapter_commit_and_hashes
-  - repaired_project_config_hashes
-  - repaired_contract_and_config_hashes
+freeze_blockers: []
 
 freeze_authority:
   user_instruction: run_and_try_current_m0_qualification_wave

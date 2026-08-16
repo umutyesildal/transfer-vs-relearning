@@ -67,7 +67,14 @@ def test_parallel_plan_covers_every_required_family_and_harness_task_once() -> N
     assert plan["lane_count"] == 7
     assert plan["max_parallel_lanes"] == 3
     assert plan["run_classification"] == "test_only_non_scientific"
-    assert plan["slurm"]["partition"] == "gpu"
+    assert plan["slurm"]["gpu_routes"] == [
+        {
+            "id": "legacy_frozen_route",
+            "partition": "gpu",
+            "gres": "gpu:v10032gb:1",
+            "memory": "64G",
+        }
+    ]
     families = {family for lane in plan["lanes"] for family in lane["families"]}
     assert REQUIRED_FAMILIES.issubset(families)
     tasks = [task for lane in plan["lanes"] for task in lane.get("task_ids", [])]
@@ -89,7 +96,7 @@ def test_parallel_plan_rejects_duplicate_tasks_and_scientific_limits(tmp_path: P
         build_m0_parallel_plan(_write_yaml(tmp_path / "scientific.yaml", scientific), repo_root=ROOT)
 
 
-def test_current_parallel_preflight_fails_before_scoring() -> None:
+def test_frozen_parallel_preflight_is_blocked_only_by_local_runtime_identity() -> None:
     payload = assess_m0_parallel_readiness(
         CONFIG,
         repo_root=ROOT,
@@ -98,12 +105,7 @@ def test_current_parallel_preflight_fails_before_scoring() -> None:
     assert payload["status"] == "blocked_pre_scoring"
     assert payload["scientific_work_started"] is False
     assert payload["lane_count"] == 7
-    assert {
-        "qualification_contract_frozen",
-        "qualification_execution_ready",
-        "qualification_execution_authorized",
-        "runtime_and_artifact_identity",
-    }.issubset(payload["blockers"])
+    assert payload["blockers"] == ["runtime_and_artifact_identity"]
     assert "project_ready_to_measure" not in payload["blockers"]
 
 
@@ -188,11 +190,23 @@ def test_single_entrypoint_submits_one_parallel_array_and_afterany_finalizer(
     plan["runtime"]["python"] = "/frozen/env/bin/python"
     plan["slurm"] = {
         "account": "yesildau",
-        "partition": "gpu",
         "control_partition": "std",
-        "gres": "gpu:rtx3090:1",
+        "gpu_route_selection_policy": "earliest_test_only_start_then_declared_order",
+        "gpu_routes": [
+            {
+                "id": "v10032gb",
+                "partition": "gpu",
+                "gres": "gpu:v10032gb:1",
+                "memory": "64G",
+            },
+            {
+                "id": "rtx3090",
+                "partition": "wbimlgpu",
+                "gres": "gpu:rtx3090:1",
+                "memory": "64G",
+            },
+        ],
         "cpus_per_task": 8,
-        "memory": "64G",
         "time_limit": "04:00:00",
     }
     output_root = tmp_path / "m0"
@@ -203,7 +217,18 @@ def test_single_entrypoint_submits_one_parallel_array_and_afterany_finalizer(
         submissions.append(argv)
         return str(1000 + len(submissions))
 
+    def fake_probe(_: dict, route: dict[str, str]) -> dict:
+        starts = {"v10032gb": "2026-08-16T15:00:00", "rtx3090": "2026-08-16T12:00:00"}
+        return {
+            "route": route,
+            "eligible": True,
+            "returncode": 0,
+            "estimated_start": starts[route["id"]],
+            "probe_output": "test-only",
+        }
+
     monkeypatch.setattr(entrypoint, "_submit", fake_submit)
+    monkeypatch.setattr(entrypoint, "_probe_gpu_route", fake_probe)
     payload = entrypoint._submit_parallel_jobs(
         plan,
         config_path=CONFIG,
@@ -215,7 +240,7 @@ def test_single_entrypoint_submits_one_parallel_array_and_afterany_finalizer(
     assert "--partition=std" in submissions[0]
     assert not any(argument.startswith("--gres=") for argument in submissions[0])
     assert "--dependency=afterok:1001" in submissions[1]
-    assert "--partition=gpu" in submissions[1]
+    assert "--partition=wbimlgpu" in submissions[1]
     assert "--array=0-6%3" in submissions[1]
     assert "--gres=gpu:rtx3090:1" in submissions[1]
     assert any("run-lane" in argument for argument in submissions[1])
@@ -225,6 +250,9 @@ def test_single_entrypoint_submits_one_parallel_array_and_afterany_finalizer(
     assert payload["preflight_job_id"] == "1001"
     assert payload["array_job_id"] == "1002"
     assert payload["finalizer_job_id"] == "1003"
+    assert payload["selected_gpu_route"]["id"] == "rtx3090"
+    selection = json.loads((output_root / "gpu_route_selection.json").read_text(encoding="utf-8"))
+    assert selection["selected_route"]["id"] == "rtx3090"
     assert json.loads((output_root / "submission_manifest.json").read_text(encoding="utf-8")) == payload
 
 
@@ -243,7 +271,17 @@ def test_submitter_persists_first_sbatch_rejection_without_claiming_a_job(
     def reject(_: list[str]) -> str:
         raise RuntimeError("GPU partition is only for use with GPUs")
 
+    def eligible_route(_: dict, route: dict[str, str]) -> dict:
+        return {
+            "route": route,
+            "eligible": True,
+            "returncode": 0,
+            "estimated_start": "2026-08-16T12:00:00",
+            "probe_output": "test-only",
+        }
+
     monkeypatch.setattr(entrypoint, "_submit", reject)
+    monkeypatch.setattr(entrypoint, "_probe_gpu_route", eligible_route)
     with pytest.raises(RuntimeError, match="only for use with GPUs"):
         entrypoint._submit_parallel_jobs(
             plan,

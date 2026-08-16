@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shlex
 import subprocess
 from pathlib import Path
@@ -23,6 +24,7 @@ from transfer_vs_relearning.utils.io import write_json
 
 DEFAULT_CONFIG = Path("configs/evaluation/m0_olmo_eval_v1_qualification_v1.yaml")
 DEFAULT_STATE = Path("documentation/current/PROJECT_STATE.yaml")
+TEST_ONLY_START_RE = re.compile(r"\bto start at ([0-9T:+-]+)\b")
 
 
 def _resolved(path: Path, repo_root: Path) -> Path:
@@ -46,6 +48,53 @@ def _submit(argv: list[str]) -> str:
     return _job_id(result.stdout)
 
 
+def _probe_gpu_route(plan: dict, route: dict[str, str]) -> dict:
+    slurm = plan["slurm"]
+    argv = [
+        "sbatch",
+        "--test-only",
+        f"--account={slurm['account']}",
+        f"--partition={route['partition']}",
+        f"--gres={route['gres']}",
+        f"--cpus-per-task={slurm['cpus_per_task']}",
+        f"--mem={route['memory']}",
+        f"--time={slurm['time_limit']}",
+        "--wrap=true",
+    ]
+    result = subprocess.run(argv, check=False, capture_output=True, text=True)
+    output = "\n".join(value.strip() for value in (result.stdout, result.stderr) if value.strip())
+    start_match = TEST_ONLY_START_RE.search(output)
+    estimated_start = start_match.group(1) if start_match else None
+    eligible = result.returncode == 0 and estimated_start is not None
+    return {
+        "route": route,
+        "eligible": eligible,
+        "returncode": result.returncode,
+        "estimated_start": estimated_start,
+        "probe_output": output,
+    }
+
+
+def _select_gpu_route(plan: dict, *, output_root: Path) -> dict[str, str]:
+    probes = [_probe_gpu_route(plan, route) for route in plan["slurm"]["gpu_routes"]]
+    eligible = [
+        (probe["estimated_start"], index, probe)
+        for index, probe in enumerate(probes)
+        if probe["eligible"]
+    ]
+    selected_probe = min(eligible, default=None)
+    payload = {
+        "schema_version": 1,
+        "policy": plan["slurm"]["gpu_route_selection_policy"],
+        "probes": probes,
+        "selected_route": selected_probe[2]["route"] if selected_probe else None,
+    }
+    write_json(output_root / "gpu_route_selection.json", payload)
+    if selected_probe is None:
+        raise RuntimeError("No configured GPU route passed the Slurm test-only availability gate")
+    return selected_probe[2]["route"]
+
+
 def _submit_parallel_jobs(
     plan: dict,
     *,
@@ -56,6 +105,22 @@ def _submit_parallel_jobs(
     script = Path(__file__).resolve()
     runtime = plan["runtime"]
     slurm = plan["slurm"]
+    try:
+        gpu_route = _select_gpu_route(plan, output_root=output_root)
+    except Exception as exc:
+        write_json(
+            output_root / "submission_manifest.json",
+            {
+                "schema_version": 1,
+                "plan_id": plan["plan_id"],
+                "status": "no_job_submitted_no_eligible_gpu_route",
+                "preflight_job_id": None,
+                "array_job_id": None,
+                "finalizer_job_id": None,
+                "error": str(exc),
+            },
+        )
+        raise
     common = [
         "sbatch",
         "--parsable",
@@ -127,13 +192,13 @@ def _submit_parallel_jobs(
     )
     array_argv = [
         *common,
-        f"--partition={slurm['partition']}",
+        f"--partition={gpu_route['partition']}",
         "--job-name=m0-olmo-eval",
         f"--dependency=afterok:{preflight_id}",
         f"--array=0-{plan['lane_count'] - 1}%{plan['max_parallel_lanes']}",
-        f"--gres={slurm['gres']}",
+        f"--gres={gpu_route['gres']}",
         f"--cpus-per-task={slurm['cpus_per_task']}",
-        f"--mem={slurm['memory']}",
+        f"--mem={gpu_route['memory']}",
         f"--time={slurm['time_limit']}",
         f"--output={output_root / 'logs/%x-%A_%a.out'}",
         f"--error={output_root / 'logs/%x-%A_%a.err'}",
@@ -207,6 +272,8 @@ def _submit_parallel_jobs(
         "array_spec": f"0-{plan['lane_count'] - 1}%{plan['max_parallel_lanes']}",
         "finalizer_job_id": finalizer_id,
         "finalizer_dependency": f"afterany:{array_id}",
+        "selected_gpu_route": gpu_route,
+        "gpu_route_selection_manifest": str(output_root / "gpu_route_selection.json"),
         "run_classification": plan["run_classification"],
     }
     write_json(output_root / "submission_manifest.json", payload)

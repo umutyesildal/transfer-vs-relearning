@@ -77,8 +77,10 @@ V3 then proved that the new materializer gate works: it created 338 cache files 
 and kept the GPU array closed when offline reload failed. The remaining blocker is upstream XNLI's
 legacy `dataset_path: xnli`, incompatible with the current Hub's official `facebook/xnli` identity.
 No v3 GPU/model/scoring work ran. A v4 compatibility overlay preserves the exact EN/TR prompt and
-metric semantics while pinning only the official repository name and observed revision; it remains
-binding-pending until its implementation/config hashes are frozen.
+metric semantics while pinning only the official repository name and observed revision. Its
+implementation, overlay, adapter, project-config and fresh-root bindings are now hash-frozen under
+the existing bounded test-only authorization. The next action is HU readiness preflight followed,
+only on PASS, by CPU materialization and the dependency-gated parallel V100 array.
 
 ## Evaluation design result
 

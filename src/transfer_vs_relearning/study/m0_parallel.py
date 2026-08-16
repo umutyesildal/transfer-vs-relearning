@@ -85,9 +85,14 @@ def build_m0_parallel_plan(config_path: Path, *, repo_root: Path) -> dict[str, A
         raise ValueError("M0 must not use a system instruction")
 
     parallel = _mapping(config.get("parallel_evaluation"), "parallel_evaluation")
-    if parallel.get("topology") != "preflight_then_single_slurm_array_plus_afterany_finalizer":
+    supported_topologies = {
+        "preflight_then_single_slurm_array_plus_afterany_finalizer",
+        "gpu_route_selection_then_preflight_then_single_slurm_array_plus_afterany_finalizer",
+    }
+    if parallel.get("topology") not in supported_topologies:
         raise ValueError(
-            "M0 parallel topology must use data preflight, one array and an afterany finalizer"
+            "M0 parallel topology must select one GPU route, then use data preflight, "
+            "one array and an afterany finalizer"
         )
     lanes = parallel.get("lanes")
     if not isinstance(lanes, list) or not lanes:
@@ -138,6 +143,46 @@ def build_m0_parallel_plan(config_path: Path, *, repo_root: Path) -> dict[str, A
         raise ValueError("max_parallel_lanes must be between one and the lane count")
     runtime = _mapping(parallel.get("runtime"), "parallel_evaluation.runtime")
     slurm = _mapping(parallel.get("slurm"), "parallel_evaluation.slurm")
+    route_policy = slurm.get(
+        "gpu_route_selection_policy", "earliest_test_only_start_then_declared_order"
+    )
+    if route_policy != "earliest_test_only_start_then_declared_order":
+        raise ValueError("M0 requires the scheduler-probed GPU route selection policy")
+    raw_gpu_routes = slurm.get("gpu_routes")
+    if raw_gpu_routes is None and all(
+        isinstance(slurm.get(key), str) and slurm[key]
+        for key in ("partition", "gres", "memory")
+    ):
+        raw_gpu_routes = [
+            {
+                "id": "legacy_frozen_route",
+                "partition": slurm["partition"],
+                "gres": slurm["gres"],
+                "memory": slurm["memory"],
+            }
+        ]
+    if not isinstance(raw_gpu_routes, list) or not raw_gpu_routes:
+        raise ValueError("parallel_evaluation.slurm.gpu_routes must be non-empty")
+    gpu_route_ids: set[str] = set()
+    gpu_routes: list[dict[str, str]] = []
+    for index, raw_route in enumerate(raw_gpu_routes):
+        route = _mapping(raw_route, f"parallel_evaluation.slurm.gpu_routes[{index}]")
+        route_id = str(route.get("id", ""))
+        if not route_id or route_id in gpu_route_ids:
+            raise ValueError(f"GPU route ID is missing or duplicated: {route_id!r}")
+        normalized_route: dict[str, str] = {"id": route_id}
+        for key in ("partition", "gres", "memory"):
+            value = route.get(key)
+            if not isinstance(value, str) or not value:
+                raise ValueError(f"GPU route {route_id} is missing {key}")
+            normalized_route[key] = value
+        gpu_route_ids.add(route_id)
+        gpu_routes.append(normalized_route)
+    slurm = {
+        **slurm,
+        "gpu_route_selection_policy": route_policy,
+        "gpu_routes": gpu_routes,
+    }
     environment_preparation = _mapping(
         parallel.get("environment_preparation"),
         "parallel_evaluation.environment_preparation",

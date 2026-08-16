@@ -1,6 +1,6 @@
 # M0 OLMo eval-v1 qualification wave v1
 
-**Status:** `xnli_overlay_repair_binding_pending` | **Owner:** project | **Created:** 2026-08-16
+**Status:** `frozen` | **Owner:** project | **Created:** 2026-08-16
 **Supersedes:** none
 
 ## Purpose and estimand
@@ -28,8 +28,9 @@ The user explicitly authorized running and trying this qualification wave on 202
 authorization covers Git publication of the narrow implementation, fast-forward synchronization of
 the clean HU monorepo, bounded HU read-only preflight, one new scratch-only environment, bounded
 task-data retrieval, one CPU/data preflight and the test-only Slurm array described below. Scoring
-submission remains fail-closed until the implementation/environment identities are inserted and the
-companion config is frozen. It does not authorize scientific M0 evaluation, training, corpus
+submission was fail-closed until the implementation/environment identities were inserted and the
+companion config was frozen; those v4 bindings are now complete below. It does not authorize
+scientific M0 evaluation, training, corpus
 materialization, cleanup or deletion. Prior model, corpus and evaluation roots stay read-only.
 
 ## Immutable identities at draft stage
@@ -203,7 +204,33 @@ accuracy metric and zero-shot settings reproduce Harness v0.4.12 XNLI EN/TR; the
 only `dataset_path` to `facebook/xnli`, pins Hub revision
 `b8dd5d7af51114dbda02c0e3f6133f332186418e`, and renames the task IDs so the compatibility variant
 cannot be confused with upstream. The other eight required task IDs are unchanged. Overlay file
-hashes, adapter hashes, project configs and the fresh v4 namespace must be frozen before execution.
+hashes, adapter hashes, project configs and the fresh v4 namespace are frozen as follows:
+
+- implementation commit: `e227fba0df311c5149b12c6bb8cca39522156985`;
+- operator entrypoint SHA-256:
+  `3d21321941628b83c31ac6f7da28efa6b8fe782447676c0d66e907f2ec2c9fd1`;
+- parallel controller/materializer SHA-256:
+  `3e1d77068239dec45521777e274d60e548fca7618c7f958118bd91a7e39aae9a`;
+- Harness adapter SHA-256:
+  `0e8ee7a842e2cdb93c0f1bee6ce59dda773e3fe3ba10c01e1e6a9c246c6d5499`;
+- project adapter SHA-256:
+  `5b8a49003e151454c3028c2eb135fda943a9169037a1a4b9d04ae5a0810fcde6`;
+- XNLI common overlay SHA-256:
+  `24e2a5784870f6a204b3d4b134195c735c366bbb7ddd5525605a924fb3941fc5`;
+- XNLI EN overlay SHA-256:
+  `786e1bba364a7165663f73b15191e42953d0702ff6b1665b449b08ed07f6ee89`;
+- XNLI TR overlay SHA-256:
+  `cb8c66fe0baffe22849d1ce361b4f59a493779ab0fa7f1542ccb23d6da8d5c1e`;
+- factual qualification config SHA-256:
+  `9d9b293ffac2b18182ddced629885d2d383eb5a30b5b343af6ebc6d9beb8d6c2`;
+- generation qualification config SHA-256:
+  `5ab21222221d3368a68d4e33f6455c588c9d5320d1c7e3f325a990cf814bb3d9`;
+- companion config SHA-256:
+  `d4efdaf7713a860c96d151d9734c4d7303f77d8a498686d0bb31a81355b6462f`;
+- fresh execution root: `/vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v4`.
+
+The v4 wave is execution-ready and authorized only as bounded `test_only_non_scientific`
+qualification. The v1--v3 roots remain immutable evidence and are not reused.
 
 The corrected repair uses the dedicated root
 `/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3`, preserves the parent compat

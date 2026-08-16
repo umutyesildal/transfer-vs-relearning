@@ -24,7 +24,7 @@ repository:
       path: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1
       branch: agent/m0-evaluation
       sync_mode: git_pull_ff_only
-      dependency_commit_verified: 69032e1ab1f6accbefacdb07a2ce33b7e8c8511b
+      dependency_commit_verified: e227fba0df311c5149b12c6bb8cca39522156985
       clean_at_verification: true
     legacy_checkout:
       path: /vol/fob-vol6/mi25/yesildau/transfer-vs-relearning
@@ -107,7 +107,7 @@ evaluation_target:
   task_qualification: documentation/evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md
   result_schema: documentation/evaluation/RESULT_SCHEMA_V1.md
   m0_qualification_wave:
-    status: xnli_overlay_repair_binding_pending
+    status: frozen_execution_ready
     classification: qualification_only
     scientific_result: false
     model: allenai/OLMo-2-0425-1B
@@ -119,9 +119,9 @@ evaluation_target:
     lane_count: 7
     max_parallel_lanes: 3
     local_adapters_implemented: true
-    implementation_commit: pending_xnli_overlay_repair_freeze
-    contract_sha256: pending_xnli_overlay_repair_freeze
-    config_sha256: pending_xnli_overlay_repair_freeze
+    implementation_commit: e227fba0df311c5149b12c6bb8cca39522156985
+    contract_sha256: 9ff2df783fdc9850d53b905849ea201533ad295c0fb8a6639fc30475011f7121
+    config_sha256: d4efdaf7713a860c96d151d9734c4d7303f77d8a498686d0bb31a81355b6462f
     environment_root: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3
     environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
     output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v4
@@ -129,8 +129,8 @@ evaluation_target:
       - /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v1
       - /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v2
       - /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v3
-    execution_ready: false
-    execution_authorized: false
+    execution_ready: true
+    execution_authorized: true
     user_authorization: qualification_run_requested_2026_08_16
   applies_to:
     - M0
@@ -170,9 +170,9 @@ evaluation_target:
     luna_packet_manifest: .agents/task-packets/study-v1/manifest.json
     full_study_stage_count: 15
     execution_adapter_ready: false
-    m0_adapter_status: xnli_overlay_repair_binding_pending
+    m0_adapter_status: frozen_execution_ready
     m0_parallel_entrypoint: scripts/study/run_m0_olmo_evaluation.py
-    execution_authorized: false
+    execution_authorized: true
     m0_preflight:
       command: >-
         .venv/bin/python scripts/study/run_study.py preflight-m0
@@ -193,9 +193,7 @@ evaluation_target:
       latest_status: blocked_pre_scoring
       scientific_work_started: false
       blockers:
-        - xnli_overlay_adapter_commit_and_hashes
-        - repaired_project_config_hashes
-        - repaired_contract_and_config_hashes
+        - runtime_and_artifact_identity
     stage_order:
       - identity_preflight
       - train_and_trace
