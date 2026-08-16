@@ -12,6 +12,10 @@ the prospective protocol so an agent does not need the chronological archive by 
 5. [`../pipeline/README.md`](../pipeline/README.md) — deterministic train/trace/eval/normalize/
    presentation foundation and its execution boundary.
 
+The removed XNLI integration and a possible future upstream Harness repair are isolated in
+[`XNLI_HARNESS_COMPATIBILITY_INCIDENT.md`](XNLI_HARNESS_COMPATIBILITY_INCIDENT.md). It is incident
+evidence, not part of the active task read set.
+
 The machine-readable draft registry is
 [`../../configs/evaluation/eval_v1_registry.yaml`](../../configs/evaluation/eval_v1_registry.yaml).
 Documents 177 and 178 remain the supervisor/design inputs. Historical numbered evaluation reports

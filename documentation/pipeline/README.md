@@ -80,8 +80,8 @@ lanes:
 | `english_retention_wikitext` | canonical WikiText rolling retention |
 | `english_retention_pile_10k` | broad-domain Pile-10k retention control |
 | `english_grammar_blimp` | BLiMP group |
-| `english_capability` | HellaSwag, WinoGender slices and XNLI-EN |
-| `turkish_capability` | TurBLiMP and XNLI-TR |
+| `english_capability` | HellaSwag and WinoGender slices |
+| `turkish_capability` | TurBLiMP |
 | `factual_access` | project-native factual ranking and paired uncertainty inputs |
 | `generation_integrity` | project-native degeneration/integrity panel |
 

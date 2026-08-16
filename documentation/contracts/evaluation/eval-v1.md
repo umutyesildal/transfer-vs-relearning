@@ -50,8 +50,8 @@ ratios, gaps and aggregates.
 
 ### Standard task lane
 
-The proposed core is WikiText, Pile-10k, BLiMP, HellaSwag, WinoGender slices, XNLI-EN,
-TurBLiMP and XNLI-TR. TurkishMMLU is included only if access is resolved before freeze. Exact task
+The proposed core is WikiText, Pile-10k, BLiMP, HellaSwag, WinoGender slices and TurBLiMP.
+TurkishMMLU is included only if access is resolved before freeze. Exact task
 roles and metric semantics are in
 [`../../evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md`](../../evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md).
 

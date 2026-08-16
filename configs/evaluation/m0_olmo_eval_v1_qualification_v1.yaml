@@ -1,11 +1,11 @@
 schema_version: 1
-name: m0-olmo-eval-v1-qualification-v1-auto-gpu-route-repair-v1
-status: frozen
+name: m0-olmo-eval-v1-qualification-v1-core-task-reduction-v1
+status: task_set_reduction_binding_pending
 as_of: "2026-08-16"
 classification: qualification_only
 scientific_result: false
-execution_ready: true
-execution_authorized: true
+execution_ready: false
+execution_authorized: false
 
 contract: documentation/contracts/evaluation/m0-olmo-qualification-v1.md
 parent_evaluation_contract: documentation/contracts/evaluation/eval-v1.md
@@ -28,11 +28,6 @@ harness:
   environment_lock_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/environment.lock.txt
   environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
   environment_identity_sha256: 9061cbc59d021676ca6b768f7688eb7da10e5460bf4919b963c9931eefcc7d71
-  include_path: configs/evaluation/lm_eval_tasks/xnli_facebook_v1
-  task_overlay_files:
-    configs/evaluation/lm_eval_tasks/xnli_facebook_v1/xnli_facebook_common_yaml: 24e2a5784870f6a204b3d4b134195c735c366bbb7ddd5525605a924fb3941fc5
-    configs/evaluation/lm_eval_tasks/xnli_facebook_v1/xnli_en_facebook_v1.yaml: 786e1bba364a7165663f73b15191e42953d0702ff6b1665b449b08ed07f6ee89
-    configs/evaluation/lm_eval_tasks/xnli_facebook_v1/xnli_tr_facebook_v1.yaml: cb8c66fe0baffe22849d1ce361b4f59a493779ab0fa7f1542ccb23d6da8d5c1e
 
 seeds:
   python: 42
@@ -49,8 +44,6 @@ required_task_discovery:
   - winogender_male
   - winogender_neutral
   - turblimp_core
-  - xnli_en_facebook_v1
-  - xnli_tr_facebook_v1
 
 conditional_task_discovery:
   decision: excluded_from_qualification_v1_access_unresolved
@@ -189,13 +182,13 @@ parallel_evaluation:
     - id: english_capability
       adapter: lm_eval
       families: [english_capability]
-      task_ids: [hellaswag, winogender_female, winogender_male, winogender_neutral, xnli_en_facebook_v1]
+      task_ids: [hellaswag, winogender_female, winogender_male, winogender_neutral]
       fewshot: 0
       limit: 2
     - id: turkish_capability
       adapter: lm_eval
       families: [turkish_capability]
-      task_ids: [turblimp_core, xnli_tr_facebook_v1]
+      task_ids: [turblimp_core]
       fewshot: 0
       limit: 2
     - id: factual_access
@@ -203,13 +196,13 @@ parallel_evaluation:
       families: [factual_access, statistical_uncertainty]
       evaluator_config: configs/evaluation/m0_olmo_qualification_factual_v1.yaml
       evaluator_config_sha256: 9d9b293ffac2b18182ddced629885d2d383eb5a30b5b343af6ebc6d9beb8d6c2
-      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v4/lanes/factual_access/raw/frozen_suite
+      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v5/lanes/factual_access/raw/frozen_suite
     - id: generation_integrity
       adapter: project_generation_integrity
       families: [generation_integrity]
       evaluator_config: configs/evaluation/m0_olmo_qualification_generation_v1.yaml
       evaluator_config_sha256: 5ab21222221d3368a68d4e33f6455c588c9d5320d1c7e3f325a990cf814bb3d9
-      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v4/lanes/generation_integrity/raw/general_capability
+      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v5/lanes/generation_integrity/raw/general_capability
 
 test_only_policy:
   limited_run_classification: test_only_non_scientific
@@ -223,7 +216,7 @@ test_only_policy:
     generic_completion_items: 31
 
 storage:
-  proposed_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v4
+  proposed_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v5
   fresh_root_required: true
   hu_home_read_only: true
   previous_evidence_roots_read_only: true
@@ -252,7 +245,10 @@ forbidden_claims:
   - ready_to_train
   - selected_primary_model
 
-freeze_blockers: []
+freeze_blockers:
+  - task_set_reduction_implementation_commit_and_hashes
+  - repaired_project_config_hashes
+  - repaired_contract_and_config_hashes
 
 freeze_authority:
   user_instruction: run_and_try_current_m0_qualification_wave
@@ -279,7 +275,7 @@ operational_history:
     scientific_result: false
     preservation: immutable_no_reuse_no_cleanup
   - namespace: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v3
-    status: BLOCKED_XNLI_LEGACY_DATASET_PATH_INCOMPATIBLE
+    status: BLOCKED_LEGACY_DATASET_REPOSITORY_ID_INCOMPATIBLE
     preflight_job_id: "460959"
     array_job_id: "460960"
     finalizer_job_id: "460961"
@@ -289,6 +285,19 @@ operational_history:
     completed_lanes: 0
     normalization_allowed: false
     scientific_result: false
+    preservation: immutable_no_reuse_no_cleanup
+  - namespace: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v4
+    status: CANCELLED_BY_USER_TASK_REMOVAL_BEFORE_GPU
+    preflight_job_id: "461253"
+    array_job_id: "461254"
+    finalizer_job_id: "461255"
+    gpu_array_started: false
+    completed_lanes: 0
+    normalization_allowed: false
+    scientific_result: false
+    final_inventory_files: 18
+    final_inventory_bytes: 3668858
+    qualification_result_sha256: 90c363707d49238e8f9b6c1e9aa10b6f410916c77dbb158149260199e3acf5d8
     preservation: immutable_no_reuse_no_cleanup
 
 eval_v1_promotion_blockers:

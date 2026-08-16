@@ -76,14 +76,12 @@ fresh namespace submit the online-materialize → offline-reload → dependent V
 V3 then proved that the new materializer gate works: it created 338 cache files / 409,436,401 bytes
 and kept the GPU array closed when offline reload failed. The remaining blocker is upstream XNLI's
 legacy `dataset_path: xnli`, incompatible with the current Hub's official `facebook/xnli` identity.
-No v3 GPU/model/scoring work ran. A v4 compatibility overlay preserves the exact EN/TR prompt and
-metric semantics while pinning only the official repository name and observed revision. Its
-implementation, overlay, adapter, project-config and fresh-root bindings are now hash-frozen under
-the existing bounded test-only authorization. The operator now probes the frozen V100, A100,
-RTX3090, RTX6000 and RTX A6000 routes with Slurm `--test-only`, records every rejection/estimate,
-chooses the earliest eligible route and submits exactly one array. The next action is HU readiness
-preflight followed, only on PASS, by one-command CPU materialization and the dependency-gated GPU
-array; Slurm owns waiting after submission.
+No v3 GPU/model/scoring work ran. A compatibility overlay was prepared for v4, but the user removed
+that task family from the thesis protocol before v4 CPU materialization completed. Jobs `461253`
+and `461254` were cancelled before GPU work; finalizer `461255` recorded 0/7 lanes, no scientific
+result and a blocked gate. The 18-file root is preserved. V5 keeps the same seven-lane topology but
+uses eight standard Harness task IDs and no local task overlay. The compatibility failure and a
+possible future upstream repair are isolated in the evaluation incident note.
 
 ## Evaluation design result
 
@@ -91,8 +89,8 @@ array; Slurm owns waiting after submission.
   `6d642546f4688648fced259eb3302efd36ece5af` in a dedicated future lock.
 - Official WikiText BPB is primary English retention; word/byte PPL remain reported.
 - v0.4.12 already includes `pile_10k`, so no custom replacement is currently needed.
-- BLiMP, HellaSwag, WinoGender slices, XNLI-EN, TurBLiMP and XNLI-TR form the proposed capability
-  bundle; TurkishMMLU remains conditional on access.
+- BLiMP, HellaSwag, WinoGender slices and TurBLiMP form the proposed capability bundle;
+  TurkishMMLU remains conditional on access.
 - Project-native factual ranking, robust intersections, relation swaps, paired subject bootstrap
   and generation integrity are preserved.
 - Canonical results are long tables; one-row-per-checkpoint output is a generated view.

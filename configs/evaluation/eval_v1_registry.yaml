@@ -135,30 +135,6 @@ standard_tasks:
     upstream_group_sha256: 5a0a660e69eb0da0316fcd758ec0adb7b7e857b368ce5d151a0e143afbf3d421
     upstream_template_sha256: 26e9fe58fd8fb83dd86b6669f152964167e84a5ee56ad8ef87c78e1a0c10f388
 
-  - id: xnli_en
-    inclusion: core
-    status: upstream_semantics_verified_dataset_revision_unresolved
-    role: english_nli_capability
-    cadence: full
-    fewshot: 0
-    primary_metric: acc
-    dataset: xnli
-    dataset_config: en
-    split: validation
-    upstream_config_sha256: 61e0924cddabc004f434b5b38750d6d7d3e800c79ee3a5be85fd127017b285f1
-
-  - id: xnli_tr
-    inclusion: core
-    status: upstream_semantics_verified_dataset_revision_unresolved
-    role: turkish_nli_manipulation_check
-    cadence: full
-    fewshot: 0
-    primary_metric: acc
-    dataset: xnli
-    dataset_config: tr
-    split: validation
-    upstream_config_sha256: 6d4bdaa4a21474908929cec208897dd7c689896c2112212ca0c5c9b5bad3827e
-
   - id: turkishmmlu
     task_ids:
       - turkishmmlu_biology

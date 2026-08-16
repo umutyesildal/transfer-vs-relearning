@@ -85,6 +85,7 @@ def test_parallel_plan_covers_every_required_family_and_harness_task_once() -> N
     tasks = [task for lane in plan["lanes"] for task in lane.get("task_ids", [])]
     config = yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
     assert sorted(tasks) == sorted(config["required_task_discovery"])
+    assert len(tasks) == 8
     assert len(tasks) == len(set(tasks))
 
 
@@ -101,7 +102,7 @@ def test_parallel_plan_rejects_duplicate_tasks_and_scientific_limits(tmp_path: P
         build_m0_parallel_plan(_write_yaml(tmp_path / "scientific.yaml", scientific), repo_root=ROOT)
 
 
-def test_frozen_parallel_preflight_is_blocked_only_by_local_runtime_identity() -> None:
+def test_task_reduction_parallel_preflight_remains_fail_closed_until_refrozen() -> None:
     payload = assess_m0_parallel_readiness(
         CONFIG,
         repo_root=ROOT,
@@ -110,7 +111,12 @@ def test_frozen_parallel_preflight_is_blocked_only_by_local_runtime_identity() -
     assert payload["status"] == "blocked_pre_scoring"
     assert payload["scientific_work_started"] is False
     assert payload["lane_count"] == 7
-    assert payload["blockers"] == ["runtime_and_artifact_identity"]
+    assert payload["blockers"] == [
+        "qualification_contract_frozen",
+        "qualification_execution_ready",
+        "qualification_execution_authorized",
+        "runtime_and_artifact_identity",
+    ]
     assert "project_ready_to_measure" not in payload["blockers"]
 
 
@@ -128,6 +134,7 @@ def test_lm_eval_command_is_offline_base_model_and_limit_is_test_only(tmp_path: 
     assert "apply_chat_template" not in " ".join(command)
     assert "trust_remote_code=False" in command
     assert "local_files_only=True" in command
+    assert "--include_path" not in command
     assert command[command.index("--tasks") + 1] == "wikitext"
     assert command[command.index("--seed") + 1] == "42,42,42,42"
     assert command[command.index("--limit") + 1] == "3"

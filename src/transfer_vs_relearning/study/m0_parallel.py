@@ -373,7 +373,7 @@ def assess_m0_parallel_readiness(
                 and sha256_file(path) == str(expected_sha256)
             )
         task_overlay_files = _mapping(
-            plan["harness"].get("task_overlay_files"), "harness task_overlay_files"
+            plan["harness"].get("task_overlay_files") or {}, "harness task_overlay_files"
         )
         task_overlay_files_ok = True
         for relative, expected_sha256 in task_overlay_files.items():
@@ -634,12 +634,19 @@ def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[st
         )
     _write_jsonl(output_root / "project_input_resolution.jsonl", project_rows)
     tasks_json = json.dumps(tasks)
-    include_path = Path(plan["repo_root"]) / str(plan["harness"]["include_path"])
-    if not include_path.is_dir():
+    raw_include_path = plan["harness"].get("include_path")
+    include_path = (
+        Path(plan["repo_root"]) / str(raw_include_path)
+        if raw_include_path is not None
+        else None
+    )
+    if include_path is not None and not include_path.is_dir():
         raise FileNotFoundError(f"M0 Harness include path is missing: {include_path}")
+    include_args = ["--include_path", str(include_path)] if include_path is not None else []
+    task_manager_args = f"include_path={str(include_path)!r}" if include_path is not None else ""
     materialize_code = (
         "import json;from lm_eval.tasks import TaskManager;"
-        f"d=TaskManager(include_path={str(include_path)!r}).load_task_or_group("
+        f"d=TaskManager({task_manager_args}).load_task_or_group("
         f"json.loads({tasks_json!r}));"
         "print(json.dumps(sorted(d)))"
     )
@@ -650,8 +657,7 @@ def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[st
             "lm_eval",
             "ls",
             "tasks",
-            "--include_path",
-            str(include_path),
+            *include_args,
         ],
         "task_validate": [
             plan["runtime"]["python"],
@@ -660,8 +666,7 @@ def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[st
             "validate",
             "--tasks",
             ",".join(tasks),
-            "--include_path",
-            str(include_path),
+            *include_args,
         ],
         "task_materialize": [plan["runtime"]["python"], "-c", materialize_code],
     }

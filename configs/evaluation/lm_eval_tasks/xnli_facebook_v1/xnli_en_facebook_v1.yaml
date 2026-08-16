@@ -1,7 +1,0 @@
-# Prompt copied byte-for-byte in meaning from Harness v0.4.12 xnli_en.
-dataset_name: en
-doc_to_choice: '{{[premise+", right? Yes, "+hypothesis,premise+", right? Also, "+hypothesis,premise+",
-  right? No, "+hypothesis]}}'
-doc_to_text: ''
-include: xnli_facebook_common_yaml
-task: xnli_en_facebook_v1

@@ -263,6 +263,25 @@ The current automatic-route bindings are:
 The CPU data preflight, selected GPU array and `afterany` finalizer are submitted by one command.
 After submission, Slurm owns dependency waiting; no interactive agent wait is required.
 
+### Append-only active-task removal
+
+On 2026-08-16 the user removed XNLI from the thesis evaluation protocol. V4 data job `461253` was
+still in CPU task discovery/materialization; array `461254` was dependency-pending, so no GPU,
+model load or scoring had started. Those two jobs were cancelled and finalizer `461255` recorded
+0/7 lanes, `scientific_result=false`, normalization disabled and gate `blocked`. Its 18-file,
+3,668,858-byte root remains immutable. The prior local overlay did not complete an end-to-end
+qualification and is removed from the active repository.
+
+The replacement v5 task set contains eight Harness task IDs across the same five Harness lanes:
+WikiText, Pile-10k, BLiMP, HellaSwag, three WinoGender slices and TurBLiMP. The two project-native
+lanes remain unchanged. XNLI is absent from the active registry, task matrix, configs and commands.
+The compatibility evidence and a bounded future upstream-repair outline are preserved separately in
+[`../../evaluation/XNLI_HARNESS_COMPATIBILITY_INCIDENT.md`](../../evaluation/XNLI_HARNESS_COMPATIBILITY_INCIDENT.md).
+
+V5 requires a fresh namespace, new implementation/project-config hashes and a new frozen companion
+config before submission. The existing bounded test-only authorization does not convert v5 into a
+scientific M0 run.
+
 The corrected repair uses the dedicated root
 `/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3`, preserves the parent compat
 prefix path without resolving it to the shared interpreter, normalizes distribution names and

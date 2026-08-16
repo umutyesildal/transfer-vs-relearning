@@ -27,9 +27,7 @@ Primary upstream references:
 | BLiMP | `blimp` | English grammar | macro `acc` | 0 | full | 67-task group verified |
 | HellaSwag | `hellaswag` | English commonsense | `acc_norm` | 0 | full | task verified |
 | WinoGender | gender slice task IDs | coreference/bias diagnostic | `acc` and gaps | 0 | full | task IDs verified |
-| XNLI English | `xnli_en` | English NLI | `acc` | 0 | full | exact localized prompt verified |
 | TurBLiMP | `turblimp_core` | Turkish grammar check | macro `acc_norm` | 0 | full | duplicate-key parity test open |
-| XNLI Turkish | `xnli_tr` | Turkish NLI check | `acc` | 0 | full | exact localized prompt verified |
 | TurkishMMLU | `turkishmmlu_*` | Turkish knowledge, secondary | `acc` | 5 | full | access unresolved |
 
 All tasks use the full frozen split. `--limit` is test-only and cannot define a scientific cheap
@@ -54,14 +52,12 @@ fails. It is complementary because it is a Pile sample and may overlap a model's
 - WinoGender is diagnostic, not a model-selection gate. Female, male and neutral slices are run
   without duplicating the `all` task; sample-count-weighted overall accuracy and slice gaps are
   derived locally.
-- XNLI uses `xnli_en` with upstream prompt text and accuracy.
 
 ### Turkish capability
 
 - TurBLiMP uses `acc_norm` as primary and raw `acc` as sensitivity. Its group YAML repeats the
   `aggregate_metric_list` key, so v0.4.12 effectively exposes the later normalized aggregate. The
   normalizer must prove the intended 16-subtask macro before freeze.
-- XNLI uses the exact `xnli_tr` localized choices and accuracy.
 - TurkishMMLU follows the benchmark's published five-shot setup, but is secondary because it mixes
   language, curriculum knowledge and reasoning. It enters eval-v1 only if access and revision are
   frozen before contract freeze.

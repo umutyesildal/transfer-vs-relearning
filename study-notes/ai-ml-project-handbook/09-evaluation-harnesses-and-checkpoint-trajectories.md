@@ -69,7 +69,6 @@ Harness result names such as raw accuracy and normalized accuracy can differ. Th
 - **Winogender:** pronoun/coreference behavior and bias-sensitive slices;
 - **TurBLiMP:** Turkish grammatical minimal pairs;
 - **TurkishMMLU:** Turkish knowledge/reasoning-style multiple choice;
-- **XNLI family:** cross-lingual natural-language inference.
 
 These tasks do not form a single latent “intelligence” score. They sample different behaviors.
 
@@ -340,4 +339,3 @@ They may score different bytes, contexts, or denominators. Decompose first.
 - Cross-check PPL by comparing text bytes, total NLL, denominators, context, and stride.
 - Task files, prompts, shot selection, dtype, and valid-row counts belong in the evaluation manifest.
 - Keep capability dimensions separate rather than manufacturing one opaque aggregate.
-
