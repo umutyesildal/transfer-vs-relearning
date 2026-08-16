@@ -22,24 +22,32 @@ artifact/presentation namespaces. It does not yet execute LM Eval or project eva
 
 The full-study controller now expresses the 15-stage M0→M1→M2-A/M2-B dependency graph, preserves
 the sibling-parent and matched-budget gates, and produces one bounded Luna adapter packet per stage.
-Its CLI is dry-run only because final scientific adapters and execution authority do not exist yet.
+The M0 standard and project adapters plus a single seven-lane parallel Slurm-array controller now
+exist locally; the full-study CLI remains dry-run because their frozen bindings and all later-state
+adapters/execution authority do not exist yet.
 The former flat entrypoint roots were losslessly grouped: 129 scripts and 135 Slurm files are mapped
 by `configs/entrypoints/catalog.json`; historical numbered documents were not rewritten.
 
 The first machine-readable M0 preflight has now run on the new M0 branch. It stopped before model
 load, inference or scoring, as designed. The current blockers are the draft study/eval contracts,
 unresolved model/output bindings, `ready_to_measure = false`, the absent dedicated `lm_eval`
-HU environment and the not-yet-implemented M0 standard/factual adapters. The local dependency is
-now locked and installed directly from Harness v0.4.12 commit
+HU environment and, at that time, the absent M0 standard/factual adapters. Those two adapter files
+are now locally implemented, but they remain unqualified and unexecutable. The local dependency is
+locked and installed directly from Harness v0.4.12 commit
 `6d642546f4688648fced259eb3302efd36ece5af`; its installed VCS identity passed preflight. This is
 `blocked_pre_scoring`, not an M0 scientific result.
 
-The next boundary is now written as the
+The next boundary is written as the
 [`M0 OLMo qualification draft`](../contracts/evaluation/m0-olmo-qualification-v1.md) with a
-machine-readable companion config. It binds the exact OLMo and Harness revisions, separates
-limited smokes from scientific scores, requires fresh immutable artifacts, and enumerates the
-environment/data/parity/resource fields still needed for freeze. It remains
-`draft_not_executable`; no HU, retrieval, Slurm, model load, inference or scoring follows from it.
+machine-readable companion config and one operator-facing entrypoint. The proposed topology is
+one task-data preflight followed by seven independent GPU lanes—WikiText, Pile-10k, BLiMP, other
+English capability, Turkish capability, factual access and generation integrity—with at most three
+V100 lanes active, followed by an `afterany` evidence finalizer. It binds the
+exact OLMo and Harness revisions, separates limited smokes from scientific scores, requires fresh
+immutable artifacts, and enumerates the environment/data/parity/resource fields still needed for
+freeze. The user authorized the bounded qualification attempt on 2026-08-16. Environment preparation
+may proceed; task retrieval and test-only scoring remain fail-closed until the exact implementation
+and environment identities are inserted into a frozen config.
 
 ## Evaluation design result
 
@@ -97,12 +105,14 @@ The valid next work is bounded evaluation qualification:
 6. add deterministic parity, identity, normalization and resume tests;
 7. only then freeze `eval-v1`.
 
-The planner/tracing implementation may be tested and reviewed locally in parallel. Executable LM
-Eval/project adapters remain after the semantic qualification boundary; their absence must not be
-bypassed with ad-hoc commands.
+The planner/tracing and M0 adapter implementation may be tested and reviewed locally. Exact runtime,
+dataset, project-evaluator and resource bindings remain before qualification execution; they must
+not be bypassed with ad-hoc commands.
 
-This status does not authorize downloading tasks, running evaluation, accessing HU, using Slurm,
-training a model, materializing a corpus, making additional pushes, or cleaning artifacts.
+The 2026-08-16 authorization is limited to the qualification implementation, bounded HU preflight,
+fresh scratch environment/task cache and test-only Slurm wave described above. It does not authorize
+scientific M0 evaluation, training, corpus materialization, cleanup, deletion or writes to prior
+evidence roots.
 
 ## Repository state
 

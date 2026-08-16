@@ -65,7 +65,7 @@ stages:
     state: M0
     kind: probing
     objective: Run the frozen factual access and generation-integrity probes on the identical M0 checkpoint.
-    depends_on: [m0_evaluation]
+    depends_on: [contract_preflight]
     adapter_id: m0_probing
     authority_class: evaluation
     context_files:

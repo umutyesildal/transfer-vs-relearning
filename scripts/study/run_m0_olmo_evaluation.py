@@ -1,0 +1,294 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import shlex
+import subprocess
+from pathlib import Path
+
+from transfer_vs_relearning.study.m0_parallel import (
+    assess_m0_parallel_readiness,
+    build_m0_parallel_plan,
+    finalize_m0_bundle,
+    initialize_m0_namespace,
+    load_initialized_plan,
+    prepare_m0_environment,
+    run_m0_data_preflight,
+    run_m0_lane,
+)
+from transfer_vs_relearning.utils.io import write_json
+
+
+DEFAULT_CONFIG = Path("configs/evaluation/m0_olmo_eval_v1_qualification_v1.yaml")
+DEFAULT_STATE = Path("documentation/current/PROJECT_STATE.yaml")
+
+
+def _resolved(path: Path, repo_root: Path) -> Path:
+    return path.resolve() if path.is_absolute() else (repo_root / path).resolve()
+
+
+def _job_id(stdout: str) -> str:
+    value = stdout.strip().split(";", 1)[0]
+    if not value.isdigit():
+        raise ValueError(f"Unexpected sbatch --parsable output: {stdout!r}")
+    return value
+
+
+def _submit(argv: list[str]) -> str:
+    result = subprocess.run(argv, check=True, capture_output=True, text=True)
+    return _job_id(result.stdout)
+
+
+def _submit_parallel_jobs(
+    plan: dict,
+    *,
+    config_path: Path,
+    repo_root: Path,
+    output_root: Path,
+) -> dict:
+    script = Path(__file__).resolve()
+    runtime = plan["runtime"]
+    slurm = plan["slurm"]
+    common = [
+        "sbatch",
+        "--parsable",
+        f"--account={slurm['account']}",
+        f"--partition={slurm['partition']}",
+    ]
+    preflight_command = [
+        runtime["python"],
+        str(script),
+        "run-preflight",
+        "--config",
+        str(config_path),
+        "--repo-root",
+        str(repo_root),
+        "--namespace",
+        str(output_root),
+    ]
+    preflight_id = _submit(
+        [
+            *common,
+            "--job-name=m0-olmo-data",
+            f"--cpus-per-task={plan['data_preflight']['cpus_per_task']}",
+            f"--mem={plan['data_preflight']['memory']}",
+            f"--time={plan['data_preflight']['time_limit']}",
+            f"--output={output_root / 'logs/%x-%j.out'}",
+            f"--error={output_root / 'logs/%x-%j.err'}",
+            f"--chdir={repo_root}",
+            f"--wrap=exec {shlex.join(preflight_command)}",
+        ]
+    )
+    lane_command = [
+        runtime["python"],
+        str(script),
+        "run-lane",
+        "--config",
+        str(config_path),
+        "--repo-root",
+        str(repo_root),
+        "--namespace",
+        str(output_root),
+    ]
+    exports = ",".join(
+        [
+            "ALL",
+            f"HF_HOME={output_root / 'cache/huggingface'}",
+            f"HF_DATASETS_CACHE={output_root / 'cache/huggingface_datasets'}",
+            f"XDG_CACHE_HOME={output_root / 'cache'}",
+            "HF_HUB_OFFLINE=1",
+            "HF_DATASETS_OFFLINE=1",
+            "TRANSFORMERS_OFFLINE=1",
+            "WANDB_MODE=disabled",
+            "PYTHONDONTWRITEBYTECODE=1",
+        ]
+    )
+    array_argv = [
+        *common,
+        "--job-name=m0-olmo-eval",
+        f"--dependency=afterok:{preflight_id}",
+        f"--array=0-{plan['lane_count'] - 1}%{plan['max_parallel_lanes']}",
+        f"--gres={slurm['gres']}",
+        f"--cpus-per-task={slurm['cpus_per_task']}",
+        f"--mem={slurm['memory']}",
+        f"--time={slurm['time_limit']}",
+        f"--output={output_root / 'logs/%x-%A_%a.out'}",
+        f"--error={output_root / 'logs/%x-%A_%a.err'}",
+        f"--export={exports}",
+        f"--chdir={repo_root}",
+        f"--wrap=exec {shlex.join(lane_command)}",
+    ]
+    try:
+        array_id = _submit(array_argv)
+    except Exception:
+        write_json(
+            output_root / "submission_manifest.json",
+            {
+                "schema_version": 1,
+                "plan_id": plan["plan_id"],
+                "status": "partial_submission_preflight_active_array_missing",
+                "preflight_job_id": preflight_id,
+                "array_job_id": None,
+                "finalizer_job_id": None,
+            },
+        )
+        raise
+
+    final_command = [
+        runtime["python"],
+        str(script),
+        "finalize",
+        "--config",
+        str(config_path),
+        "--repo-root",
+        str(repo_root),
+        "--namespace",
+        str(output_root),
+    ]
+    try:
+        finalizer_id = _submit(
+            [
+                *common,
+                "--job-name=m0-olmo-finalize",
+                f"--dependency=afterany:{array_id}",
+                "--cpus-per-task=2",
+                "--mem=8G",
+                "--time=00:30:00",
+                f"--output={output_root / 'logs/%x-%j.out'}",
+                f"--error={output_root / 'logs/%x-%j.err'}",
+                f"--chdir={repo_root}",
+                f"--wrap=exec {shlex.join(final_command)}",
+            ]
+        )
+    except Exception:
+        write_json(
+            output_root / "submission_manifest.json",
+            {
+                "schema_version": 1,
+                "plan_id": plan["plan_id"],
+                "status": "partial_submission_array_active_finalizer_missing",
+                "preflight_job_id": preflight_id,
+                "array_job_id": array_id,
+                "finalizer_job_id": None,
+            },
+        )
+        raise
+    payload = {
+        "schema_version": 1,
+        "plan_id": plan["plan_id"],
+        "status": "submitted",
+        "preflight_job_id": preflight_id,
+        "array_job_id": array_id,
+        "array_dependency": f"afterok:{preflight_id}",
+        "array_spec": f"0-{plan['lane_count'] - 1}%{plan['max_parallel_lanes']}",
+        "finalizer_job_id": finalizer_id,
+        "finalizer_dependency": f"afterany:{array_id}",
+        "run_classification": plan["run_classification"],
+    }
+    write_json(output_root / "submission_manifest.json", payload)
+    return payload
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Plan, submit and finalize the fail-closed parallel OLMo M0 evaluation bundle."
+    )
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    for name in ("plan", "preflight", "prepare-environment", "submit"):
+        command = subparsers.add_parser(name)
+        command.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
+        command.add_argument("--repo-root", type=Path, default=Path.cwd())
+        command.add_argument("--project-state", type=Path, default=DEFAULT_STATE)
+        command.add_argument("--namespace", type=Path)
+
+    lane_parser = subparsers.add_parser("run-lane", help=argparse.SUPPRESS)
+    lane_parser.add_argument("--config", type=Path, required=True)
+    lane_parser.add_argument("--repo-root", type=Path, required=True)
+    lane_parser.add_argument("--namespace", type=Path, required=True)
+    lane_parser.add_argument("--lane-index", type=int)
+
+    data_parser = subparsers.add_parser("run-preflight", help=argparse.SUPPRESS)
+    data_parser.add_argument("--config", type=Path, required=True)
+    data_parser.add_argument("--repo-root", type=Path, required=True)
+    data_parser.add_argument("--namespace", type=Path, required=True)
+
+    final_parser = subparsers.add_parser("finalize", help=argparse.SUPPRESS)
+    final_parser.add_argument("--config", type=Path, required=True)
+    final_parser.add_argument("--repo-root", type=Path, required=True)
+    final_parser.add_argument("--namespace", type=Path, required=True)
+
+    args = parser.parse_args()
+    repo_root = args.repo_root.resolve()
+    config_path = _resolved(args.config, repo_root)
+
+    if args.command in {"plan", "preflight", "prepare-environment", "submit"}:
+        plan = build_m0_parallel_plan(config_path, repo_root=repo_root)
+        namespace = args.namespace or Path(plan["storage"]["proposed_root"])
+        namespace = _resolved(namespace, repo_root)
+    if args.command == "plan":
+        print(json.dumps(plan, indent=2, ensure_ascii=False, sort_keys=True))
+    elif args.command == "prepare-environment":
+        print(
+            json.dumps(
+                prepare_m0_environment(plan, repo_root=repo_root),
+                indent=2,
+                ensure_ascii=False,
+                sort_keys=True,
+            )
+        )
+    elif args.command in {"preflight", "submit"}:
+        project_state = _resolved(args.project_state, repo_root)
+        readiness = assess_m0_parallel_readiness(
+            config_path,
+            repo_root=repo_root,
+            project_state_path=project_state,
+            output_root=namespace,
+        )
+        if args.command == "preflight":
+            print(json.dumps(readiness, indent=2, ensure_ascii=False, sort_keys=True))
+            if readiness["status"] != "ready":
+                raise SystemExit(2)
+        else:
+            if readiness["status"] != "ready":
+                print(json.dumps(readiness, indent=2, ensure_ascii=False, sort_keys=True))
+                raise SystemExit(2)
+            initialize_m0_namespace(namespace, plan)
+            print(
+                json.dumps(
+                    _submit_parallel_jobs(
+                        plan,
+                        config_path=config_path,
+                        repo_root=repo_root,
+                        output_root=namespace,
+                    ),
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
+    elif args.command == "run-preflight":
+        namespace = args.namespace.resolve()
+        plan = load_initialized_plan(namespace, config_path, repo_root=repo_root)
+        print(json.dumps(run_m0_data_preflight(plan, output_root=namespace), indent=2))
+    elif args.command == "run-lane":
+        namespace = args.namespace.resolve()
+        plan = load_initialized_plan(namespace, config_path, repo_root=repo_root)
+        lane_index = args.lane_index
+        if lane_index is None:
+            raw_index = os.environ.get("SLURM_ARRAY_TASK_ID")
+            if raw_index is None or not raw_index.isdigit():
+                parser.error("run-lane requires --lane-index or SLURM_ARRAY_TASK_ID")
+            lane_index = int(raw_index)
+        print(json.dumps(run_m0_lane(plan, lane_index, output_root=namespace), indent=2))
+    elif args.command == "finalize":
+        namespace = args.namespace.resolve()
+        plan = load_initialized_plan(namespace, config_path, repo_root=repo_root)
+        payload = finalize_m0_bundle(plan, output_root=namespace)
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        if payload["status"] != "complete":
+            raise SystemExit(2)
+
+
+if __name__ == "__main__":
+    main()

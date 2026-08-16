@@ -1,6 +1,6 @@
 # M0 OLMo eval-v1 qualification wave v1
 
-**Status:** `draft_not_executable` | **Owner:** project | **Created:** 2026-08-16  
+**Status:** `implementation_ready_environment_binding_pending` | **Owner:** project | **Created:** 2026-08-16
 **Supersedes:** none
 
 ## Purpose and estimand
@@ -24,14 +24,13 @@ model comparison, gate or trajectory plot.
 
 ## Scope and prohibitions
 
-Preparation scope is limited to local implementation, tests, manifests and contract review. A
-future separately authorized execution may use one fresh scratch namespace for task/runtime
-qualification and bounded model smokes.
-
-This draft does not authorize HU/SSH, network retrieval, model or dataset download, Slurm/GPU,
-evaluation or scoring, training, corpus materialization, cleanup, deletion, publication or push.
-It does not authorize the scientific M0 evaluation. Prior model, corpus and evaluation roots stay
-read-only.
+The user explicitly authorized running and trying this qualification wave on 2026-08-16. That
+authorization covers Git publication of the narrow implementation, fast-forward synchronization of
+the clean HU monorepo, bounded HU read-only preflight, one new scratch-only environment, bounded
+task-data retrieval, one CPU/data preflight and the test-only Slurm array described below. Scoring
+submission remains fail-closed until the implementation/environment identities are inserted and the
+companion config is frozen. It does not authorize scientific M0 evaluation, training, corpus
+materialization, cleanup or deletion. Prior model, corpus and evaluation roots stay read-only.
 
 ## Immutable identities at draft stage
 
@@ -48,9 +47,10 @@ read-only.
 - Python, NumPy, Torch and few-shot seeds: 42;
 - proposed new root: `/vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v1`.
 
-The implementation commit, adapter hashes, complete environment lock, CUDA/GPU route, dataset
-revisions and content manifests remain unresolved. They must be inserted before this contract can
-be reviewed for freeze.
+The implementation commit, adapter hashes and complete environment lock remain unresolved until the
+preparatory commit and environment creation finish. The selected qualification route is one
+V100-32GB per lane, FP16, at most three concurrent lanes. Dataset content manifests are outputs of
+the authorized online data preflight, not circular prerequisites for starting that preflight.
 
 ## Protocol
 
@@ -59,21 +59,34 @@ be reviewed for freeze.
 - implement an M0 standard-task adapter that accepts only a frozen model manifest, registry and
   fresh output namespace;
 - implement the M0 project-factual/probing adapter without changing existing scoring semantics;
+- expose one user entrypoint which submits a seven-lane Slurm array: WikiText, Pile-10k, BLiMP,
+  the remaining English capability tasks, Turkish capability tasks, factual access and generation
+  integrity;
+- allocate one independent model/GPU process per lane and cap concurrency through the frozen array
+  bound; do not run multiple model processes concurrently on one GPU;
+- attach one `afterany` finalizer which always records missing/failed lane state but emits the
+  complete evaluation manifest only when all seven lanes have matching identities and complete;
 - preserve raw Harness/project outputs and normalize them in a separate idempotent step;
 - reject `--limit` unless the run classification is exactly `test_only_non_scientific`;
 - add identity, task-resolution, schema, partial-result, resume-mismatch and duplicate-key tests.
 
 Q0 is local engineering. Passing Q0 does not make the contract executable.
 
+TurkishMMLU is explicitly excluded from qualification v1 because access is unresolved. This is not
+an eval-v1 exclusion decision. If it is later included, it receives a separate five-shot lane in a
+new contract version; it may not be inserted silently into the zero-shot Turkish lane.
+
 ### Q1 — bounded read-only HU preflight
 
-A future authorized wave must verify the exact repository commit, clean relevant paths, historical
-model-manifest bytes, proposed-root absence, scratch capacity/inodes, runtime route and absence of
-duplicate project jobs. HU home and all previous evidence roots are read-only.
+The authorized read-only inspection verified the clean active HU monorepo, historical model
+manifest and exact model revision, proposed-root absence, scratch capacity/inodes, a compatible
+Torch 2.6/CUDA 12.4 V100 base environment, three idle V100-32GB GPUs and absence of duplicate
+project jobs. HU home, the dirty legacy checkout and all previous evidence roots remain read-only.
 
 ### Q2 — environment and task-data qualification
 
-In one dedicated, content-locked environment:
+In the fresh dedicated root
+`/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v1`:
 
 - prove the installed `lm_eval` source identity equals the pinned commit;
 - record Python, Torch, Transformers, Datasets, tokenizers, CUDA and GPU identities;
@@ -85,7 +98,9 @@ In one dedicated, content-locked environment:
 
 ### Q3 — test-only OLMo smoke and parity
 
-Use the exact OLMo revision and bounded, predeclared smoke limits. Every final task receives a
+Use the exact OLMo revision and bounded, predeclared smoke limits: Harness limit two per
+task/subtask, eight ordered factual probes, 31 generation prompts and 31 generic completion items.
+Every included task receives a
 finite-forward and output-schema smoke. WikiText additionally receives canonical count/result
 parity plus the declared heading sensitivity. TurBLiMP receives explicit 16-subtask macro parity
 despite the upstream duplicate YAML key. No Q3 metric is a scientific M0 score.
@@ -115,6 +130,11 @@ The proposed root is fresh and fail-closed. Required future outputs are:
 - `qualification_result.json`;
 - `final_inventory.json`.
 
+The parallel controller additionally writes `parallel_plan.json`, `submission_manifest.json`, one
+`lanes/<lane-id>/lane_result.json` per lane and `bundle_status.json`. These operational manifests
+do not replace the qualification outputs above. A partial array remains visible and cannot open
+normalization or create a complete evaluation manifest.
+
 All JSON files use atomic write-then-rename. Raw artifacts are immutable. Every result row includes
 contract name/version, implementation commit, model/checkpoint identity, task ID, task-config hash,
 dataset revision, environment fingerprint, run classification, status and raw-artifact pointer.
@@ -127,8 +147,10 @@ unexpected existing root, unresolved task, non-finite value, incomplete denomina
 or parity mismatch fails closed. Partial outputs are retained as evidence but never zero-filled or
 promoted to scientific results. No outcome-aware rerun is allowed.
 
-The numerical parity tolerances, exact smoke limits, Pile-10k cadence decision and TurkishMMLU
-decision remain freeze blockers. Until they are fixed, the only valid status is `draft_not_executable`.
+Missing parity evidence, unresolved dataset identity, the Pile-10k cadence decision and the final
+TurkishMMLU access decision block promotion to eval-v1 freeze review; they do not prevent this
+bounded qualification wave from recording the missing evidence. Until they close, the final
+qualification gate remains `blocked` even when all seven smoke lanes complete.
 
 ## Preflight, resume and rollback
 
@@ -152,26 +174,29 @@ decision remain freeze blockers. Until they are fixed, the only valid status is 
 9. the final implementation commit, resource bounds, Slurm plan and all artifact hashes are bound;
 10. the reviewed document receives a final SHA-256 and exact user authorization.
 
-## Freeze blockers
+## Qualification execution bindings
 
 - implementation commit and adapter hashes;
-- exact Python/package/CUDA/GPU environment;
-- download/file/byte limits and scratch capacity bound;
-- dataset revisions and content manifests;
-- final task IDs and per-task smoke limits;
+- exact environment-lock hash after fresh scratch-only installation;
+- final contract/config SHA-256 binding after those identities are inserted.
+
+The GPU route, resource limits, seven included task lanes, per-task smoke limits, cache bounds and
+fresh output root are fixed in the companion config.
+
+## Eval-v1 promotion blockers
+
+- dataset revisions and content manifests from the data preflight;
 - TurkishMMLU include/exclude decision;
 - WikiText and TurBLiMP numerical parity tolerances;
 - Pile-10k scientific cadence rule;
-- exact Slurm resources, timeouts and job topology;
 - final output schemas, inventory rule and retention class;
-- final contract/config SHA-256 and explicit authorization.
 
 ## Authority boundary
 
-This file and its companion config are design artifacts only. No qualification command may run
-until all freeze blockers are closed, the status becomes `frozen`, exact hashes are recorded and
-the user explicitly authorizes that exact frozen wave. Scientific M0 evaluation requires a later,
-separate frozen execution contract after qualification succeeds.
+Environment preparation may run under the 2026-08-16 user authorization. The CPU/data preflight and
+GPU array may run only after the remaining execution bindings are recorded and the config becomes
+`frozen`. Any semantic or resource change after that freeze needs new user authorization and a new
+namespace. Scientific M0 evaluation always requires a later, separate frozen execution contract.
 
 ## Change policy
 

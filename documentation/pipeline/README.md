@@ -69,10 +69,48 @@ The historical OLMo family has weights only at parent and updates
 `42/84/126/168/210/252`, mapping to epochs `0/6/12/18/24/30/36`. The historical-backfill planner
 accepts only those points. It never interpolates or invents the missing epoch weights.
 
+## M0 parallel evaluation entrypoint
+
+[`../../scripts/study/run_m0_olmo_evaluation.py`](../../scripts/study/run_m0_olmo_evaluation.py)
+is the single operator-facing M0 entrypoint. It partitions the bundle into seven independent GPU
+lanes:
+
+| Lane | Work |
+|---|---|
+| `english_retention_wikitext` | canonical WikiText rolling retention |
+| `english_retention_pile_10k` | broad-domain Pile-10k retention control |
+| `english_grammar_blimp` | BLiMP group |
+| `english_capability` | HellaSwag, WinoGender slices and XNLI-EN |
+| `turkish_capability` | TurBLiMP and XNLI-TR |
+| `factual_access` | project-native factual ranking and paired uncertainty inputs |
+| `generation_integrity` | project-native degeneration/integrity panel |
+
+One online CPU/data preflight resolves and caches every included Harness task. Only after that job
+passes does one Slurm array run the seven lanes with at most three V100-32GB GPUs concurrently.
+Each active lane owns one GPU/model process; the controller does not multiplex model instances on
+one GPU. An `afterany` finalizer inventories every outcome, while complete normalization opens only
+after all required lanes finish with identical plan and classification identities.
+
+TurkishMMLU is excluded from qualification v1 because access is unresolved. This does not settle its
+eval-v1 role. A later inclusion would use a separate five-shot lane and new contract version; it is
+not merged into the zero-shot Turkish lane.
+
+The current draft can be inspected without evaluation:
+
+```bash
+.venv/bin/python scripts/study/run_m0_olmo_evaluation.py plan
+.venv/bin/python scripts/study/run_m0_olmo_evaluation.py preflight
+```
+
+`submit` rejects the current config because qualification limits, environment/model/config hashes,
+Slurm resources, contract freeze and exact authorization are unresolved. Qualification and the
+later scientific M0 wave use the same controller but separate frozen configs/namespaces; success of
+a limited qualification array never becomes a scientific M0 score.
+
 ## Remaining production boundary
 
-The planner and trace/artifact contracts are implemented locally. Actual stage adapters for the
-final pinned LM Evaluation Harness tasks, project factual evaluator, Slurm route and complete-result
+The planner, trace/artifact contracts and fail-closed M0 Harness/project/parallel adapters are
+implemented locally. Their final evaluator configs, environment, resource values and complete-result
 normalizer remain blocked on eval-v1 qualification and a separately authorized execution contract.
 Until then every rendered plan has `execution_authorized: false` and
 `status: planned_not_authorized`.
@@ -83,7 +121,7 @@ Until then every rendered plan has `execution_authorized: false` and
 
 ```text
 contract preflight
-→ M0 evaluation → M0 probing → normalization
+→ M0 evaluation + M0 probing in parallel → normalization
 → M1 training → evaluation + probing → checkpoint selection
 → matched M2 sibling preflight
 → M2-A training + M2-B training
@@ -99,9 +137,10 @@ Render the complete 15-stage graph without scientific execution:
   --dry-run
 ```
 
-The tested runner accepts only registered Python adapters; it never executes arbitrary shell text
-from YAML. The CLI currently registers no scientific adapter and rejects non-dry execution until
-eval-v1, corpus/training contracts and exact authorization are frozen.
+The tested full-study runner accepts only registered Python adapters; it never executes arbitrary
+shell text from YAML. The dedicated M0 controller likewise maps only three fixed adapter types and
+rejects submission until eval-v1 identities and exact authorization are frozen. Later training and
+branch adapters remain unregistered.
 
 Before implementing or starting the first M0 lane, inspect every machine-readable gate with:
 

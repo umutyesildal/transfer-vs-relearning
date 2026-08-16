@@ -114,8 +114,14 @@ evaluation_target:
     model_revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
     contract: documentation/contracts/evaluation/m0-olmo-qualification-v1.md
     config: configs/evaluation/m0_olmo_eval_v1_qualification_v1.yaml
+    entrypoint: scripts/study/run_m0_olmo_evaluation.py
+    parallel_topology: preflight_then_single_slurm_array_plus_afterany_finalizer
+    lane_count: 7
+    max_parallel_lanes: 3
+    local_adapters_implemented: true
     execution_ready: false
     execution_authorized: false
+    user_authorization: qualification_run_requested_2026_08_16
   applies_to:
     - M0
     - M1
@@ -152,6 +158,8 @@ evaluation_target:
     luna_packet_manifest: .agents/task-packets/study-v1/manifest.json
     full_study_stage_count: 15
     execution_adapter_ready: false
+    m0_adapter_status: local_implemented_unqualified
+    m0_parallel_entrypoint: scripts/study/run_m0_olmo_evaluation.py
     execution_authorized: false
     m0_preflight:
       command: >-
@@ -166,8 +174,18 @@ evaluation_target:
         - project_eval_contract_frozen
         - eval_registry_frozen
         - eval_registry_execution_ready
-        - m0_evaluation_adapter_present
-        - m0_probing_adapter_present
+    m0_parallel_preflight:
+      command: >-
+        .venv/bin/python scripts/study/run_m0_olmo_evaluation.py preflight
+        --config configs/evaluation/m0_olmo_eval_v1_qualification_v1.yaml
+      latest_status: blocked_pre_scoring
+      scientific_work_started: false
+      blockers:
+        - qualification_contract_frozen
+        - qualification_execution_ready
+        - qualification_execution_authorized
+        - parallel_bindings_resolved
+        - runtime_and_artifact_identity
     stage_order:
       - identity_preflight
       - train_and_trace
@@ -239,6 +257,8 @@ active_priority:
     - presentation_bundle_manifest_contract
     - m0_fail_closed_preflight
     - m0_olmo_qualification_draft
+    - m0_parallel_evaluation_controller
+    - m0_harness_and_project_adapter_scaffold
   required_outputs:
     - exact_dataset_revision_and_access_evidence
     - lm_eval_validation_and_runtime_evidence

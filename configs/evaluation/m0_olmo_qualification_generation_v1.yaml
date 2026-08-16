@@ -1,0 +1,24 @@
+schema_version: 1
+name: m0-olmo-qualification-generation-v1
+adapter_engine: general_capability
+run_classification: test_only_non_scientific
+run_name: m0_olmo_qualification_generation_test_only
+output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v1/lanes/generation_integrity/raw/general_capability
+model_manifest: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
+data:
+  corpus_file: /vol/tmp2/yesildau/general_capability_v1/wikitext2_raw_test.jsonl
+  prompts_file: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1/configs/general_capability/prompts_v1.jsonl
+  completions_file: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1/configs/general_capability/completions_v1.jsonl
+  synthetic_subjects_file: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1/artifacts/datasets/relation_v2_gate_v1/data/canonical_subject_profiles_5000.csv
+scoring:
+  block_size: 512
+  batch_size: 4
+  candidate_batch_size: 16
+  bootstrap_samples: 200
+generation:
+  max_new_tokens: 64
+runtime:
+  device: cuda
+  bf16: false
+  seed: 42
+scientific_result: false

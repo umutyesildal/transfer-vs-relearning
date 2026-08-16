@@ -171,10 +171,10 @@ def test_m0_preflight_reports_current_contract_and_adapter_blockers() -> None:
         "project_eval_contract_frozen",
         "eval_registry_frozen",
         "eval_registry_execution_ready",
-        "m0_evaluation_adapter_present",
-        "m0_probing_adapter_present",
     }.issubset(payload["blockers"])
     checks = {row["id"]: row for row in payload["checks"]}
+    assert checks["m0_evaluation_adapter_present"]["status"] == "pass"
+    assert checks["m0_probing_adapter_present"]["status"] == "pass"
     assert checks["lm_eval_environment_identity"]["status"] == "pass"
     assert "version=0.4.12" in checks["lm_eval_environment_identity"]["detail"]
     assert "6d642546f4688648fced259eb3302efd36ece5af" in checks[

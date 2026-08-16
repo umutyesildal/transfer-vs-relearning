@@ -46,7 +46,7 @@ required_task_discovery:
   - xnli_tr
 
 conditional_task_discovery:
-  decision: unresolved_before_freeze
+  decision: excluded_from_qualification_v1_access_unresolved
   task_family: turkishmmlu
   task_ids:
     - turkishmmlu_biology
@@ -66,12 +66,109 @@ phases:
   - q3_test_only_olmo_smoke_and_parity
   - q4_qualification_result_and_freeze_gate
 
+parallel_evaluation:
+  topology: preflight_then_single_slurm_array_plus_afterany_finalizer
+  one_model_instance_per_lane: true
+  max_parallel_lanes: 3
+  finalizer_policy: >-
+    Always inventory lane outcomes; emit the complete bundle manifest only when every required
+    lane completed with the identical plan and run classification.
+  runtime:
+    python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v1/bin/python
+    implementation_commit: __FROZEN_IMPLEMENTATION_COMMIT__
+    implementation_files:
+      scripts/study/run_m0_olmo_evaluation.py: __FROZEN_ENTRYPOINT_SHA256__
+      src/transfer_vs_relearning/study/m0_parallel.py: __FROZEN_PARALLEL_CONTROLLER_SHA256__
+      src/transfer_vs_relearning/study/adapters/m0_evaluation.py: __FROZEN_HARNESS_ADAPTER_SHA256__
+      src/transfer_vs_relearning/study/adapters/m0_probing.py: __FROZEN_PROJECT_ADAPTER_SHA256__
+    environment_lock_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v1/environment.lock.txt
+    environment_lock_sha256: __FROZEN_ENVIRONMENT_LOCK_SHA256__
+    device: cuda:0
+    precision: float16
+    batch_size: auto:4
+    max_batch_size: 16
+    log_samples: true
+  environment_preparation:
+    authorized: true
+    root: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v1
+    base_python: /vol/tmp2/yesildau/m1_provenance_screen_v3/compat_envs/torch260_cu124_v1/bin/python
+    max_environment_bytes: 2147483648
+    requirements:
+      - evaluate==0.4.6
+      - pytablewriter==1.2.1
+      - rouge-score==0.1.2
+      - sacrebleu==2.6.0
+      - sqlitedict==2.1.0
+      - word2number==1.1
+      - more-itertools==11.1.0
+  data_preflight:
+    network_retrieval_authorized: true
+    max_cache_files: 100000
+    max_cache_bytes: 10737418240
+    cpus_per_task: 8
+    memory: 32G
+    time_limit: 02:00:00
+  slurm:
+    account: yesildau
+    partition: gpu
+    gres: gpu:v10032gb:1
+    cpus_per_task: 8
+    memory: 64G
+    time_limit: 04:00:00
+  lanes:
+    - id: english_retention_wikitext
+      adapter: lm_eval
+      families: [english_retention]
+      task_ids: [wikitext]
+      fewshot: 0
+      limit: 2
+    - id: english_retention_pile_10k
+      adapter: lm_eval
+      families: [english_retention]
+      task_ids: [pile_10k]
+      fewshot: 0
+      limit: 2
+    - id: english_grammar_blimp
+      adapter: lm_eval
+      families: [english_capability]
+      task_ids: [blimp]
+      fewshot: 0
+      limit: 2
+    - id: english_capability
+      adapter: lm_eval
+      families: [english_capability]
+      task_ids: [hellaswag, winogender_female, winogender_male, winogender_neutral, xnli_en]
+      fewshot: 0
+      limit: 2
+    - id: turkish_capability
+      adapter: lm_eval
+      families: [turkish_capability]
+      task_ids: [turblimp_core, xnli_tr]
+      fewshot: 0
+      limit: 2
+    - id: factual_access
+      adapter: project_factual
+      families: [factual_access, statistical_uncertainty]
+      evaluator_config: configs/evaluation/m0_olmo_qualification_factual_v1.yaml
+      evaluator_config_sha256: 8243e681b923d3257ed499305026c7da94ad52eae91f062b11e3b3f1362b4c23
+      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v1/lanes/factual_access/raw/frozen_suite
+    - id: generation_integrity
+      adapter: project_generation_integrity
+      families: [generation_integrity]
+      evaluator_config: configs/evaluation/m0_olmo_qualification_generation_v1.yaml
+      evaluator_config_sha256: 040f842e1339e3c7627e0392640adef781b8fb9f58e1abaa603b7844579bf4de
+      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v1/lanes/generation_integrity/raw/general_capability
+
 test_only_policy:
   limited_run_classification: test_only_non_scientific
   limit_may_define_scientific_subset: false
   metrics_may_enter_scientific_tables: false
   normalizer_must_reject_mixed_classifications: true
-  exact_limits: unresolved_until_implementation_freeze
+  exact_limits:
+    harness_examples_per_task_or_subtask: 2
+    factual_ordered_probes: 8
+    generation_prompts: 31
+    generic_completion_items: 31
 
 storage:
   proposed_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v1
@@ -105,24 +202,20 @@ forbidden_claims:
 
 freeze_blockers:
   - implementation_commit_and_adapter_hashes
-  - exact_environment_cuda_and_gpu_route
-  - download_file_byte_and_storage_bounds
+  - exact_environment_lock_sha256
+  - final_contract_config_hashes
+
+eval_v1_promotion_blockers:
   - dataset_revisions_and_content_manifests
-  - final_task_ids_and_per_task_smoke_limits
   - turkishmmlu_inclusion_decision
   - wikitext_and_turblimp_parity_tolerances
   - pile_10k_scientific_cadence
-  - slurm_resources_timeouts_and_job_topology
   - final_schema_inventory_and_retention_rules
-  - final_contract_config_hashes_and_explicit_authorization
 
 prohibitions:
-  - hu_ssh
-  - network_retrieval
-  - model_or_dataset_download
-  - slurm_or_gpu
-  - evaluation_or_scoring
+  - scientific_evaluation_claims
+  - model_download
   - training
   - corpus_materialization
   - cleanup_or_deletion
-  - publication_or_push
+  - task_data_retrieval_beyond_frozen_cache_bounds

@@ -1,0 +1,18 @@
+schema_version: 1
+name: m0-olmo-qualification-factual-v1
+adapter_engine: pre_m2_frozen
+run_classification: test_only_non_scientific
+model_label: m0_olmo_qualification_test_only
+model_manifest: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
+dataset_dir: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1/artifacts/datasets/relation_v2_gate_v1
+probe_registry: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1/artifacts/pre_m2_followup_v1/evaluations/paraphrase_probe_registry.csv
+output_dir: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v1/lanes/factual_access/raw/frozen_suite
+candidate_batch_size: 16
+checkpoint_interval: 8
+probe_limit: 8
+device: cuda
+bf16: false
+scientific_result: false
+notes:
+  - The eight-row limit covers one ordered fact across its form/scaffold cells.
+  - This smoke does not freeze the final factual probe registry or create an M0 score.
