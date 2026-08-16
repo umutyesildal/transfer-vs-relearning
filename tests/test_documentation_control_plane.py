@@ -9,6 +9,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 STATE_PATH = ROOT / "documentation/current/PROJECT_STATE.yaml"
 EVAL_REGISTRY_PATH = ROOT / "configs/evaluation/eval_v1_registry.yaml"
+M0_QUALIFICATION_PATH = ROOT / "configs/evaluation/m0_olmo_eval_v1_qualification_v1.yaml"
 LEGACY_DIR = ROOT / "documentation/records/workspace-guidance"
 MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 
@@ -54,6 +55,8 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["inventory"],
         state["evaluation_target"]["task_qualification"],
         state["evaluation_target"]["result_schema"],
+        state["evaluation_target"]["m0_qualification_wave"]["contract"],
+        state["evaluation_target"]["m0_qualification_wave"]["config"],
         state["evaluation_target"]["pipeline"]["documentation"],
         state["evaluation_target"]["pipeline"]["prospective_template"],
         state["evaluation_target"]["pipeline"]["full_study_template"],
@@ -65,6 +68,12 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     ]
     for relative in referenced_paths:
         assert (ROOT / relative).is_file(), relative
+
+    qualification = state["evaluation_target"]["m0_qualification_wave"]
+    assert qualification["status"] == "draft_not_executable"
+    assert qualification["scientific_result"] is False
+    assert qualification["execution_ready"] is False
+    assert qualification["execution_authorized"] is False
 
 
 def test_active_entrypoints_stay_within_context_budget():
@@ -133,6 +142,31 @@ def test_eval_v1_registry_is_draft_and_fail_closed():
         "presentation_bundle",
     ]
     assert registry["freeze_blockers"]
+
+
+def test_m0_qualification_is_non_scientific_and_fail_closed():
+    qualification = yaml.safe_load(M0_QUALIFICATION_PATH.read_text(encoding="utf-8"))
+
+    assert qualification["status"] == "draft_not_executable"
+    assert qualification["classification"] == "qualification_only"
+    assert qualification["scientific_result"] is False
+    assert qualification["execution_ready"] is False
+    assert qualification["execution_authorized"] is False
+    assert qualification["model"]["repository"] == "allenai/OLMo-2-0425-1B"
+    assert qualification["model"]["revision"] == (
+        "a1847dff35000b4271fa70afc5db10fd29fedbdf"
+    )
+    assert qualification["harness"]["git_commit"] == (
+        "6d642546f4688648fced259eb3302efd36ece5af"
+    )
+    assert qualification["test_only_policy"]["metrics_may_enter_scientific_tables"] is False
+    assert qualification["test_only_policy"]["normalizer_must_reject_mixed_classifications"] is True
+    assert qualification["allowed_final_gate_values"] == [
+        "qualified_for_eval_v1_freeze_review",
+        "blocked",
+    ]
+    assert "scientific_m0_score" in qualification["forbidden_claims"]
+    assert qualification["freeze_blockers"]
 
 
 def test_legacy_guidance_hashes_are_preserved():

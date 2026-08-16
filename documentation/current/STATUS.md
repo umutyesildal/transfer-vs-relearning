@@ -32,6 +32,13 @@ unresolved model/output bindings, `ready_to_measure = false`, the absent dedicat
 environment and the not-yet-implemented M0 standard/factual adapters. This is
 `blocked_pre_scoring`, not an M0 scientific result.
 
+The next boundary is now written as the
+[`M0 OLMo qualification draft`](../contracts/evaluation/m0-olmo-qualification-v1.md) with a
+machine-readable companion config. It binds the exact OLMo and Harness revisions, separates
+limited smokes from scientific scores, requires fresh immutable artifacts, and enumerates the
+environment/data/parity/resource fields still needed for freeze. It remains
+`draft_not_executable`; no HU, retrieval, Slurm, model load, inference or scoring follows from it.
+
 ## Evaluation design result
 
 - LM Evaluation Harness is pinned prospectively to v0.4.12 commit

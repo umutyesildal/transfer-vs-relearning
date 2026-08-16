@@ -1,0 +1,128 @@
+schema_version: 1
+name: m0-olmo-eval-v1-qualification-v1
+status: draft_not_executable
+as_of: "2026-08-16"
+classification: qualification_only
+scientific_result: false
+execution_ready: false
+execution_authorized: false
+
+contract: documentation/contracts/evaluation/m0-olmo-qualification-v1.md
+parent_evaluation_contract: documentation/contracts/evaluation/eval-v1.md
+evaluation_registry: configs/evaluation/eval_v1_registry.yaml
+
+model:
+  repository: allenai/OLMo-2-0425-1B
+  revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+  backend: hf
+  apply_chat_template: false
+  system_instruction: null
+  historical_manifest_path: >-
+    /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
+  historical_manifest_sha256: 8702b80d5b7e4c996c8ce2ff5fe771ada08ab0080bde1926c0b1f53c607303dc
+
+harness:
+  package: lm_eval
+  release: v0.4.12
+  git_commit: 6d642546f4688648fced259eb3302efd36ece5af
+  environment_lock: unresolved_until_implementation_freeze
+
+seeds:
+  python: 42
+  numpy: 42
+  torch: 42
+  fewshot: 42
+
+required_task_discovery:
+  - wikitext
+  - pile_10k
+  - blimp
+  - hellaswag
+  - winogender_female
+  - winogender_male
+  - winogender_neutral
+  - turblimp_core
+  - xnli_en
+  - xnli_tr
+
+conditional_task_discovery:
+  decision: unresolved_before_freeze
+  task_family: turkishmmlu
+  task_ids:
+    - turkishmmlu_biology
+    - turkishmmlu_chemistry
+    - turkishmmlu_physics
+    - turkishmmlu_geography
+    - turkishmmlu_philosophy
+    - turkishmmlu_history
+    - turkishmmlu_religion_and_ethics
+    - turkishmmlu_turkish_language_and_literature
+    - turkishmmlu_mathematics
+
+phases:
+  - q0_local_implementation_and_tests
+  - q1_hu_read_only_preflight
+  - q2_environment_and_task_data_qualification
+  - q3_test_only_olmo_smoke_and_parity
+  - q4_qualification_result_and_freeze_gate
+
+test_only_policy:
+  limited_run_classification: test_only_non_scientific
+  limit_may_define_scientific_subset: false
+  metrics_may_enter_scientific_tables: false
+  normalizer_must_reject_mixed_classifications: true
+  exact_limits: unresolved_until_implementation_freeze
+
+storage:
+  proposed_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v1
+  fresh_root_required: true
+  hu_home_read_only: true
+  previous_evidence_roots_read_only: true
+  atomic_writes_required: true
+
+required_outputs:
+  - qualification_manifest.json
+  - environment_lock.json
+  - model_identity.json
+  - task_resolution.jsonl
+  - dataset_content_manifest.jsonl
+  - runtime_measurements.jsonl
+  - parity_results.jsonl
+  - raw_artifact_manifest.jsonl
+  - qualification_result.json
+  - final_inventory.json
+
+allowed_final_gate_values:
+  - qualified_for_eval_v1_freeze_review
+  - blocked
+
+forbidden_claims:
+  - M0_PASS
+  - M0_FAIL
+  - scientific_m0_score
+  - ready_to_train
+  - selected_primary_model
+
+freeze_blockers:
+  - implementation_commit_and_adapter_hashes
+  - exact_environment_cuda_and_gpu_route
+  - download_file_byte_and_storage_bounds
+  - dataset_revisions_and_content_manifests
+  - final_task_ids_and_per_task_smoke_limits
+  - turkishmmlu_inclusion_decision
+  - wikitext_and_turblimp_parity_tolerances
+  - pile_10k_scientific_cadence
+  - slurm_resources_timeouts_and_job_topology
+  - final_schema_inventory_and_retention_rules
+  - final_contract_config_hashes_and_explicit_authorization
+
+prohibitions:
+  - hu_ssh
+  - network_retrieval
+  - model_or_dataset_download
+  - slurm_or_gpu
+  - evaluation_or_scoring
+  - training
+  - corpus_materialization
+  - cleanup_or_deletion
+  - publication_or_push

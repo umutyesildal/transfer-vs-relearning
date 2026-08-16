@@ -65,3 +65,8 @@ No `eval-v1` contract is frozen yet. The local inventory, upstream task-semantic
 schema now exist. The prospective protocol is
 [`evaluation/eval-v1.md`](evaluation/eval-v1.md). Its exact dataset revisions, environment/runtime
 evidence, parity checks, cheap-panel identity and numerical margins remain freeze blockers.
+
+The bounded first qualification design is
+[`evaluation/m0-olmo-qualification-v1.md`](evaluation/m0-olmo-qualification-v1.md). It is a
+`draft_not_executable` engineering contract: reduced/limited smokes are explicitly non-scientific,
+and a later frozen, hash-bound authorization is required before HU, retrieval, Slurm or scoring.

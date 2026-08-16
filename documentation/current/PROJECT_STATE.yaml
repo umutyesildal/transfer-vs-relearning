@@ -78,6 +78,16 @@ evaluation_target:
   inventory: documentation/evaluation/EVALUATOR_INVENTORY_V1.md
   task_qualification: documentation/evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md
   result_schema: documentation/evaluation/RESULT_SCHEMA_V1.md
+  m0_qualification_wave:
+    status: draft_not_executable
+    classification: qualification_only
+    scientific_result: false
+    model: allenai/OLMo-2-0425-1B
+    model_revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+    contract: documentation/contracts/evaluation/m0-olmo-qualification-v1.md
+    config: configs/evaluation/m0_olmo_eval_v1_qualification_v1.yaml
+    execution_ready: false
+    execution_authorized: false
   applies_to:
     - M0
     - M1
@@ -196,6 +206,8 @@ active_priority:
     - opt_in_epoch_training_trace_and_snapshot_contract
     - typed_planned_not_run_artifact_scaffold
     - presentation_bundle_manifest_contract
+    - m0_fail_closed_preflight
+    - m0_olmo_qualification_draft
   required_outputs:
     - exact_dataset_revision_and_access_evidence
     - lm_eval_validation_and_runtime_evidence
