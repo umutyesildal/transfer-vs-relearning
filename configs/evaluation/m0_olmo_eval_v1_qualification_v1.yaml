@@ -1,11 +1,11 @@
 schema_version: 1
-name: m0-olmo-eval-v1-qualification-v1-core-task-reduction-v1
-status: frozen
+name: m0-olmo-eval-v1-qualification-v1-materializer-serialization-repair-v1
+status: materializer_serialization_repair_binding_pending
 as_of: "2026-08-16"
 classification: qualification_only
 scientific_result: false
-execution_ready: true
-execution_authorized: true
+execution_ready: false
+execution_authorized: false
 
 contract: documentation/contracts/evaluation/m0-olmo-qualification-v1.md
 parent_evaluation_contract: documentation/contracts/evaluation/eval-v1.md
@@ -196,13 +196,13 @@ parallel_evaluation:
       families: [factual_access, statistical_uncertainty]
       evaluator_config: configs/evaluation/m0_olmo_qualification_factual_v1.yaml
       evaluator_config_sha256: 7c2919fef13fa95f069cba94b919134becf749fc692a6193879322f321dc3502
-      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v5/lanes/factual_access/raw/frozen_suite
+      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v6/lanes/factual_access/raw/frozen_suite
     - id: generation_integrity
       adapter: project_generation_integrity
       families: [generation_integrity]
       evaluator_config: configs/evaluation/m0_olmo_qualification_generation_v1.yaml
       evaluator_config_sha256: 9f34d8d825823dffe6ed714f9e369b1bddc71ad49faf7cddca5d393211017eee
-      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v5/lanes/generation_integrity/raw/general_capability
+      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v6/lanes/generation_integrity/raw/general_capability
 
 test_only_policy:
   limited_run_classification: test_only_non_scientific
@@ -216,7 +216,7 @@ test_only_policy:
     generic_completion_items: 31
 
 storage:
-  proposed_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v5
+  proposed_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v6
   fresh_root_required: true
   hu_home_read_only: true
   previous_evidence_roots_read_only: true
@@ -245,7 +245,10 @@ forbidden_claims:
   - ready_to_train
   - selected_primary_model
 
-freeze_blockers: []
+freeze_blockers:
+  - materializer_serialization_repair_commit_and_hashes
+  - repaired_project_config_hashes
+  - repaired_contract_and_config_hashes
 
 freeze_authority:
   user_instruction: run_and_try_current_m0_qualification_wave
@@ -295,6 +298,22 @@ operational_history:
     final_inventory_files: 18
     final_inventory_bytes: 3668858
     qualification_result_sha256: 90c363707d49238e8f9b6c1e9aa10b6f410916c77dbb158149260199e3acf5d8
+    preservation: immutable_no_reuse_no_cleanup
+  - namespace: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v5
+    status: BLOCKED_MATERIALIZER_RESULT_SERIALIZATION
+    preflight_job_id: "461284"
+    array_job_id: "461285"
+    finalizer_job_id: "461286"
+    cache_files: 404
+    cache_bytes: 413883954
+    gpu_array_started: false
+    completed_lanes: 0
+    normalization_allowed: false
+    scientific_result: false
+    final_inventory_files: 431
+    final_inventory_bytes: 417737203
+    preflight_result_sha256: 3a2db3eafe9a86ed57a9e2a8a6c4192362a43e062e7bbea0d7b873699cfc682e
+    qualification_result_sha256: 8c27a4522958e6803690685b5b4bc4a48c228c707a814ac36badc184ee1e8a36
     preservation: immutable_no_reuse_no_cleanup
 
 eval_v1_promotion_blockers:

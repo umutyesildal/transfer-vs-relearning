@@ -648,7 +648,7 @@ def run_m0_data_preflight(plan: dict[str, Any], *, output_root: Path) -> dict[st
         "import json;from lm_eval.tasks import TaskManager;"
         f"d=TaskManager({task_manager_args}).load_task_or_group("
         f"json.loads({tasks_json!r}));"
-        "print(json.dumps(sorted(d)))"
+        "print(json.dumps({'loaded_entry_count':len(d)}))"
     )
     commands = {
         "task_list": [

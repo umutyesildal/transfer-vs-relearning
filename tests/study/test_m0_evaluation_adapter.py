@@ -102,7 +102,7 @@ def test_parallel_plan_rejects_duplicate_tasks_and_scientific_limits(tmp_path: P
         build_m0_parallel_plan(_write_yaml(tmp_path / "scientific.yaml", scientific), repo_root=ROOT)
 
 
-def test_frozen_reduced_parallel_preflight_is_blocked_only_by_local_runtime_identity() -> None:
+def test_materializer_repair_preflight_remains_fail_closed_until_refrozen() -> None:
     payload = assess_m0_parallel_readiness(
         CONFIG,
         repo_root=ROOT,
@@ -111,7 +111,12 @@ def test_frozen_reduced_parallel_preflight_is_blocked_only_by_local_runtime_iden
     assert payload["status"] == "blocked_pre_scoring"
     assert payload["scientific_work_started"] is False
     assert payload["lane_count"] == 7
-    assert payload["blockers"] == ["runtime_and_artifact_identity"]
+    assert payload["blockers"] == [
+        "qualification_contract_frozen",
+        "qualification_execution_ready",
+        "qualification_execution_authorized",
+        "runtime_and_artifact_identity",
+    ]
     assert "project_ready_to_measure" not in payload["blockers"]
 
 
@@ -357,8 +362,10 @@ def test_data_preflight_records_exact_task_and_cache_identity(
     cache_file = output_root / "cache" / "dataset.arrow"
     cache_file.write_bytes(b"frozen-data")
     task_ids = [task for lane in plan["lanes"] for task in lane.get("task_ids", [])]
+    seen_commands: list[list[str]] = []
 
     def fake_run(command: list[str], **_: object) -> object:
+        seen_commands.append(command)
         if "ls" in command:
             stdout = "\n".join(f"| {task} | task |" for task in task_ids)
         else:
@@ -373,6 +380,10 @@ def test_data_preflight_records_exact_task_and_cache_identity(
     payload = run_m0_data_preflight(plan, output_root=output_root)
     assert payload["status"] == "complete"
     assert payload["resolved_task_count"] == len(task_ids)
+    materialize_commands = [command for command in seen_commands if "-c" in command]
+    assert len(materialize_commands) == 2
+    assert all("loaded_entry_count" in command[-1] for command in materialize_commands)
+    assert all("sorted(d)" not in command[-1] for command in materialize_commands)
     task_rows = [
         json.loads(line)
         for line in (output_root / "task_resolution.jsonl").read_text(encoding="utf-8").splitlines()

@@ -300,6 +300,27 @@ The v5 replacement bindings are frozen:
 The existing bounded test-only authorization permits this reduced replacement wave; it does not
 convert v5 into a scientific M0 run.
 
+### Append-only TaskManager result-serialization correction
+
+V5 data job `461284` discovered and validated all eight task IDs and materialized 404 cache files /
+413,883,954 bytes. After `load_task_or_group` returned successfully, the preflight diagnostic tried
+to evaluate `sorted(d)`. Harness returned a mapping containing both string and `ConfigurableGroup`
+keys, so Python raised `TypeError: '<' not supported between instances of 'str' and
+'ConfigurableGroup'`. Offline reload reached the same diagnostic failure. This was a controller
+serialization bug after task construction, not a dataset/task failure.
+
+Array `461285` never received a GPU and finalizer `461286` preserved 431 files / 417,737,203 bytes,
+0/7 lanes, no scientific result and a blocked gate. The v5 root is immutable. Its preflight-result
+SHA-256 is `3a2db3eafe9a86ed57a9e2a8a6c4192362a43e062e7bbea0d7b873699cfc682e` and
+qualification-result SHA-256 is
+`8c27a4522958e6803690685b5b4bc4a48c228c707a814ac36badc184ee1e8a36`.
+
+The v6 repair changes only the diagnostic payload to
+`{"loaded_entry_count": len(d)}`. It does not alter TaskManager inputs, task identities, datasets,
+cache bounds, offline flags, model, lane limits, GPU routes or evaluation semantics. A regression
+test requires both online and offline generated commands to use the JSON-safe count and forbids
+`sorted(d)`. V6 requires a fresh namespace and exact implementation/config hashes before execution.
+
 The corrected repair uses the dedicated root
 `/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3`, preserves the parent compat
 prefix path without resolving it to the shared interpreter, normalizes distribution names and

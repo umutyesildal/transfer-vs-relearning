@@ -83,7 +83,10 @@ result and a blocked gate. The 18-file root is preserved. V5 keeps the same seve
 uses eight standard Harness task IDs and no local task overlay. The compatibility failure and a
 possible future upstream repair are isolated in the evaluation incident note. V5 implementation,
 project configs, task set and fresh namespace are now hash-frozen under the existing bounded
-test-only authorization; HU readiness preflight is the next action.
+test-only authorization. V5 then materialized all task data but failed after TaskManager returned,
+when the controller tried to sort mixed string/`ConfigurableGroup` result keys. No GPU/model/scoring
+work ran. V6 replaces only that diagnostic with a JSON-safe loaded-entry count and targets a fresh
+namespace; its implementation/config hashes are binding-pending.
 
 ## Evaluation design result
 
