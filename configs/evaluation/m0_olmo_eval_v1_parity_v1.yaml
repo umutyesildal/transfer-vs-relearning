@@ -7,7 +7,7 @@ contract: documentation/contracts/evaluation/m0-olmo-qualification-parity-v1.md
 
 source:
   root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8
-  plan_id: b406caea29643888
+  plan_id: b4065be7c013d8e3
   recovery_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8_english_capability_recovery_v1
   recovery_result_sha256: a5e8dcc72e0a7303505be975b0bc2f8422c02b6b17ca7d08a182adecd54d00c8
   english_retention_wikitext:

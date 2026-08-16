@@ -57,7 +57,7 @@ config are now frozen as follows:
   `9f331af3df4da84fdd5bfc6b2b52cbbfc4a0fb87d1bf51d4e3de4b01c4f59829`;
 - WikiText heading task YAML SHA-256:
   `b8b66fa5ff4ef376596f1d1e046633193f1e261bb77ad40ac9831564a19a7eaa`;
-- companion config SHA-256:
+- initial companion config SHA-256:
   `cf2191108a3a7c28f6cedd747ebd531496e473a366147677ec0339a897a7ca1a`;
 - completed seven-lane recovery result SHA-256:
   `a5e8dcc72e0a7303505be975b0bc2f8422c02b6b17ca7d08a182adecd54d00c8`;
@@ -95,3 +95,18 @@ corpus work, cleanup, deletion, threshold change or eval-v1 freeze is authorized
 
 None for this bounded test-only parity wave. A blocked runtime or parity result does not authorize
 an automatic retry or any semantic repair.
+
+## Append-only source plan-ID binding correction
+
+The first frozen preflight completed without creating the proposed namespace and without submitting
+any Slurm job. Every implementation, environment, upstream task, cache, recovery, model and file
+identity gate passed. It stopped only because the companion config bound source plan ID
+`b406caea29643888`, while the immutable WikiText lane, TurBLiMP lane, v8 `parallel_plan.json` and
+completed recovery result all independently record `b4065be7c013d8e3`.
+
+This correction changes that one source plan-ID field. Lane-result byte hashes, sample artifacts,
+model, runtime, task semantics, tolerance, route, root and prohibitions are unchanged. The corrected
+companion config SHA-256 is
+`49876c2f5240c0249ae374da5ac62b15aab15bb60ee0699ac47b279d4f6f88c4`. The user's bounded
+test-only authorization remains applicable to this identity-only correction; it does not authorize
+an outcome-aware scientific rerun.
