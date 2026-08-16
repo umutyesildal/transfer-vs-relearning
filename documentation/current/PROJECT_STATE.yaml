@@ -1,5 +1,5 @@
 schema_version: 1
-as_of: "2026-08-15"
+as_of: "2026-08-16"
 project: transfer-vs-relearning
 
 repository:
@@ -85,7 +85,7 @@ evaluation_target:
     - statistical_uncertainty
   lm_eval_harness_required: true
   custom_fact_evaluator_required: true
-  checkpoint_policy: cheap_panel_plus_precommitted_full_milestones
+  checkpoint_policy: future_every_epoch_dense_plus_precommitted_full_milestones
   harness:
     release: v0.4.12
     git_commit: 6d642546f4688648fced259eb3302efd36ece5af
@@ -94,6 +94,19 @@ evaluation_target:
     environment_locked: false
   architecture: hybrid_harness_custom_factual_and_normalizer
   canonical_result_shape: long_tables_with_generated_checkpoint_view
+  pipeline:
+    status: local_planner_trace_and_artifact_foundation_prepared
+    documentation: documentation/pipeline/README.md
+    prospective_template: configs/pipelines/eval_v1_olmo_epoch_trajectory_template.yaml
+    execution_adapter_ready: false
+    execution_authorized: false
+    stage_order:
+      - identity_preflight
+      - train_and_trace
+      - dense_evaluation
+      - full_evaluation
+      - normalization
+      - presentation_bundle
   freeze_blockers:
     - dataset_revisions_and_content_manifests
     - environment_lock_and_olmo_task_smoke
@@ -152,6 +165,10 @@ active_priority:
     - normalized_result_schema_draft
     - checkpoint_cadence_draft
     - eval_v1_contract_draft
+    - deterministic_pipeline_planner
+    - opt_in_epoch_training_trace_and_snapshot_contract
+    - typed_planned_not_run_artifact_scaffold
+    - presentation_bundle_manifest_contract
   required_outputs:
     - exact_dataset_revision_and_access_evidence
     - lm_eval_validation_and_runtime_evidence

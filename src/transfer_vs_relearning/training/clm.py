@@ -420,6 +420,7 @@ def _run_hf_training(
         AutoModelForCausalLM,
         AutoTokenizer,
         Trainer,
+        TrainerCallback,
         TrainingArguments,
         default_data_collator,
         set_seed,
@@ -429,6 +430,16 @@ def _run_hf_training(
     model_config = config["model"]
     training_config = config["training"]
     runtime_config = config["runtime"]
+    tracking_config = config.get("tracking")
+    if tracking_config is not None:
+        if not isinstance(tracking_config, dict):
+            raise ValueError("tracking must be a mapping")
+        if tracking_config.get("schema_version") != 1:
+            raise ValueError("Only tracking schema_version 1 is supported")
+        if tracking_config.get("dense_cadence") != "every_epoch_end_including_parent":
+            raise ValueError("Tracked training requires every epoch end including parent")
+        if tracking_config.get("epoch_snapshot_policy") != "model_only_every_epoch":
+            raise ValueError("Tracked training requires model-only snapshots every epoch")
 
     seed, split_seed, data_seed = resolve_training_seeds(dataset_config, training_config)
     set_seed(seed)
@@ -630,9 +641,19 @@ def _run_hf_training(
             if answer_field not in raw_split[split_name].column_names:
                 raise ValueError(f"Answer field {answer_field!r} not found in {split_name} dataset")
 
-        def tokenize_answer_only_batch(examples: dict[str, list[Any]]) -> dict[str, list[list[int]]]:
+        def tokenize_answer_only_batch(examples: dict[str, list[Any]]) -> dict[str, list[Any]]:
             texts = [str(value) for value in examples[text_field]]
             answers = [str(value) for value in examples[answer_field]]
+            trace_was_truncated = [False] * len(texts)
+            if tracking_config:
+                untruncated = tokenizer(
+                    texts,
+                    add_special_tokens=False,
+                    truncation=False,
+                )["input_ids"]
+                trace_was_truncated = [
+                    len(input_ids) > block_size - 1 for input_ids in untruncated
+                ]
             tokenized = tokenizer(
                 texts,
                 add_special_tokens=False,
@@ -786,6 +807,8 @@ def _run_hf_training(
                 "attention_mask": batch_attention_mask,
                 "labels": batch_labels,
             }
+            if tracking_config:
+                result["__trace_was_truncated"] = trace_was_truncated
             if retention_config:
                 result.update(
                     {
@@ -847,10 +870,138 @@ def _run_hf_training(
         raise ValueError("Configured max_steps must be positive")
     save_steps = int(training_config.get("save_steps") or interval_from_fractions(estimated_steps, list(training_config.get("checkpoint_fractions", [0.25]))))
     eval_steps = int(training_config.get("eval_steps") or save_steps)
-
     warmup_ratio = float(training_config.get("warmup_ratio", 0.0))
     warmup_steps = int(training_config.get("warmup_steps", round(estimated_steps * warmup_ratio)))
 
+    trace_recorder: Any | None = None
+    trace_callback: Any | None = None
+    tokenization_stats: Any | None = None
+    snapshot_capacity: dict[str, int] | None = None
+    if tracking_config:
+        from transfer_vs_relearning.pipeline.training_trace import (
+            TrainingTraceRecorder,
+            create_transformers_trace_callback,
+            make_static_trace_manifest,
+            summarize_tokenized_rows,
+            validate_snapshot_capacity,
+        )
+
+        epochs_float = float(training_config["num_train_epochs"])
+        epochs = int(round(epochs_float))
+        if not math.isclose(epochs_float, epochs, abs_tol=1e-9) or epochs <= 0:
+            raise ValueError("Tracked training requires a positive integer epoch count")
+        effective_row_batch = (
+            int(training_config["per_device_train_batch_size"])
+            * int(training_config.get("gradient_accumulation_steps", 1))
+            * world_size
+        )
+        if train_blocks % effective_row_batch:
+            raise ValueError(
+                "Tracked training requires train rows divisible by effective row batch so epoch "
+                "and update identities cannot drift"
+            )
+        updates_per_epoch = train_blocks // effective_row_batch
+        if estimated_steps != epochs * updates_per_epoch:
+            raise ValueError("Tracked training max_steps disagrees with exact epoch/update mapping")
+        tokenization_stats = summarize_tokenized_rows(
+            (
+                {
+                    "attention_mask": row["attention_mask"],
+                    "labels": row["labels"],
+                    "__trace_was_truncated": row.get("__trace_was_truncated", False),
+                }
+                for row in lm_datasets["train"]
+            ),
+            max_sequence_length=block_size,
+        )
+        for split_name in ("train", "test"):
+            if "__trace_was_truncated" in lm_datasets[split_name].column_names:
+                lm_datasets[split_name] = lm_datasets[split_name].remove_columns(
+                    ["__trace_was_truncated"]
+                )
+        snapshot_root = run_dir / "epoch_snapshots"
+        snapshot_capacity = validate_snapshot_capacity(
+            snapshot_root,
+            epoch_count=epochs,
+            estimated_snapshot_bytes=int(tracking_config["estimated_snapshot_bytes"]),
+            minimum_free_bytes=int(tracking_config["minimum_free_bytes"]),
+        )
+        write_json(run_dir / "snapshot_storage_preflight.json", snapshot_capacity)
+        config_sha256 = sha256_text(json.dumps(config, ensure_ascii=False, sort_keys=True))
+        static_trace_manifest = make_static_trace_manifest(
+            run_id=run_dir.name,
+            config_sha256=config_sha256,
+            model_manifest_sha256=sha256_file(
+                resolve_path(repo_root, model_config["base_model_manifest"])
+            ),
+            dataset_manifest_sha256=sha256_file(
+                resolve_path(repo_root, dataset_config["dataset_manifest"])
+            ),
+            model_identity={
+                "model_id": model_manifest.get("model_id"),
+                "base_model_id": model_manifest.get("base_model_id"),
+                "requested_revision": model_manifest.get("requested_revision"),
+                "resolved_revision": model_manifest.get("resolved_revision"),
+                "tokenizer_source_path": model_manifest.get("tokenizer_source_path"),
+                "tokenizer_source_path_absolute": model_manifest.get(
+                    "tokenizer_source_path_absolute"
+                ),
+                "tokenizer_source_file_hashes": model_manifest.get(
+                    "tokenizer_source_file_hashes"
+                ),
+            },
+            dataset_identity={
+                "version": dataset_config.get("version"),
+                "train_file": str(train_file),
+                "validation_file": (
+                    str(resolve_path(repo_root, validation_file_value))
+                    if validation_file_value
+                    else None
+                ),
+            },
+            runtime_identity={
+                "world_size": world_size,
+                "local_files_only": local_files_only,
+                "torch": torch.__version__,
+                "cuda": torch.version.cuda,
+                "transformers": transformers.__version__,
+                "datasets": datasets.__version__,
+                "cuda_device_count": torch.cuda.device_count(),
+                "gpu_name": (
+                    torch.cuda.get_device_name(0) if torch.cuda.is_available() else None
+                ),
+            },
+            seed=seed,
+            data_seed=data_seed,
+            epochs=epochs,
+            updates_per_epoch=updates_per_epoch,
+            effective_row_batch=effective_row_batch,
+            training=training_config,
+            resolved_training={
+                "estimated_optimizer_steps": estimated_steps,
+                "updates_per_epoch": updates_per_epoch,
+                "save_steps": save_steps,
+                "eval_steps": eval_steps,
+                "warmup_steps": warmup_steps,
+            },
+            tokenization=tokenization_stats,
+            fact_exposures_per_epoch=int(tracking_config["fact_exposures_per_epoch"]),
+            snapshot_policy=str(tracking_config["epoch_snapshot_policy"]),
+        )
+        trace_recorder = TrainingTraceRecorder(run_dir / "training_trace", static_trace_manifest)
+        trace_callback = create_transformers_trace_callback(
+            TrainerCallback,
+            recorder=trace_recorder,
+            tokenizer=tokenizer,
+            snapshot_root=snapshot_root,
+            epochs=epochs,
+            updates_per_epoch=updates_per_epoch,
+            train_rows=train_blocks,
+            fact_exposures_per_epoch=int(tracking_config["fact_exposures_per_epoch"]),
+            tokenization=tokenization_stats,
+            estimated_snapshot_bytes=int(tracking_config["estimated_snapshot_bytes"]),
+            minimum_free_bytes=int(tracking_config["minimum_free_bytes"]),
+        )
     args_kwargs: dict[str, Any] = {
         "output_dir": str(run_dir / "checkpoints"),
         "per_device_train_batch_size": int(training_config["per_device_train_batch_size"]),
@@ -1031,6 +1182,8 @@ def _run_hf_training(
         "eval_dataset": lm_datasets["test"],
         "data_collator": collator,
     }
+    if trace_callback is not None:
+        trainer_kwargs["callbacks"] = [trace_callback]
     optimizer_foreach = training_config.get("optimizer_foreach")
     if optimizer_foreach is not None:
         if retention_config or contrastive_config:
@@ -1101,6 +1254,15 @@ def _run_hf_training(
         "train_metrics": train_metrics,
         "eval_metrics": eval_metrics,
         "retention_loss_metrics": replay_metrics,
+        "training_trace_manifest": (
+            str(run_dir / "training_trace" / "training_trace_manifest.json")
+            if trace_recorder is not None
+            else None
+        ),
+        "snapshot_storage_preflight": snapshot_capacity,
+        "tokenization_stats": (
+            tokenization_stats.__dict__ if tokenization_stats is not None else None
+        ),
         "software": {
             "torch": torch.__version__,
             "cuda": torch.version.cuda,

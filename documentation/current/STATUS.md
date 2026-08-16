@@ -1,6 +1,6 @@
 # Current project status
 
-**As of:** 2026-08-15 | **Phase:** evaluation foundation design
+**As of:** 2026-08-16 | **Phase:** evaluation foundation design
 **Readiness:** `ready_to_measure = false`, `ready_to_train = false`
 
 ## Executive state
@@ -15,6 +15,11 @@ semantics, metric roles, normalized schema and proposed dense/full cadence. eval
 exact dataset revisions, environment/runtime evidence, parity checks, cheap-panel identity and
 numeric scientific margins are not frozen. No new training family can open before those close.
 
+The local pipeline foundation is now opt-in and fail-closed. It derives an exact epoch/update/batch
+schedule, records tokenization and optimization traces, preserves model-only epoch snapshots behind
+storage guards, plans dense/full evaluation in order, and initializes typed `planned_not_run`
+artifact/presentation namespaces. It does not yet execute LM Eval or project evaluation stages.
+
 ## Evaluation design result
 
 - LM Evaluation Harness is pinned prospectively to v0.4.12 commit
@@ -26,7 +31,10 @@ numeric scientific margins are not frozen. No new training family can open befor
 - Project-native factual ranking, robust intersections, relation swaps, paired subject bootstrap
   and generation integrity are preserved.
 - Canonical results are long tables; one-row-per-checkpoint output is a generated view.
-- Dense evaluation covers every checkpoint; full evaluation is proposed at entry/midpoint/endpoint.
+- Future dense evaluation covers the parent and every epoch end; full evaluation is proposed at
+  entry/midpoint/endpoint. Historical OLMo remains limited to its seven existing weight states.
+- Retention is raw BPB plus ΔBPB; PPL ratio is companion evidence and retention score is plot-only.
+- Training trace, typed normalized tables and presentation metadata are mandatory future outputs.
 
 See the [`evaluation read set`](../evaluation/README.md) and
 [`eval-v1 draft`](../contracts/evaluation/eval-v1.md).
@@ -67,6 +75,10 @@ The valid next work is bounded evaluation qualification:
 5. freeze the cheap factual probe registry and numeric scientific margins;
 6. add deterministic parity, identity, normalization and resume tests;
 7. only then freeze `eval-v1`.
+
+The planner/tracing implementation may be tested and reviewed locally in parallel. Executable LM
+Eval/project adapters remain after the semantic qualification boundary; their absence must not be
+bypassed with ad-hoc commands.
 
 This status does not authorize downloading tasks, running evaluation, accessing HU, using Slurm,
 training a model, materializing a corpus, making additional pushes, or cleaning artifacts.

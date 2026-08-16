@@ -52,6 +52,8 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["inventory"],
         state["evaluation_target"]["task_qualification"],
         state["evaluation_target"]["result_schema"],
+        state["evaluation_target"]["pipeline"]["documentation"],
+        state["evaluation_target"]["pipeline"]["prospective_template"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],
@@ -79,6 +81,7 @@ def test_control_plane_markdown_links_resolve():
         *sorted((ROOT / "documentation/contracts").glob("*.md")),
         *sorted((ROOT / "documentation/decisions").glob("*.md")),
         *sorted((ROOT / "documentation/evaluation").glob("*.md")),
+        *sorted((ROOT / "documentation/pipeline").glob("*.md")),
         ROOT / "documentation/records/README.md",
     ]
 
@@ -115,6 +118,15 @@ def test_eval_v1_registry_is_draft_and_fail_closed():
     assert tasks["xnli_en"]["dataset_config"] == "en"
     assert tasks["xnli_tr"]["dataset_config"] == "tr"
     assert tasks["turkishmmlu"]["status"] == "dataset_access_unverified"
+    assert registry["cadence"]["dense"]["rule"] == (
+        "every_epoch_end_including_parent_for_future_runs"
+    )
+    assert registry["retention"]["derived_retention_score"]["scientific_gate"] is False
+    assert registry["training_trace"]["epoch_snapshot_policy"] == "model_only_every_epoch"
+    assert registry["pipeline"]["stage_order"][-2:] == [
+        "normalization",
+        "presentation_bundle",
+    ]
     assert registry["freeze_blockers"]
 
 

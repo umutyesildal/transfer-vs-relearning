@@ -1,0 +1,48 @@
+dataset:
+  version: __FROZEN_DATASET_VERSION__
+  dataset_dir: __MATERIALIZED_ON_SCRATCH__
+  dataset_manifest: __FROZEN_DATASET_MANIFEST__
+  train_file: __FROZEN_TRAIN_FILE__
+  validation_file: __FROZEN_VALIDATION_FILE__
+  text_field: text
+  answer_field: answer
+  split_seed: 42
+model:
+  base_model_manifest: __FROZEN_OLMO_MODEL_MANIFEST__
+training:
+  run_name: __FROZEN_RUN_NAME__
+  output_root: __FRESH_SCRATCH_OUTPUT_ROOT__
+  block_size: 128
+  learning_rate: 5.0e-5
+  num_train_epochs: 36.0
+  per_device_train_batch_size: 5
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 100
+  warmup_ratio: 0.02
+  weight_decay: 0.0
+  lr_scheduler_type: constant_with_warmup
+  loss_mode: answer_only
+  supervise_eos: false
+  model_load_dtype: bfloat16
+  bf16: true
+  fp16: false
+  gradient_checkpointing: true
+  optimizer_foreach: false
+  max_grad_norm: 1.0
+  logging_steps: 5
+  save_steps: 42
+  eval_steps: 42
+  save_total_limit: 6
+  seed: 42
+  data_seed: 42
+runtime:
+  local_files_only: true
+  world_size: 1
+tracking:
+  schema_version: 1
+  dense_cadence: every_epoch_end_including_parent
+  epoch_snapshot_policy: model_only_every_epoch
+  storage_preflight_required: true
+  estimated_snapshot_bytes: 3100000000
+  minimum_free_bytes: 20000000000
+  fact_exposures_per_epoch: 3500

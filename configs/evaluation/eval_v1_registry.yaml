@@ -29,7 +29,7 @@ harness:
 
 cadence:
   dense:
-    rule: every_precommitted_checkpoint_including_parent
+    rule: every_epoch_end_including_parent_for_future_runs
     families:
       - identity_and_training_trace
       - factual_access_cheap
@@ -49,6 +49,8 @@ cadence:
   historical_olmo_steps:
     dense: [0, 42, 84, 126, 168, 210, 252]
     full: [0, 126, 252]
+    available_epochs: [0, 6, 12, 18, 24, 30, 36]
+    limitation: missing_epoch_weights_cannot_be_reconstructed_or_imputed
   unresolved:
     - pile_10k_dense_or_full_after_runtime_qualification
     - exact_m2_steps_from_future_training_contract
@@ -221,18 +223,68 @@ custom_factual:
   exact_prefix_generation: secondary_where_explicitly_defined
 
 retention:
-  english_primary: wikitext_bits_per_byte_ratio_to_parent
-  english_secondary: pile_10k_bits_per_byte_ratio_to_parent
-  turkish_primary: frozen_heldout_turkish_bits_per_byte_ratio_to_parent
+  english_primary: wikitext_raw_bits_per_byte_and_absolute_delta_to_parent
+  english_secondary: pile_10k_raw_bits_per_byte_and_absolute_delta_to_parent
+  turkish_primary: frozen_heldout_turkish_raw_bits_per_byte_and_absolute_delta_to_parent
   report_always:
     - raw_value
     - parent_value
     - absolute_delta
-    - ratio_to_parent
+    - word_perplexity
+    - byte_perplexity
+    - perplexity_ratio_to_parent
+  bpb_ratio_to_parent:
+    role: optional_diagnostic_only
+    reason: bits_per_byte_is_already_log_scaled
   derived_retention_score:
     formula: 100 / perplexity_ratio
     role: visualization_only
     scientific_gate: false
+
+training_trace:
+  required_for_future_runs: true
+  cadence: optimizer_logs_plus_every_epoch_end
+  epoch_snapshot_policy: model_only_every_epoch
+  resumable_checkpoint_policy: separately_precommitted_milestones
+  storage_preflight_required: true
+  required_tokenization_statistics:
+    - total_nonpad_tokens
+    - total_supervised_tokens
+    - mean_nonpad_tokens
+    - p50_nonpad_tokens
+    - p95_nonpad_tokens
+    - padding_fraction
+    - truncation_count
+    - truncation_rate
+  required_optimization_trace:
+    - epoch
+    - update
+    - cumulative_examples
+    - cumulative_fact_exposures
+    - cumulative_supervised_tokens
+    - cumulative_total_tokens
+    - train_loss
+    - learning_rate
+    - grad_norm
+    - checkpoint_sha256
+
+pipeline:
+  config_schema: configs/pipelines/eval_v1_olmo_epoch_trajectory_template.yaml
+  stage_order:
+    - identity_preflight
+    - train_and_trace
+    - dense_evaluation
+    - full_evaluation
+    - normalization
+    - presentation_bundle
+  required_outputs:
+    - checkpoint_registry.parquet
+    - metric_observations.parquet
+    - factual_probe_results.parquet
+    - trajectory_wide.csv
+    - hyperparameters.csv
+    - evaluation_manifest.json
+    - presentation/figure_manifest.json
 
 freeze_blockers:
   - exact_huggingface_dataset_revisions_and_local_content_manifests

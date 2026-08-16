@@ -24,6 +24,10 @@ contracts are not frozen. `ready_to_measure` and `ready_to_train` are both false
 Slurm, training, evaluation, corpus-download, publication, or cleanup action follows from this
 README.
 
+A local planner/tracing foundation now renders the future
+preflight→train→epoch-eval→normalize→presentation sequence without executing it. See
+[`documentation/pipeline/README.md`](documentation/pipeline/README.md).
+
 The verified monorepo is now published on `main`. Active evaluation-foundation work continues on
 `agent/eval-harness`. Both source histories and all workspace material were preserved; the
 original worktrees and private pre-filter bundle remain rollback sources.
@@ -64,6 +68,7 @@ stable rules, while `PROJECT_STATE.yaml` contains the changing project state.
 | `documentation/current/` | Small live control plane: state, authority, and roadmap |
 | `documentation/contracts/` | Prospective frozen execution and measurement contracts |
 | `documentation/decisions/` | Short durable architecture/scientific decisions |
+| `documentation/pipeline/` | Train/trace/evaluate/normalize/presentation interface |
 | `documentation/records/` | Immutable or superseded records and preserved guidance |
 | `documentation/*.md` | Existing chronological scientific record, Documents 00–178 |
 | `artifacts/` and `runs/` | Local/generated scientific artifacts; generally not Git data |

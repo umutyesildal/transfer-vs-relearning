@@ -1,0 +1,49 @@
+schema_version: 1
+pipeline_id: eval-v1-olmo-m1-epoch-trajectory-template
+status: draft
+execution_authorized: false
+
+experiment:
+  experiment_id: prospective-olmo-m1-eval-v1
+  state: M1
+  parent_state: M0
+  arm: M1
+  parent_checkpoint_id: OLMo-2-0425-1B@a1847dff35000b4271fa70afc5db10fd29fedbdf
+  model_id: allenai/OLMo-2-0425-1B
+  model_revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+  tokenizer_id: allenai/OLMo-2-0425-1B
+  tokenizer_revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+  seed: 42
+
+training_plan:
+  config: configs/training/eval_v1_olmo_epoch_tracked_template.yaml
+  trajectory_mode: prospective
+  expected_train_rows: 3500
+  expected_total_updates: 252
+  tracking:
+    dense_cadence: every_epoch_end_including_parent
+    epoch_snapshot_policy: model_only_every_epoch
+    storage_preflight_required: true
+    estimated_snapshot_bytes: 3100000000
+    minimum_free_bytes: 20000000000
+    fact_exposures_per_epoch: 3500
+
+evaluation:
+  contract: eval-v1
+  dense_bundles:
+    - identity_and_training_trace
+    - factual_access_cheap
+    - english_retention_primary
+    - generation_integrity_cheap
+  full_bundles:
+    - factual_access_full
+    - english_capability
+    - turkish_capability
+    - generation_integrity_full
+  full_epochs: [0, 18, 36]
+
+outputs:
+  root: __FRESH_SCRATCH_OUTPUT_ROOT__
+  raw_namespaces_immutable: true
+  normalized_tables_required: true
+  presentation_bundle_required: true

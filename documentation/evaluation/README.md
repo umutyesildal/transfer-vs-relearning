@@ -8,7 +8,9 @@ the prospective protocol so an agent does not need the chronological archive by 
 1. [`EVALUATOR_INVENTORY_V1.md`](EVALUATOR_INVENTORY_V1.md) — what already exists and what is reusable;
 2. [`LM_EVAL_TASK_QUALIFICATION_V1.md`](LM_EVAL_TASK_QUALIFICATION_V1.md) — verified upstream tasks and open blockers;
 3. [`RESULT_SCHEMA_V1.md`](RESULT_SCHEMA_V1.md) — canonical normalized artifacts;
-4. [`../contracts/evaluation/eval-v1.md`](../contracts/evaluation/eval-v1.md) — prospective protocol.
+4. [`../contracts/evaluation/eval-v1.md`](../contracts/evaluation/eval-v1.md) — prospective protocol;
+5. [`../pipeline/README.md`](../pipeline/README.md) — deterministic train/trace/eval/normalize/
+   presentation foundation and its execution boundary.
 
 The machine-readable draft registry is
 [`../../configs/evaluation/eval_v1_registry.yaml`](../../configs/evaluation/eval_v1_registry.yaml).

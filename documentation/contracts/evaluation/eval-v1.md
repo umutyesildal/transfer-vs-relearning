@@ -59,6 +59,12 @@ BPB is the primary retention unit. Word PPL and byte PPL are always reported. Ra
 used to rank different tokenizers. Official task preprocessing is unchanged; alternate WikiText
 heading formatting is sensitivity-only.
 
+Retention reports the raw checkpoint BPB, raw parent BPB and `ΔBPB = checkpoint − parent` as the
+primary comparison. Word/byte PPL and `PPL checkpoint / PPL parent` are companion quantities. A
+BPB ratio is diagnostic-only because BPB is already logarithmic. `100 / PPL ratio` may be labelled
+`retention_score` in plot data only; it is not a percentage of retained facts and never defines a
+scientific gate.
+
 ### Project factual lane
 
 - mean answer-token log probability is the primary candidate score;
@@ -79,13 +85,17 @@ not silently merged with lexical-empty output.
 
 ## Cadence
 
-Every precommitted checkpoint, including the parent, receives the dense identity, factual,
-retention and generation panel. The full factual and capability bundle runs at state entry,
-normalized progress 0.5 and endpoint 1.0.
+For every future run, the parent and every epoch end receive the dense identity, factual,
+retention and generation panel. Each epoch must therefore leave a model-only snapshot with a
+content inventory and checkpoint hash. Separately precommitted milestone checkpoints retain
+optimizer, scheduler and RNG state for resume. The full factual and capability bundle runs at
+state entry, normalized progress 0.5 and endpoint 1.0.
 
 For the historical OLMo trajectory, dense steps are `0/42/84/126/168/210/252` and full steps are
-`0/126/252`. Future training contracts must bind exact updates to the same normalized cadence
-before outcomes. If progress 0.5 is not a saved checkpoint, the mapping is frozen before training.
+`0/126/252`, corresponding to epochs `0/6/12/18/24/30/36` for the dense points. The missing epoch
+weights do not exist and must not be reconstructed, interpolated or reported as measurements.
+Future training contracts must bind every epoch to an exact update before outcomes. If progress
+0.5 is not an integer epoch, its checkpoint mapping is frozen before training.
 
 Pile-10k cadence remains unresolved until measured runtime is known. A cheap scientific subset may
 not use `--limit`; it requires an explicit frozen sample-ID registry.
@@ -98,6 +108,18 @@ harness and project outputs are immutable. Canonical normalized artifacts follow
 
 A human one-row-per-checkpoint CSV is generated from the canonical long tables. It is never edited
 or used as the provenance source.
+
+Every future training run must also emit a trace manifest, append-safe optimizer-log events, one
+complete epoch-end row per epoch and one model-only snapshot inventory per epoch. Required trace
+fields cover static hyperparameters, effective batch, sequence/token statistics, padding and
+truncation, cumulative examples/fact exposures/supervised and total tokens, loss/LR/gradient norm,
+epoch/update identity and checkpoint hash. Epoch snapshots require a fail-closed storage preflight.
+
+The default pipeline order is `identity preflight → train and trace → dense evaluation → full
+evaluation → normalization → presentation bundle`. Required presentation inputs are generated from
+canonical tables, never copied by hand: `trajectory_wide.csv`, `hyperparameters.csv`, plot-data
+tables, figure status/identity manifest and metadata-complete captions. A missing or invalid result
+remains visible and prevents a complete figure status.
 
 ## Scientific decision rules
 
