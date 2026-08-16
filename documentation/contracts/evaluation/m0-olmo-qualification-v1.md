@@ -91,10 +91,16 @@ nested-venv path-resolution bug inherited shared Torch 2.7/CUDA 12.8 instead of 
 Torch 2.6/CUDA 12.4 compatibility packages. No data preflight, model load, GPU job or scoring used
 that environment. It is immutable and must not be reused or cleaned by this wave.
 
-The repair uses the fresh dedicated root
-`/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v2`, preserves the parent compat
-prefix path without resolving it to the shared interpreter and asserts the exact base and final
-runtime identities before accepting its lock:
+The v2 repair correctly installed Torch 2.6.0+cu124 and Harness 0.4.12 at the pinned commit, but a
+final metadata-name gate compared upstream `lm_eval` without normalizing it to distribution name
+`lm-eval`; the command stopped before writing a completed environment identity. The v2 root is also
+preserved, immutable and excluded from reuse. No data preflight, model load, GPU job or scoring used
+it.
+
+The corrected repair uses the fresh dedicated root
+`/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3`, preserves the parent compat
+prefix path without resolving it to the shared interpreter, normalizes distribution names and
+asserts the exact base/final runtime identities before accepting its lock:
 
 - prove the installed `lm_eval` source identity equals the pinned commit;
 - record Python, Torch, Transformers, Datasets, tokenizers, CUDA and GPU identities;

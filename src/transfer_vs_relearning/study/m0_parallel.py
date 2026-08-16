@@ -397,8 +397,8 @@ def prepare_m0_environment(plan: dict[str, Any], *, repo_root: Path) -> dict[str
         raise FileNotFoundError(f"Base Python is missing or not executable: {base_python}")
     identity_code = (
         "import importlib.metadata,json,platform,torch,transformers,datasets,accelerate;"
-        "d=importlib.metadata.distribution('lm-eval') if "
-        "any(x.metadata['Name']=='lm-eval' for x in importlib.metadata.distributions()) else None;"
+        "d=next((x for x in importlib.metadata.distributions() if "
+        "(x.metadata.get('Name') or '').lower().replace('_','-')=='lm-eval'),None);"
         "u=json.loads(d.read_text('direct_url.json') or '{}') if d else {};"
         "print(json.dumps({'python':platform.python_version(),'torch':torch.__version__,"
         "'cuda':torch.version.cuda,'transformers':transformers.__version__,"
