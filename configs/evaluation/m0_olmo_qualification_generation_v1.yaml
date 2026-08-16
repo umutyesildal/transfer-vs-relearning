@@ -3,7 +3,7 @@ name: m0-olmo-qualification-generation-v1
 adapter_engine: general_capability
 run_classification: test_only_non_scientific
 run_name: m0_olmo_qualification_generation_test_only
-output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v7/lanes/generation_integrity/raw/general_capability
+output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8/lanes/generation_integrity/raw/general_capability
 model_manifest: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
 data:
   corpus_file: /vol/tmp2/yesildau/general_capability_v1/wikitext2_raw_test.jsonl

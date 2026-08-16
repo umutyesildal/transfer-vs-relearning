@@ -24,7 +24,7 @@ repository:
       path: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1
       branch: agent/m0-evaluation
       sync_mode: git_pull_ff_only
-      dependency_commit_verified: d39cdc2653a558c1cf494f6791b00a4aaef3ba08
+      dependency_commit_verified: 562f1d3ed4a1918403845ea8d12cf65f57c60dd5
       clean_at_verification: true
     legacy_checkout:
       path: /vol/fob-vol6/mi25/yesildau/transfer-vs-relearning
@@ -120,14 +120,15 @@ evaluation_target:
     harness_task_count: 8
     max_parallel_lanes: 7
     local_adapters_implemented: true
-    implementation_commit: d39cdc2653a558c1cf494f6791b00a4aaef3ba08
-    contract_sha256: ae1b2ba627f49556f281ff4ed24a9bb5dabf988e3a8c83e80162571dfbab161b
-    config_sha256: baa039ba2827256f33466a3018fa49afe325588536784ae492c97958b8cc5f26
-    gpu_route_policy: earliest_test_only_start_then_declared_order
+    implementation_commit: 562f1d3ed4a1918403845ea8d12cf65f57c60dd5
+    contract_sha256: 85b9df7853f4119da427f307c888e0f8e8bc1e93e04eef51ddff334a0eb5d30c
+    config_sha256: 79ef439adb445d49bdbef43a0f0993578b7e6ddf753b5f72664d942dd713153d
+    gpu_route_policy: earliest_start_window_then_declared_slots_per_lane
+    max_route_start_skew_seconds: 900
     gpu_route_candidates: [v10032gb, a10080gb, rtx3090, rtx6000, rtxa6000]
     environment_root: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3
     environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
-    output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v7
+    output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8
     consolidated_result: evaluation_results.json
     prior_not_run_roots:
       - /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v1
@@ -136,9 +137,10 @@ evaluation_target:
       - /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v4
       - /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v5
       - /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v6
+      - /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v7
     execution_ready: true
     execution_authorized: true
-    user_authorization: independent_lane_integrity_repair_and_rerun_requested_2026_08_16
+    user_authorization: earliest_route_window_repair_and_rerun_requested_2026_08_16
   applies_to:
     - M0
     - M1

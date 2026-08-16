@@ -95,7 +95,13 @@ blocked, non-scientific run. V7 keeps the successful controller preflight, remov
 packaging-dependent duplicate check, submits seven independent per-lane GPU jobs from the same
 script and adds `evaluation_results.json` alongside the complete raw-artifact manifest. Its exact
 implementation, project configs, companion config and fresh v7 namespace are frozen under the
-user's bounded test-only rerun authorization.
+user's bounded test-only rerun authorization. V7 submission then showed that six lanes had immediate
+V100/RTX6000 estimates while the seventh had been assigned to an RTXA6000 estimate almost twenty
+hours later. The entire v7 chain was cancelled during incomplete CPU preflight and before any GPU
+lane, model load or scoring; its seven control files are preserved. V8 adds a frozen 900-second
+earliest-start window: later eligible routes remain audited but are excluded, and near-term declared
+slots are reused for overflow lanes. The one-command evaluation/result behavior is unchanged and the
+fresh v8 namespace is execution-ready.
 
 ## Evaluation design result
 

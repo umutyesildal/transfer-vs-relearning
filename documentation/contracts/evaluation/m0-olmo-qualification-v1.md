@@ -398,6 +398,47 @@ The user's 2026-08-16 instruction to implement this repair and keep the one-comm
 pipeline authorizes this bounded v7 qualification wave. It remains test-only and cannot create a
 scientific M0 score.
 
+### Append-only route-start-window correction
+
+V7 submission exposed a scheduling-policy defect before any GPU lane started. Six jobs were routed
+to V10032GB/RTX6000 estimates at `2026-08-16T16:08:44`, while the seventh job was assigned to an
+otherwise eligible RTXA6000 route estimated for `2026-08-17T11:37:36`. Reusing one of the six
+near-term declared slots would complete earlier than binding a lane to that distant route. Jobs
+`461403`--`461411` were therefore cancelled after 40 seconds of incomplete CPU preflight and before
+GPU/model/scoring work. The preserved v7 root has seven files / 65,748 bytes, zero lane results,
+submission-manifest SHA-256
+`92979c07164ba124c7723c04c0b5d9f5beac5bc08bc51d8205d71b967c047c96` and route-selection
+SHA-256 `b2f10be29f78a0df08aa463c938b66ea95aab024d7a9db6e1afa8f6dcabad464`.
+
+V8 retains independent per-lane jobs but admits only scheduler-tested routes whose estimated start
+is within 900 seconds of the earliest eligible estimate. It expands declared physical slots for
+those near-term routes and cycles those slots when the seven lanes exceed immediate slot count.
+All eligible but later routes remain recorded in `gpu_route_selection.json` as excluded by the
+start window. This changes only scheduling latency; the model, Harness commit, task set, datasets,
+limits, seeds, precision, evaluation commands, outputs and finalizer semantics remain unchanged.
+
+The v8 bindings are frozen:
+
+- implementation commit: `562f1d3ed4a1918403845ea8d12cf65f57c60dd5`;
+- operator entrypoint SHA-256:
+  `0761e3848ae0ae87368ca706912b69447797da1cad70d63d3c03df955a7a56d3`;
+- parallel controller/finalizer SHA-256:
+  `e5727047ecec24c3982c47ab04584330c1f2cd99a9770d5952f5fde452ac3e3c`;
+- Harness adapter SHA-256:
+  `953f1958b6051be33e96c2b94ecb86ae79c5b19ce9a9376cd00f16af7ecdcfa5`;
+- project adapter SHA-256:
+  `5b8a49003e151454c3028c2eb135fda943a9169037a1a4b9d04ae5a0810fcde6`;
+- factual qualification config SHA-256:
+  `9eddb999e6da7b06e655864132fd5438723ca96a748c3b9e721bdb718f70d87f`;
+- generation qualification config SHA-256:
+  `dd4207dfc2c24055e39f095c51b279f11c6ec9ba3e3730271bf6c5ad63478876`;
+- companion config SHA-256:
+  `79ef439adb445d49bdbef43a0f0993578b7e6ddf753b5f72664d942dd713153d`;
+- fresh execution root: `/vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8`.
+
+The user's instruction to solve the full-parallel one-script workflow authorizes this bounded,
+semantics-neutral v8 scheduling correction and rerun. It remains test-only and non-scientific.
+
 The corrected repair uses the dedicated root
 `/vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3`, preserves the parent compat
 prefix path without resolving it to the shared interpreter, normalizes distribution names and

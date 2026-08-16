@@ -1,5 +1,5 @@
 schema_version: 1
-name: m0-olmo-eval-v1-qualification-v1-independent-lane-integrity-repair-v1
+name: m0-olmo-eval-v1-qualification-v1-earliest-route-window-repair-v1
 status: frozen
 as_of: "2026-08-16"
 classification: qualification_only
@@ -76,10 +76,10 @@ parallel_evaluation:
     lane completed with the identical plan and run classification.
   runtime:
     python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
-    implementation_commit: d39cdc2653a558c1cf494f6791b00a4aaef3ba08
+    implementation_commit: 562f1d3ed4a1918403845ea8d12cf65f57c60dd5
     implementation_files:
-      scripts/study/run_m0_olmo_evaluation.py: 1ec72fd68afe3668a7663d456fd6dac94bdc75fda839adf98409843a81b80687
-      src/transfer_vs_relearning/study/m0_parallel.py: 874b2739c96191a954d9af7d1a8c7352db847dc94af51413b3fa3a10a4c00b90
+      scripts/study/run_m0_olmo_evaluation.py: 0761e3848ae0ae87368ca706912b69447797da1cad70d63d3c03df955a7a56d3
+      src/transfer_vs_relearning/study/m0_parallel.py: e5727047ecec24c3982c47ab04584330c1f2cd99a9770d5952f5fde452ac3e3c
       src/transfer_vs_relearning/study/adapters/m0_evaluation.py: 953f1958b6051be33e96c2b94ecb86ae79c5b19ce9a9376cd00f16af7ecdcfa5
       src/transfer_vs_relearning/study/adapters/m0_probing.py: 5b8a49003e151454c3028c2eb135fda943a9169037a1a4b9d04ae5a0810fcde6
     environment_lock_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/environment.lock.txt
@@ -137,7 +137,8 @@ parallel_evaluation:
   slurm:
     account: yesildau
     control_partition: std
-    gpu_route_selection_policy: earliest_test_only_start_then_declared_order
+    gpu_route_selection_policy: earliest_start_window_then_declared_slots_per_lane
+    max_route_start_skew_seconds: 900
     gpu_routes:
       - id: v10032gb
         partition: gpu
@@ -201,14 +202,14 @@ parallel_evaluation:
       adapter: project_factual
       families: [factual_access, statistical_uncertainty]
       evaluator_config: configs/evaluation/m0_olmo_qualification_factual_v1.yaml
-      evaluator_config_sha256: 0f3d385847a6652279418b9914224e6c51d8a511e0986a282ceed4122fbfc75e
-      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v7/lanes/factual_access/raw/frozen_suite
+      evaluator_config_sha256: 9eddb999e6da7b06e655864132fd5438723ca96a748c3b9e721bdb718f70d87f
+      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8/lanes/factual_access/raw/frozen_suite
     - id: generation_integrity
       adapter: project_generation_integrity
       families: [generation_integrity]
       evaluator_config: configs/evaluation/m0_olmo_qualification_generation_v1.yaml
-      evaluator_config_sha256: 15790e1272448b4ddf17b00acea9aefc07482a6a45163e41b0abefa67f8038ca
-      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v7/lanes/generation_integrity/raw/general_capability
+      evaluator_config_sha256: dd4207dfc2c24055e39f095c51b279f11c6ec9ba3e3730271bf6c5ad63478876
+      expected_output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8/lanes/generation_integrity/raw/general_capability
 
 test_only_policy:
   limited_run_classification: test_only_non_scientific
@@ -222,7 +223,7 @@ test_only_policy:
     generic_completion_items: 31
 
 storage:
-  proposed_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v7
+  proposed_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8
   fresh_root_required: true
   hu_home_read_only: true
   previous_evidence_roots_read_only: true
@@ -337,6 +338,21 @@ operational_history:
     bundle_status_sha256: d2e13eeefad1929d0c71fdb144b0e6a2c6bedc6c9990a941de17ebc5fc4d29de
     qualification_result_sha256: 1f2c386e8e1ae2378b0166b5d6b3e335c3a8e0a4f692956b748667fed09e7bd6
     final_inventory_sha256: 1d22a689ca92aaf74a02da72fee237eab9768b9d7c25cbbcd7e56b12eda7cfb2
+    preservation: immutable_no_reuse_no_cleanup
+  - namespace: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v7
+    status: CANCELLED_ROUTE_START_SKEW_BEFORE_GPU
+    preflight_job_id: "461403"
+    lane_job_ids: ["461404", "461405", "461406", "461407", "461408", "461409", "461410"]
+    finalizer_job_id: "461411"
+    data_preflight_started: true
+    data_preflight_completed: false
+    gpu_lane_started: false
+    completed_lanes: 0
+    scientific_result: false
+    file_count_at_closure: 7
+    total_bytes_at_closure: 65748
+    submission_manifest_sha256: 92979c07164ba124c7723c04c0b5d9f5beac5bc08bc51d8205d71b967c047c96
+    gpu_route_selection_sha256: b2f10be29f78a0df08aa463c938b66ea95aab024d7a9db6e1afa8f6dcabad464
     preservation: immutable_no_reuse_no_cleanup
 
 eval_v1_promotion_blockers:
