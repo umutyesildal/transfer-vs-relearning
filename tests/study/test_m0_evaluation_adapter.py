@@ -98,7 +98,12 @@ def test_current_parallel_preflight_fails_before_scoring() -> None:
     assert payload["status"] == "blocked_pre_scoring"
     assert payload["scientific_work_started"] is False
     assert payload["lane_count"] == 7
-    assert payload["blockers"] == ["runtime_and_artifact_identity"]
+    assert {
+        "qualification_contract_frozen",
+        "qualification_execution_ready",
+        "qualification_execution_authorized",
+        "runtime_and_artifact_identity",
+    }.issubset(payload["blockers"])
     assert "project_ready_to_measure" not in payload["blockers"]
 
 
@@ -174,6 +179,7 @@ def test_single_entrypoint_submits_one_parallel_array_and_afterany_finalizer(
     plan["slurm"] = {
         "account": "yesildau",
         "partition": "gpu",
+        "control_partition": "std",
         "gres": "gpu:rtx3090:1",
         "cpus_per_task": 8,
         "memory": "64G",
@@ -196,17 +202,52 @@ def test_single_entrypoint_submits_one_parallel_array_and_afterany_finalizer(
     )
     assert len(submissions) == 3
     assert any("run-preflight" in argument for argument in submissions[0])
+    assert "--partition=std" in submissions[0]
     assert not any(argument.startswith("--gres=") for argument in submissions[0])
     assert "--dependency=afterok:1001" in submissions[1]
+    assert "--partition=gpu" in submissions[1]
     assert "--array=0-6%3" in submissions[1]
     assert "--gres=gpu:rtx3090:1" in submissions[1]
     assert any("run-lane" in argument for argument in submissions[1])
     assert "--dependency=afterany:1002" in submissions[2]
+    assert "--partition=std" in submissions[2]
     assert any("finalize" in argument for argument in submissions[2])
     assert payload["preflight_job_id"] == "1001"
     assert payload["array_job_id"] == "1002"
     assert payload["finalizer_job_id"] == "1003"
     assert json.loads((output_root / "submission_manifest.json").read_text(encoding="utf-8")) == payload
+
+
+def test_submitter_persists_first_sbatch_rejection_without_claiming_a_job(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    entrypoint_path = ROOT / "scripts/study/run_m0_olmo_evaluation.py"
+    spec = importlib.util.spec_from_file_location("m0_entrypoint_rejection", entrypoint_path)
+    assert spec and spec.loader
+    entrypoint = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(entrypoint)
+    plan = build_m0_parallel_plan(CONFIG, repo_root=ROOT)
+    output_root = tmp_path / "m0-rejected"
+    (output_root / "logs").mkdir(parents=True)
+
+    def reject(_: list[str]) -> str:
+        raise RuntimeError("GPU partition is only for use with GPUs")
+
+    monkeypatch.setattr(entrypoint, "_submit", reject)
+    with pytest.raises(RuntimeError, match="only for use with GPUs"):
+        entrypoint._submit_parallel_jobs(
+            plan,
+            config_path=CONFIG,
+            repo_root=ROOT,
+            output_root=output_root,
+        )
+    manifest = json.loads(
+        (output_root / "submission_manifest.json").read_text(encoding="utf-8")
+    )
+    assert manifest["status"] == "no_job_submitted_preflight_sbatch_rejected"
+    assert manifest["preflight_job_id"] is None
+    assert manifest["array_job_id"] is None
+    assert manifest["finalizer_job_id"] is None
 
 
 def test_finalizer_requires_every_lane_and_never_zero_fills(tmp_path: Path) -> None:

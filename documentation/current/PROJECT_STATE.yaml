@@ -107,7 +107,7 @@ evaluation_target:
   task_qualification: documentation/evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md
   result_schema: documentation/evaluation/RESULT_SCHEMA_V1.md
   m0_qualification_wave:
-    status: frozen_test_only_execution_authorized
+    status: operational_repair_binding_pending
     classification: qualification_only
     scientific_result: false
     model: allenai/OLMo-2-0425-1B
@@ -119,13 +119,15 @@ evaluation_target:
     lane_count: 7
     max_parallel_lanes: 3
     local_adapters_implemented: true
-    implementation_commit: 7ba5099215103266afc17cfad1b45b7cfcc399b2
-    contract_sha256: 34853482f78fb2c778b6a4256926c7837b7e150de8525fcef0e353ff8ed0961e
-    config_sha256: 85caf5157338e1aa2a6e2f8185ebcc9bf386395ddbc88cd7e5ff2ed5996e009b
+    implementation_commit: pending_operational_repair_freeze
+    contract_sha256: pending_operational_repair_freeze
+    config_sha256: pending_operational_repair_freeze
     environment_root: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3
     environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
-    execution_ready: true
-    execution_authorized: true
+    output_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v2
+    prior_not_run_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v1
+    execution_ready: false
+    execution_authorized: false
     user_authorization: qualification_run_requested_2026_08_16
   applies_to:
     - M0
@@ -165,7 +167,7 @@ evaluation_target:
     luna_packet_manifest: .agents/task-packets/study-v1/manifest.json
     full_study_stage_count: 15
     execution_adapter_ready: false
-    m0_adapter_status: frozen_qualification_executable
+    m0_adapter_status: operational_repair_binding_pending
     m0_parallel_entrypoint: scripts/study/run_m0_olmo_evaluation.py
     execution_authorized: false
     m0_preflight:
@@ -185,10 +187,12 @@ evaluation_target:
       command: >-
         .venv/bin/python scripts/study/run_m0_olmo_evaluation.py preflight
         --config configs/evaluation/m0_olmo_eval_v1_qualification_v1.yaml
-      latest_status: pending_final_hu_sync_and_preflight
+      latest_status: blocked_pre_scoring
       scientific_work_started: false
       blockers:
-        - final_hu_sync_and_runtime_preflight
+        - repaired_submitter_commit_and_hash
+        - repaired_project_config_hashes
+        - repaired_contract_and_config_hashes
     stage_order:
       - identity_preflight
       - train_and_trace

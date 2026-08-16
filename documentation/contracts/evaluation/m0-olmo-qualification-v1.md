@@ -1,6 +1,6 @@
 # M0 OLMo eval-v1 qualification wave v1
 
-**Status:** `frozen_test_only_execution_authorized` | **Owner:** project | **Created:** 2026-08-16
+**Status:** `operational_repair_binding_pending` | **Owner:** project | **Created:** 2026-08-16
 **Supersedes:** none
 
 ## Purpose and estimand
@@ -68,6 +68,21 @@ The qualification execution bindings are frozen as follows:
 The selected route is one V100-32GB per active lane, FP16, with at most three concurrent lanes.
 Dataset content manifests are outputs of the authorized online data preflight, not circular
 prerequisites for starting that preflight.
+
+### Append-only Slurm partition correction
+
+The first frozen submission attempt created only the planned namespace
+`/vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v1`. Slurm rejected the very first `sbatch`
+because the CPU-only data preflight was sent to partition `gpu` without a GPU GRES request. No job
+ID was issued; task-data preflight, network retrieval, model load, GPU allocation and scoring were
+all zero. The root contains only the plan/bundle status and is preserved without reuse or cleanup.
+
+The semantics-neutral operational repair routes the CPU/data preflight and finalizer to `std`, keeps
+the seven evaluation lanes on `gpu` with `gpu:v10032gb:1`, records Slurm stderr on any future
+submission rejection and uses the new root
+`/vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v2`. All model, task, limits, precision, seeds,
+cache bounds and scientific prohibitions remain unchanged. The repair must bind a new implementation
+commit plus exact config hashes before resubmission.
 
 ## Protocol
 

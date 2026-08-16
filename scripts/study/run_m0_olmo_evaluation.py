@@ -37,7 +37,12 @@ def _job_id(stdout: str) -> str:
 
 
 def _submit(argv: list[str]) -> str:
-    result = subprocess.run(argv, check=True, capture_output=True, text=True)
+    result = subprocess.run(argv, check=False, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise RuntimeError(
+            "Slurm submission failed "
+            f"(exit={result.returncode}, stdout={result.stdout!r}, stderr={result.stderr!r})"
+        )
     return _job_id(result.stdout)
 
 
@@ -55,7 +60,6 @@ def _submit_parallel_jobs(
         "sbatch",
         "--parsable",
         f"--account={slurm['account']}",
-        f"--partition={slurm['partition']}",
     ]
     preflight_command = [
         runtime["python"],
@@ -68,19 +72,35 @@ def _submit_parallel_jobs(
         "--namespace",
         str(output_root),
     ]
-    preflight_id = _submit(
-        [
-            *common,
-            "--job-name=m0-olmo-data",
-            f"--cpus-per-task={plan['data_preflight']['cpus_per_task']}",
-            f"--mem={plan['data_preflight']['memory']}",
-            f"--time={plan['data_preflight']['time_limit']}",
-            f"--output={output_root / 'logs/%x-%j.out'}",
-            f"--error={output_root / 'logs/%x-%j.err'}",
-            f"--chdir={repo_root}",
-            f"--wrap=exec {shlex.join(preflight_command)}",
-        ]
-    )
+    try:
+        preflight_id = _submit(
+            [
+                *common,
+                f"--partition={plan['data_preflight']['partition']}",
+                "--job-name=m0-olmo-data",
+                f"--cpus-per-task={plan['data_preflight']['cpus_per_task']}",
+                f"--mem={plan['data_preflight']['memory']}",
+                f"--time={plan['data_preflight']['time_limit']}",
+                f"--output={output_root / 'logs/%x-%j.out'}",
+                f"--error={output_root / 'logs/%x-%j.err'}",
+                f"--chdir={repo_root}",
+                f"--wrap=exec {shlex.join(preflight_command)}",
+            ]
+        )
+    except Exception as exc:
+        write_json(
+            output_root / "submission_manifest.json",
+            {
+                "schema_version": 1,
+                "plan_id": plan["plan_id"],
+                "status": "no_job_submitted_preflight_sbatch_rejected",
+                "preflight_job_id": None,
+                "array_job_id": None,
+                "finalizer_job_id": None,
+                "error": str(exc),
+            },
+        )
+        raise
     lane_command = [
         runtime["python"],
         str(script),
@@ -107,6 +127,7 @@ def _submit_parallel_jobs(
     )
     array_argv = [
         *common,
+        f"--partition={slurm['partition']}",
         "--job-name=m0-olmo-eval",
         f"--dependency=afterok:{preflight_id}",
         f"--array=0-{plan['lane_count'] - 1}%{plan['max_parallel_lanes']}",
@@ -151,6 +172,7 @@ def _submit_parallel_jobs(
         finalizer_id = _submit(
             [
                 *common,
+                f"--partition={slurm['control_partition']}",
                 "--job-name=m0-olmo-finalize",
                 f"--dependency=afterany:{array_id}",
                 "--cpus-per-task=2",

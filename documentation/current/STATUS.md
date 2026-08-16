@@ -51,6 +51,12 @@ proves Torch 2.6.0+cu124, CUDA 12.4 and exact Harness commit identity. Implement
 environment lock, V100 route, limits and resources are now inserted into the frozen config. The
 CPU/data preflight and dependent test-only array are the next executable action.
 
+The first submission attempt was operational `NOT_RUN`: Slurm rejected the CPU-only data preflight
+before issuing any job ID because it was routed to `gpu` without a GPU request. The planned v1
+namespace is preserved; no task retrieval, model load, GPU work or scoring occurred. A narrow repair
+now routes control jobs to `std`, retains evaluation lanes on V100 and targets a fresh v2 namespace.
+Its new implementation/config hashes must be frozen before resubmission.
+
 ## Evaluation design result
 
 - LM Evaluation Harness is pinned prospectively to v0.4.12 commit
