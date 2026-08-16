@@ -1,6 +1,6 @@
 # Experiment pipeline v1
 
-**Status:** scientific M0 operator frozen; later stages planner-only | **Execution authorization:** none
+**Status:** scientific M0 operator frozen; later stages planner-only | **Execution authorization:** one M0 wave only
 
 This layer turns one reviewed experiment manifest into a deterministic sequence:
 
@@ -142,14 +142,18 @@ Inspect the exact plan and preflight without inference or scoring:
 
 The frozen contract is
 [`m0-three-model-scientific-v1.md`](../contracts/evaluation/m0-three-model-scientific-v1.md).
-Both the family and all per-model configs deliberately remain `execution_authorized: false`.
+The user subsequently authorized exactly one wave through the
+[`single-wave authorization overlay`](../contracts/evaluation/m0-three-model-scientific-v1-authorization-2026-08-16.md).
+The authorized operator repeats an exact 30 GiB HU-home measurement before submission, keeps
+HU-home writes forbidden and cannot reuse the authorization because the fixed family root must be
+fresh.
 
 ## Remaining production boundary
 
 The planner, trace/artifact contracts and fail-closed M0 Harness/project/parallel adapters are
-implemented. The scientific three-model M0 raw-result layer is frozen and execution-ready but not
-authorized. Its canonical scientific normalizer and every M1/M2 training adapter remain separate
-work. The full-study plan therefore remains `execution_authorized: false`.
+implemented. The scientific three-model M0 raw-result layer is frozen and authorized for one
+standalone wave. Its canonical scientific normalizer and every M1/M2 training adapter remain
+separate work. The full-study plan therefore remains `execution_authorized: false`.
 
 ## Full M0→M2 study control
 

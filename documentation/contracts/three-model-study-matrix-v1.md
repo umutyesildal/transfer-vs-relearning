@@ -18,7 +18,7 @@ packet per model/stage node.
 - implementation commit: `329afaa91b4b403b86eca82f60bb3649a6f38800`;
 - matrix config: `configs/studies/three_model_m0_to_m2_matrix_v1.yaml`;
 - matrix config SHA-256:
-  `c870189fb845f9740010872f5aab899b2b1396e68a1f2c06588dc656beaba9db`;
+  `e35f94345f67a53e44d91faa88507cb54a10e6cce2e875960b9b7810c6dae43a`;
 - operator entrypoint: `scripts/study/run_model_matrix.py`;
 - operator entrypoint SHA-256:
   `ad4d64050c237630bb2b8a91e930f124fb7ac6284ca820d829c4de1b948c631e`;
@@ -27,7 +27,7 @@ packet per model/stage node.
   `68970821c389125f47e04effa6c74251a9efe1c58419bf49368922f4295c8074`;
 - tests: `tests/test_three_model_matrix.py`;
 - test SHA-256:
-  `d893cbb39ca2d42b9f00ccb233ac6a329c440c7f56d6eb201a901125b79a437b`;
+  `c5c5861dbdca4ff5d4ac66ece97b4bf2cbd03be9a86d9b3c05e1c99adead8403`;
 - reused workflow-template SHA-256:
   `2fe1851eedd24061ad09f8d6db56ef82cd877c396d97dee38db2c1b6a1a4443c`.
 
@@ -72,14 +72,17 @@ the sibling parent or permit outcome-aware recipe changes.
 The prepared matrix intentionally uses explicit `null` config paths and named blockers where a
 scientific binding does not yet exist. It never substitutes placeholders or historical recipes.
 
-- eval-v1 is frozen but not execution-authorized;
-- all three scientific M0 configs are frozen but not execution-authorized;
+- eval-v1 remains unconditionally frozen and is not broadly execution-authorized;
+- all three scientific M0 configs are frozen and authorized for exactly one standalone M0 wave
+  under the separate 2026-08-16 authorization overlay;
 - the M1 corpus and per-model recipes are not frozen;
 - matched M2-A/M2-B corpus and per-model recipes are not frozen;
 - matrix-level execution is false.
 
-`run` therefore refuses external work. `run --dry-run`, `plan`, `init`, `status`, `next`, and
-`packets` are local planning/inspection commands only.
+The matrix `run` therefore still refuses external work. The standalone M0 operator may consume the
+single-wave authorization, but the authorization cannot be reused by this 27-node matrix.
+`run --dry-run`, `plan`, `init`, `status`, `next`, and `packets` remain local
+planning/inspection commands only.
 
 ## Operator and Luna usage
 

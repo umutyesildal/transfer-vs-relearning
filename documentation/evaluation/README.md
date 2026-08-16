@@ -27,6 +27,8 @@ The final input/gate closure is recorded in
 [`../180_EVAL_V1_SCIENTIFIC_INPUT_AND_PROTOCOL_FREEZE_TR.md`](../180_EVAL_V1_SCIENTIFIC_INPUT_AND_PROTOCOL_FREEZE_TR.md).
 The frozen three-model scientific M0 binding is
 [`../contracts/evaluation/m0-three-model-scientific-v1.md`](../contracts/evaluation/m0-three-model-scientific-v1.md).
+Its exact single-wave execution authorization and hard 30 GiB HU-home gate are in
+[`../contracts/evaluation/m0-three-model-scientific-v1-authorization-2026-08-16.md`](../contracts/evaluation/m0-three-model-scientific-v1-authorization-2026-08-16.md).
 
-`eval-v1` is frozen, but this directory grants no evaluation, download, HU, Slurm, training, or
-publication authority.
+`eval-v1` is frozen. Only the authorization overlay grants its exact single M0 wave; this directory
+does not broaden that authority to downloads, training, later evaluations or cleanup.

@@ -1,6 +1,6 @@
 # Current project status
 
-**As of:** 2026-08-16 | **Phase:** three-model scientific M0 pre-execution validation
+**As of:** 2026-08-16 | **Phase:** authorized three-model scientific M0 submission
 **Readiness:** `ready_to_measure = true`, `ready_to_train = false`
 
 ## Executive state
@@ -14,8 +14,8 @@ architecture, exact Harness environment/dataset identities, final task set, Pile
 full/cheap bilingual factual registries, normalized schema, numeric gates, uncertainty and
 checkpoint-binding policy. Any semantic change requires eval-v2. Freeze does not authorize
 scientific execution. The exact three-model M0 configs and bounded execution contract are now
-frozen with authorization false. HU read-only identity preflight passed for all three models; a
-separate execution authorization is next.
+frozen. HU read-only identity preflight passed for all three models, and the user authorized exactly
+one 24-lane wave bound to the frozen contract and pre-authorization manifest. M1/M2 remain blocked.
 
 The local pipeline foundation is now opt-in and fail-closed. It derives an exact epoch/update/batch
 schedule, records tokenization and optimization traces, preserves model-only epoch snapshots behind
@@ -34,8 +34,9 @@ by `configs/entrypoints/catalog.json`; historical numbered documents were not re
 The three-model matrix now expands that workflow across the exact OLMo, Qwen2.5-1.5B and
 SmolLM2-1.7B assets. It contains 27 nodes in nine three-job waves: 12 state-evaluation nodes, nine
 training nodes and six local preflight/analysis nodes. Its local/HU suite passed 29/29 and it can
-render 27 one-model/one-stage Luna packets. The matrix is `planned_not_authorized`; missing
-scientific M0 and M1/M2 recipe configs remain explicit blockers, not inferred placeholders.
+render 27 one-model/one-stage Luna packets. The matrix is `planned_not_authorized`; its scientific
+M0 bindings now exist and have a separate single-wave authorization, while M1/M2 recipe configs
+remain explicit blockers rather than inferred placeholders.
 
 The first machine-readable M0 preflight has now run on the new M0 branch. It stopped before model
 load, inference or scoring, as designed. The current blockers are the draft study/eval contracts,
@@ -183,18 +184,19 @@ The three-model scientific M0 binding package is complete:
    family finalizer without keeping an agent blocked;
 5. V100/A100 routes explicitly fall back to RTX3090 and then RTX6000/RTXA6000.
 
-HU read-only identity preflight has passed: 39/39 focused tests plus model-manifest, environment,
-cache, config, commit, task-overlay and fresh-output checks for all three models. Its only blockers
-were the deliberately false model/family execution flags. Scientific submission now requires one
-new explicit authorization bound to the frozen family contract and manifest.
+HU read-only identity preflight passed: 39/39 focused tests plus model-manifest, environment, cache,
+config, commit, task-overlay and fresh-output checks for all three models. The single-wave
+authorization is now published locally. Exact HU home use is 14,545,990,549 bytes against the
+32,212,254,720-byte hard limit; home writes remain forbidden. The next action is push, HU
+fast-forward, repeated fail-closed preflight and one submission.
 
 M1/M2 training, corpus materialization and scientific scoring remain unauthorized. They must not be
 bypassed with ad-hoc commands.
 
-The 2026-08-16 qualification/recovery/parity authorization has been consumed. No further
-evaluation, scientific M0, training, corpus materialization, cleanup, deletion or writes to prior
-evidence roots are authorized by it. The matrix planning contract likewise grants no external
-execution.
+The 2026-08-16 qualification/recovery/parity authorization remains consumed. A separate 2026-08-16
+overlay authorizes exactly one scientific three-model M0 wave. It grants no automatic retry,
+second wave, M1/M2, corpus materialization, cleanup, deletion or HU-home writes. The matrix planning
+contract itself still grants no external execution.
 
 ## Repository state
 

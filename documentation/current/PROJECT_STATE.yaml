@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m0-evaluation
-  status: eval_v1_and_three_model_scientific_m0_frozen_execution_not_authorized
+  status: three_model_scientific_m0_single_wave_authorized_pre_submission
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -214,7 +214,7 @@ evaluation_target:
   architecture: hybrid_harness_custom_factual_and_normalizer
   canonical_result_shape: long_tables_with_generated_checkpoint_view
   pipeline:
-    status: scientific_three_model_m0_frozen_not_authorized_later_stages_prepared
+    status: scientific_three_model_m0_single_wave_authorized_later_stages_blocked
     documentation: documentation/pipeline/README.md
     prospective_template: configs/pipelines/eval_v1_olmo_epoch_trajectory_template.yaml
     full_study_template: configs/studies/m0_to_m2_eval_v1_template.yaml
@@ -223,15 +223,15 @@ evaluation_target:
     full_study_stage_count: 15
     execution_adapter_ready: false
     m0_execution_adapter_ready: true
-    m0_adapter_status: scientific_three_model_24_lane_family_frozen_not_authorized
+    m0_adapter_status: scientific_three_model_24_lane_family_authorized_once
     m0_parallel_entrypoint: scripts/study/run_three_model_m0_evaluation.py
     execution_authorized: false
     three_model_matrix:
       status: planned_not_authorized
       contract: documentation/contracts/three-model-study-matrix-v1.md
-      contract_sha256: 5e4094a7b39e0456784e7ba2ce4e57d58885a617d85381fd7dc34498e8356426
+      contract_sha256: d2ddd3f9ca1a4593a4c61dc87e6415466fe7b18c719ba797a7451cd9eb32039d
       config: configs/studies/three_model_m0_to_m2_matrix_v1.yaml
-      config_sha256: c870189fb845f9740010872f5aab899b2b1396e68a1f2c06588dc656beaba9db
+      config_sha256: e35f94345f67a53e44d91faa88507cb54a10e6cce2e875960b9b7810c6dae43a
       entrypoint: scripts/study/run_model_matrix.py
       implementation_commit: 329afaa91b4b403b86eca82f60bb3649a6f38800
       models: [olmo, qwen, smollm]
@@ -245,14 +245,24 @@ evaluation_target:
       hu_test_count: 29
       execution_authorized: false
     scientific_m0_family:
-      status: frozen_execution_not_authorized
+      status: authorized_single_wave_pre_submission
       contract: documentation/contracts/evaluation/m0-three-model-scientific-v1.md
       contract_sha256: 013f6f638176cbfd15fbe65c7d07a9dbb8d0029879e217f65e4e69bbeef765d9
       manifest: configs/evaluation/m0_scientific_three_model_v1.yaml
-      manifest_sha256: 264525095a3f67b5899771069ad227a41ed431de14fd98c38168690787d2bf5d
+      pre_authorization_manifest_sha256: 264525095a3f67b5899771069ad227a41ed431de14fd98c38168690787d2bf5d
+      manifest_sha256: 7ae29ce2e8086cf7d00df22050158537869b98460572af1308db7d864c113867
       config_source: configs/evaluation/m0_scientific_model_matrix_v1.yaml
+      config_source_sha256: dc47ca50fb67478be5f94aa50ca33ed2ba69c5e795963774905955f287e6a245
       implementation_commit: ea4e01de68e80cd33136674aa3cb59dc4547cfbd
       operator: scripts/study/run_three_model_m0_evaluation.py
+      operator_sha256: e8293c6ec6103b9a797bf8550a45e3b7f62fbd0d130f104f4f94378b375557a3
+      authorization_record: >-
+        documentation/contracts/evaluation/m0-three-model-scientific-v1-authorization-2026-08-16.md
+      authorization_record_sha256: f682751fd22311f664821d486f052d8fdaaee2e536939df0a3a4221fda3f7c92
+      authorization_publication_commit: ea2f4c6
+      wave_limit: 1
+      automatic_retry_authorized: false
+      m1_or_m2_authorized: false
       models: [olmo, qwen, smollm]
       model_count: 3
       lanes_per_model: 8
@@ -260,23 +270,29 @@ evaluation_target:
       parallel_models: 3
       family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1
       execution_ready: true
-      execution_authorized: false
+      execution_authorized: true
+      hu_home_gate:
+        path: /vol/fob-vol6/mi25/yesildau
+        limit_bytes: 32212254720
+        preparation_measurement_bytes: 14545990549
+        preparation_headroom_bytes: 17666264171
+        exact_measurement_required_before_submission: true
+        writes_authorized: false
       preflight_command: >-
         /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
         scripts/study/run_three_model_m0_evaluation.py preflight
-      latest_status: hu_read_only_identity_preflight_pass_authorization_only_blocker
+      latest_status: authorization_published_locally_hu_fast_forward_pending
       preflight_record: >-
         documentation/records/evaluation/M0_THREE_MODEL_READ_ONLY_PREFLIGHT_2026-08-16.md
       preflight_record_sha256: e42052dad0a99db6306cb8a0b1c29a91ec146ce94e163fc18a21fe4d228afab8
-      hu_commit: 5966678924329219d6daffa5e9bafdeae0114540
+      pre_authorization_hu_commit: 5966678924329219d6daffa5e9bafdeae0114540
       hu_focused_tests: 39
       hu_identity_checks_passed_for_all_models: true
       scientific_work_started: false
       blockers:
-        - family_execution_not_authorized
-        - olmo_execution_not_authorized
-        - qwen_execution_not_authorized
-        - smollm_execution_not_authorized
+        - authorization_publication_not_pushed
+        - hu_authorization_commit_not_fast_forwarded
+        - authorized_hu_preflight_pending
     m0_preflight:
       command: >-
         .venv/bin/python scripts/study/run_study.py preflight-m0
@@ -344,8 +360,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: separately_authorize_three_model_scientific_m0
-  first_boundary: exact_execution_authorization_bound_to_frozen_family
+  name: submit_authorized_three_model_scientific_m0_once
+  first_boundary: publish_fast_forward_preflight_then_single_submission
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -371,10 +387,11 @@ active_priority:
     - three_model_24_lane_parallel_operator
     - turkish_cross_domain_bpb_lane
     - hu_read_only_three_model_identity_preflight
+    - exact_execution_authorization_bound_to_frozen_family
+    - hu_home_30_gib_preparation_gate
     - three_model_27_node_matrix_planner
     - three_model_luna_micro_packet_renderer
   required_outputs:
-    - exact_execution_authorization_bound_to_frozen_family
     - separately_authorized_parallel_submission
     - three_model_raw_bundle
     - frozen_normalization_and_gate_result
@@ -389,10 +406,19 @@ authorization:
   corpus_materialization: false
   push_or_publication: false
   cleanup_or_deletion: false
+  scoped:
+    three_model_scientific_m0:
+      status: authorized_single_wave_pre_submission
+      contract_sha256: 013f6f638176cbfd15fbe65c7d07a9dbb8d0029879e217f65e4e69bbeef765d9
+      pre_authorization_manifest_sha256: 264525095a3f67b5899771069ad227a41ed431de14fd98c38168690787d2bf5d
+      wave_limit: 1
+      hu_home_limit_bytes: 32212254720
+      m1_or_m2_authorized: false
+      cleanup_or_deletion_authorized: false
 
 next_decision_required:
-  subject: three_model_scientific_m0_execution_authorization
+  subject: none_authorized_execution_in_progress
   note: >-
-    eval-v1 and the exact OLMo, Qwen and SmolLM scientific M0 family are frozen. HU read-only
-    identity preflight passed for all models; obtain one exact authorization before enabling the
-    family and per-model execution flags or submitting any Slurm/GPU/scoring work.
+    The exact single three-model M0 wave is authorized. Publish and fast-forward the authorization,
+    repeat fail-closed HU identity and 30 GiB home gates, then submit once. Do not extend this scope
+    to retry, M1/M2, corpus, cleanup or deletion.
