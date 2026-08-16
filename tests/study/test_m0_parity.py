@@ -213,10 +213,10 @@ def test_heading_sensitivity_requires_same_documents_but_no_numeric_delta_gate(
     }
 
 
-def test_prepared_repair_plan_binds_exact_16_subtasks_and_test_only_scope() -> None:
+def test_frozen_repair_plan_binds_exact_16_subtasks_and_test_only_scope() -> None:
     plan = build_parity_plan(CONFIG, repo_root=ROOT)
-    assert plan["status"] == "prepared"
-    assert plan["execution_authorized"] is False
+    assert plan["status"] == "frozen"
+    assert plan["execution_authorized"] is True
     assert plan["turblimp"]["subtask_ids"] == SUBTASKS
     assert plan["run_classification"] == "test_only_non_scientific"
 

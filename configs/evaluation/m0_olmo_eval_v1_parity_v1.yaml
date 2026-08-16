@@ -1,8 +1,8 @@
 schema_version: 1
 name: m0-olmo-eval-v1-qualification-parity-v1
-status: prepared
+status: frozen
 as_of: "2026-08-16"
-execution_authorized: false
+execution_authorized: true
 contract: documentation/contracts/evaluation/m0-olmo-qualification-parity-v1.md
 
 source:
@@ -32,8 +32,12 @@ runtime:
   precision: float16
   batch_size: auto:4
   max_batch_size: 16
-  implementation_commit: null
-  implementation_files: {}
+  implementation_commit: cb48fddadcbaa1e6ef145d6be7d7568359723573
+  implementation_files:
+    scripts/study/run_m0_parity.py: bfe2832517f214059539f5cb97763a92407ad9efe62cad98e4ea640f349b9380
+    src/transfer_vs_relearning/study/m0_parity.py: a7d66c49224828ed997a29f0e8caeefd0cce93c3ad97351a8188d30fffdcbda0
+    configs/evaluation/task_overlays/wikitext_heading_sensitivity_v1/preprocess_wikitext_heading.py: 9f331af3df4da84fdd5bfc6b2b52cbbfc4a0fb87d1bf51d4e3de4b01c4f59829
+    configs/evaluation/task_overlays/wikitext_heading_sensitivity_v1/wikitext_heading_sensitivity_v1.yaml: b8b66fa5ff4ef376596f1d1e046633193f1e261bb77ad40ac9831564a19a7eaa
   upstream_task_files:
     wikitext_config:
       path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/lib/python3.11/site-packages/lm_eval/tasks/wikitext/wikitext.yaml
@@ -109,9 +113,7 @@ storage:
 run_classification: test_only_non_scientific
 scientific_result: false
 eval_v1_frozen_by_this_wave: false
-freeze_blockers:
-  - corrected_implementation_identity_not_frozen
-  - corrected_execution_not_authorized
+freeze_blockers: []
 
 freeze_authority:
   user_instruction: continue_the_agreed_parity_then_eval_v1_sequence

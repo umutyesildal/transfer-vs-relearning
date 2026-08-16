@@ -1,6 +1,6 @@
 # M0 OLMo qualification parity v1
 
-**Status:** `prepared correction / not executable` | **Owner:** project | **Created:** 2026-08-16
+**Status:** `frozen v2 correction / execution-authorized` | **Owner:** project | **Created:** 2026-08-16
 **Parent:** `m0-olmo-qualification-v1`
 
 ## Purpose
@@ -93,9 +93,8 @@ corpus work, cleanup, deletion, threshold change or eval-v1 freeze is authorized
 
 ## Freeze blockers
 
-The original v1 binding was consumed by the pre-submission structural check described below. The
-prepared v2 correction requires a new implementation commit, exact file hashes and a corrected
-companion-config hash before execution.
+None for the frozen test-only v2 correction. A blocked v2 result does not authorize another retry
+or any further semantic repair.
 
 ## Append-only source plan-ID binding correction
 
@@ -144,4 +143,22 @@ future structural gate blocks, and proposes fresh root
 `/vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_parity_v2`. All source artifacts, task order,
 sample counts, model/runtime identities, tolerance, heading sensitivity and scientific
 prohibitions remain unchanged. It is not executable until the corrected implementation and config
-are frozen.
+are frozen; those bindings are supplied below.
+
+Those corrected bindings are now frozen:
+
+- corrected implementation commit: `cb48fddadcbaa1e6ef145d6be7d7568359723573`;
+- corrected operator SHA-256:
+  `bfe2832517f214059539f5cb97763a92407ad9efe62cad98e4ea640f349b9380`;
+- corrected parity module SHA-256:
+  `a7d66c49224828ed997a29f0e8caeefd0cce93c3ad97351a8188d30fffdcbda0`;
+- unchanged heading preprocessor SHA-256:
+  `9f331af3df4da84fdd5bfc6b2b52cbbfc4a0fb87d1bf51d4e3de4b01c4f59829`;
+- unchanged heading task YAML SHA-256:
+  `b8b66fa5ff4ef376596f1d1e046633193f1e261bb77ad40ac9831564a19a7eaa`;
+- frozen corrected companion config SHA-256:
+  `b855225f13355989877e988e90f8049df790ce0e244348417b42fb31054920b5`.
+
+The user's 2026-08-16 instruction to continue the agreed parity → eval-v1 sequence authorizes this
+single fresh v2 test-only correction because it restores the exact pinned upstream definition and
+does not select a denominator after observing a scientific model outcome. It authorizes no v3.
