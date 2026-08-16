@@ -49,6 +49,21 @@ def _submit(argv: list[str]) -> str:
     return _job_id(result.stdout)
 
 
+def _job_slug(plan: dict) -> str:
+    repository = str(plan["model"]["repository"]).rsplit("/", 1)[-1].lower()
+    return re.sub(r"[^a-z0-9]+", "-", repository).strip("-")[:24]
+
+
+def _cache_exports(plan: dict, output_root: Path) -> tuple[Path, Path, Path]:
+    preflight = plan["data_preflight"]
+    cache_root = (
+        Path(str(preflight["source_cache_root"]))
+        if preflight.get("mode") == "frozen_offline_reuse"
+        else output_root / "cache"
+    )
+    return cache_root / "huggingface", cache_root / "huggingface_datasets", cache_root
+
+
 def _probe_gpu_route(plan: dict, route: dict[str, str]) -> dict:
     slurm = plan["slurm"]
     argv = [
@@ -186,6 +201,7 @@ def _submit_independent_lane_jobs(
     script = Path(__file__).resolve()
     runtime = plan["runtime"]
     slurm = plan["slurm"]
+    job_slug = _job_slug(plan)
     try:
         assignments = _select_gpu_routes_for_lanes(plan, output_root=output_root)
     except Exception as exc:
@@ -219,7 +235,7 @@ def _submit_independent_lane_jobs(
             [
                 *common,
                 f"--partition={plan['data_preflight']['partition']}",
-                "--job-name=m0-olmo-data",
+                f"--job-name=m0-{job_slug}-data",
                 f"--cpus-per-task={plan['data_preflight']['cpus_per_task']}",
                 f"--mem={plan['data_preflight']['memory']}",
                 f"--time={plan['data_preflight']['time_limit']}",
@@ -245,6 +261,7 @@ def _submit_independent_lane_jobs(
         raise
 
     lane_jobs: list[dict] = []
+    hf_home, datasets_cache, xdg_cache = _cache_exports(plan, output_root)
     for assignment in assignments:
         route = assignment["route"]
         lane_index = assignment["lane_index"]
@@ -264,9 +281,9 @@ def _submit_independent_lane_jobs(
         exports = ",".join(
             [
                 "ALL",
-                f"HF_HOME={output_root / 'cache/huggingface'}",
-                f"HF_DATASETS_CACHE={output_root / 'cache/huggingface_datasets'}",
-                f"XDG_CACHE_HOME={output_root / 'cache'}",
+                f"HF_HOME={hf_home}",
+                f"HF_DATASETS_CACHE={datasets_cache}",
+                f"XDG_CACHE_HOME={xdg_cache}",
                 "HF_HUB_OFFLINE=1",
                 "HF_DATASETS_OFFLINE=1",
                 "TRANSFORMERS_OFFLINE=1",
@@ -282,7 +299,7 @@ def _submit_independent_lane_jobs(
                 [
                     *common,
                     f"--partition={route['partition']}",
-                    f"--job-name=m0-olmo-eval-{lane_index}",
+                    f"--job-name=m0-{job_slug}-eval-{lane_index}",
                     f"--dependency=afterok:{preflight_id}",
                     f"--gres={route['gres']}",
                     f"--cpus-per-task={slurm['cpus_per_task']}",
@@ -330,7 +347,7 @@ def _submit_independent_lane_jobs(
             [
                 *common,
                 f"--partition={slurm['control_partition']}",
-                "--job-name=m0-olmo-finalize",
+                f"--job-name=m0-{job_slug}-finalize",
                 f"--dependency={finalizer_dependency}",
                 "--cpus-per-task=2",
                 "--mem=8G",
@@ -392,6 +409,7 @@ def _submit_parallel_jobs(
     script = Path(__file__).resolve()
     runtime = plan["runtime"]
     slurm = plan["slurm"]
+    job_slug = _job_slug(plan)
     try:
         gpu_route = _select_gpu_route(plan, output_root=output_root)
     except Exception as exc:
@@ -429,7 +447,7 @@ def _submit_parallel_jobs(
             [
                 *common,
                 f"--partition={plan['data_preflight']['partition']}",
-                "--job-name=m0-olmo-data",
+                f"--job-name=m0-{job_slug}-data",
                 f"--cpus-per-task={plan['data_preflight']['cpus_per_task']}",
                 f"--mem={plan['data_preflight']['memory']}",
                 f"--time={plan['data_preflight']['time_limit']}",
@@ -464,12 +482,13 @@ def _submit_parallel_jobs(
         "--namespace",
         str(output_root),
     ]
+    hf_home, datasets_cache, xdg_cache = _cache_exports(plan, output_root)
     exports = ",".join(
         [
             "ALL",
-            f"HF_HOME={output_root / 'cache/huggingface'}",
-            f"HF_DATASETS_CACHE={output_root / 'cache/huggingface_datasets'}",
-            f"XDG_CACHE_HOME={output_root / 'cache'}",
+            f"HF_HOME={hf_home}",
+            f"HF_DATASETS_CACHE={datasets_cache}",
+            f"XDG_CACHE_HOME={xdg_cache}",
             "HF_HUB_OFFLINE=1",
             "HF_DATASETS_OFFLINE=1",
             "TRANSFORMERS_OFFLINE=1",
@@ -480,7 +499,7 @@ def _submit_parallel_jobs(
     array_argv = [
         *common,
         f"--partition={gpu_route['partition']}",
-        "--job-name=m0-olmo-eval",
+        f"--job-name=m0-{job_slug}-eval",
         f"--dependency=afterok:{preflight_id}",
         f"--array=0-{plan['lane_count'] - 1}%{plan['max_parallel_lanes']}",
         f"--gres={gpu_route['gres']}",
@@ -525,7 +544,7 @@ def _submit_parallel_jobs(
             [
                 *common,
                 f"--partition={slurm['control_partition']}",
-                "--job-name=m0-olmo-finalize",
+                f"--job-name=m0-{job_slug}-finalize",
                 f"--dependency=afterany:{array_id}",
                 "--cpus-per-task=2",
                 "--mem=8G",
@@ -569,7 +588,7 @@ def _submit_parallel_jobs(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Plan, submit and finalize the fail-closed parallel OLMo M0 evaluation bundle."
+        description="Plan, submit and finalize one fail-closed parallel M0 evaluation bundle."
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
     for name in ("plan", "preflight", "prepare-environment", "submit"):
