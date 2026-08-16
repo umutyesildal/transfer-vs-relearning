@@ -2,6 +2,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import tomllib
 
 import yaml
 
@@ -12,6 +13,10 @@ EVAL_REGISTRY_PATH = ROOT / "configs/evaluation/eval_v1_registry.yaml"
 M0_QUALIFICATION_PATH = ROOT / "configs/evaluation/m0_olmo_eval_v1_qualification_v1.yaml"
 LEGACY_DIR = ROOT / "documentation/records/workspace-guidance"
 MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
+LM_EVAL_REQUIREMENT = (
+    "lm-eval @ git+https://github.com/EleutherAI/lm-evaluation-harness.git@"
+    "6d642546f4688648fced259eb3302efd36ece5af"
+)
 
 
 def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
@@ -167,6 +172,17 @@ def test_m0_qualification_is_non_scientific_and_fail_closed():
     ]
     assert "scientific_m0_score" in qualification["forbidden_claims"]
     assert qualification["freeze_blockers"]
+
+
+def test_lm_eval_dependency_is_pinned_to_the_qualified_commit():
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    environment = yaml.safe_load((ROOT / "environment.yml").read_text(encoding="utf-8"))
+    pip_dependencies = next(
+        row["pip"] for row in environment["dependencies"] if isinstance(row, dict) and "pip" in row
+    )
+
+    assert LM_EVAL_REQUIREMENT in project["project"]["dependencies"]
+    assert LM_EVAL_REQUIREMENT in pip_dependencies
 
 
 def test_legacy_guidance_hashes_are_preserved():

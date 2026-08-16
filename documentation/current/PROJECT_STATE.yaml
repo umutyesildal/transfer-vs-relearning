@@ -107,6 +107,10 @@ evaluation_target:
     release: v0.4.12
     git_commit: 6d642546f4688648fced259eb3302efd36ece5af
     source_semantics_verified: true
+    dependency_spec_pinned: true
+    local_lock_updated: true
+    local_install_identity_verified: true
+    local_install_version: 0.4.12
     dataset_revisions_frozen: false
     environment_locked: false
   architecture: hybrid_harness_custom_factual_and_normalizer
@@ -134,7 +138,6 @@ evaluation_target:
         - project_eval_contract_frozen
         - eval_registry_frozen
         - eval_registry_execution_ready
-        - lm_eval_environment_available
         - m0_evaluation_adapter_present
         - m0_probing_adapter_present
     stage_order:

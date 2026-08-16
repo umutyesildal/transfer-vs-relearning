@@ -29,7 +29,9 @@ by `configs/entrypoints/catalog.json`; historical numbered documents were not re
 The first machine-readable M0 preflight has now run on the new M0 branch. It stopped before model
 load, inference or scoring, as designed. The current blockers are the draft study/eval contracts,
 unresolved model/output bindings, `ready_to_measure = false`, the absent dedicated `lm_eval`
-environment and the not-yet-implemented M0 standard/factual adapters. This is
+HU environment and the not-yet-implemented M0 standard/factual adapters. The local dependency is
+now locked and installed directly from Harness v0.4.12 commit
+`6d642546f4688648fced259eb3302efd36ece5af`; its installed VCS identity passed preflight. This is
 `blocked_pre_scoring`, not an M0 scientific result.
 
 The next boundary is now written as the

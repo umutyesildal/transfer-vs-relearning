@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import json
+import importlib.metadata
 import importlib.util
+import json
 import re
 from pathlib import Path
 from typing import Any, Callable
@@ -273,13 +274,27 @@ def assess_m0_readiness(
         registry.get("execution_ready") is True,
         f"execution_ready is {registry.get('execution_ready')!r}",
     )
-    record(
-        "lm_eval_environment_available",
-        importlib.util.find_spec("lm_eval") is not None,
-        "lm_eval import is available"
-        if importlib.util.find_spec("lm_eval") is not None
-        else "lm_eval is not installed in this Python environment",
-    )
+    harness = registry.get("harness", {}) if isinstance(registry.get("harness"), dict) else {}
+    expected_version = str(harness.get("release", "")).removeprefix("v")
+    expected_commit = str(harness.get("git_commit", ""))
+    harness_detail = "lm_eval is not installed in this Python environment"
+    harness_identity_matches = False
+    if importlib.util.find_spec("lm_eval") is not None:
+        try:
+            distribution = importlib.metadata.distribution("lm-eval")
+            direct_url_text = distribution.read_text("direct_url.json")
+            direct_url = json.loads(direct_url_text) if direct_url_text else {}
+            installed_commit = str(direct_url.get("vcs_info", {}).get("commit_id", ""))
+            harness_identity_matches = (
+                distribution.version == expected_version and installed_commit == expected_commit
+            )
+            harness_detail = (
+                f"installed version={distribution.version}, commit={installed_commit or 'missing'}; "
+                f"expected version={expected_version or 'missing'}, commit={expected_commit or 'missing'}"
+            )
+        except (importlib.metadata.PackageNotFoundError, json.JSONDecodeError) as error:
+            harness_detail = f"lm_eval identity metadata is invalid: {error}"
+    record("lm_eval_environment_identity", harness_identity_matches, harness_detail)
 
     m0_stages = {
         stage["id"]: stage
