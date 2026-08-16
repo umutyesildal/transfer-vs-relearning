@@ -1,0 +1,157 @@
+schema_version: 1
+matrix_id: olmo-qwen-smollm-m0-to-m2-eval-v1
+status: prepared
+as_of: "2026-08-16"
+execution_authorized: false
+
+state_design:
+  states: [M0, M1, M2-A, M2-B]
+  m2_siblings:
+    parent: M1
+    arms: [M2-A, M2-B]
+    matched_budget_required: true
+
+parallelism:
+  model_order: [olmo, qwen, smollm]
+  max_concurrent_jobs: 3
+  barrier_between_waves: true
+  scheduling_unit: one_model_one_stage_one_job
+  policy: three_models_advance_as_a_cohort
+
+workflow_template:
+  path: configs/studies/m0_to_m2_eval_v1_template.yaml
+  sha256: 2fe1851eedd24061ad09f8d6db56ef82cd877c396d97dee38db2c1b6a1a4443c
+
+contracts:
+  evaluation:
+    status: draft
+    execution_authorized: false
+    path: documentation/contracts/evaluation/eval-v1.md
+    sha256: 971f3b669d1ecb0aebae4aad351e282145aafa56a9dfe3855f7dec147a45869a
+    blocker: qualification_parity_dataset_revisions_and_numeric_margins_not_frozen
+  m1_training:
+    status: not_frozen
+    execution_authorized: false
+    path: null
+    sha256: null
+    blocker: corpus_and_model_specific_m1_recipes_not_frozen
+  m2_training:
+    status: not_frozen
+    execution_authorized: false
+    path: null
+    sha256: null
+    blocker: matched_m2a_m2b_corpus_and_recipe_contract_not_frozen
+
+models:
+  olmo:
+    display_name: OLMo-2-0425-1B
+    repository: allenai/OLMo-2-0425-1B
+    revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+    manifest:
+      path: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
+      sha256: 8702b80d5b7e4c996c8ce2ff5fe771ada08ab0080bde1926c0b1f53c607303dc
+    bindings:
+      m0_scientific_evaluation:
+        status: qualification_only
+        execution_authorized: false
+        path: configs/evaluation/m0_olmo_eval_v1_qualification_v1.yaml
+        sha256: 79ef439adb445d49bdbef43a0f0993578b7e6ddf753b5f72664d942dd713153d
+        blocker: qualification_metrics_are_not_scientific_m0
+      m1_recipe:
+        status: not_frozen
+        execution_authorized: false
+        path: null
+        sha256: null
+        blocker: exact_corpus_schedule_and_hyperparameters_not_frozen
+      m2a_recipe:
+        status: not_frozen
+        execution_authorized: false
+        path: null
+        sha256: null
+        blocker: fact_free_turkish_corpus_and_matched_budget_not_frozen
+      m2b_recipe:
+        status: not_frozen
+        execution_authorized: false
+        path: null
+        sha256: null
+        blocker: controlled_fact_reexposure_and_matched_budget_not_frozen
+
+  qwen:
+    display_name: Qwen2.5-1.5B
+    repository: Qwen/Qwen2.5-1.5B
+    revision: 8faed761d45a263340a0528343f099c05c9a4323
+    manifest:
+      path: /vol/tmp2/yesildau/m1_cross_family_screen_v1/models/Qwen__Qwen2.5-1.5B/model_manifest.json
+      sha256: c9d3562b717784251fe14c2b7972660fe4a20fe4687e15f69746bc1713d2d4fb
+    bindings:
+      m0_scientific_evaluation:
+        status: not_frozen
+        execution_authorized: false
+        path: null
+        sha256: null
+        blocker: qwen_m0_eval_v1_config_not_frozen
+      m1_recipe:
+        status: not_frozen
+        execution_authorized: false
+        path: null
+        sha256: null
+        blocker: exact_corpus_schedule_and_hyperparameters_not_frozen
+      m2a_recipe:
+        status: not_frozen
+        execution_authorized: false
+        path: null
+        sha256: null
+        blocker: fact_free_turkish_corpus_and_matched_budget_not_frozen
+      m2b_recipe:
+        status: not_frozen
+        execution_authorized: false
+        path: null
+        sha256: null
+        blocker: controlled_fact_reexposure_and_matched_budget_not_frozen
+
+  smollm:
+    display_name: SmolLM2-1.7B
+    repository: HuggingFaceTB/SmolLM2-1.7B
+    revision: effd688a12921b4cc83e3312b6feb579f70f9c71
+    manifest:
+      path: /vol/fob-vol6/mi25/yesildau/transfer-vs-relearning/artifacts/models/HuggingFaceTB__SmolLM2-1.7B/model_manifest.json
+      sha256: e5d04302087b8b41828f734c1d88c4620a74bb80d6919de62df37b9d57dadbfc
+    bindings:
+      m0_scientific_evaluation:
+        status: not_frozen
+        execution_authorized: false
+        path: null
+        sha256: null
+        blocker: smollm_m0_eval_v1_config_not_frozen
+      m1_recipe:
+        status: not_frozen
+        execution_authorized: false
+        path: null
+        sha256: null
+        blocker: exact_corpus_schedule_and_hyperparameters_not_frozen
+      m2a_recipe:
+        status: not_frozen
+        execution_authorized: false
+        path: null
+        sha256: null
+        blocker: fact_free_turkish_corpus_and_matched_budget_not_frozen
+      m2b_recipe:
+        status: not_frozen
+        execution_authorized: false
+        path: null
+        sha256: null
+        blocker: controlled_fact_reexposure_and_matched_budget_not_frozen
+
+required_operator_outputs:
+  - matrix_plan.json
+  - matrix_state.json
+  - per_node_evidence_manifests
+  - canonical_cross_model_state_table
+  - presentation_bundle
+
+forbidden_claims:
+  - ready_to_measure
+  - ready_to_train
+  - scientific_m0_result
+  - selected_primary_model
+  - m1_or_m2_execution_authorized
