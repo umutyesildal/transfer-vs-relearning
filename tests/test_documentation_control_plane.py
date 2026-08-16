@@ -100,6 +100,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["pipeline"]["scientific_m0_family"]["manifest"],
         state["evaluation_target"]["pipeline"]["scientific_m0_family"]["config_source"],
         state["evaluation_target"]["pipeline"]["scientific_m0_family"]["operator"],
+        state["evaluation_target"]["pipeline"]["scientific_m0_family"]["preflight_record"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],
@@ -137,6 +138,8 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert scientific_m0["total_gpu_lanes"] == 24
     assert scientific_m0["execution_ready"] is True
     assert scientific_m0["execution_authorized"] is False
+    assert scientific_m0["hu_identity_checks_passed_for_all_models"] is True
+    assert scientific_m0["hu_focused_tests"] == 39
     assert scientific_m0["scientific_work_started"] is False
 
 

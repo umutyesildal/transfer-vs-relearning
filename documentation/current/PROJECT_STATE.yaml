@@ -262,13 +262,21 @@ evaluation_target:
       execution_ready: true
       execution_authorized: false
       preflight_command: >-
-        .venv/bin/python scripts/study/run_three_model_m0_evaluation.py preflight
-      latest_status: local_plan_valid_hu_read_only_preflight_pending
+        /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
+        scripts/study/run_three_model_m0_evaluation.py preflight
+      latest_status: hu_read_only_identity_preflight_pass_authorization_only_blocker
+      preflight_record: >-
+        documentation/records/evaluation/M0_THREE_MODEL_READ_ONLY_PREFLIGHT_2026-08-16.md
+      preflight_record_sha256: e42052dad0a99db6306cb8a0b1c29a91ec146ce94e163fc18a21fe4d228afab8
+      hu_commit: 5966678924329219d6daffa5e9bafdeae0114540
+      hu_focused_tests: 39
+      hu_identity_checks_passed_for_all_models: true
       scientific_work_started: false
       blockers:
         - family_execution_not_authorized
-        - per_model_execution_not_authorized
-        - hu_identity_preflight_pending
+        - olmo_execution_not_authorized
+        - qwen_execution_not_authorized
+        - smollm_execution_not_authorized
     m0_preflight:
       command: >-
         .venv/bin/python scripts/study/run_study.py preflight-m0
@@ -336,8 +344,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: validate_then_separately_authorize_three_model_scientific_m0
-  first_boundary: hu_read_only_identity_preflight_then_exact_execution_authorization
+  name: separately_authorize_three_model_scientific_m0
+  first_boundary: exact_execution_authorization_bound_to_frozen_family
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -362,10 +370,10 @@ active_priority:
     - three_model_scientific_m0_configs
     - three_model_24_lane_parallel_operator
     - turkish_cross_domain_bpb_lane
+    - hu_read_only_three_model_identity_preflight
     - three_model_27_node_matrix_planner
     - three_model_luna_micro_packet_renderer
   required_outputs:
-    - hu_read_only_three_model_identity_preflight
     - exact_execution_authorization_bound_to_frozen_family
     - separately_authorized_parallel_submission
     - three_model_raw_bundle
@@ -385,6 +393,6 @@ authorization:
 next_decision_required:
   subject: three_model_scientific_m0_execution_authorization
   note: >-
-    eval-v1 and the exact OLMo, Qwen and SmolLM scientific M0 family are frozen. Verify all HU
-    identities read-only, then obtain one exact authorization before enabling the family and
-    per-model execution flags or submitting any Slurm/GPU/scoring work.
+    eval-v1 and the exact OLMo, Qwen and SmolLM scientific M0 family are frozen. HU read-only
+    identity preflight passed for all models; obtain one exact authorization before enabling the
+    family and per-model execution flags or submitting any Slurm/GPU/scoring work.

@@ -14,8 +14,8 @@ architecture, exact Harness environment/dataset identities, final task set, Pile
 full/cheap bilingual factual registries, normalized schema, numeric gates, uncertainty and
 checkpoint-binding policy. Any semantic change requires eval-v2. Freeze does not authorize
 scientific execution. The exact three-model M0 configs and bounded execution contract are now
-frozen with authorization false; HU identity preflight and a separate execution authorization are
-next.
+frozen with authorization false. HU read-only identity preflight passed for all three models; a
+separate execution authorization is next.
 
 The local pipeline foundation is now opt-in and fail-closed. It derives an exact epoch/update/batch
 schedule, records tokenization and optimization traces, preserves model-only epoch snapshots behind
@@ -183,8 +183,10 @@ The three-model scientific M0 binding package is complete:
    family finalizer without keeping an agent blocked;
 5. V100/A100 routes explicitly fall back to RTX3090 and then RTX6000/RTXA6000.
 
-The valid next action is HU read-only identity preflight. Scientific submission requires one new
-explicit authorization bound to the frozen family contract and manifest.
+HU read-only identity preflight has passed: 39/39 focused tests plus model-manifest, environment,
+cache, config, commit, task-overlay and fresh-output checks for all three models. Its only blockers
+were the deliberately false model/family execution flags. Scientific submission now requires one
+new explicit authorization bound to the frozen family contract and manifest.
 
 M1/M2 training, corpus materialization and scientific scoring remain unauthorized. They must not be
 bypassed with ad-hoc commands.
