@@ -1,0 +1,110 @@
+schema_version: 1
+name: m0-olmo-eval-v1-qualification-parity-v1
+status: prepared
+as_of: "2026-08-16"
+execution_authorized: false
+contract: documentation/contracts/evaluation/m0-olmo-qualification-parity-v1.md
+
+source:
+  root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8
+  plan_id: b406caea29643888
+  recovery_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8_english_capability_recovery_v1
+  recovery_result_sha256: 9f4801ade3f9c1c283766b24988bc75b5bd47c548852f396a8f2757ce27cdf84
+  english_retention_wikitext:
+    lane_result_sha256: 23bbf0ca68202abc1633dc132cf803b537e341e4129ee14192bef7b9be1afbde
+  turkish_capability:
+    lane_result_sha256: c1da6b48bed624c49088c2add56eb9c051ab37f9b163b5a0cd201f9911631ab4
+
+model:
+  repository: allenai/OLMo-2-0425-1B
+  revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+  manifest_path: >-
+    /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
+  manifest_sha256: 8702b80d5b7e4c996c8ce2ff5fe771ada08ab0080bde1926c0b1f53c607303dc
+
+runtime:
+  python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
+  environment_lock_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/environment.lock.txt
+  environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
+  lm_eval_release: v0.4.12
+  lm_eval_commit: 6d642546f4688648fced259eb3302efd36ece5af
+  device: cuda:0
+  precision: float16
+  batch_size: auto:4
+  max_batch_size: 16
+  implementation_commit: null
+  implementation_files: {}
+  upstream_task_files:
+    wikitext_config:
+      path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/lib/python3.11/site-packages/lm_eval/tasks/wikitext/wikitext.yaml
+      sha256: f6d1a228da486466ac91922c99cb5ff197610ec045decb2009599a16b80eaf45
+    wikitext_preprocess:
+      path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/lib/python3.11/site-packages/lm_eval/tasks/wikitext/preprocess_wikitext.py
+      sha256: a44020374b172159bf5be80a64d2c4194c9d5c77284f696ac666361338c8da7d
+    turblimp_group:
+      path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/lib/python3.11/site-packages/lm_eval/tasks/turblimp/turblimp_group.yaml
+      sha256: 5a0a660e69eb0da0316fcd758ec0adb7b7e857b368ce5d151a0e143afbf3d421
+    turblimp_template:
+      path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/lib/python3.11/site-packages/lm_eval/tasks/turblimp/_template_yaml
+      sha256: 26e9fe58fd8fb83dd86b6669f152964167e84a5ee56ad8ef87c78e1a0c10f388
+
+wikitext:
+  expected_sample_count: 2
+  canonical_role: primary_parity_reference
+  heading_overlay:
+    include_path: configs/evaluation/task_overlays/wikitext_heading_sensitivity_v1
+    task_id: wikitext_heading_markdown_sensitivity_v1
+    role: descriptive_sensitivity_only_no_numeric_gate
+    transform: equal_sign_headings_to_same_depth_markdown_headings
+
+turblimp:
+  group_task_id: turblimp_core
+  expected_samples_per_subtask: 2
+  aggregation: unweighted_macro_over_16_equal_size_subtasks
+  decision_metric: acc_norm
+  normalization: loglikelihood_divided_by_utf8_byte_length
+  subtask_ids:
+    - turblimp_anaphor_agreement
+    - turblimp_argument_structure_ditransitive
+    - turblimp_argument_structure_transitive
+    - turblimp_binding
+    - turblimp_determiners
+    - turblimp_ellipsis
+    - turblimp_irregular_forms
+    - turblimp_island_effects
+    - turblimp_nominalization
+    - turblimp_npi_licensing
+    - turblimp_passives
+    - turblimp_quantifiers
+    - turblimp_relative_clauses
+    - turblimp_scrambling
+    - turblimp_subject_agreement
+    - turblimp_suspended_affixation
+
+tolerances:
+  absolute_metric_parity: 1.0e-12
+
+slurm:
+  account: yesildau
+  control_partition: std
+  cpus_per_task: 8
+  time_limit: 04:00:00
+  gpu_route:
+    id: v10032gb
+    partition: gpu
+    gres: gpu:v10032gb:1
+    memory: 64G
+  min_free_gpu_bytes: 17179869184
+
+storage:
+  proposed_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_parity_v1
+  fresh_root_required: true
+  hu_home_read_only: true
+  prior_evidence_roots_read_only: true
+
+run_classification: test_only_non_scientific
+scientific_result: false
+eval_v1_frozen_by_this_wave: false
+freeze_blockers:
+  - implementation_identity_not_frozen
+  - execution_not_authorized
