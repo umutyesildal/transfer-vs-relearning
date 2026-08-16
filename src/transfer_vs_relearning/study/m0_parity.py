@@ -412,6 +412,12 @@ def validate_source_lane(plan: dict[str, Any], lane_id: str) -> tuple[Path, list
     path = Path(plan["source"]["root"]) / "lanes" / lane_id / "lane_result.json"
     if not path.is_file() or sha256_file(path) != lane["lane_result_sha256"]:
         raise ValueError(f"Parity source lane-result mismatch: {lane_id}")
+    lane_result = _load_json(path)
+    if (
+        lane_result.get("plan_id") != plan["source"]["plan_id"]
+        or lane_result.get("lane_id") != lane_id
+    ):
+        raise ValueError(f"Parity source lane plan/ID mismatch: {lane_id}")
     prefix = "samples_wikitext_" if lane_id == "english_retention_wikitext" else "samples_turblimp_"
     return _result_and_samples(path, sample_prefix=prefix)
 

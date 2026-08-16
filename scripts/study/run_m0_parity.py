@@ -173,6 +173,12 @@ def assess_parity_readiness(
     record("heading_overlay_present", overlay.is_dir(), str(overlay))
     source_cache = Path(plan["source"]["root"]) / "cache"
     record("offline_source_cache_present", source_cache.is_dir() and any(source_cache.iterdir()), str(source_cache))
+    recovery_result = Path(plan["source"]["recovery_root"]) / "qualification_result.json"
+    recovery_ok = (
+        recovery_result.is_file()
+        and sha256_file(recovery_result) == plan["source"]["recovery_result_sha256"]
+    )
+    record("seven_lane_recovery_result_identity", recovery_ok, str(recovery_result))
     try:
         verify_m0_model_manifest(plan, repo_root=repo_root)
     except (FileNotFoundError, ValueError, KeyError) as exc:

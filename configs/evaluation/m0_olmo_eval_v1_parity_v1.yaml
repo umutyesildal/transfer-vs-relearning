@@ -9,7 +9,7 @@ source:
   root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8
   plan_id: b406caea29643888
   recovery_root: /vol/tmp2/yesildau/eval_v1_m0_olmo_qualification_v8_english_capability_recovery_v1
-  recovery_result_sha256: 9f4801ade3f9c1c283766b24988bc75b5bd47c548852f396a8f2757ce27cdf84
+  recovery_result_sha256: a5e8dcc72e0a7303505be975b0bc2f8422c02b6b17ca7d08a182adecd54d00c8
   english_retention_wikitext:
     lane_result_sha256: 23bbf0ca68202abc1633dc132cf803b537e341e4129ee14192bef7b9be1afbde
   turkish_capability:
