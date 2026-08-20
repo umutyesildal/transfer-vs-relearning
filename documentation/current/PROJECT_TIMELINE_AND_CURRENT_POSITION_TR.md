@@ -364,7 +364,10 @@ Bu adım 20 Ağustos'ta yerel olarak hazırlandı ve donduruldu; henüz çalış
 - her lane öncesi üç UUID audit edilir ve unchanged free-memory eşiğini geçen en yüksek boş VRAM'li
   UUID deterministik seçilir;
 - hiçbir memory eşiği veya scientific evaluation semantiği değiştirilmedi;
-- execution durumu: exact SHA-bound kullanıcı yetkisi bekliyor.
+- exact SHA-bound tek-wave kullanıcı yetkisi 20 Ağustos'ta verildi;
+- authorization record:
+  [`m0-three-model-seven-lane-exclusive-a100-recovery-v1-authorization-2026-08-20.md`](../contracts/evaluation/m0-three-model-seven-lane-exclusive-a100-recovery-v1-authorization-2026-08-20.md);
+- execution durumu: HU fast-forward ve final preflight sonrası tek beş-job DAG bekliyor.
 
 ### Adım 2 — Complete raw bundle ve canonical normalization
 
