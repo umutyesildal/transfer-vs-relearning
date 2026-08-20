@@ -416,7 +416,7 @@ evaluation_target:
       normalization_authorized: false
       m1_or_m2_authorized: false
     m0_seven_lane_exclusive_a100_recovery:
-      status: submitted_resources_pending
+      status: terminal_partial_invalid_cancelled_output_routing_defect
       contract: documentation/contracts/evaluation/m0-three-model-seven-lane-exclusive-a100-recovery-v1.md
       contract_sha256: d2a6d9e35c60a00328380fe7ecfb68bfa3fdd0528ea469ecec0acfecdc849058
       config: configs/evaluation/m0_scientific_recovery_isolation_v1.yaml
@@ -444,6 +444,13 @@ evaluation_target:
       family_finalizer: "471051"
       scheduler_estimate: "2026-08-22T10:46:25"
       submission_manifest_sha256: 32de77b5c7ae3c9d31cc9032f949e562fc38b64fe6f9410e4182ed86d4546e53
+      terminal_record: documentation/records/evaluation/M0_EXCLUSIVE_A100_RECOVERY_CANCELLATION_AND_INTEGRITY_RESULT_2026-08-20.md
+      controller_cancelled_by_user: true
+      valid_recovered_lane_count: 2
+      invalid_recovered_lane_count: 1
+      not_run_recovery_lane_count: 4
+      normalization_authorized: false
+      terminal_composite_sha256: 8563bfcdfbe49cb3953bfe54fb22cd5910cff2933caf80a74cd51eeb681839cb
       prior_authorization_attempt: blocked_preflight_scope_key_no_root_no_jobs
       automatic_retry_authorized: false
       normalization_authorized: false

@@ -116,6 +116,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["pipeline"]["m0_seven_lane_exclusive_a100_recovery"]["authorization_record"],
         state["evaluation_target"]["pipeline"]["m0_seven_lane_exclusive_a100_recovery"]["corrected_authorization_record"],
         state["evaluation_target"]["pipeline"]["m0_seven_lane_exclusive_a100_recovery"]["submission_record"],
+        state["evaluation_target"]["pipeline"]["m0_seven_lane_exclusive_a100_recovery"]["terminal_record"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],
@@ -222,7 +223,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert len(scientific_m0["known_operational_failures"]) == 7
 
     isolated = state["evaluation_target"]["pipeline"]["m0_seven_lane_exclusive_a100_recovery"]
-    assert isolated["status"] == "submitted_resources_pending"
+    assert isolated["status"] == "terminal_partial_invalid_cancelled_output_routing_defect"
     assert isolated["contract_sha256"] == (
         "d2a6d9e35c60a00328380fe7ecfb68bfa3fdd0528ea469ecec0acfecdc849058"
     )
@@ -237,6 +238,10 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert isolated["execution_authorized"] is True
     assert isolated["automatic_retry_authorized"] is False
     assert isolated["normalization_authorized"] is False
+    assert isolated["controller_cancelled_by_user"] is True
+    assert isolated["valid_recovered_lane_count"] == 2
+    assert isolated["invalid_recovered_lane_count"] == 1
+    assert isolated["not_run_recovery_lane_count"] == 4
 
     isolated_authorization = state["authorization"]["scoped"][
         "m0_seven_lane_exclusive_a100_recovery"
