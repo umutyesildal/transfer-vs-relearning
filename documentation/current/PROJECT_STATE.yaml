@@ -588,7 +588,7 @@ authorization:
       normalization_authorized: false
       m1_or_m2_authorized: false
     m0_seven_lane_exclusive_a100_recovery:
-      status: corrected_authorized_single_wave
+      status: authorized_single_wave
       execution_authorized: true
       contract_sha256: d2a6d9e35c60a00328380fe7ecfb68bfa3fdd0528ea469ecec0acfecdc849058
       pre_authorization_config_sha256: 0fcd32da2c29eb9f2c8d0d838d160746890ddbec0d51d833bce9c1cc9943aa35

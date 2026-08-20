@@ -240,7 +240,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     isolated_authorization = state["authorization"]["scoped"][
         "m0_seven_lane_exclusive_a100_recovery"
     ]
-    assert isolated_authorization["status"] == "corrected_authorized_single_wave"
+    assert isolated_authorization["status"] == "authorized_single_wave"
     assert isolated_authorization["execution_authorized"] is True
     assert isolated_authorization["wave_limit"] == 1
     assert isolated_authorization["slurm_job_count"] == 5
