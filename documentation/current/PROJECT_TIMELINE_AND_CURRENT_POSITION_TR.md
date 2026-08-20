@@ -340,7 +340,14 @@ Bu adım 20 Ağustos'ta yerel olarak hazırlandı ve donduruldu; henüz çalış
 - authorization record:
   [`m0-three-model-seven-lane-recovery-v1-authorization-2026-08-20.md`](../contracts/evaluation/m0-three-model-seven-lane-recovery-v1-authorization-2026-08-20.md);
 - pre-authorization config SHA-256 `4a603719...` korunarak execution overlay açıldı;
-- execution durumu: HU fast-forward ve fail-closed preflight sonrası tek submission bekliyor.
+- execution durumu: tek wave 20 Ağustos'ta submit edildi ve terminale ulaştı;
+- jobs: 470523--470533 içindeki yedi lane, üç model finalizer ve bir family finalizer;
+- yedi lane'in tamamı model load/scoring öncesinde frozen free-VRAM guard'da durdu;
+- scientific score: `0`; source lane sayısı hâlâ `17/24`;
+- composite SHA-256: `a714ce0dc891641ab0c6f99a3366d941ba2b3f8f3e2b0d4db8b28f4e90125f06`;
+- normalization hâlâ kapalı ve tek-wave authorization tüketildi;
+- execution record:
+  [`M0_SEVEN_LANE_RECOVERY_EXECUTION_2026-08-20.md`](../records/evaluation/M0_SEVEN_LANE_RECOVERY_EXECUTION_2026-08-20.md).
 
 ### Adım 2 — Complete raw bundle ve canonical normalization
 
@@ -379,11 +386,11 @@ retention  = child − exact parent
 
 ## 6. Bugünkü execution sınırı
 
-Şu anda yeni training başlatmak doğru adım değildir. Doğru tek execution yolu authorize edilmiştir:
+Şu anda yeni training başlatmak doğru adım değildir. Yetkilendirilen tek recovery wave tüketilmiştir:
 
 > Mevcut 17 geçerli M0 lane'i immutable biçimde koruyan ve yalnızca eksik yedi lane'i tamamlayan
-> frozen recovery contract'ın exact SHA-256 değerine bağlı yalnızca tek recovery DAG'ını
-> çalıştırmak ve terminal durumunu beklemek.
+> Yedi lane shared/occupied GPU görünürlüğü nedeniyle memory guard'da fail-closed durdu. Yeni bir
+> deneme ancak GPU isolation/clean-device koşulunu ayrı ve exact biçimde donduran yeni kontratla açılabilir.
 
 Bu wave dışında:
 
@@ -411,5 +418,6 @@ Bu wave dışında:
 ## 8. Tek satırlık güncel hüküm
 
 **Pipeline başlatıldı; M0 execution terminalde 17/24 geçerli ham lane ile fail-closed duruyor;
-eksik yedi lane için recovery contract donduruldu ve exact SHA-bound tek wave authorize edildi;
-sıradaki adım yalnız bu DAG'ın execution ve terminal doğrulamasıdır.**
+eksik yedi lane için exact SHA-bound tek wave çalıştırıldı fakat yedi lane de scoring öncesi memory
+guard'da durdu; 17/24 korunuyor ve sıradaki adım otomatik retry değil, ayrı frozen GPU-isolation
+recovery kontratıdır.**

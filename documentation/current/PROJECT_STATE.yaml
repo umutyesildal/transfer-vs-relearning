@@ -1,11 +1,11 @@
 schema_version: 1
-as_of: "2026-08-16"
+as_of: "2026-08-20"
 project: transfer-vs-relearning
 
 repository:
   layout: monorepo_v1
   branch: agent/m0-evaluation
-  status: three_model_scientific_m0_submitted_results_pending
+  status: m0_recovery_terminal_not_run_gpu_memory_guard
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -379,9 +379,10 @@ evaluation_target:
       blockers:
         - seven_required_lanes_failed_pre_scoring
         - complete_raw_bundle_required_before_normalization
-        - recovery_execution_not_yet_submitted
+        - authorized_recovery_wave_blocked_all_seven_at_gpu_memory_guard
+        - new_recovery_contract_not_authorized
     m0_seven_lane_recovery:
-      status: authorized_single_wave_not_yet_submitted
+      status: terminal_not_run_gpu_memory_guard_all_seven
       contract: documentation/contracts/evaluation/m0-three-model-seven-lane-recovery-v1.md
       contract_sha256: 1ee7c8d9d1da092cd1e4a64dbffa4594e041ebf2b4d56eb62f345a6aaa8c25c4
       config: configs/evaluation/m0_scientific_recovery_v1.yaml
@@ -389,6 +390,7 @@ evaluation_target:
       config_sha256: d934b782fe307d1d54b7fdce47be8ebc2409a6b6c2acf3f2aa435aa4577ac6d7
       authorization_record: documentation/contracts/evaluation/m0-three-model-seven-lane-recovery-v1-authorization-2026-08-20.md
       authorization_record_sha256: 053f6c4900aea9ca1dd375a7cbe7a2afd38362daedaed2324f529ddae264e479
+      execution_record: documentation/records/evaluation/M0_SEVEN_LANE_RECOVERY_EXECUTION_2026-08-20.md
       operator: scripts/study/recover_three_model_m0.py
       implementation_commit: 07cbaa6d55f0713a08bae8a1c3c9cbe2df5e8942
       source_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1
@@ -399,7 +401,17 @@ evaluation_target:
       gpu_lane_count: 7
       model_finalizer_count: 3
       family_finalizer_count: 1
-      execution_authorized: true
+      execution_authorized: false
+      authorization_consumed: true
+      resubmission_authorized: false
+      scientific_score_count: 0
+      submitted_jobs:
+        lane_jobs: ["470523", "470524", "470525", "470527", "470528", "470529", "470531"]
+        model_finalizers: ["470526", "470530", "470532"]
+        family_finalizer: "470533"
+      submission_manifest_sha256: 90598763f9639e44b6d078dd4399d48f121f7313435d10c1461fe228beb5b989
+      composite_bundle_sha256: a714ce0dc891641ab0c6f99a3366d941ba2b3f8f3e2b0d4db8b28f4e90125f06
+      composite_status: partial_invalid_no_cross_model_summary
       automatic_retry_authorized: false
       normalization_authorized: false
       m1_or_m2_authorized: false
@@ -470,8 +482,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: execute_authorized_single_wave_seven_lane_m0_recovery
-  first_boundary: hu_fast_forward_preflight_then_single_dag
+  name: design_separate_gpu_isolation_recovery_contract
+  first_boundary: no_retry_before_new_frozen_contract_and_exact_authorization
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -505,8 +517,9 @@ active_priority:
     - three_model_terminal_raw_bundle_17_of_24
     - terminal_read_only_lane_and_finalizer_audit
     - exact_sha_bound_recovery_authorization
+    - seven_lane_recovery_execution_result_terminal_not_run
   required_outputs:
-    - seven_lane_recovery_execution_result
+    - separately_frozen_gpu_isolation_recovery_contract
     - complete_composite_three_model_raw_bundle
     - frozen_normalization_and_gate_result
 
@@ -531,21 +544,24 @@ authorization:
       cleanup_or_deletion_authorized: false
       resubmission_authorized: false
     m0_seven_lane_recovery:
-      status: authorized_single_wave
-      execution_authorized: true
+      status: consumed_terminal_not_run
+      execution_authorized: false
       contract_sha256: 1ee7c8d9d1da092cd1e4a64dbffa4594e041ebf2b4d56eb62f345a6aaa8c25c4
       pre_authorization_config_sha256: 4a603719dd43a65dd9b36a36786407993afe84cf8d1d48f6245656d235c6bfeb
       config_sha256: d934b782fe307d1d54b7fdce47be8ebc2409a6b6c2acf3f2aa435aa4577ac6d7
       authorization_record_sha256: 053f6c4900aea9ca1dd375a7cbe7a2afd38362daedaed2324f529ddae264e479
       wave_limit: 1
+      wave_consumed: true
       recovery_lane_count: 7
+      scientific_score_count: 0
+      resubmission_authorized: false
       rescore_complete_lanes_authorized: false
       normalization_authorized: false
       m1_or_m2_authorized: false
 
 next_decision_required:
-  subject: none_until_authorized_recovery_wave_reaches_terminal_state
+  subject: separately_frozen_gpu_isolation_recovery_contract
   note: >-
-    The user bound one recovery wave to contract SHA-256 1ee7c8d9... and pre-authorization config
-    SHA-256 4a603719.... Execute one fail-closed seven-GPU-lane plus four-finalizer DAG. Preserve
-    the 17 complete source lanes. Normalization and M1/M2 remain separate and unauthorized.
+    The exact single wave was consumed. All seven GPU jobs stopped before model load/scoring at the
+    frozen free-memory guards, so the family remains 17/24 and normalization remains closed. Do not
+    retry, alter routes or weaken thresholds without a new frozen contract and exact authorization.
