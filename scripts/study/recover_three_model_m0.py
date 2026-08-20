@@ -258,12 +258,13 @@ def run_isolated_wave(
             Path(recovery["recovery_family_root"]) / "isolated_wave_ledger.json",
             {"schema_version": 1, "status": "running", "lanes": ledger},
         )
+    lane_count = len(recovery["isolation"]["target_order"])
     complete = sum(row["status"] == "complete" for row in ledger)
     payload = {
         "schema_version": 1,
-        "status": "complete" if complete == 7 else "partial_invalid",
+        "status": "complete" if complete == lane_count else "partial_invalid",
         "complete_lane_count": complete,
-        "lane_count": 7,
+        "lane_count": lane_count,
         "lanes": ledger,
     }
     write_json(Path(recovery["recovery_family_root"]) / "isolated_wave_ledger.json", payload)
@@ -332,9 +333,9 @@ def assess_recovery_readiness(
         evidence = validate_family_recovery_source(recovery)
     except (OSError, ValueError, KeyError, json.JSONDecodeError) as exc:
         evidence = None
-        record("source_17_plus_7_evidence", False, exc)
+        record("frozen_source_and_retained_evidence", False, exc)
     else:
-        record("source_17_plus_7_evidence", True, evidence["source_family_bundle_sha256"])
+        record("frozen_source_and_retained_evidence", True, evidence["source_family_bundle_sha256"])
 
     state = yaml.safe_load(project_state_path.read_text(encoding="utf-8"))
     family_state = state["evaluation_target"]["pipeline"]["scientific_m0_family"]
@@ -345,11 +346,10 @@ def assess_recovery_readiness(
         family_state["status"] == "terminal_partial_invalid_17_of_24",
         family_state["status"],
     )
-    scoped_key = (
-        "m0_seven_lane_exclusive_a100_recovery"
-        if recovery.get("mode") == "exclusive_a100_sequential"
-        else "m0_seven_lane_recovery"
-    )
+    scoped_key = {
+        "exclusive_a100_sequential": "m0_seven_lane_exclusive_a100_recovery",
+        "retargeted_five_lane": "m0_five_lane_retargeted_recovery",
+    }.get(recovery.get("mode"), "m0_seven_lane_recovery")
     scoped = state.get("authorization", {}).get("scoped", {}).get(scoped_key, {})
     record(
         "project_recovery_authorization",
@@ -377,7 +377,7 @@ def assess_recovery_readiness(
     blockers = [row["id"] for row in checks if row["status"] != "pass"]
     return {
         "schema_version": 1,
-        "scope": "m0_three_model_seven_lane_recovery_preflight",
+        "scope": "m0_three_model_recovery_preflight",
         "status": "ready" if not blockers else "blocked_pre_scoring",
         "scientific_work_started": False,
         "config_path": recovery["config_path"],
@@ -568,7 +568,7 @@ def submit_family_recovery(
     config_path: Path,
     repo_root: Path,
 ) -> dict[str, Any]:
-    if recovery.get("mode") == "exclusive_a100_sequential":
+    if recovery.get("mode") in {"exclusive_a100_sequential", "retargeted_five_lane"}:
         return submit_isolated_family_recovery(
             recovery, config_path=config_path, repo_root=repo_root
         )
@@ -719,10 +719,22 @@ def main() -> None:
         plan = load_initialized_plan(Path(model["recovery_root"]), Path(model["config_path"]), repo_root=repo_root)
         if plan["lanes"][args.lane_index]["id"] != args.lane_id:
             raise ValueError("Recovery lane index/ID mismatch")
+        runtime_output_subdir = model["targets"][args.lane_id].get("runtime_output_subdir")
+        if runtime_output_subdir is not None:
+            lane = plan["lanes"][args.lane_index]
+            if lane["adapter"] != "project_corpus_perplexity" or runtime_output_subdir != "corpora":
+                raise ValueError("Runtime output retarget is allowed only for corpus PPL/corpora")
+            lane["runtime_output_root"] = str(
+                Path(model["recovery_root"])
+                / "lanes"
+                / args.lane_id
+                / "raw"
+                / runtime_output_subdir
+            )
         run_gpu_memory_guard(Path(model["recovery_root"]), args.lane_id, min_free_bytes=args.min_free_gpu_bytes)
         payload = run_m0_lane(plan, args.lane_index, output_root=Path(model["recovery_root"]))
     elif args.command == "run-isolated-wave":
-        if recovery.get("mode") != "exclusive_a100_sequential":
+        if recovery.get("mode") not in {"exclusive_a100_sequential", "retargeted_five_lane"}:
             raise ValueError("run-isolated-wave requires the exclusive A100 sequential contract")
         payload = run_isolated_wave(recovery, config_path=config_path, repo_root=repo_root)
     elif args.command == "finalize-model":

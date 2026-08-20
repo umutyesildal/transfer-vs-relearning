@@ -57,6 +57,9 @@ def build_project_probe_command(
         expected_root = Path(str(lane["expected_output_root"])).resolve()
         if output_root != expected_root:
             raise ValueError("Corpus PPL evaluator output root mismatch")
+        runtime_output_root = Path(
+            str(lane.get("runtime_output_root", config["output_dir"]))
+        ).resolve()
         corpora = config.get("corpora")
         input_sha256 = config.get("input_sha256")
         if not isinstance(corpora, dict) or not corpora:
@@ -77,7 +80,7 @@ def build_project_probe_command(
         command.extend(
             [
                 "--output-dir",
-                str(config["output_dir"]),
+                str(runtime_output_root),
                 "--block-size",
                 str(config["scoring"]["block_size"]),
                 "--batch-size",

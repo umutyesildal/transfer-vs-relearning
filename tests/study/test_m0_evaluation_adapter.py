@@ -198,6 +198,39 @@ def test_project_probe_command_accepts_only_registered_entrypoint_and_exact_conf
         build_project_probe_command(plan, lane, repo_root=ROOT)
 
 
+def test_corpus_ppl_runtime_output_retarget_preserves_frozen_config_identity(tmp_path: Path) -> None:
+    plan, manifest_path = _runtime_plan(tmp_path)
+    corpus = tmp_path / "turkish.jsonl"
+    corpus.write_text('{"text":"örnek"}\n', encoding="utf-8")
+    frozen_output = tmp_path / "historical-output"
+    runtime_output = tmp_path / "fresh-recovery" / "raw" / "corpora"
+    evaluator_config = _write_yaml(
+        tmp_path / "ppl.yaml",
+        {
+            "adapter_engine": "corpora_perplexity",
+            "run_classification": plan["run_classification"],
+            "model_manifest": str(manifest_path),
+            "model_label": "m0-test",
+            "output_dir": str(frozen_output),
+            "corpora": {"turkish": str(corpus)},
+            "input_sha256": {"turkish": sha256_file(corpus)},
+            "scoring": {"block_size": 128, "batch_size": 1, "bootstrap_samples": 10},
+            "runtime": {"seed": 42, "device": "cuda", "bf16": False},
+        },
+    )
+    lane = {
+        "id": "turkish_perplexity",
+        "adapter": "project_corpus_perplexity",
+    }
+    lane["evaluator_config"] = str(evaluator_config)
+    lane["evaluator_config_sha256"] = sha256_file(evaluator_config)
+    lane["expected_output_root"] = str(frozen_output)
+    lane["runtime_output_root"] = str(runtime_output)
+    command = build_project_probe_command(plan, lane, repo_root=ROOT)
+    assert command[command.index("--output-dir") + 1] == str(runtime_output)
+    assert sha256_file(evaluator_config) == lane["evaluator_config_sha256"]
+
+
 def test_single_entrypoint_submits_one_parallel_array_and_afterany_finalizer(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

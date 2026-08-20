@@ -209,6 +209,72 @@ def _isolation_fixture(tmp_path: Path) -> Path:
     return path
 
 
+def _retargeted_five_lane_fixture(tmp_path: Path) -> Path:
+    base_path, plans = _fixture(tmp_path)
+    base = yaml.safe_load(base_path.read_text(encoding="utf-8"))
+    retained_root = tmp_path / "prior-isolation" / "olmo"
+    retained: dict[str, dict] = {}
+    for lane_id in ("english_capability", "turkish_capability"):
+        lane = next(row for row in plans["olmo"]["lanes"] if row["id"] == lane_id)
+        _complete_lane(plans["olmo"], retained_root, lane)
+        result = retained_root / "lanes" / lane_id / "lane_result.json"
+        retained[lane_id] = {
+            "root": str(retained_root),
+            "lane_result_sha256": sha256_file(result),
+        }
+    five_targets = {
+        "olmo": {"turkish_perplexity": base["models"]["olmo"]["targets"]["turkish_perplexity"]},
+        "qwen": base["models"]["qwen"]["targets"],
+        "smollm": base["models"]["smollm"]["targets"],
+    }
+    five_targets["olmo"]["turkish_perplexity"]["runtime_output_subdir"] = "corpora"
+    five_targets["qwen"]["turkish_perplexity"]["runtime_output_subdir"] = "corpora"
+    payload = {
+        "schema_version": 1,
+        "name": "fixture-retargeted-five-lane",
+        "status": "frozen",
+        "mode": "retargeted_five_lane",
+        "execution_authorized": False,
+        "base_recovery_config": str(base_path),
+        "base_recovery_config_sha256": sha256_file(base_path),
+        "source_lane_count": 24,
+        "recovery_lane_count": 5,
+        "model_order": ["olmo", "qwen", "smollm"],
+        "recovery_family_root": str(tmp_path / "retargeted-five-lane"),
+        "model_overrides": {
+            "olmo": {"targets": five_targets["olmo"], "retained_recovery_lanes": retained},
+            "qwen": {"targets": five_targets["qwen"]},
+            "smollm": {"targets": five_targets["smollm"]},
+        },
+        "isolation": {
+            "node": "gruenau10",
+            "partition": "gpu",
+            "gres": "gpu:a10080gb:3",
+            "requested_gpu_count": 3,
+            "exclusive_node_allocation": True,
+            "expected_gpu_name": "NVIDIA A100 80GB PCIe",
+            "min_total_gpu_bytes": 80 * 1024**3,
+            "selection_rule": "maximum_free_bytes_then_uuid",
+            "max_wait_seconds": 7200,
+            "poll_interval_seconds": 60,
+            "cpus_per_task": 8,
+            "memory": "96G",
+            "time_limit": "1-00:00:00",
+            "target_order": [
+                "olmo:turkish_perplexity",
+                "qwen:english_retention_pile_10k",
+                "qwen:turkish_capability",
+                "qwen:turkish_perplexity",
+                "smollm:english_capability",
+            ],
+        },
+        "implementation": {"commit": "0" * 40, "files": {}},
+    }
+    path = tmp_path / "retargeted-five-lane.yaml"
+    path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+    return path
+
+
 def test_recovery_plan_binds_exactly_seventeen_plus_seven(tmp_path: Path) -> None:
     config_path, _ = _fixture(tmp_path)
     recovery = load_family_recovery_plan(config_path, repo_root=ROOT)
@@ -357,3 +423,58 @@ def test_isolation_selector_chooses_highest_free_eligible_uuid(
     )
     assert selected == "GPU-b"
     assert attempts[-1]["status"] == "pass"
+
+
+def test_retargeted_five_lane_recovery_retains_nineteen_and_recovers_only_five(
+    tmp_path: Path,
+) -> None:
+    config_path = _retargeted_five_lane_fixture(tmp_path)
+    recovery = load_family_recovery_plan(config_path, repo_root=ROOT)
+    assert recovery["retained_lane_count"] == 19
+    assert recovery["target_lane_count"] == 5
+    evidence = validate_family_recovery_source(recovery)
+    assert evidence["retained_lane_count"] == 19
+    assert set(evidence["models"]["olmo"]["retained_recovery_lanes"]) == {
+        "english_capability",
+        "turkish_capability",
+    }
+    initialize_family_recovery_namespace(recovery)
+    for model in recovery["models"]:
+        for lane in model["plan"]["lanes"]:
+            if lane["id"] in model["targets"]:
+                _complete_lane(model["plan"], Path(model["recovery_root"]), lane)
+        bundle = finalize_recovered_model(model)
+        assert bundle["status"] == "complete"
+    family = finalize_family_recovery(recovery)
+    assert family["normalization_allowed"] is True
+    assert family["retained_lane_count"] == 19
+    assert family["recovered_lane_count"] == 5
+
+
+def test_retargeted_five_lane_operator_submits_one_wave_and_four_finalizers(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config_path = _retargeted_five_lane_fixture(tmp_path)
+    recovery = load_family_recovery_plan(config_path, repo_root=ROOT)
+    entrypoint = ROOT / "scripts/study/recover_three_model_m0.py"
+    spec = importlib.util.spec_from_file_location("recover_three_model_m0_five", entrypoint)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    submissions: list[list[str]] = []
+
+    class Result:
+        returncode = 0
+        stdout = "sbatch: Job 1 to start at 2026-08-20T12:00:00"
+        stderr = ""
+
+    monkeypatch.setattr(module, "_run", lambda argv: Result())
+    monkeypatch.setattr(
+        module,
+        "_submit",
+        lambda argv: submissions.append(argv) or str(9100 + len(submissions)),
+    )
+    payload = module.submit_family_recovery(recovery, config_path=config_path, repo_root=ROOT)
+    assert len(submissions) == 5
+    assert any("run-isolated-wave" in value for value in submissions[0])
+    assert payload["wave_job"] == "9101"
