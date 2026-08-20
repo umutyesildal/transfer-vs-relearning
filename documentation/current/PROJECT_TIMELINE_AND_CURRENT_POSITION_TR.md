@@ -397,7 +397,13 @@ donduruldu:
   `705661dd5e32d836ee58f64101bc887c7a85059bae3ca2b25505ad967bde9a7d`;
 - contract SHA-256:
   `1b030869455d68aa0ecf933f881c1661e1fbf504997376fdba08a626e1bc0a55`;
-- execution: `false`; HU fast-forward, preflight ve submission henüz yapılmadı.
+- exact SHA-bound execution authorization 20 Ağustos'ta verildi;
+- authorization record:
+  [`m0-three-model-five-lane-retargeted-recovery-v1-authorization-2026-08-20.md`](../contracts/evaluation/m0-three-model-five-lane-retargeted-recovery-v1-authorization-2026-08-20.md);
+- authorized config SHA-256:
+  `08cbe81574b63aa3f488e7f17cc1f6f41b339e85c5d5814b7cbd6fbf76f27c41`;
+- execution: HU fast-forward, final preflight ve tek beş-job DAG için yetkili; bu kayıt anında
+  henüz submit edilmedi.
 
 ### Adım 2 — Complete raw bundle ve canonical normalization
 

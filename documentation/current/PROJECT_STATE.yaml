@@ -454,11 +454,14 @@ evaluation_target:
       prior_authorization_attempt: blocked_preflight_scope_key_no_root_no_jobs
       automatic_retry_authorized: false
     m0_five_lane_retargeted_recovery:
-      status: frozen_unexecuted_exact_authorization_required
+      status: authorized_single_wave_unsubmitted
       contract: documentation/contracts/evaluation/m0-three-model-five-lane-retargeted-recovery-v1.md
       contract_sha256: 1b030869455d68aa0ecf933f881c1661e1fbf504997376fdba08a626e1bc0a55
       config: configs/evaluation/m0_scientific_recovery_retargeted_v1.yaml
-      config_sha256: 705661dd5e32d836ee58f64101bc887c7a85059bae3ca2b25505ad967bde9a7d
+      pre_authorization_config_sha256: 705661dd5e32d836ee58f64101bc887c7a85059bae3ca2b25505ad967bde9a7d
+      config_sha256: 08cbe81574b63aa3f488e7f17cc1f6f41b339e85c5d5814b7cbd6fbf76f27c41
+      authorization_record: documentation/contracts/evaluation/m0-three-model-five-lane-retargeted-recovery-v1-authorization-2026-08-20.md
+      authorization_record_sha256: 9b0e73ec4dcc85959adf9705bfe18ad9b483773c760f618152d6b8aebdb13c24
       operator: scripts/study/recover_three_model_m0.py
       implementation_commit: caaa380c2b237437b38019ac319e95a82b38f80e
       source_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1
@@ -468,7 +471,7 @@ evaluation_target:
       recovery_lane_count: 5
       topology: one_exclusive_three_a100_sequential_wave_plus_four_finalizers
       slurm_job_count: 5
-      execution_authorized: false
+      execution_authorized: true
       normalization_authorized: false
       m1_or_m2_authorized: false
       automatic_retry_authorized: false
@@ -541,8 +544,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: obtain_exact_authorization_for_five_lane_retargeted_recovery
-  first_boundary: five_lane_contract_and_config_require_exact_authorization
+  name: execute_authorized_five_lane_retargeted_recovery
+  first_boundary: publication_hu_fast_forward_final_preflight_single_dag
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -639,10 +642,12 @@ authorization:
       normalization_authorized: false
       m1_or_m2_authorized: false
     m0_five_lane_retargeted_recovery:
-      status: frozen_unexecuted_exact_authorization_required
-      execution_authorized: false
+      status: authorized_single_wave
+      execution_authorized: true
       contract_sha256: 1b030869455d68aa0ecf933f881c1661e1fbf504997376fdba08a626e1bc0a55
-      config_sha256: 705661dd5e32d836ee58f64101bc887c7a85059bae3ca2b25505ad967bde9a7d
+      pre_authorization_config_sha256: 705661dd5e32d836ee58f64101bc887c7a85059bae3ca2b25505ad967bde9a7d
+      config_sha256: 08cbe81574b63aa3f488e7f17cc1f6f41b339e85c5d5814b7cbd6fbf76f27c41
+      authorization_record_sha256: 9b0e73ec4dcc85959adf9705bfe18ad9b483773c760f618152d6b8aebdb13c24
       wave_limit: 1
       slurm_job_count: 5
       retained_lane_count: 19
@@ -653,9 +658,7 @@ authorization:
       automatic_retry_authorized: false
 
 next_decision_required:
-  subject: exact_sha_bound_five_lane_retargeted_recovery_authorization
+  subject: none_until_authorized_five_lane_wave_terminal
   note: >-
-    The cancelled exclusive wave retained two valid OLMo lanes and exposed one PPL output-routing
-    defect. A fresh contract now binds 19 retained plus five target lanes and requires exact
-    authorization before publication, HU fast-forward, preflight or one five-job DAG. Normalization
-    and M1/M2 remain separate.
+    Exact authorization is recorded for publication, preservation-checked HU fast-forward, one
+    final preflight and one five-job DAG. No retry, normalization or M1/M2 work is authorized.

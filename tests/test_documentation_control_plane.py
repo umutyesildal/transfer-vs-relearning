@@ -120,6 +120,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["pipeline"]["m0_five_lane_retargeted_recovery"]["contract"],
         state["evaluation_target"]["pipeline"]["m0_five_lane_retargeted_recovery"]["config"],
         state["evaluation_target"]["pipeline"]["m0_five_lane_retargeted_recovery"]["operator"],
+        state["evaluation_target"]["pipeline"]["m0_five_lane_retargeted_recovery"]["authorization_record"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],
@@ -255,17 +256,17 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert isolated_authorization["slurm_job_count"] == 5
 
     retargeted = state["evaluation_target"]["pipeline"]["m0_five_lane_retargeted_recovery"]
-    assert retargeted["status"] == "frozen_unexecuted_exact_authorization_required"
+    assert retargeted["status"] == "authorized_single_wave_unsubmitted"
     assert retargeted["contract_sha256"] == (
         "1b030869455d68aa0ecf933f881c1661e1fbf504997376fdba08a626e1bc0a55"
     )
     assert retargeted["config_sha256"] == (
-        "705661dd5e32d836ee58f64101bc887c7a85059bae3ca2b25505ad967bde9a7d"
+        "08cbe81574b63aa3f488e7f17cc1f6f41b339e85c5d5814b7cbd6fbf76f27c41"
     )
     assert retargeted["retained_lane_count"] == 19
     assert retargeted["recovery_lane_count"] == 5
     assert retargeted["slurm_job_count"] == 5
-    assert retargeted["execution_authorized"] is False
+    assert retargeted["execution_authorized"] is True
     assert retargeted["normalization_authorized"] is False
     assert retargeted["m1_or_m2_authorized"] is False
     assert retargeted["automatic_retry_authorized"] is False
@@ -273,10 +274,8 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     retargeted_authorization = state["authorization"]["scoped"][
         "m0_five_lane_retargeted_recovery"
     ]
-    assert retargeted_authorization["status"] == (
-        "frozen_unexecuted_exact_authorization_required"
-    )
-    assert retargeted_authorization["execution_authorized"] is False
+    assert retargeted_authorization["status"] == "authorized_single_wave"
+    assert retargeted_authorization["execution_authorized"] is True
     assert retargeted_authorization["wave_limit"] == 1
     assert retargeted_authorization["retained_lane_count"] == 19
     assert retargeted_authorization["recovery_lane_count"] == 5

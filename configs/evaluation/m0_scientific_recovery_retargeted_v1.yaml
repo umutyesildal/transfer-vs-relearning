@@ -3,8 +3,20 @@ name: m0-scientific-three-model-five-lane-retargeted-recovery-v1
 status: frozen
 as_of: "2026-08-20"
 mode: retargeted_five_lane
-execution_authorized: false
-execution_authorization: null
+execution_authorized: true
+execution_authorization:
+  status: authorized_single_wave
+  execution_authorized: true
+  authorized_at: "2026-08-20"
+  authorized_contract_sha256: 1b030869455d68aa0ecf933f881c1661e1fbf504997376fdba08a626e1bc0a55
+  pre_authorization_config_sha256: 705661dd5e32d836ee58f64101bc887c7a85059bae3ca2b25505ad967bde9a7d
+  authorization_record: documentation/contracts/evaluation/m0-three-model-five-lane-retargeted-recovery-v1-authorization-2026-08-20.md
+  authorization_record_sha256: 9b0e73ec4dcc85959adf9705bfe18ad9b483773c760f618152d6b8aebdb13c24
+  wave_limit: 1
+  slurm_job_count: 5
+  automatic_retry_authorized: false
+  normalization_authorized: false
+  m1_or_m2_authorized: false
 contract: documentation/contracts/evaluation/m0-three-model-five-lane-retargeted-recovery-v1.md
 
 base_recovery_config: configs/evaluation/m0_scientific_recovery_v1.yaml
