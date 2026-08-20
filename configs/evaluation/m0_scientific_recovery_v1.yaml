@@ -1,0 +1,109 @@
+schema_version: 1
+name: m0-scientific-three-model-seven-lane-recovery-v1
+status: frozen
+as_of: "2026-08-20"
+execution_authorized: false
+execution_authorization: null
+contract: documentation/contracts/evaluation/m0-three-model-seven-lane-recovery-v1.md
+
+source_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1
+source_family_bundle_sha256: 75fcd7cf1e388eb5a4e883264c6aa14db83797b2e7832a4bbc8e40bb38865db1
+source_lane_count: 24
+recovery_lane_count: 7
+model_order: [olmo, qwen, smollm]
+
+recovery_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_v1
+
+hu_home_gate:
+  path: /vol/fob-vol6/mi25/yesildau
+  limit_bytes: 32212254720
+  writes_authorized: false
+  exact_measurement_required_before_submission: true
+
+implementation:
+  commit: 0000000000000000000000000000000000000000
+  files:
+    scripts/study/recover_three_model_m0.py: 0000000000000000000000000000000000000000000000000000000000000000
+    src/transfer_vs_relearning/study/m0_family_recovery.py: 0000000000000000000000000000000000000000000000000000000000000000
+    tests/study/test_m0_family_recovery.py: 0000000000000000000000000000000000000000000000000000000000000000
+
+models:
+  olmo:
+    config: configs/evaluation/m0_scientific/olmo_m0_eval_v1_scientific_v1.yaml
+    config_sha256: 6727b56ea1aa2784ad8fd3ce658289dd3d1ef136b83507b8390a20c1cc871187
+    source_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1/olmo
+    recovery_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_v1/olmo
+    source_parallel_plan_sha256: e6dd7f869d161b06cd8ef23d94040839aefbac23b54ce2bde6cc98c9a6b6946e
+    source_preflight_sha256: f2bd81630bb1acc0d89a8d3eb03c6e349026861204cbb21c0fd665da33b0d45c
+    source_bundle_status_sha256: 300f187a606222c0b5608c059ed5cec66e3ce9566671d04183c8b0c44a57d0f7
+    source_scientific_bundle_result_sha256: b56793569534d64fd1864f8714dfc365c0e8201d281d1b86b5b28905ea2a1e1b
+    source_final_inventory_sha256: b5f67f7d418b13652b2ef6451649808f8327b4c8972cffb538fc1e3e8b48fdd6
+    source_lanes:
+      english_retention_wikitext: {status: complete, lane_result_sha256: f1bdec898bd7a06b259fbd6f778b7b601d4f22cdac92bbc09629f460379533a4}
+      english_retention_pile_10k: {status: complete, lane_result_sha256: 7c3c6d8f6d3e077213db063dd7cd53fa8856ed8bbbc9e373002d24859da75f55}
+      english_grammar_blimp: {status: complete, lane_result_sha256: 86df97c78e3c1a8d94785392676b7e1e79c2cacef35744f4a2c07dbc1f9a9a7d}
+      english_capability: {status: failed_pre_scoring, lane_result_sha256: a480cce3893396fa4108be021d774985b7946bd3785e4dcf5cc75f29eed714e1}
+      turkish_capability: {status: failed_pre_scoring, lane_result_sha256: e43666af28e186d9255437109e842a11042c83727785a25a180cdf31d2f3e43a}
+      turkish_perplexity: {status: failed_pre_scoring, lane_result_sha256: 2292a078eabbbac2bee76282e1ea830f17cab1bcac139aa2b4721949ca3f6e64}
+      factual_access: {status: complete, lane_result_sha256: a8a1154d02460c15a022c2a4dffa9801abe39463af161f3b20c57a58a5e7020a}
+      generation_integrity: {status: complete, lane_result_sha256: 2f3b4b025f8b24c39426ae874de7c7e6d813330ea81b64a6db1ff94ebe5784c4}
+    targets:
+      english_capability: {route_id: v10032gb, min_free_gpu_bytes: 30064771072}
+      turkish_capability: {route_id: v10032gb, min_free_gpu_bytes: 30064771072}
+      turkish_perplexity: {route_id: v10032gb, min_free_gpu_bytes: 30064771072}
+
+  qwen:
+    config: configs/evaluation/m0_scientific/qwen_m0_eval_v1_scientific_v1.yaml
+    config_sha256: c797cfba1046b482b6b8e2df0987a4c371782ab4989d90e202fcacab3fef67fc
+    source_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1/qwen
+    recovery_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_v1/qwen
+    source_parallel_plan_sha256: 9958b560714c1066fd87fc21c817cd5a3a5ad65e053a74cc7edcfa056740176b
+    source_preflight_sha256: c7376f99ab08c61707f595e761ebc078b29e456a3fdc9b6d017d1b87877ee8e7
+    source_bundle_status_sha256: 3d3f920cf91c415303af79eefe7a598aa823c5b4aeae26ad057d4cce594f2109
+    source_scientific_bundle_result_sha256: 776b16d5c560c0b280f34ad8416f55e648de5750dc99a3034cfd045554d97c71
+    source_final_inventory_sha256: 0cabf380c8c4b790a4cc6c81ae348f535a44853ba218b5fb5b5b0cb13e3a17f3
+    source_lanes:
+      english_retention_wikitext: {status: complete, lane_result_sha256: 05d4d113553047bbd43846b3b00aa4cb146c96a5c8df3c7ac1fb587542d881a0}
+      english_retention_pile_10k: {status: failed_pre_scoring, lane_result_sha256: d17bff419e6224cf06c97747092e54322c32300baa15f7d6f036cc31cc925ba0}
+      english_grammar_blimp: {status: complete, lane_result_sha256: 644785cd842b620ef638effb3e155e62856702f99f85b1c5041edc5eccdf8f4f}
+      english_capability: {status: complete, lane_result_sha256: 86fd696f12c476fe87d80bb8988c222087427458b8bef073bde56e468b85130f}
+      turkish_capability: {status: failed_pre_scoring, lane_result_sha256: e8ae3a6019965797fbc435a63a4e8c701c85974c1bdaacecf1baf639c4c0e404}
+      turkish_perplexity: {status: failed_pre_scoring, lane_result_sha256: 6bcfdfaa589d09284e94d2d3e4ecc985acabfeaa904c4322311dd7fd5499dcad}
+      factual_access: {status: complete, lane_result_sha256: 63b89002054c22f7b1ef74a182eb14bfc6524c7e2a3e0d64dde49a667d98cbb9}
+      generation_integrity: {status: complete, lane_result_sha256: 0a2bdf5efbec40f3d8cdcfe06ca512bfc603e20011df6fd2cd59a7c774a7300d}
+    targets:
+      english_retention_pile_10k: {route_id: a10080gb, min_free_gpu_bytes: 68719476736}
+      turkish_capability: {route_id: v10032gb, min_free_gpu_bytes: 30064771072}
+      turkish_perplexity: {route_id: v10032gb, min_free_gpu_bytes: 30064771072}
+
+  smollm:
+    config: configs/evaluation/m0_scientific/smollm_m0_eval_v1_scientific_v1.yaml
+    config_sha256: 2cde6f871f97f82d4fef94d56fa688126e923d952e47cbac056971a3b95858c4
+    source_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1/smollm
+    recovery_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_v1/smollm
+    source_parallel_plan_sha256: 537a4d8dde81213eeaf8c129242ff7f17797308adb7e15f886f5b4dede0294e4
+    source_preflight_sha256: 73ee442084a61a5437417b44116f335068ae57dcbbb28ff3a99a53e6c1671f98
+    source_bundle_status_sha256: 5df613b6da8baa5628a05ee11b30835c3c550a6040812c6a26ecea766aeaf64a
+    source_scientific_bundle_result_sha256: 98cb16739d21f9a09110614e22bebf621fa119a64e737bfab7171ad7925021d5
+    source_final_inventory_sha256: 58a35f7d4e6910f4b0ac4cab350aa97a3251c1c7092ab7e68eb6e944f90c75bd
+    source_lanes:
+      english_retention_wikitext: {status: complete, lane_result_sha256: 94ec5cdd1a89fbfe626f93cb80cbd16555b29be0fd3ae07635c33010083cb811}
+      english_retention_pile_10k: {status: complete, lane_result_sha256: 5b660081b3da1a22802e6d9f09ccb8824ec84c36d222bc6a1c3801182b6593e4}
+      english_grammar_blimp: {status: complete, lane_result_sha256: 6d167633362465727a3f9dde10f94f8e34157e81f5485ba2f640ab65174333e2}
+      english_capability: {status: failed_pre_scoring, lane_result_sha256: 1122cf81114a3e3c226e5284da97c9f7bdd7a611be588da78f279d9b23812695}
+      turkish_capability: {status: complete, lane_result_sha256: a29cf167407d632653ec7fe0f20328121c6941e42238fdb05db61fbd5debac9b}
+      turkish_perplexity: {status: complete, lane_result_sha256: 3fd100aa59e473b2af0021f8fa7cedb368929ae54b6f3b539f43c4593fea4647}
+      factual_access: {status: complete, lane_result_sha256: ad42c27c4e3502d6faa28ba58318de235e2af1743324eb49b5f7d16188997fb2}
+      generation_integrity: {status: complete, lane_result_sha256: 277389fe36db71abe55d4f523c718322836476a0d4e5ee7db86416025751bf70}
+    targets:
+      english_capability: {route_id: v10032gb, min_free_gpu_bytes: 30064771072}
+
+prohibitions:
+  - rescore_seventeen_complete_source_lanes
+  - mutate_source_family_root
+  - change_eval_v1_semantics
+  - automatic_retry
+  - second_recovery_wave
+  - m1_or_m2_training
+  - cleanup_or_deletion
+  - hu_home_writes
