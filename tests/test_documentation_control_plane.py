@@ -74,6 +74,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["repository"]["hu_checkouts"]["legacy_retention"]["current_status"],
         state["repository"]["hu_checkouts"]["legacy_retention"]["cleanup_proposal"],
         state["scientific_design"]["current_design_plan"],
+        state["scientific_design"]["current_timeline"],
         *state["scientific_design"]["supervisor_realignments"],
         state["evaluation_target"]["contract"],
         state["evaluation_target"]["freeze_record"],
@@ -134,7 +135,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert matrix["execution_authorized"] is False
 
     scientific_m0 = state["evaluation_target"]["pipeline"]["scientific_m0_family"]
-    assert scientific_m0["status"] == "submitted_results_pending"
+    assert scientific_m0["status"] == "terminal_partial_invalid_17_of_24"
     assert scientific_m0["models"] == ["olmo", "qwen", "smollm"]
     assert scientific_m0["model_count"] == 3
     assert scientific_m0["lanes_per_model"] == 8
@@ -155,12 +156,20 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert scientific_m0["hu_focused_tests"] == 39
     assert scientific_m0["scientific_work_started"] is True
     assert scientific_m0["scientific_metrics_available"] is False
-    assert scientific_m0["latest_read_only_snapshot_utc"] == "2026-08-16T15:51:59Z"
+    assert scientific_m0["latest_read_only_snapshot_utc"] == "2026-08-20T07:59:47Z"
     assert scientific_m0["lane_snapshot"] == {
-        "complete": 13,
+        "complete": 17,
         "failed_pre_scoring": 7,
-        "running": 3,
-        "pending": 1,
+        "running": 0,
+        "pending": 0,
+    }
+    assert scientific_m0["terminal_raw_bundle"] == {
+        "path": "/vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1/three_model_m0_raw_bundle.json",
+        "sha256": "75fcd7cf1e388eb5a4e883264c6aa14db83797b2e7832a4bbc8e40bb38865db1",
+        "written_at_local": "2026-08-16T22:23:14+02:00",
+        "status": "partial_invalid_no_cross_model_summary",
+        "normalization_allowed": False,
+        "cross_model_pass_fail": "not_computed_by_raw_family_finalizer",
     }
     assert len(scientific_m0["known_operational_failures"]) == 7
 

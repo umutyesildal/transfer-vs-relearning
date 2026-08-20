@@ -85,6 +85,7 @@ scientific_design:
       - M2-B
     matched_budget_required: true
   current_design_plan: documentation/178_END_TO_END_EXPERIMENTAL_PLAN_AND_EVALUATION_PROTOCOL_EN.md
+  current_timeline: documentation/current/PROJECT_TIMELINE_AND_CURRENT_POSITION_TR.md
   supervisor_realignments:
     - documentation/144_SUPERVISOR_FEEDBACK_AND_SCIENTIFIC_REALIGNMENT_TR.md
     - documentation/177_SUPERVISOR_FEEDBACK_EVALUATION_FIRST_OLMO_AND_M2_PRIORITY_REALIGNMENT_TR.md
@@ -246,7 +247,7 @@ evaluation_target:
       hu_test_count: 29
       execution_authorized: false
     scientific_m0_family:
-      status: submitted_results_pending
+      status: terminal_partial_invalid_17_of_24
       contract: documentation/contracts/evaluation/m0-three-model-scientific-v1.md
       contract_sha256: 013f6f638176cbfd15fbe65c7d07a9dbb8d0029879e217f65e4e69bbeef765d9
       manifest: configs/evaluation/m0_scientific_three_model_v1.yaml
@@ -285,13 +286,33 @@ evaluation_target:
       preflight_command: >-
         /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
         scripts/study/run_three_model_m0_evaluation.py preflight
-      latest_status: thirteen_complete_seven_failed_pre_scoring_three_running_one_pending
-      latest_read_only_snapshot_utc: "2026-08-16T15:51:59Z"
+      latest_status: terminal_seventeen_complete_seven_partial_invalid_normalization_blocked
+      latest_read_only_snapshot_utc: "2026-08-20T07:59:47Z"
       lane_snapshot:
-        complete: 13
+        complete: 17
         failed_pre_scoring: 7
-        running: 3
-        pending: 1
+        running: 0
+        pending: 0
+      model_bundle_snapshot:
+        olmo:
+          complete: 5
+          partial_invalid: 3
+          normalization_allowed: false
+        qwen:
+          complete: 5
+          partial_invalid: 3
+          normalization_allowed: false
+        smollm:
+          complete: 7
+          partial_invalid: 1
+          normalization_allowed: false
+      terminal_raw_bundle:
+        path: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1/three_model_m0_raw_bundle.json
+        sha256: 75fcd7cf1e388eb5a4e883264c6aa14db83797b2e7832a4bbc8e40bb38865db1
+        written_at_local: "2026-08-16T22:23:14+02:00"
+        status: partial_invalid_no_cross_model_summary
+        normalization_allowed: false
+        cross_model_pass_fail: not_computed_by_raw_family_finalizer
       preflight_record: >-
         documentation/records/evaluation/M0_THREE_MODEL_READ_ONLY_PREFLIGHT_2026-08-16.md
       preflight_record_sha256: e42052dad0a99db6306cb8a0b1c29a91ec146ce94e163fc18a21fe4d228afab8
@@ -318,6 +339,7 @@ evaluation_target:
         family_finalizer: "461898"
       scientific_work_started: true
       scientific_metrics_available: false
+      scientific_metric_state: immutable_raw_metrics_present_canonical_summary_unavailable
       known_operational_failures:
         - job_id: "461864"
           model: olmo
@@ -354,7 +376,11 @@ evaluation_target:
           lane: turkish_perplexity
           status: failed_pre_scoring
           cause: foreign_process_rtx6000_oom_during_model_transfer
-      blockers: []
+      blockers:
+        - seven_required_lanes_failed_pre_scoring
+        - complete_raw_bundle_required_before_normalization
+        - separately_frozen_recovery_contract_not_prepared
+        - recovery_execution_not_authorized
     m0_preflight:
       command: >-
         .venv/bin/python scripts/study/run_study.py preflight-m0
@@ -422,8 +448,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: monitor_submitted_three_model_scientific_m0
-  first_boundary: preserve_status_then_raw_completion_without_rerun
+  name: decide_bounded_recovery_for_seven_missing_m0_lanes
+  first_boundary: freeze_runtime_only_recovery_without_rescoring_seventeen_complete_lanes
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -454,8 +480,11 @@ active_priority:
     - separately_authorized_parallel_submission
     - three_model_27_node_matrix_planner
     - three_model_luna_micro_packet_renderer
+    - three_model_terminal_raw_bundle_17_of_24
+    - terminal_read_only_lane_and_finalizer_audit
   required_outputs:
-    - three_model_raw_bundle
+    - seven_lane_recovery_contract_or_explicit_no_recovery_decision
+    - complete_composite_three_model_raw_bundle
     - frozen_normalization_and_gate_result
 
 authorization:
@@ -480,8 +509,10 @@ authorization:
       resubmission_authorized: false
 
 next_decision_required:
-  subject: none_submitted_wave_in_progress
+  subject: bounded_recovery_contract_for_seven_missing_m0_lanes
   note: >-
-    The exact single three-model M0 wave has been submitted and its authorization is consumed.
-    Monitor read-only and preserve every outcome. Do not resubmit, reroute, retry or extend this
-    scope to M1/M2, corpus, cleanup or deletion.
+    The exact single three-model M0 wave is terminal with 17 complete and seven failed-pre-scoring
+    lanes. Preserve all source artifacts. Do not resubmit all 24 lanes, normalize an incomplete
+    bundle, or start M1/M2. The next eligible design action is a separately frozen recovery
+    contract targeting only the seven missing lanes; its execution would require new exact user
+    authorization.
