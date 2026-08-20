@@ -336,7 +336,11 @@ Bu adım 20 Ağustos'ta yerel olarak hazırlandı ve donduruldu; henüz çalış
 - config SHA-256:
   `4a603719dd43a65dd9b36a36786407993afe84cf8d1d48f6245656d235c6bfeb`;
 - exact DAG: yedi GPU lane + üç model finalizer + bir family finalizer;
-- execution durumu: exact SHA-bound kullanıcı yetkisi bekliyor.
+- exact SHA-bound kullanıcı yetkisi 20 Ağustos'ta verildi;
+- authorization record:
+  [`m0-three-model-seven-lane-recovery-v1-authorization-2026-08-20.md`](../contracts/evaluation/m0-three-model-seven-lane-recovery-v1-authorization-2026-08-20.md);
+- pre-authorization config SHA-256 `4a603719...` korunarak execution overlay açıldı;
+- execution durumu: HU fast-forward ve fail-closed preflight sonrası tek submission bekliyor.
 
 ### Adım 2 — Complete raw bundle ve canonical normalization
 
@@ -373,15 +377,15 @@ relearning = M2-B − M2-A
 retention  = child − exact parent
 ```
 
-## 6. Bugün verilmesi gereken karar
+## 6. Bugünkü execution sınırı
 
-Şu anda yeni training başlatmak doğru adım değildir. Doğru tek sonraki execution yolu hazırdır:
+Şu anda yeni training başlatmak doğru adım değildir. Doğru tek execution yolu authorize edilmiştir:
 
 > Mevcut 17 geçerli M0 lane'i immutable biçimde koruyan ve yalnızca eksik yedi lane'i tamamlayan
-> frozen recovery contract'ın exact SHA-256 değerine bağlı tek recovery wave için kullanıcı yetkisi
-> almak ve yalnız bu DAG'ı çalıştırmak.
+> frozen recovery contract'ın exact SHA-256 değerine bağlı yalnızca tek recovery DAG'ını
+> çalıştırmak ve terminal durumunu beklemek.
 
-Bu karar verilmeden:
+Bu wave dışında:
 
 - mevcut 24 lane yeniden submit edilmez;
 - başarılı 17 lane tekrar skorlanmaz;
@@ -407,5 +411,5 @@ Bu karar verilmeden:
 ## 8. Tek satırlık güncel hüküm
 
 **Pipeline başlatıldı; M0 execution terminalde 17/24 geçerli ham lane ile fail-closed duruyor;
-eksik yedi lane için recovery contract donduruldu; sıradaki adım duplicate submit veya M1 değil,
-exact SHA-bound tek recovery authorization ve yalnız bu DAG'ın execution'ıdır.**
+eksik yedi lane için recovery contract donduruldu ve exact SHA-bound tek wave authorize edildi;
+sıradaki adım yalnız bu DAG'ın execution ve terminal doğrulamasıdır.**

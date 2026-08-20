@@ -2,8 +2,21 @@ schema_version: 1
 name: m0-scientific-three-model-seven-lane-recovery-v1
 status: frozen
 as_of: "2026-08-20"
-execution_authorized: false
-execution_authorization: null
+execution_authorized: true
+execution_authorization:
+  status: authorized_single_wave
+  execution_authorized: true
+  authorized_at: "2026-08-20"
+  authorized_contract_sha256: 1ee7c8d9d1da092cd1e4a64dbffa4594e041ebf2b4d56eb62f345a6aaa8c25c4
+  pre_authorization_config_sha256: 4a603719dd43a65dd9b36a36786407993afe84cf8d1d48f6245656d235c6bfeb
+  authorization_record: documentation/contracts/evaluation/m0-three-model-seven-lane-recovery-v1-authorization-2026-08-20.md
+  authorization_record_sha256: 053f6c4900aea9ca1dd375a7cbe7a2afd38362daedaed2324f529ddae264e479
+  wave_limit: 1
+  automatic_retry_authorized: false
+  rescore_complete_lanes_authorized: false
+  normalization_authorized: false
+  m1_or_m2_authorized: false
+  cleanup_or_deletion_authorized: false
 contract: documentation/contracts/evaluation/m0-three-model-seven-lane-recovery-v1.md
 
 source_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1

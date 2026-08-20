@@ -379,13 +379,16 @@ evaluation_target:
       blockers:
         - seven_required_lanes_failed_pre_scoring
         - complete_raw_bundle_required_before_normalization
-        - recovery_execution_not_authorized
+        - recovery_execution_not_yet_submitted
     m0_seven_lane_recovery:
-      status: frozen_unexecuted_exact_authorization_required
+      status: authorized_single_wave_not_yet_submitted
       contract: documentation/contracts/evaluation/m0-three-model-seven-lane-recovery-v1.md
       contract_sha256: 1ee7c8d9d1da092cd1e4a64dbffa4594e041ebf2b4d56eb62f345a6aaa8c25c4
       config: configs/evaluation/m0_scientific_recovery_v1.yaml
-      config_sha256: 4a603719dd43a65dd9b36a36786407993afe84cf8d1d48f6245656d235c6bfeb
+      pre_authorization_config_sha256: 4a603719dd43a65dd9b36a36786407993afe84cf8d1d48f6245656d235c6bfeb
+      config_sha256: d934b782fe307d1d54b7fdce47be8ebc2409a6b6c2acf3f2aa435aa4577ac6d7
+      authorization_record: documentation/contracts/evaluation/m0-three-model-seven-lane-recovery-v1-authorization-2026-08-20.md
+      authorization_record_sha256: 053f6c4900aea9ca1dd375a7cbe7a2afd38362daedaed2324f529ddae264e479
       operator: scripts/study/recover_three_model_m0.py
       implementation_commit: 07cbaa6d55f0713a08bae8a1c3c9cbe2df5e8942
       source_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1
@@ -396,7 +399,7 @@ evaluation_target:
       gpu_lane_count: 7
       model_finalizer_count: 3
       family_finalizer_count: 1
-      execution_authorized: false
+      execution_authorized: true
       automatic_retry_authorized: false
       normalization_authorized: false
       m1_or_m2_authorized: false
@@ -467,8 +470,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: obtain_exact_authorization_for_frozen_seven_lane_m0_recovery
-  first_boundary: execute_only_config_4a6037_after_exact_authorization
+  name: execute_authorized_single_wave_seven_lane_m0_recovery
+  first_boundary: hu_fast_forward_preflight_then_single_dag
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -501,8 +504,8 @@ active_priority:
     - three_model_luna_micro_packet_renderer
     - three_model_terminal_raw_bundle_17_of_24
     - terminal_read_only_lane_and_finalizer_audit
-  required_outputs:
     - exact_sha_bound_recovery_authorization
+  required_outputs:
     - seven_lane_recovery_execution_result
     - complete_composite_three_model_raw_bundle
     - frozen_normalization_and_gate_result
@@ -528,10 +531,12 @@ authorization:
       cleanup_or_deletion_authorized: false
       resubmission_authorized: false
     m0_seven_lane_recovery:
-      status: exact_authorization_required
-      execution_authorized: false
+      status: authorized_single_wave
+      execution_authorized: true
       contract_sha256: 1ee7c8d9d1da092cd1e4a64dbffa4594e041ebf2b4d56eb62f345a6aaa8c25c4
-      config_sha256: 4a603719dd43a65dd9b36a36786407993afe84cf8d1d48f6245656d235c6bfeb
+      pre_authorization_config_sha256: 4a603719dd43a65dd9b36a36786407993afe84cf8d1d48f6245656d235c6bfeb
+      config_sha256: d934b782fe307d1d54b7fdce47be8ebc2409a6b6c2acf3f2aa435aa4577ac6d7
+      authorization_record_sha256: 053f6c4900aea9ca1dd375a7cbe7a2afd38362daedaed2324f529ddae264e479
       wave_limit: 1
       recovery_lane_count: 7
       rescore_complete_lanes_authorized: false
@@ -539,9 +544,8 @@ authorization:
       m1_or_m2_authorized: false
 
 next_decision_required:
-  subject: exact_authorization_for_frozen_seven_lane_m0_recovery
+  subject: none_until_authorized_recovery_wave_reaches_terminal_state
   note: >-
-    The exact seven-lane recovery contract and config are frozen and unexecuted. Preserve all 17
-    complete source lanes. Do not submit until the user explicitly binds authorization to contract
-    SHA-256 1ee7c8d9... or config SHA-256 4a603719.... That future authorization may open one
-    seven-GPU-lane plus four-finalizer DAG only; normalization and M1/M2 remain separate.
+    The user bound one recovery wave to contract SHA-256 1ee7c8d9... and pre-authorization config
+    SHA-256 4a603719.... Execute one fail-closed seven-GPU-lane plus four-finalizer DAG. Preserve
+    the 17 complete source lanes. Normalization and M1/M2 remain separate and unauthorized.
