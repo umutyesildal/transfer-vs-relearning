@@ -1,0 +1,54 @@
+schema_version: 1
+name: m0-scientific-three-model-seven-lane-exclusive-a100-recovery-v1
+status: frozen
+as_of: "2026-08-20"
+mode: exclusive_a100_sequential
+execution_authorized: false
+execution_authorization: null
+contract: documentation/contracts/evaluation/m0-three-model-seven-lane-exclusive-a100-recovery-v1.md
+
+base_recovery_config: configs/evaluation/m0_scientific_recovery_v1.yaml
+base_recovery_config_sha256: d934b782fe307d1d54b7fdce47be8ebc2409a6b6c2acf3f2aa435aa4577ac6d7
+model_order: [olmo, qwen, smollm]
+recovery_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_isolation_v1
+
+isolation:
+  node: gruenau10
+  partition: gpu
+  gres: gpu:a10080gb:3
+  requested_gpu_count: 3
+  exclusive_node_allocation: true
+  expected_gpu_name: NVIDIA A100 80GB PCIe
+  min_total_gpu_bytes: 85899345920
+  selection_rule: maximum_free_bytes_then_uuid
+  max_wait_seconds: 7200
+  poll_interval_seconds: 60
+  cpus_per_task: 8
+  memory: 96G
+  time_limit: 1-00:00:00
+  target_order:
+    - olmo:english_capability
+    - olmo:turkish_capability
+    - olmo:turkish_perplexity
+    - qwen:english_retention_pile_10k
+    - qwen:turkish_capability
+    - qwen:turkish_perplexity
+    - smollm:english_capability
+
+implementation:
+  commit: IMPLEMENTATION_COMMIT_PLACEHOLDER
+  files:
+    scripts/study/recover_three_model_m0.py: OPERATOR_SHA256_PLACEHOLDER
+    src/transfer_vs_relearning/study/m0_family_recovery.py: MODULE_SHA256_PLACEHOLDER
+    tests/study/test_m0_family_recovery.py: TEST_SHA256_PLACEHOLDER
+
+prohibitions:
+  - mutate_first_recovery_root
+  - rescore_seventeen_complete_source_lanes
+  - change_eval_v1_semantics
+  - lower_existing_lane_memory_thresholds
+  - automatic_resubmission
+  - second_isolation_wave
+  - m1_or_m2_training
+  - cleanup_or_deletion
+  - hu_home_writes

@@ -72,8 +72,55 @@ def load_family_recovery_plan(config_path: Path, *, repo_root: Path) -> dict[str
     payload = yaml.safe_load(config_path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict) or payload.get("schema_version") != 1:
         raise ValueError("M0 family recovery config must be a schema-v1 mapping")
+    if payload.get("mode") == "exclusive_a100_sequential":
+        overlay = payload
+        base_path = _resolve(overlay["base_recovery_config"], repo_root)
+        expected_base = _sha256(
+            overlay.get("base_recovery_config_sha256"), "base_recovery_config_sha256"
+        )
+        if not base_path.is_file() or sha256_file(base_path) != expected_base:
+            raise ValueError("Frozen base recovery config changed")
+        base = yaml.safe_load(base_path.read_text(encoding="utf-8"))
+        if not isinstance(base, dict) or base.get("schema_version") != 1:
+            raise ValueError("Base recovery config must be a schema-v1 mapping")
+        family_root = Path(str(overlay["recovery_family_root"]))
+        models = {model_id: dict(value) for model_id, value in base["models"].items()}
+        for model_id in overlay.get("model_order", base["model_order"]):
+            models[model_id]["recovery_root"] = str(family_root / model_id)
+        payload = {
+            **base,
+            **overlay,
+            "models": models,
+            "base_recovery_config_path": str(base_path),
+        }
     if payload.get("status") != "frozen":
         raise ValueError("M0 family recovery config must be frozen")
+    if payload.get("mode") == "exclusive_a100_sequential":
+        isolation = payload.get("isolation")
+        expected_order = [
+            "olmo:english_capability",
+            "olmo:turkish_capability",
+            "olmo:turkish_perplexity",
+            "qwen:english_retention_pile_10k",
+            "qwen:turkish_capability",
+            "qwen:turkish_perplexity",
+            "smollm:english_capability",
+        ]
+        valid_isolation = isinstance(isolation, dict) and (
+            isolation.get("node") == "gruenau10"
+            and isolation.get("partition") == "gpu"
+            and isolation.get("gres") == "gpu:a10080gb:3"
+            and isolation.get("requested_gpu_count") == 3
+            and isolation.get("exclusive_node_allocation") is True
+            and isolation.get("expected_gpu_name") == "NVIDIA A100 80GB PCIe"
+            and isolation.get("min_total_gpu_bytes") == 80 * 1024**3
+            and isolation.get("selection_rule") == "maximum_free_bytes_then_uuid"
+            and isolation.get("max_wait_seconds") == 7200
+            and isolation.get("poll_interval_seconds") == 60
+            and isolation.get("target_order") == expected_order
+        )
+        if not valid_isolation:
+            raise ValueError("Exclusive A100 isolation policy changed or broadened")
     if payload.get("source_lane_count") != 24 or payload.get("recovery_lane_count") != 7:
         raise ValueError("Recovery contract must bind exactly 24 source lanes and seven targets")
     model_order = payload.get("model_order")

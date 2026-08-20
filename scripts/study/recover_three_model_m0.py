@@ -7,6 +7,8 @@ import os
 import re
 import shlex
 import subprocess
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -87,6 +89,185 @@ def _probe_route(model: dict[str, Any], route: dict[str, Any]) -> dict[str, Any]
         "estimated_start": match.group(1) if match else None,
         "probe_output": output,
     }
+
+
+def _gpu_inventory() -> list[dict[str, Any]]:
+    result = _run(
+        [
+            "nvidia-smi",
+            "--query-gpu=uuid,name,memory.total,memory.free",
+            "--format=csv,noheader,nounits",
+        ]
+    )
+    if result.returncode != 0:
+        raise RuntimeError(f"nvidia-smi inventory failed: {result.stderr.strip()}")
+    rows: list[dict[str, Any]] = []
+    for line in result.stdout.splitlines():
+        fields = [value.strip() for value in line.split(",")]
+        if len(fields) != 4:
+            raise ValueError(f"Malformed nvidia-smi row: {line!r}")
+        rows.append(
+            {
+                "uuid": fields[0],
+                "name": fields[1],
+                "total_bytes": int(fields[2]) * 1024**2,
+                "free_bytes": int(fields[3]) * 1024**2,
+            }
+        )
+    return rows
+
+
+def _select_isolated_gpu(
+    recovery: dict[str, Any],
+    *,
+    lane_label: str,
+    min_free_bytes: int,
+    attempts: list[dict[str, Any]],
+) -> str:
+    policy = recovery["isolation"]
+    deadline = time.monotonic() + int(policy["max_wait_seconds"])
+    expected_count = int(policy["requested_gpu_count"])
+    while True:
+        rows = _gpu_inventory()
+        eligible = [
+            row
+            for row in rows
+            if row["name"] == policy["expected_gpu_name"]
+            and row["total_bytes"] >= int(policy["min_total_gpu_bytes"])
+            and row["free_bytes"] >= min_free_bytes
+        ]
+        selected = max(eligible, key=lambda row: (row["free_bytes"], row["uuid"])) if eligible else None
+        attempt = {
+            "observed_at": datetime.now(timezone.utc).isoformat(),
+            "lane": lane_label,
+            "slurm_job_id": os.environ.get("SLURM_JOB_ID"),
+            "slurm_node": os.environ.get("SLURMD_NODENAME"),
+            "cuda_visible_devices_before_selection": os.environ.get("CUDA_VISIBLE_DEVICES"),
+            "minimum_free_bytes": min_free_bytes,
+            "expected_gpu_count": expected_count,
+            "gpus": rows,
+            "selected_uuid": selected["uuid"] if selected else None,
+            "status": "pass" if selected and len(rows) == expected_count else "waiting",
+        }
+        attempts.append(attempt)
+        write_json(
+            Path(recovery["recovery_family_root"]) / "gpu_isolation_audit.json",
+            {"schema_version": 1, "attempts": attempts},
+        )
+        if selected and len(rows) == expected_count:
+            return str(selected["uuid"])
+        if time.monotonic() >= deadline:
+            raise RuntimeError(f"No eligible isolated A100 remained available for {lane_label}")
+        time.sleep(int(policy["poll_interval_seconds"]))
+
+
+def run_isolated_wave(
+    recovery: dict[str, Any],
+    *,
+    config_path: Path,
+    repo_root: Path,
+) -> dict[str, Any]:
+    attempts: list[dict[str, Any]] = []
+    ledger: list[dict[str, Any]] = []
+    script = Path(__file__).resolve()
+    model_map = {model["model_id"]: model for model in recovery["models"]}
+    for target in recovery["isolation"]["target_order"]:
+        model_id, lane_id = target.split(":", 1)
+        model = model_map[model_id]
+        frozen_target = model["targets"][lane_id]
+        lane_index = next(
+            index for index, lane in enumerate(model["plan"]["lanes"]) if lane["id"] == lane_id
+        )
+        minimum = int(frozen_target["min_free_gpu_bytes"])
+        row: dict[str, Any] = {
+            "model_id": model_id,
+            "lane_id": lane_id,
+            "lane_index": lane_index,
+            "minimum_free_bytes": minimum,
+            "started_at": datetime.now(timezone.utc).isoformat(),
+        }
+        try:
+            selected_uuid = _select_isolated_gpu(
+                recovery,
+                lane_label=target,
+                min_free_bytes=minimum,
+                attempts=attempts,
+            )
+            row["selected_uuid"] = selected_uuid
+            command = [
+                model["plan"]["runtime"]["python"],
+                str(script),
+                "run-lane",
+                "--config",
+                str(config_path),
+                "--repo-root",
+                str(repo_root),
+                "--model-id",
+                model_id,
+                "--lane-id",
+                lane_id,
+                "--lane-index",
+                str(lane_index),
+                "--min-free-gpu-bytes",
+                str(minimum),
+            ]
+            environment = dict(os.environ)
+            environment.update(
+                {
+                    "CUDA_VISIBLE_DEVICES": selected_uuid,
+                    "M0_GPU_ROUTE_ID": "a10080gb_exclusive_uuid",
+                    "M0_GPU_GRES": "gpu:a10080gb:3",
+                    "M0_GPU_PARTITION": "gpu",
+                    "HF_HUB_OFFLINE": "1",
+                    "HF_DATASETS_OFFLINE": "1",
+                    "TRANSFORMERS_OFFLINE": "1",
+                    "WANDB_MODE": "disabled",
+                    "PYTHONDONTWRITEBYTECODE": "1",
+                    "PYTHONPATH": str(repo_root / "src"),
+                }
+            )
+            log_root = Path(recovery["recovery_family_root"]) / "logs" / "isolated_children"
+            log_root.mkdir(parents=True, exist_ok=True)
+            stdout_path = log_root / f"{model_id}-{lane_id}.out"
+            stderr_path = log_root / f"{model_id}-{lane_id}.err"
+            with stdout_path.open("w", encoding="utf-8") as stdout, stderr_path.open(
+                "w", encoding="utf-8"
+            ) as stderr:
+                child = subprocess.run(
+                    command,
+                    check=False,
+                    cwd=repo_root,
+                    env=environment,
+                    stdout=stdout,
+                    stderr=stderr,
+                    text=True,
+                )
+            row.update(
+                {
+                    "returncode": child.returncode,
+                    "status": "complete" if child.returncode == 0 else "failed",
+                    "stdout": str(stdout_path),
+                    "stderr": str(stderr_path),
+                }
+            )
+        except (OSError, ValueError, RuntimeError) as exc:
+            row.update({"returncode": None, "status": "blocked", "error": str(exc)})
+        row["finished_at"] = datetime.now(timezone.utc).isoformat()
+        ledger.append(row)
+        write_json(
+            Path(recovery["recovery_family_root"]) / "isolated_wave_ledger.json",
+            {"schema_version": 1, "status": "running", "lanes": ledger},
+        )
+    complete = sum(row["status"] == "complete" for row in ledger)
+    payload = {
+        "schema_version": 1,
+        "status": "complete" if complete == 7 else "partial_invalid",
+        "complete_lane_count": complete,
+        "lane_count": 7,
+        "lanes": ledger,
+    }
+    write_json(Path(recovery["recovery_family_root"]) / "isolated_wave_ledger.json", payload)
+    return payload
 
 
 def _measure_home(path: str, limit_bytes: int) -> dict[str, Any]:
@@ -217,12 +398,175 @@ def _initialized_model(recovery: dict[str, Any], model_id: str) -> dict[str, Any
     return model
 
 
+def submit_isolated_family_recovery(
+    recovery: dict[str, Any],
+    *,
+    config_path: Path,
+    repo_root: Path,
+) -> dict[str, Any]:
+    initialize_family_recovery_namespace(recovery)
+    family_root = Path(recovery["recovery_family_root"])
+    policy = recovery["isolation"]
+    script = Path(__file__).resolve()
+    first = recovery["models"][0]["plan"]
+    slurm = first["slurm"]
+    probe = _run(
+        [
+            "sbatch",
+            "--test-only",
+            f"--account={slurm['account']}",
+            f"--partition={policy['partition']}",
+            f"--nodelist={policy['node']}",
+            f"--gres={policy['gres']}",
+            "--exclusive",
+            f"--cpus-per-task={policy['cpus_per_task']}",
+            f"--mem={policy['memory']}",
+            f"--time={policy['time_limit']}",
+            "--wrap=true",
+        ]
+    )
+    probe_output = "\n".join(value.strip() for value in (probe.stdout, probe.stderr) if value.strip())
+    probe_payload = {
+        "schema_version": 1,
+        "returncode": probe.returncode,
+        "output": probe_output,
+        "eligible": probe.returncode == 0 and TEST_ONLY_START_RE.search(probe_output) is not None,
+        "policy": policy,
+    }
+    write_json(family_root / "exclusive_route_probe.json", probe_payload)
+    if not probe_payload["eligible"]:
+        write_json(
+            family_root / "submission_manifest.json",
+            {"schema_version": 1, "status": "no_jobs_submitted_route_gate_failed"},
+        )
+        raise RuntimeError("Exclusive three-A100 route failed its Slurm test-only gate")
+
+    exports = ",".join(
+        [
+            "ALL",
+            f"PYTHONPATH={repo_root / 'src'}",
+            "PYTHONDONTWRITEBYTECODE=1",
+            "HF_HUB_OFFLINE=1",
+            "HF_DATASETS_OFFLINE=1",
+            "TRANSFORMERS_OFFLINE=1",
+            "WANDB_MODE=disabled",
+        ]
+    )
+    wave_command = [
+        first["runtime"]["python"],
+        str(script),
+        "run-isolated-wave",
+        "--config",
+        str(config_path),
+        "--repo-root",
+        str(repo_root),
+    ]
+    wave_job = _submit(
+        [
+            "sbatch",
+            "--parsable",
+            f"--account={slurm['account']}",
+            f"--partition={policy['partition']}",
+            f"--nodelist={policy['node']}",
+            f"--job-name={JOB_PREFIX}isolated-wave",
+            f"--gres={policy['gres']}",
+            "--exclusive",
+            f"--cpus-per-task={policy['cpus_per_task']}",
+            f"--mem={policy['memory']}",
+            f"--time={policy['time_limit']}",
+            f"--output={family_root / 'logs/%x-%j.out'}",
+            f"--error={family_root / 'logs/%x-%j.err'}",
+            f"--export={exports}",
+            f"--chdir={repo_root}",
+            f"--wrap=exec {shlex.join(wave_command)}",
+        ]
+    )
+    model_finalizers: dict[str, str] = {}
+    for model in recovery["models"]:
+        command = [
+            model["plan"]["runtime"]["python"],
+            str(script),
+            "finalize-model",
+            "--config",
+            str(config_path),
+            "--repo-root",
+            str(repo_root),
+            "--model-id",
+            model["model_id"],
+        ]
+        model_finalizers[model["model_id"]] = _submit(
+            [
+                "sbatch",
+                "--parsable",
+                f"--account={slurm['account']}",
+                f"--partition={slurm['control_partition']}",
+                f"--job-name={JOB_PREFIX}{model['model_id']}-isolated-final",
+                f"--dependency=afterany:{wave_job}",
+                "--cpus-per-task=2",
+                "--mem=8G",
+                "--time=00:30:00",
+                f"--output={family_root / 'logs/%x-%j.out'}",
+                f"--error={family_root / 'logs/%x-%j.err'}",
+                f"--export={exports}",
+                f"--chdir={repo_root}",
+                f"--wrap=exec {shlex.join(command)}",
+            ]
+        )
+    family_command = [
+        first["runtime"]["python"],
+        str(script),
+        "finalize-family",
+        "--config",
+        str(config_path),
+        "--repo-root",
+        str(repo_root),
+    ]
+    dependency = ":".join(model_finalizers.values())
+    family_finalizer = _submit(
+        [
+            "sbatch",
+            "--parsable",
+            f"--account={slurm['account']}",
+            f"--partition={slurm['control_partition']}",
+            f"--job-name={JOB_PREFIX}isolated-family-final",
+            f"--dependency=afterany:{dependency}",
+            "--cpus-per-task=2",
+            "--mem=8G",
+            "--time=00:30:00",
+            f"--output={family_root / 'logs/%x-%j.out'}",
+            f"--error={family_root / 'logs/%x-%j.err'}",
+            f"--export={exports}",
+            f"--chdir={repo_root}",
+            f"--wrap=exec {shlex.join(family_command)}",
+        ]
+    )
+    payload = {
+        "schema_version": 1,
+        "status": "submitted",
+        "topology": "one_exclusive_three_a100_sequential_wave_plus_four_finalizers",
+        "config_path": recovery["config_path"],
+        "config_sha256": recovery["config_sha256"],
+        "source_family_root": recovery["source_family_root"],
+        "recovery_family_root": recovery["recovery_family_root"],
+        "wave_job": wave_job,
+        "model_finalizers": model_finalizers,
+        "family_finalizer": family_finalizer,
+        "route_probe": probe_payload,
+    }
+    write_json(family_root / "submission_manifest.json", payload)
+    return payload
+
+
 def submit_family_recovery(
     recovery: dict[str, Any],
     *,
     config_path: Path,
     repo_root: Path,
 ) -> dict[str, Any]:
+    if recovery.get("mode") == "exclusive_a100_sequential":
+        return submit_isolated_family_recovery(
+            recovery, config_path=config_path, repo_root=repo_root
+        )
     initialize_family_recovery_namespace(recovery)
     family_root = Path(recovery["recovery_family_root"])
     script = Path(__file__).resolve()
@@ -322,7 +666,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Recover exactly seven missing scientific M0 lanes")
     parser.add_argument(
         "command",
-        choices=("plan", "preflight", "submit", "status", "run-lane", "finalize-model", "finalize-family"),
+        choices=(
+            "plan",
+            "preflight",
+            "submit",
+            "status",
+            "run-lane",
+            "run-isolated-wave",
+            "finalize-model",
+            "finalize-family",
+        ),
     )
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
@@ -363,6 +716,10 @@ def main() -> None:
             raise ValueError("Recovery lane index/ID mismatch")
         run_gpu_memory_guard(Path(model["recovery_root"]), args.lane_id, min_free_bytes=args.min_free_gpu_bytes)
         payload = run_m0_lane(plan, args.lane_index, output_root=Path(model["recovery_root"]))
+    elif args.command == "run-isolated-wave":
+        if recovery.get("mode") != "exclusive_a100_sequential":
+            raise ValueError("run-isolated-wave requires the exclusive A100 sequential contract")
+        payload = run_isolated_wave(recovery, config_path=config_path, repo_root=repo_root)
     elif args.command == "finalize-model":
         if args.model_id is None:
             parser.error("finalize-model requires model-id")
@@ -371,6 +728,8 @@ def main() -> None:
         payload = finalize_family_recovery(recovery)
     print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
     if args.command == "preflight" and payload["status"] != "ready":
+        raise SystemExit(2)
+    if args.command == "run-isolated-wave" and payload["status"] != "complete":
         raise SystemExit(2)
     if args.command == "finalize-model" and payload["status"] != "complete":
         raise SystemExit(2)

@@ -166,6 +166,49 @@ def _fixture(tmp_path: Path) -> tuple[Path, dict[str, dict]]:
     return config_path, plans
 
 
+def _isolation_fixture(tmp_path: Path) -> Path:
+    base_path, _ = _fixture(tmp_path)
+    payload = {
+        "schema_version": 1,
+        "name": "fixture-isolated-recovery",
+        "status": "frozen",
+        "mode": "exclusive_a100_sequential",
+        "execution_authorized": False,
+        "base_recovery_config": str(base_path),
+        "base_recovery_config_sha256": sha256_file(base_path),
+        "model_order": ["olmo", "qwen", "smollm"],
+        "recovery_family_root": str(tmp_path / "isolated-recovery"),
+        "isolation": {
+            "node": "gruenau10",
+            "partition": "gpu",
+            "gres": "gpu:a10080gb:3",
+            "requested_gpu_count": 3,
+            "exclusive_node_allocation": True,
+            "expected_gpu_name": "NVIDIA A100 80GB PCIe",
+            "min_total_gpu_bytes": 80 * 1024**3,
+            "selection_rule": "maximum_free_bytes_then_uuid",
+            "max_wait_seconds": 7200,
+            "poll_interval_seconds": 60,
+            "cpus_per_task": 8,
+            "memory": "96G",
+            "time_limit": "1-00:00:00",
+            "target_order": [
+                "olmo:english_capability",
+                "olmo:turkish_capability",
+                "olmo:turkish_perplexity",
+                "qwen:english_retention_pile_10k",
+                "qwen:turkish_capability",
+                "qwen:turkish_perplexity",
+                "smollm:english_capability",
+            ],
+        },
+        "implementation": {"commit": "0" * 40, "files": {}},
+    }
+    path = tmp_path / "isolation.yaml"
+    path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+    return path
+
+
 def test_recovery_plan_binds_exactly_seventeen_plus_seven(tmp_path: Path) -> None:
     config_path, _ = _fixture(tmp_path)
     recovery = load_family_recovery_plan(config_path, repo_root=ROOT)
@@ -236,3 +279,81 @@ def test_operator_submits_only_seven_lanes_and_four_finalizers(
     pile = next(argv for argv in submissions if any("english_retention_pile_10k" in value for value in argv))
     assert "--gres=gpu:a10080gb:1" in pile
     assert payload["family_finalizer"] == "8011"
+
+
+def test_isolation_overlay_preserves_seventeen_plus_seven_and_uses_fresh_root(
+    tmp_path: Path,
+) -> None:
+    config_path = _isolation_fixture(tmp_path)
+    recovery = load_family_recovery_plan(config_path, repo_root=ROOT)
+    assert recovery["mode"] == "exclusive_a100_sequential"
+    assert recovery["retained_lane_count"] == 17
+    assert recovery["target_lane_count"] == 7
+    assert Path(recovery["recovery_family_root"]).name == "isolated-recovery"
+    assert all(
+        Path(model["recovery_root"]).parent == Path(recovery["recovery_family_root"])
+        for model in recovery["models"]
+    )
+    assert validate_family_recovery_source(recovery)["status"] == "ready"
+
+
+def test_isolation_operator_submits_one_exclusive_wave_and_four_finalizers(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config_path = _isolation_fixture(tmp_path)
+    recovery = load_family_recovery_plan(config_path, repo_root=ROOT)
+    entrypoint = ROOT / "scripts/study/recover_three_model_m0.py"
+    spec = importlib.util.spec_from_file_location("recover_three_model_m0_isolation", entrypoint)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    submissions: list[list[str]] = []
+
+    class Result:
+        returncode = 0
+        stdout = "sbatch: Job 1 to start at 2026-08-20T12:00:00"
+        stderr = ""
+
+    monkeypatch.setattr(module, "_run", lambda argv: Result())
+
+    def fake_submit(argv: list[str]) -> str:
+        submissions.append(argv)
+        return str(9000 + len(submissions))
+
+    monkeypatch.setattr(module, "_submit", fake_submit)
+    payload = module.submit_family_recovery(recovery, config_path=config_path, repo_root=ROOT)
+    assert len(submissions) == 5
+    wave = submissions[0]
+    assert "--exclusive" in wave
+    assert "--nodelist=gruenau10" in wave
+    assert "--gres=gpu:a10080gb:3" in wave
+    assert any("run-isolated-wave" in value for value in wave)
+    assert sum(any("finalize-model" in value for value in argv) for argv in submissions) == 3
+    assert sum(any("finalize-family" in value for value in argv) for argv in submissions) == 1
+    assert payload["wave_job"] == "9001"
+    assert payload["family_finalizer"] == "9005"
+
+
+def test_isolation_selector_chooses_highest_free_eligible_uuid(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config_path = _isolation_fixture(tmp_path)
+    recovery = load_family_recovery_plan(config_path, repo_root=ROOT)
+    Path(recovery["recovery_family_root"]).mkdir()
+    entrypoint = ROOT / "scripts/study/recover_three_model_m0.py"
+    spec = importlib.util.spec_from_file_location("recover_three_model_m0_selector", entrypoint)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    rows = [
+        {"uuid": "GPU-a", "name": "NVIDIA A100 80GB PCIe", "total_bytes": 80 * 1024**3, "free_bytes": 40},
+        {"uuid": "GPU-b", "name": "NVIDIA A100 80GB PCIe", "total_bytes": 80 * 1024**3, "free_bytes": 90},
+        {"uuid": "GPU-c", "name": "NVIDIA A100 80GB PCIe", "total_bytes": 80 * 1024**3, "free_bytes": 70},
+    ]
+    monkeypatch.setattr(module, "_gpu_inventory", lambda: rows)
+    attempts: list[dict] = []
+    selected = module._select_isolated_gpu(
+        recovery, lane_label="qwen:english_retention_pile_10k", min_free_bytes=64, attempts=attempts
+    )
+    assert selected == "GPU-b"
+    assert attempts[-1]["status"] == "pass"
