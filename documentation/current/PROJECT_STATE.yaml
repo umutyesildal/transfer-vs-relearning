@@ -379,8 +379,27 @@ evaluation_target:
       blockers:
         - seven_required_lanes_failed_pre_scoring
         - complete_raw_bundle_required_before_normalization
-        - separately_frozen_recovery_contract_not_prepared
         - recovery_execution_not_authorized
+    m0_seven_lane_recovery:
+      status: frozen_unexecuted_exact_authorization_required
+      contract: documentation/contracts/evaluation/m0-three-model-seven-lane-recovery-v1.md
+      contract_sha256: 1ee7c8d9d1da092cd1e4a64dbffa4594e041ebf2b4d56eb62f345a6aaa8c25c4
+      config: configs/evaluation/m0_scientific_recovery_v1.yaml
+      config_sha256: 4a603719dd43a65dd9b36a36786407993afe84cf8d1d48f6245656d235c6bfeb
+      operator: scripts/study/recover_three_model_m0.py
+      implementation_commit: 07cbaa6d55f0713a08bae8a1c3c9cbe2df5e8942
+      source_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1
+      source_family_bundle_sha256: 75fcd7cf1e388eb5a4e883264c6aa14db83797b2e7832a4bbc8e40bb38865db1
+      recovery_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_v1
+      retained_lane_count: 17
+      recovery_lane_count: 7
+      gpu_lane_count: 7
+      model_finalizer_count: 3
+      family_finalizer_count: 1
+      execution_authorized: false
+      automatic_retry_authorized: false
+      normalization_authorized: false
+      m1_or_m2_authorized: false
     m0_preflight:
       command: >-
         .venv/bin/python scripts/study/run_study.py preflight-m0
@@ -448,8 +467,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: decide_bounded_recovery_for_seven_missing_m0_lanes
-  first_boundary: freeze_runtime_only_recovery_without_rescoring_seventeen_complete_lanes
+  name: obtain_exact_authorization_for_frozen_seven_lane_m0_recovery
+  first_boundary: execute_only_config_4a6037_after_exact_authorization
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -483,7 +502,8 @@ active_priority:
     - three_model_terminal_raw_bundle_17_of_24
     - terminal_read_only_lane_and_finalizer_audit
   required_outputs:
-    - seven_lane_recovery_contract_or_explicit_no_recovery_decision
+    - exact_sha_bound_recovery_authorization
+    - seven_lane_recovery_execution_result
     - complete_composite_three_model_raw_bundle
     - frozen_normalization_and_gate_result
 
@@ -507,12 +527,21 @@ authorization:
       m1_or_m2_authorized: false
       cleanup_or_deletion_authorized: false
       resubmission_authorized: false
+    m0_seven_lane_recovery:
+      status: exact_authorization_required
+      execution_authorized: false
+      contract_sha256: 1ee7c8d9d1da092cd1e4a64dbffa4594e041ebf2b4d56eb62f345a6aaa8c25c4
+      config_sha256: 4a603719dd43a65dd9b36a36786407993afe84cf8d1d48f6245656d235c6bfeb
+      wave_limit: 1
+      recovery_lane_count: 7
+      rescore_complete_lanes_authorized: false
+      normalization_authorized: false
+      m1_or_m2_authorized: false
 
 next_decision_required:
-  subject: bounded_recovery_contract_for_seven_missing_m0_lanes
+  subject: exact_authorization_for_frozen_seven_lane_m0_recovery
   note: >-
-    The exact single three-model M0 wave is terminal with 17 complete and seven failed-pre-scoring
-    lanes. Preserve all source artifacts. Do not resubmit all 24 lanes, normalize an incomplete
-    bundle, or start M1/M2. The next eligible design action is a separately frozen recovery
-    contract targeting only the seven missing lanes; its execution would require new exact user
-    authorization.
+    The exact seven-lane recovery contract and config are frozen and unexecuted. Preserve all 17
+    complete source lanes. Do not submit until the user explicitly binds authorization to contract
+    SHA-256 1ee7c8d9... or config SHA-256 4a603719.... That future authorization may open one
+    seven-GPU-lane plus four-finalizer DAG only; normalization and M1/M2 remain separate.

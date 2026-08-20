@@ -327,7 +327,16 @@ Gerekli tasarım sınırları:
 - tek separately authorized recovery wave;
 - missing veya yeni hata yine `0` sayılmadan fail closed.
 
-Bu adım henüz hazırlanmış veya çalıştırılmış değildir.
+Bu adım 20 Ağustos'ta yerel olarak hazırlandı ve donduruldu; henüz çalıştırılmadı:
+
+- contract:
+  [`m0-three-model-seven-lane-recovery-v1.md`](../contracts/evaluation/m0-three-model-seven-lane-recovery-v1.md);
+- contract SHA-256:
+  `1ee7c8d9d1da092cd1e4a64dbffa4594e041ebf2b4d56eb62f345a6aaa8c25c4`;
+- config SHA-256:
+  `4a603719dd43a65dd9b36a36786407993afe84cf8d1d48f6245656d235c6bfeb`;
+- exact DAG: yedi GPU lane + üç model finalizer + bir family finalizer;
+- execution durumu: exact SHA-bound kullanıcı yetkisi bekliyor.
 
 ### Adım 2 — Complete raw bundle ve canonical normalization
 
@@ -366,11 +375,11 @@ retention  = child − exact parent
 
 ## 6. Bugün verilmesi gereken karar
 
-Şu anda yeni training başlatmak doğru adım değildir. Doğru tek sonraki execution yolu:
+Şu anda yeni training başlatmak doğru adım değildir. Doğru tek sonraki execution yolu hazırdır:
 
-> Mevcut 17 geçerli M0 lane'i immutable biçimde koruyan ve yalnızca eksik yedi lane'i tamamlayan,
-> eval-v1 semantiğini değiştirmeyen bir recovery contract hazırlamak; daha sonra contract'ın exact
-> SHA-256 değerine bağlı tek recovery wave için ayrıca kullanıcı yetkisi istemek.
+> Mevcut 17 geçerli M0 lane'i immutable biçimde koruyan ve yalnızca eksik yedi lane'i tamamlayan
+> frozen recovery contract'ın exact SHA-256 değerine bağlı tek recovery wave için kullanıcı yetkisi
+> almak ve yalnız bu DAG'ı çalıştırmak.
 
 Bu karar verilmeden:
 
@@ -398,5 +407,5 @@ Bu karar verilmeden:
 ## 8. Tek satırlık güncel hüküm
 
 **Pipeline başlatıldı; M0 execution terminalde 17/24 geçerli ham lane ile fail-closed duruyor;
-sıradaki adım duplicate submit veya M1 değil, yalnızca eksik yedi lane için ayrı recovery contract
-ve authorization hazırlamaktır.**
+eksik yedi lane için recovery contract donduruldu; sıradaki adım duplicate submit veya M1 değil,
+exact SHA-bound tek recovery authorization ve yalnız bu DAG'ın execution'ıdır.**

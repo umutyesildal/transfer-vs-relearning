@@ -105,6 +105,9 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["pipeline"]["scientific_m0_family"]["authorization_record"],
         state["evaluation_target"]["pipeline"]["scientific_m0_family"]["preflight_record"],
         state["evaluation_target"]["pipeline"]["scientific_m0_family"]["submission_record"],
+        state["evaluation_target"]["pipeline"]["m0_seven_lane_recovery"]["contract"],
+        state["evaluation_target"]["pipeline"]["m0_seven_lane_recovery"]["config"],
+        state["evaluation_target"]["pipeline"]["m0_seven_lane_recovery"]["operator"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],
@@ -171,6 +174,31 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         "normalization_allowed": False,
         "cross_model_pass_fail": "not_computed_by_raw_family_finalizer",
     }
+
+    recovery = state["evaluation_target"]["pipeline"]["m0_seven_lane_recovery"]
+    assert recovery["status"] == "frozen_unexecuted_exact_authorization_required"
+    assert recovery["contract_sha256"] == (
+        "1ee7c8d9d1da092cd1e4a64dbffa4594e041ebf2b4d56eb62f345a6aaa8c25c4"
+    )
+    assert recovery["config_sha256"] == (
+        "4a603719dd43a65dd9b36a36786407993afe84cf8d1d48f6245656d235c6bfeb"
+    )
+    assert recovery["retained_lane_count"] == 17
+    assert recovery["recovery_lane_count"] == 7
+    assert recovery["gpu_lane_count"] == 7
+    assert recovery["model_finalizer_count"] == 3
+    assert recovery["family_finalizer_count"] == 1
+    assert recovery["execution_authorized"] is False
+    assert recovery["automatic_retry_authorized"] is False
+    assert recovery["normalization_authorized"] is False
+    assert recovery["m1_or_m2_authorized"] is False
+
+    recovery_authorization = state["authorization"]["scoped"]["m0_seven_lane_recovery"]
+    assert recovery_authorization["status"] == "exact_authorization_required"
+    assert recovery_authorization["execution_authorized"] is False
+    assert recovery_authorization["wave_limit"] == 1
+    assert recovery_authorization["recovery_lane_count"] == 7
+    assert recovery_authorization["rescore_complete_lanes_authorized"] is False
     assert len(scientific_m0["known_operational_failures"]) == 7
 
 
