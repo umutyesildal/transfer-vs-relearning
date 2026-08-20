@@ -345,7 +345,12 @@ def assess_recovery_readiness(
         family_state["status"] == "terminal_partial_invalid_17_of_24",
         family_state["status"],
     )
-    scoped = state.get("authorization", {}).get("scoped", {}).get("m0_seven_lane_recovery", {})
+    scoped_key = (
+        "m0_seven_lane_exclusive_a100_recovery"
+        if recovery.get("mode") == "exclusive_a100_sequential"
+        else "m0_seven_lane_recovery"
+    )
+    scoped = state.get("authorization", {}).get("scoped", {}).get(scoped_key, {})
     record(
         "project_recovery_authorization",
         scoped.get("status") == "authorized_single_wave"
