@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m0-evaluation
-  status: m0_five_lane_retargeted_recovery_frozen_unexecuted
+  status: m0_five_lane_retargeted_recovery_submitted_controller_running
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -454,7 +454,7 @@ evaluation_target:
       prior_authorization_attempt: blocked_preflight_scope_key_no_root_no_jobs
       automatic_retry_authorized: false
     m0_five_lane_retargeted_recovery:
-      status: authorized_single_wave_unsubmitted
+      status: submitted_controller_running
       contract: documentation/contracts/evaluation/m0-three-model-five-lane-retargeted-recovery-v1.md
       contract_sha256: 1b030869455d68aa0ecf933f881c1661e1fbf504997376fdba08a626e1bc0a55
       config: configs/evaluation/m0_scientific_recovery_retargeted_v1.yaml
@@ -471,7 +471,21 @@ evaluation_target:
       recovery_lane_count: 5
       topology: one_exclusive_three_a100_sequential_wave_plus_four_finalizers
       slurm_job_count: 5
-      execution_authorized: true
+      execution_authorized: false
+      authorization_consumed: true
+      resubmission_authorized: false
+      final_preflight_checks_passed: 17
+      final_preflight_blockers: []
+      hu_home_observed_bytes: 14545990549
+      submission_record: documentation/records/evaluation/M0_FIVE_LANE_RETARGETED_RECOVERY_SUBMISSION_2026-08-20.md
+      wave_job: "471536"
+      model_finalizers:
+        olmo: "471537"
+        qwen: "471538"
+        smollm: "471539"
+      family_finalizer: "471540"
+      submission_manifest_sha256: 4551a5c9266d354e06a0438f286b9d4063c0a2c4b5ff5bc8e3b699daaa3da6ad
+      recovery_manifest_sha256: 9a2011a89a31a48e2a3f9b68a137c0e25d606a4d3da95b940abb098e3386ff8f
       normalization_authorized: false
       m1_or_m2_authorized: false
       automatic_retry_authorized: false
@@ -585,8 +599,9 @@ active_priority:
     - exclusive_a100_recovery_terminal_cancellation_integrity_record
     - five_lane_runtime_output_retarget_implementation
     - nineteen_plus_five_composite_contract
-  required_outputs:
     - exact_sha_bound_five_lane_recovery_authorization
+    - five_lane_retargeted_recovery_submission
+  required_outputs:
     - five_lane_retargeted_recovery_execution_result
     - complete_composite_three_model_raw_bundle
     - frozen_normalization_and_gate_result
@@ -642,8 +657,8 @@ authorization:
       normalization_authorized: false
       m1_or_m2_authorized: false
     m0_five_lane_retargeted_recovery:
-      status: authorized_single_wave
-      execution_authorized: true
+      status: consumed_by_single_submission
+      execution_authorized: false
       contract_sha256: 1b030869455d68aa0ecf933f881c1661e1fbf504997376fdba08a626e1bc0a55
       pre_authorization_config_sha256: 705661dd5e32d836ee58f64101bc887c7a85059bae3ca2b25505ad967bde9a7d
       config_sha256: 08cbe81574b63aa3f488e7f17cc1f6f41b339e85c5d5814b7cbd6fbf76f27c41
@@ -656,6 +671,8 @@ authorization:
       normalization_authorized: false
       m1_or_m2_authorized: false
       automatic_retry_authorized: false
+      wave_consumed: true
+      resubmission_authorized: false
 
 next_decision_required:
   subject: none_until_authorized_five_lane_wave_terminal

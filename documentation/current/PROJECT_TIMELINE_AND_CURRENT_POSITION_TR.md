@@ -1,8 +1,8 @@
 # Proje timeline'ı ve güncel konum
 
-**Son doğrulama:** 2026-08-20T16:15:00+02:00
+**Son doğrulama:** 2026-08-20T16:18:06+02:00
 
-**Bilimsel faz:** eval-v1 donduruldu; 19 geçerli M0 lane korunuyor, beş-lane recovery frozen/unexecuted
+**Bilimsel faz:** eval-v1 donduruldu; 19 geçerli M0 lane korunuyor, beş-lane recovery controller running
 
 **Training readiness:** `ready_to_train=false`
 
@@ -35,9 +35,9 @@ M1 training = başlamadı ve yetkili değil
 ```
 
 Exclusive recovery controller'ı output-routing hatası doğrulandıktan sonra kullanıcı yetkisiyle
-iptal edildi. İki geçerli OLMo lane'i hash ile korundu. Sıradaki karar, yalnız kalan beş lane'i
-fresh output root'larına yazan yeni frozen contract'a exact execution authorization verilip
-verilmeyeceği.
+iptal edildi. İki geçerli OLMo lane'i hash ile korundu. Yalnız kalan beş lane'i fresh output
+root'larına yazan yeni wave exact authorization sonrası submit edildi; controller `471536`
+şu anda çalışıyor.
 
 ## 2. Şu an tam olarak neredeyiz?
 
@@ -61,8 +61,8 @@ flowchart LR
     style K fill:#e9ecef,stroke:#495057
 ```
 
-Güncel konum **H'dedir**. Beş-lane contract hazırdır fakat execution yetkili değildir. Normalization
-ve model karşılaştırması fail-closed tutulmuştur.
+Güncel konum **H'dedir**. Beş-lane controller çalışıyor; finalizer'lar dependency pending.
+Normalization ve model karşılaştırması fail-closed tutulmuştur.
 
 ## 3. Kronolojik timeline
 
@@ -403,7 +403,11 @@ donduruldu:
 - authorized config SHA-256:
   `08cbe81574b63aa3f488e7f17cc1f6f41b339e85c5d5814b7cbd6fbf76f27c41`;
 - execution: HU fast-forward, final preflight ve tek beş-job DAG için yetkili; bu kayıt anında
-  henüz submit edilmedi.
+  tek wave olarak submit edildi;
+- controller `471536` running; model finalizer'lar `471537--471539`, family finalizer `471540`;
+- submission record:
+  [`M0_FIVE_LANE_RETARGETED_RECOVERY_SUBMISSION_2026-08-20.md`](../records/evaluation/M0_FIVE_LANE_RETARGETED_RECOVERY_SUBMISSION_2026-08-20.md);
+- tek-wave authorization tüketildi; resubmission yetkili değil.
 
 ### Adım 2 — Complete raw bundle ve canonical normalization
 
@@ -445,8 +449,8 @@ retention  = child − exact parent
 Şu anda yeni training başlatmak doğru adım değildir. Önceki recovery yetkileri tüketilmiştir:
 
 > 17 original ve iki geçerli isolation lane'i hash ile koruyan, yalnız kalan beş lane'i fresh
-> root'a yazan contract hazırdır. Execution yalnız final contract/config SHA'larına bağlı ayrı
-> kullanıcı yetkisiyle açılabilir.
+> root'a yazan tek wave submit edilmiştir. Yeni submit/retry yetkisi yoktur; terminal bundle
+> beklenmektedir.
 
 Bu wave dışında:
 
@@ -473,7 +477,6 @@ Bu wave dışında:
 
 ## 8. Tek satırlık güncel hüküm
 
-**Pipeline başlatıldı; 17 original + 2 geçerli OLMo recovery lane'i korunuyor; beş invalid/missing
-lane için output-retargeted frozen contract hazır fakat unexecuted; sıradaki adım final
-contract/config SHA'larına bağlı exact authorization, HU fast-forward, preflight ve tek beş-job
-DAG'dır.**
+**Pipeline başlatıldı; 17 original + 2 geçerli OLMo recovery lane'i korunuyor; kalan beş lane için
+output-retargeted controller `471536` çalışıyor ve dört finalizer dependency pending; sıradaki adım
+yeniden submit değil, bu tek wave'in terminal 24/24 composite sonucunu beklemektir.**
