@@ -415,6 +415,27 @@ evaluation_target:
       automatic_retry_authorized: false
       normalization_authorized: false
       m1_or_m2_authorized: false
+    m0_seven_lane_exclusive_a100_recovery:
+      status: frozen_unexecuted_exact_authorization_required
+      contract: documentation/contracts/evaluation/m0-three-model-seven-lane-exclusive-a100-recovery-v1.md
+      contract_sha256: 41215ef7be2ad18ea9c8f52581870955431ba7ff5ba8af20633650452c0dca01
+      config: configs/evaluation/m0_scientific_recovery_isolation_v1.yaml
+      config_sha256: 9632b5274cda8012432aeb7837d4cb33ab7e2992354ede615eaf1f22eee9d689
+      operator: scripts/study/recover_three_model_m0.py
+      implementation_commit: 112a2c5482525d0f541b646cf232e6c94e7deb7b
+      source_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1
+      first_recovery_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_v1
+      recovery_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_isolation_v1
+      retained_lane_count: 17
+      recovery_lane_count: 7
+      topology: one_exclusive_three_a100_sequential_wave_plus_four_finalizers
+      slurm_job_count: 5
+      node: gruenau10
+      gres: gpu:a10080gb:3
+      execution_authorized: false
+      automatic_retry_authorized: false
+      normalization_authorized: false
+      m1_or_m2_authorized: false
     m0_preflight:
       command: >-
         .venv/bin/python scripts/study/run_study.py preflight-m0
@@ -482,8 +503,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: design_separate_gpu_isolation_recovery_contract
-  first_boundary: no_retry_before_new_frozen_contract_and_exact_authorization
+  name: obtain_exact_authorization_for_exclusive_a100_recovery
+  first_boundary: execute_only_contract_41215e_after_exact_authorization
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -518,8 +539,9 @@ active_priority:
     - terminal_read_only_lane_and_finalizer_audit
     - exact_sha_bound_recovery_authorization
     - seven_lane_recovery_execution_result_terminal_not_run
-  required_outputs:
     - separately_frozen_gpu_isolation_recovery_contract
+  required_outputs:
+    - exact_sha_bound_exclusive_a100_recovery_authorization
     - complete_composite_three_model_raw_bundle
     - frozen_normalization_and_gate_result
 
@@ -558,10 +580,21 @@ authorization:
       rescore_complete_lanes_authorized: false
       normalization_authorized: false
       m1_or_m2_authorized: false
+    m0_seven_lane_exclusive_a100_recovery:
+      status: exact_authorization_required
+      execution_authorized: false
+      contract_sha256: 41215ef7be2ad18ea9c8f52581870955431ba7ff5ba8af20633650452c0dca01
+      config_sha256: 9632b5274cda8012432aeb7837d4cb33ab7e2992354ede615eaf1f22eee9d689
+      wave_limit: 1
+      slurm_job_count: 5
+      recovery_lane_count: 7
+      rescore_complete_lanes_authorized: false
+      normalization_authorized: false
+      m1_or_m2_authorized: false
 
 next_decision_required:
-  subject: separately_frozen_gpu_isolation_recovery_contract
+  subject: exact_authorization_for_exclusive_a100_recovery
   note: >-
-    The exact single wave was consumed. All seven GPU jobs stopped before model load/scoring at the
-    frozen free-memory guards, so the family remains 17/24 and normalization remains closed. Do not
-    retry, alter routes or weaken thresholds without a new frozen contract and exact authorization.
+    An exclusive three-A100 sequential recovery contract is now frozen and unexecuted. It preserves
+    the 17 source lanes and both prior roots, keeps every memory threshold, and requires a new exact
+    authorization before one five-job DAG. Normalization and M1/M2 remain separate.

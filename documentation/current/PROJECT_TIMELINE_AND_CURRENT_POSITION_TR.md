@@ -349,6 +349,23 @@ Bu adım 20 Ağustos'ta yerel olarak hazırlandı ve donduruldu; henüz çalış
 - execution record:
   [`M0_SEVEN_LANE_RECOVERY_EXECUTION_2026-08-20.md`](../records/evaluation/M0_SEVEN_LANE_RECOVERY_EXECUTION_2026-08-20.md).
 
+İlk recovery sonucundan sonra ikinci bir operational-isolation kontratı hazırlandı ve donduruldu:
+
+- contract:
+  [`m0-three-model-seven-lane-exclusive-a100-recovery-v1.md`](../contracts/evaluation/m0-three-model-seven-lane-exclusive-a100-recovery-v1.md);
+- contract SHA-256:
+  `41215ef7be2ad18ea9c8f52581870955431ba7ff5ba8af20633650452c0dca01`;
+- config SHA-256:
+  `9632b5274cda8012432aeb7837d4cb33ab7e2992354ede615eaf1f22eee9d689`;
+- fresh root:
+  `/vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_isolation_v1`;
+- topology: `gruenau10` üzerinde üç A10080'i bağlayan tek exclusive controller, yedi lane
+  sequential, ardından üç model ve bir family finalizer; toplam beş job;
+- her lane öncesi üç UUID audit edilir ve unchanged free-memory eşiğini geçen en yüksek boş VRAM'li
+  UUID deterministik seçilir;
+- hiçbir memory eşiği veya scientific evaluation semantiği değiştirilmedi;
+- execution durumu: exact SHA-bound kullanıcı yetkisi bekliyor.
+
 ### Adım 2 — Complete raw bundle ve canonical normalization
 
 Yedi recovery lane geçerli biçimde tamamlanırsa 17 source + 7 recovery artefaktı hash doğrulamalı
@@ -389,8 +406,9 @@ retention  = child − exact parent
 Şu anda yeni training başlatmak doğru adım değildir. Yetkilendirilen tek recovery wave tüketilmiştir:
 
 > Mevcut 17 geçerli M0 lane'i immutable biçimde koruyan ve yalnızca eksik yedi lane'i tamamlayan
-> Yedi lane shared/occupied GPU görünürlüğü nedeniyle memory guard'da fail-closed durdu. Yeni bir
-> deneme ancak GPU isolation/clean-device koşulunu ayrı ve exact biçimde donduran yeni kontratla açılabilir.
+> Yedi lane shared/occupied GPU görünürlüğü nedeniyle memory guard'da fail-closed durdu. GPU
+> isolation ve deterministic UUID seçimini exact biçimde donduran yeni kontrat hazır; execution
+> yalnız kontrat SHA'sına bağlı ayrı kullanıcı yetkisiyle açılabilir.
 
 Bu wave dışında:
 
@@ -420,4 +438,4 @@ Bu wave dışında:
 **Pipeline başlatıldı; M0 execution terminalde 17/24 geçerli ham lane ile fail-closed duruyor;
 eksik yedi lane için exact SHA-bound tek wave çalıştırıldı fakat yedi lane de scoring öncesi memory
 guard'da durdu; 17/24 korunuyor ve sıradaki adım otomatik retry değil, ayrı frozen GPU-isolation
-recovery kontratıdır.**
+recovery kontratının exact authorization ve tek execution'ıdır.**

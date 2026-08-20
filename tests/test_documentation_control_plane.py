@@ -110,6 +110,9 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["pipeline"]["m0_seven_lane_recovery"]["operator"],
         state["evaluation_target"]["pipeline"]["m0_seven_lane_recovery"]["authorization_record"],
         state["evaluation_target"]["pipeline"]["m0_seven_lane_recovery"]["execution_record"],
+        state["evaluation_target"]["pipeline"]["m0_seven_lane_exclusive_a100_recovery"]["contract"],
+        state["evaluation_target"]["pipeline"]["m0_seven_lane_exclusive_a100_recovery"]["config"],
+        state["evaluation_target"]["pipeline"]["m0_seven_lane_exclusive_a100_recovery"]["operator"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],
@@ -214,6 +217,31 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert recovery_authorization["recovery_lane_count"] == 7
     assert recovery_authorization["rescore_complete_lanes_authorized"] is False
     assert len(scientific_m0["known_operational_failures"]) == 7
+
+    isolated = state["evaluation_target"]["pipeline"]["m0_seven_lane_exclusive_a100_recovery"]
+    assert isolated["status"] == "frozen_unexecuted_exact_authorization_required"
+    assert isolated["contract_sha256"] == (
+        "41215ef7be2ad18ea9c8f52581870955431ba7ff5ba8af20633650452c0dca01"
+    )
+    assert isolated["config_sha256"] == (
+        "9632b5274cda8012432aeb7837d4cb33ab7e2992354ede615eaf1f22eee9d689"
+    )
+    assert isolated["retained_lane_count"] == 17
+    assert isolated["recovery_lane_count"] == 7
+    assert isolated["slurm_job_count"] == 5
+    assert isolated["node"] == "gruenau10"
+    assert isolated["gres"] == "gpu:a10080gb:3"
+    assert isolated["execution_authorized"] is False
+    assert isolated["automatic_retry_authorized"] is False
+    assert isolated["normalization_authorized"] is False
+
+    isolated_authorization = state["authorization"]["scoped"][
+        "m0_seven_lane_exclusive_a100_recovery"
+    ]
+    assert isolated_authorization["status"] == "exact_authorization_required"
+    assert isolated_authorization["execution_authorized"] is False
+    assert isolated_authorization["wave_limit"] == 1
+    assert isolated_authorization["slurm_job_count"] == 5
 
 
 def test_active_entrypoints_stay_within_context_budget():

@@ -36,11 +36,11 @@ isolation:
     - smollm:english_capability
 
 implementation:
-  commit: IMPLEMENTATION_COMMIT_PLACEHOLDER
+  commit: 112a2c5482525d0f541b646cf232e6c94e7deb7b
   files:
-    scripts/study/recover_three_model_m0.py: OPERATOR_SHA256_PLACEHOLDER
-    src/transfer_vs_relearning/study/m0_family_recovery.py: MODULE_SHA256_PLACEHOLDER
-    tests/study/test_m0_family_recovery.py: TEST_SHA256_PLACEHOLDER
+    scripts/study/recover_three_model_m0.py: 539ee695152c667f0aed07fa8256e41622a032358774277aef995d70c3d3d960
+    src/transfer_vs_relearning/study/m0_family_recovery.py: 6274c6f3ca502744611efaf4f96055272bb6cd0c114e84f90b7b191ef683eab1
+    tests/study/test_m0_family_recovery.py: 440d8d5665ab34eab7ff5f911c957089e03d0c193d6a65ad11004de4e66c4c3f
 
 prohibitions:
   - mutate_first_recovery_root
