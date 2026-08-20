@@ -416,11 +416,14 @@ evaluation_target:
       normalization_authorized: false
       m1_or_m2_authorized: false
     m0_seven_lane_exclusive_a100_recovery:
-      status: corrected_frozen_unexecuted_exact_reauthorization_required
+      status: corrected_authorized_single_wave_not_yet_submitted
       contract: documentation/contracts/evaluation/m0-three-model-seven-lane-exclusive-a100-recovery-v1.md
       contract_sha256: d2a6d9e35c60a00328380fe7ecfb68bfa3fdd0528ea469ecec0acfecdc849058
       config: configs/evaluation/m0_scientific_recovery_isolation_v1.yaml
-      config_sha256: 0fcd32da2c29eb9f2c8d0d838d160746890ddbec0d51d833bce9c1cc9943aa35
+      pre_authorization_config_sha256: 0fcd32da2c29eb9f2c8d0d838d160746890ddbec0d51d833bce9c1cc9943aa35
+      config_sha256: cdf0fbd30027dc44c1ec876606fb92f32b0df1121c0dc4fe2c10ad254494c5e8
+      corrected_authorization_record: documentation/contracts/evaluation/m0-three-model-seven-lane-exclusive-a100-recovery-v1-corrected-authorization-2026-08-20.md
+      corrected_authorization_record_sha256: db1a9ae60f7fa4597e141db8e96190da156963bf36d8a0af3b2c4184de4e7cf0
       authorization_record: documentation/contracts/evaluation/m0-three-model-seven-lane-exclusive-a100-recovery-v1-authorization-2026-08-20.md
       authorization_record_sha256: 5ee57b18a2d55c0c2a11cb77a0ceed1ede76c9c1587ead4321a21e15accf36c4
       operator: scripts/study/recover_three_model_m0.py
@@ -434,7 +437,7 @@ evaluation_target:
       slurm_job_count: 5
       node: gruenau10
       gres: gpu:a10080gb:3
-      execution_authorized: false
+      execution_authorized: true
       prior_authorization_attempt: blocked_preflight_scope_key_no_root_no_jobs
       automatic_retry_authorized: false
       normalization_authorized: false
@@ -585,10 +588,12 @@ authorization:
       normalization_authorized: false
       m1_or_m2_authorized: false
     m0_seven_lane_exclusive_a100_recovery:
-      status: corrected_exact_reauthorization_required
-      execution_authorized: false
+      status: corrected_authorized_single_wave
+      execution_authorized: true
       contract_sha256: d2a6d9e35c60a00328380fe7ecfb68bfa3fdd0528ea469ecec0acfecdc849058
-      config_sha256: 0fcd32da2c29eb9f2c8d0d838d160746890ddbec0d51d833bce9c1cc9943aa35
+      pre_authorization_config_sha256: 0fcd32da2c29eb9f2c8d0d838d160746890ddbec0d51d833bce9c1cc9943aa35
+      config_sha256: cdf0fbd30027dc44c1ec876606fb92f32b0df1121c0dc4fe2c10ad254494c5e8
+      corrected_authorization_record_sha256: db1a9ae60f7fa4597e141db8e96190da156963bf36d8a0af3b2c4184de4e7cf0
       prior_authorization_record_sha256: 5ee57b18a2d55c0c2a11cb77a0ceed1ede76c9c1587ead4321a21e15accf36c4
       prior_attempt: blocked_preflight_scope_key_no_root_no_jobs
       wave_limit: 1
@@ -599,7 +604,7 @@ authorization:
       m1_or_m2_authorized: false
 
 next_decision_required:
-  subject: exact_reauthorization_for_corrected_exclusive_a100_recovery
+  subject: none_until_corrected_exclusive_a100_wave_terminal
   note: >-
     The first authorization attempt stopped at preflight because the operator read the consumed old
     scope key. No root or jobs were created. A narrow correction is frozen under new contract/config

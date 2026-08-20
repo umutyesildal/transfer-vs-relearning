@@ -3,8 +3,20 @@ name: m0-scientific-three-model-seven-lane-exclusive-a100-recovery-v1
 status: frozen
 as_of: "2026-08-20"
 mode: exclusive_a100_sequential
-execution_authorized: false
-execution_authorization: null
+execution_authorized: true
+execution_authorization:
+  status: authorized_single_wave
+  execution_authorized: true
+  authorized_at: "2026-08-20"
+  authorized_contract_sha256: d2a6d9e35c60a00328380fe7ecfb68bfa3fdd0528ea469ecec0acfecdc849058
+  pre_authorization_config_sha256: 0fcd32da2c29eb9f2c8d0d838d160746890ddbec0d51d833bce9c1cc9943aa35
+  authorization_record: documentation/contracts/evaluation/m0-three-model-seven-lane-exclusive-a100-recovery-v1-corrected-authorization-2026-08-20.md
+  authorization_record_sha256: db1a9ae60f7fa4597e141db8e96190da156963bf36d8a0af3b2c4184de4e7cf0
+  wave_limit: 1
+  slurm_job_count: 5
+  automatic_retry_authorized: false
+  normalization_authorized: false
+  m1_or_m2_authorized: false
 contract: documentation/contracts/evaluation/m0-three-model-seven-lane-exclusive-a100-recovery-v1.md
 
 base_recovery_config: configs/evaluation/m0_scientific_recovery_v1.yaml
