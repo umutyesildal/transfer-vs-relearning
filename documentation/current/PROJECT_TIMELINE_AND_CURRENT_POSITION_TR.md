@@ -1,8 +1,8 @@
 # Proje timeline'ı ve güncel konum
 
-**Son doğrulama:** 2026-08-20T07:59:47Z
+**Son doğrulama:** 2026-08-20T16:15:00+02:00
 
-**Bilimsel faz:** eval-v1 donduruldu; üç modelli M0 wave terminal `partial_invalid`
+**Bilimsel faz:** eval-v1 donduruldu; 19 geçerli M0 lane korunuyor, beş-lane recovery frozen/unexecuted
 
 **Training readiness:** `ready_to_train=false`
 
@@ -25,17 +25,19 @@ Ancak **tam M0→M1→M2-A/M2-B pipeline henüz başlamadı.** M0 wave sonucu:
 
 ```text
 24 required lane
-├── 17 complete raw lane
-└── 7 failed_pre_scoring / partial_invalid lane
+├── 17 original complete raw lane
+├── 2 valid OLMo isolation-recovery lane
+└── 5 invalid/missing recovery target
 
 normalization_allowed = false
 cross-model scientific summary = yok
 M1 training = başlamadı ve yetkili değil
 ```
 
-Bu nedenle ikinci bir M0 submit yapılmadı ve M1'e otomatik geçilmedi. Mevcut wave'i yeniden
-başlatmak duplicate/outcome-aware rerun olurdu. Sıradaki bilimsel karar, tam olarak eksik yedi lane
-için semantiği değiştirmeyen ayrı bir recovery contract hazırlayıp hazırlamamak.
+Exclusive recovery controller'ı output-routing hatası doğrulandıktan sonra kullanıcı yetkisiyle
+iptal edildi. İki geçerli OLMo lane'i hash ile korundu. Sıradaki karar, yalnız kalan beş lane'i
+fresh output root'larına yazan yeni frozen contract'a exact execution authorization verilip
+verilmeyeceği.
 
 ## 2. Şu an tam olarak neredeyiz?
 
@@ -47,7 +49,7 @@ flowchart LR
     D --> E["3-model M0 preflight"]
     E --> F["24-lane M0 submit"]
     F --> G["17 complete + 7 partial_invalid"]
-    G --> H["Eksik 7 lane recovery kararı"]
+    G --> H["19 retained + 5 target recovery authorization"]
     H --> I["Canonical normalization + M0 gate"]
     I --> J["M1 recipe + training"]
     J --> K["M2-A / M2-B sibling training"]
@@ -59,8 +61,8 @@ flowchart LR
     style K fill:#e9ecef,stroke:#495057
 ```
 
-Güncel konum **G ile H arasındadır**. M0 GPU işleri terminaldir; fakat bilimsel M0 ailesi complete
-değildir. Normalization ve model karşılaştırması fail-closed tutulmuştur.
+Güncel konum **H'dedir**. Beş-lane contract hazırdır fakat execution yetkili değildir. Normalization
+ve model karşılaştırması fail-closed tutulmuştur.
 
 ## 3. Kronolojik timeline
 
@@ -374,11 +376,32 @@ Bu adım 20 Ağustos'ta yerel olarak hazırlandı ve donduruldu; henüz çalış
   `d2a6d9e35c60a00328380fe7ecfb68bfa3fdd0528ea469ecec0acfecdc849058`;
 - corrected config SHA-256:
   `0fcd32da2c29eb9f2c8d0d838d160746890ddbec0d51d833bce9c1cc9943aa35`;
-- execution durumu: corrected exact SHA-bound reauthorization bekliyor.
+- execution durumu: wave submit edildi; OLMo English/Turkish capability tamamlandı, OLMo PPL
+  evaluator'ı yanlışlıkla original output root'a yazdığı için controller kullanıcı yetkisiyle
+  iptal edildi; Qwen ve SmolLM hedefleri başlamadı;
+- terminal record:
+  [`M0_EXCLUSIVE_A100_RECOVERY_CANCELLATION_AND_INTEGRITY_RESULT_2026-08-20.md`](../records/evaluation/M0_EXCLUSIVE_A100_RECOVERY_CANCELLATION_AND_INTEGRITY_RESULT_2026-08-20.md).
+
+Bu sonuçtan sonra 19 geçerli lane'i koruyan ve yalnız beş lane'i hedefleyen retargeted contract
+donduruldu:
+
+- retained: 17 original + 2 geçerli OLMo isolation lane;
+- target: OLMo Turkish PPL, Qwen Pile-10k, Qwen Turkish capability/PPL ve SmolLM English
+  capability;
+- PPL frozen config identity'si korunurken runtime output yalnız fresh lane `raw/corpora` alanına
+  çevriliyor;
+- original root'a eklenmiş üç PPL dosyası path/byte/SHA-256 ile açıkça evidence olarak bağlandı;
+- fresh root:
+  `/vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_retargeted_v1`;
+- config SHA-256:
+  `705661dd5e32d836ee58f64101bc887c7a85059bae3ca2b25505ad967bde9a7d`;
+- contract SHA-256:
+  `1b030869455d68aa0ecf933f881c1661e1fbf504997376fdba08a626e1bc0a55`;
+- execution: `false`; HU fast-forward, preflight ve submission henüz yapılmadı.
 
 ### Adım 2 — Complete raw bundle ve canonical normalization
 
-Yedi recovery lane geçerli biçimde tamamlanırsa 17 source + 7 recovery artefaktı hash doğrulamalı
+Beş recovery lane geçerli biçimde tamamlanırsa 19 retained + 5 recovery artefaktı hash doğrulamalı
 bir composite M0 bundle'a bağlanır. Ardından eval-v1 normalizer:
 
 - checkpoint registry;
@@ -413,12 +436,11 @@ retention  = child − exact parent
 
 ## 6. Bugünkü execution sınırı
 
-Şu anda yeni training başlatmak doğru adım değildir. Yetkilendirilen tek recovery wave tüketilmiştir:
+Şu anda yeni training başlatmak doğru adım değildir. Önceki recovery yetkileri tüketilmiştir:
 
-> Mevcut 17 geçerli M0 lane'i immutable biçimde koruyan ve yalnızca eksik yedi lane'i tamamlayan
-> Yedi lane shared/occupied GPU görünürlüğü nedeniyle memory guard'da fail-closed durdu. GPU
-> isolation ve deterministic UUID seçimini exact biçimde donduran yeni kontrat hazır; execution
-> yalnız kontrat SHA'sına bağlı ayrı kullanıcı yetkisiyle açılabilir.
+> 17 original ve iki geçerli isolation lane'i hash ile koruyan, yalnız kalan beş lane'i fresh
+> root'a yazan contract hazırdır. Execution yalnız final contract/config SHA'larına bağlı ayrı
+> kullanıcı yetkisiyle açılabilir.
 
 Bu wave dışında:
 
@@ -445,7 +467,7 @@ Bu wave dışında:
 
 ## 8. Tek satırlık güncel hüküm
 
-**Pipeline başlatıldı; M0 execution terminalde 17/24 geçerli ham lane ile fail-closed duruyor;
-eksik yedi lane için exact SHA-bound tek wave çalıştırıldı fakat yedi lane de scoring öncesi memory
-guard'da durdu; 17/24 korunuyor ve sıradaki adım otomatik retry değil, ayrı frozen GPU-isolation
-recovery kontratının exact authorization ve tek execution'ıdır.**
+**Pipeline başlatıldı; 17 original + 2 geçerli OLMo recovery lane'i korunuyor; beş invalid/missing
+lane için output-retargeted frozen contract hazır fakat unexecuted; sıradaki adım final
+contract/config SHA'larına bağlı exact authorization, HU fast-forward, preflight ve tek beş-job
+DAG'dır.**

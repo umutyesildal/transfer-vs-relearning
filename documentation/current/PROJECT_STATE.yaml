@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m0-evaluation
-  status: m0_recovery_terminal_not_run_gpu_memory_guard
+  status: m0_five_lane_retargeted_recovery_frozen_unexecuted
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -453,6 +453,25 @@ evaluation_target:
       terminal_composite_sha256: 8563bfcdfbe49cb3953bfe54fb22cd5910cff2933caf80a74cd51eeb681839cb
       prior_authorization_attempt: blocked_preflight_scope_key_no_root_no_jobs
       automatic_retry_authorized: false
+    m0_five_lane_retargeted_recovery:
+      status: frozen_unexecuted_exact_authorization_required
+      contract: documentation/contracts/evaluation/m0-three-model-five-lane-retargeted-recovery-v1.md
+      contract_sha256: 1b030869455d68aa0ecf933f881c1661e1fbf504997376fdba08a626e1bc0a55
+      config: configs/evaluation/m0_scientific_recovery_retargeted_v1.yaml
+      config_sha256: 705661dd5e32d836ee58f64101bc887c7a85059bae3ca2b25505ad967bde9a7d
+      operator: scripts/study/recover_three_model_m0.py
+      implementation_commit: caaa380c2b237437b38019ac319e95a82b38f80e
+      source_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1
+      retained_isolation_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_isolation_v1
+      recovery_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_retargeted_v1
+      retained_lane_count: 19
+      recovery_lane_count: 5
+      topology: one_exclusive_three_a100_sequential_wave_plus_four_finalizers
+      slurm_job_count: 5
+      execution_authorized: false
+      normalization_authorized: false
+      m1_or_m2_authorized: false
+      automatic_retry_authorized: false
       normalization_authorized: false
       m1_or_m2_authorized: false
     m0_preflight:
@@ -522,8 +541,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: obtain_exact_reauthorization_for_corrected_exclusive_a100_recovery
-  first_boundary: corrected_contract_d2a6d9_requires_exact_authorization
+  name: obtain_exact_authorization_for_five_lane_retargeted_recovery
+  first_boundary: five_lane_contract_and_config_require_exact_authorization
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -560,8 +579,12 @@ active_priority:
     - seven_lane_recovery_execution_result_terminal_not_run
     - separately_frozen_gpu_isolation_recovery_contract
     - exact_sha_bound_exclusive_a100_recovery_authorization
+    - exclusive_a100_recovery_terminal_cancellation_integrity_record
+    - five_lane_runtime_output_retarget_implementation
+    - nineteen_plus_five_composite_contract
   required_outputs:
-    - exclusive_a100_recovery_execution_result
+    - exact_sha_bound_five_lane_recovery_authorization
+    - five_lane_retargeted_recovery_execution_result
     - complete_composite_three_model_raw_bundle
     - frozen_normalization_and_gate_result
 
@@ -615,10 +638,24 @@ authorization:
       rescore_complete_lanes_authorized: false
       normalization_authorized: false
       m1_or_m2_authorized: false
+    m0_five_lane_retargeted_recovery:
+      status: frozen_unexecuted_exact_authorization_required
+      execution_authorized: false
+      contract_sha256: 1b030869455d68aa0ecf933f881c1661e1fbf504997376fdba08a626e1bc0a55
+      config_sha256: 705661dd5e32d836ee58f64101bc887c7a85059bae3ca2b25505ad967bde9a7d
+      wave_limit: 1
+      slurm_job_count: 5
+      retained_lane_count: 19
+      recovery_lane_count: 5
+      rescore_complete_lanes_authorized: false
+      normalization_authorized: false
+      m1_or_m2_authorized: false
+      automatic_retry_authorized: false
 
 next_decision_required:
-  subject: none_until_corrected_exclusive_a100_wave_terminal
+  subject: exact_sha_bound_five_lane_retargeted_recovery_authorization
   note: >-
-    The first authorization attempt stopped at preflight because the operator read the consumed old
-    scope key. No root or jobs were created. A narrow correction is frozen under new contract/config
-    hashes and requires exact reauthorization. Normalization and M1/M2 remain separate.
+    The cancelled exclusive wave retained two valid OLMo lanes and exposed one PPL output-routing
+    defect. A fresh contract now binds 19 retained plus five target lanes and requires exact
+    authorization before publication, HU fast-forward, preflight or one five-job DAG. Normalization
+    and M1/M2 remain separate.

@@ -1,0 +1,101 @@
+schema_version: 1
+name: m0-scientific-three-model-five-lane-retargeted-recovery-v1
+status: frozen
+as_of: "2026-08-20"
+mode: retargeted_five_lane
+execution_authorized: false
+execution_authorization: null
+contract: documentation/contracts/evaluation/m0-three-model-five-lane-retargeted-recovery-v1.md
+
+base_recovery_config: configs/evaluation/m0_scientific_recovery_v1.yaml
+base_recovery_config_sha256: d934b782fe307d1d54b7fdce47be8ebc2409a6b6c2acf3f2aa435aa4577ac6d7
+source_lane_count: 24
+recovery_lane_count: 5
+model_order: [olmo, qwen, smollm]
+recovery_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_retargeted_v1
+
+known_source_append_artifacts:
+  - path: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1/olmo/lanes/turkish_perplexity/raw/corpora/summary.json
+    bytes: 1991
+    sha256: 1b798928c52d1f5d2cb6fb2b4f7b284e22053ddd0f19772ad5c2b1c6d7cb206a
+  - path: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1/olmo/lanes/turkish_perplexity/raw/corpora/trwiki_cross_domain/loss_blocks.csv
+    bytes: 954202
+    sha256: 1a99a61613f267ef83b9151f0ac1142afbdb17cdc953368e439396b931bfc69c
+  - path: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1/olmo/lanes/turkish_perplexity/raw/corpora/trwiki_cross_domain/summary.json
+    bytes: 936
+    sha256: 630ab6f16573160df8a13343ffac05706df49892ee971b89fe05cd59f9ebb2e1
+
+model_overrides:
+  olmo:
+    targets:
+      turkish_perplexity:
+        route_id: v10032gb
+        min_free_gpu_bytes: 30064771072
+        runtime_output_subdir: corpora
+    retained_recovery_lanes:
+      english_capability:
+        root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_isolation_v1/olmo
+        lane_result_sha256: b254691b103bfae7fb9294b3078ae2a794e6c282d7afd3892e68eff4238df598
+      turkish_capability:
+        root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_isolation_v1/olmo
+        lane_result_sha256: 3c934519740b45f62d6ead3c34e3e3871f62ef9ba9f8e748b663d17c12101c64
+  qwen:
+    targets:
+      english_retention_pile_10k:
+        route_id: a10080gb
+        min_free_gpu_bytes: 68719476736
+      turkish_capability:
+        route_id: v10032gb
+        min_free_gpu_bytes: 30064771072
+      turkish_perplexity:
+        route_id: v10032gb
+        min_free_gpu_bytes: 30064771072
+        runtime_output_subdir: corpora
+  smollm:
+    targets:
+      english_capability:
+        route_id: v10032gb
+        min_free_gpu_bytes: 30064771072
+
+isolation:
+  node: gruenau10
+  partition: gpu
+  gres: gpu:a10080gb:3
+  requested_gpu_count: 3
+  exclusive_node_allocation: true
+  expected_gpu_name: NVIDIA A100 80GB PCIe
+  min_total_gpu_bytes: 85899345920
+  selection_rule: maximum_free_bytes_then_uuid
+  max_wait_seconds: 7200
+  poll_interval_seconds: 60
+  cpus_per_task: 8
+  memory: 96G
+  time_limit: 1-00:00:00
+  target_order:
+    - olmo:turkish_perplexity
+    - qwen:english_retention_pile_10k
+    - qwen:turkish_capability
+    - qwen:turkish_perplexity
+    - smollm:english_capability
+
+implementation:
+  commit: caaa380c2b237437b38019ac319e95a82b38f80e
+  files:
+    scripts/study/recover_three_model_m0.py: 842ceb88e5d2831e60c509e3f6820dc8400a7f9baafe7c24f88e241688379551
+    src/transfer_vs_relearning/study/adapters/m0_probing.py: e05883a070e0a971620e087e426897a07bd0f1b7de0788e81b519f8dfd9dab18
+    src/transfer_vs_relearning/study/m0_family_recovery.py: 8badbc9030b4776f6ba7de7719ca18f8f33e65ca156a194a4f5ee9fc4dd0ebe2
+    tests/study/test_m0_evaluation_adapter.py: c950c9fadd2126833eb67b9336cf45a31104a4c51e9396dc923ea094a3d9519a
+    tests/study/test_m0_family_recovery.py: 74693fabb1da2330016c7ea183a241c4d24f65543d76678f58cc5509bf1e6f1a
+
+prohibitions:
+  - rescore_nineteen_valid_lanes
+  - mutate_or_delete_prior_evidence
+  - change_eval_v1_semantics
+  - lower_existing_lane_memory_thresholds
+  - write_project_evaluator_outputs_outside_fresh_lane_raw_roots
+  - automatic_resubmission
+  - second_retargeted_wave
+  - normalization_or_scientific_interpretation
+  - m1_or_m2_training
+  - cleanup_or_deletion
+  - hu_home_writes
