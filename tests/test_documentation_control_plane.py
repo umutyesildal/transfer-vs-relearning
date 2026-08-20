@@ -115,6 +115,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["pipeline"]["m0_seven_lane_exclusive_a100_recovery"]["operator"],
         state["evaluation_target"]["pipeline"]["m0_seven_lane_exclusive_a100_recovery"]["authorization_record"],
         state["evaluation_target"]["pipeline"]["m0_seven_lane_exclusive_a100_recovery"]["corrected_authorization_record"],
+        state["evaluation_target"]["pipeline"]["m0_seven_lane_exclusive_a100_recovery"]["submission_record"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],
@@ -221,7 +222,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert len(scientific_m0["known_operational_failures"]) == 7
 
     isolated = state["evaluation_target"]["pipeline"]["m0_seven_lane_exclusive_a100_recovery"]
-    assert isolated["status"] == "corrected_authorized_single_wave_not_yet_submitted"
+    assert isolated["status"] == "submitted_resources_pending"
     assert isolated["contract_sha256"] == (
         "d2a6d9e35c60a00328380fe7ecfb68bfa3fdd0528ea469ecec0acfecdc849058"
     )

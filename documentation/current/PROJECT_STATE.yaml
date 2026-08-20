@@ -416,7 +416,7 @@ evaluation_target:
       normalization_authorized: false
       m1_or_m2_authorized: false
     m0_seven_lane_exclusive_a100_recovery:
-      status: corrected_authorized_single_wave_not_yet_submitted
+      status: submitted_resources_pending
       contract: documentation/contracts/evaluation/m0-three-model-seven-lane-exclusive-a100-recovery-v1.md
       contract_sha256: d2a6d9e35c60a00328380fe7ecfb68bfa3fdd0528ea469ecec0acfecdc849058
       config: configs/evaluation/m0_scientific_recovery_isolation_v1.yaml
@@ -438,6 +438,12 @@ evaluation_target:
       node: gruenau10
       gres: gpu:a10080gb:3
       execution_authorized: true
+      submission_record: documentation/records/evaluation/M0_EXCLUSIVE_A100_RECOVERY_SUBMISSION_2026-08-20.md
+      wave_job: "471047"
+      model_finalizers: ["471048", "471049", "471050"]
+      family_finalizer: "471051"
+      scheduler_estimate: "2026-08-22T10:46:25"
+      submission_manifest_sha256: 32de77b5c7ae3c9d31cc9032f949e562fc38b64fe6f9410e4182ed86d4546e53
       prior_authorization_attempt: blocked_preflight_scope_key_no_root_no_jobs
       automatic_retry_authorized: false
       normalization_authorized: false
