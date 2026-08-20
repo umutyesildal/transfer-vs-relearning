@@ -126,15 +126,21 @@ intervention.
 
 ## 10. Frozen implementation
 
-- implementation commit: `112a2c5482525d0f541b646cf232e6c94e7deb7b`;
+- implementation commit: `1bf87f84cff5b67c1a45d5a2b4244a59fa226337`;
 - operator SHA-256:
-  `539ee695152c667f0aed07fa8256e41622a032358774277aef995d70c3d3d960`;
+  `99ba9adb0e74f14f7a4b3e3b20e5e4ccd1c3a61fea0747ac34fc0544a6942d39`;
 - recovery module SHA-256:
   `6274c6f3ca502744611efaf4f96055272bb6cd0c114e84f90b7b191ef683eab1`;
 - recovery tests SHA-256:
   `440d8d5665ab34eab7ff5f911c957089e03d0c193d6a65ad11004de4e66c4c3f`;
 - config SHA-256:
-  `9632b5274cda8012432aeb7837d4cb33ab7e2992354ede615eaf1f22eee9d689`.
+  `0fcd32da2c29eb9f2c8d0d838d160746890ddbec0d51d833bce9c1cc9943aa35`.
+
+The implementation identity includes one preflight-only correction discovered during the first
+authorization attempt: isolation mode now reads the dedicated
+`m0_seven_lane_exclusive_a100_recovery` scoped authorization key instead of the consumed first-wave
+key. That attempt stopped at preflight with 14/15 checks passing; it created no recovery root and
+submitted no job. The correction changes no execution topology or scientific behavior.
 
 ## 11. Authorization boundary
 

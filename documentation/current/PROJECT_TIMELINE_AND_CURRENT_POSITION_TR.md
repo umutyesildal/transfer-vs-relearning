@@ -367,7 +367,14 @@ Bu adım 20 Ağustos'ta yerel olarak hazırlandı ve donduruldu; henüz çalış
 - exact SHA-bound tek-wave kullanıcı yetkisi 20 Ağustos'ta verildi;
 - authorization record:
   [`m0-three-model-seven-lane-exclusive-a100-recovery-v1-authorization-2026-08-20.md`](../contracts/evaluation/m0-three-model-seven-lane-exclusive-a100-recovery-v1-authorization-2026-08-20.md);
-- execution durumu: HU fast-forward ve final preflight sonrası tek beş-job DAG bekliyor.
+- ilk authorization attempt final preflight'ta 14/15 PASS ile scope-key kontrolünde durdu;
+- recovery root oluşturulmadı ve Slurm job submit edilmedi;
+- isolation modunun dedicated authorization key'ini okuyan dar correction donduruldu;
+- corrected contract SHA-256:
+  `d2a6d9e35c60a00328380fe7ecfb68bfa3fdd0528ea469ecec0acfecdc849058`;
+- corrected config SHA-256:
+  `0fcd32da2c29eb9f2c8d0d838d160746890ddbec0d51d833bce9c1cc9943aa35`;
+- execution durumu: corrected exact SHA-bound reauthorization bekliyor.
 
 ### Adım 2 — Complete raw bundle ve canonical normalization
 

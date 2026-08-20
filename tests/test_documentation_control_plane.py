@@ -220,30 +220,27 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert len(scientific_m0["known_operational_failures"]) == 7
 
     isolated = state["evaluation_target"]["pipeline"]["m0_seven_lane_exclusive_a100_recovery"]
-    assert isolated["status"] == "authorized_single_wave_not_yet_submitted"
+    assert isolated["status"] == "corrected_frozen_unexecuted_exact_reauthorization_required"
     assert isolated["contract_sha256"] == (
-        "41215ef7be2ad18ea9c8f52581870955431ba7ff5ba8af20633650452c0dca01"
-    )
-    assert isolated["pre_authorization_config_sha256"] == (
-        "9632b5274cda8012432aeb7837d4cb33ab7e2992354ede615eaf1f22eee9d689"
+        "d2a6d9e35c60a00328380fe7ecfb68bfa3fdd0528ea469ecec0acfecdc849058"
     )
     assert isolated["config_sha256"] == (
-        "6f73a94344e6e0602338e55c84bc8fef550e44fb4d3ead8da3704f69ab7f8d28"
+        "0fcd32da2c29eb9f2c8d0d838d160746890ddbec0d51d833bce9c1cc9943aa35"
     )
     assert isolated["retained_lane_count"] == 17
     assert isolated["recovery_lane_count"] == 7
     assert isolated["slurm_job_count"] == 5
     assert isolated["node"] == "gruenau10"
     assert isolated["gres"] == "gpu:a10080gb:3"
-    assert isolated["execution_authorized"] is True
+    assert isolated["execution_authorized"] is False
     assert isolated["automatic_retry_authorized"] is False
     assert isolated["normalization_authorized"] is False
 
     isolated_authorization = state["authorization"]["scoped"][
         "m0_seven_lane_exclusive_a100_recovery"
     ]
-    assert isolated_authorization["status"] == "authorized_single_wave"
-    assert isolated_authorization["execution_authorized"] is True
+    assert isolated_authorization["status"] == "corrected_exact_reauthorization_required"
+    assert isolated_authorization["execution_authorized"] is False
     assert isolated_authorization["wave_limit"] == 1
     assert isolated_authorization["slurm_job_count"] == 5
 

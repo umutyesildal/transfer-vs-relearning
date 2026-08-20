@@ -416,16 +416,15 @@ evaluation_target:
       normalization_authorized: false
       m1_or_m2_authorized: false
     m0_seven_lane_exclusive_a100_recovery:
-      status: authorized_single_wave_not_yet_submitted
+      status: corrected_frozen_unexecuted_exact_reauthorization_required
       contract: documentation/contracts/evaluation/m0-three-model-seven-lane-exclusive-a100-recovery-v1.md
-      contract_sha256: 41215ef7be2ad18ea9c8f52581870955431ba7ff5ba8af20633650452c0dca01
+      contract_sha256: d2a6d9e35c60a00328380fe7ecfb68bfa3fdd0528ea469ecec0acfecdc849058
       config: configs/evaluation/m0_scientific_recovery_isolation_v1.yaml
-      pre_authorization_config_sha256: 9632b5274cda8012432aeb7837d4cb33ab7e2992354ede615eaf1f22eee9d689
-      config_sha256: 6f73a94344e6e0602338e55c84bc8fef550e44fb4d3ead8da3704f69ab7f8d28
+      config_sha256: 0fcd32da2c29eb9f2c8d0d838d160746890ddbec0d51d833bce9c1cc9943aa35
       authorization_record: documentation/contracts/evaluation/m0-three-model-seven-lane-exclusive-a100-recovery-v1-authorization-2026-08-20.md
       authorization_record_sha256: 5ee57b18a2d55c0c2a11cb77a0ceed1ede76c9c1587ead4321a21e15accf36c4
       operator: scripts/study/recover_three_model_m0.py
-      implementation_commit: 112a2c5482525d0f541b646cf232e6c94e7deb7b
+      implementation_commit: 1bf87f84cff5b67c1a45d5a2b4244a59fa226337
       source_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1
       first_recovery_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_v1
       recovery_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_isolation_v1
@@ -435,7 +434,8 @@ evaluation_target:
       slurm_job_count: 5
       node: gruenau10
       gres: gpu:a10080gb:3
-      execution_authorized: true
+      execution_authorized: false
+      prior_authorization_attempt: blocked_preflight_scope_key_no_root_no_jobs
       automatic_retry_authorized: false
       normalization_authorized: false
       m1_or_m2_authorized: false
@@ -506,8 +506,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: execute_authorized_exclusive_a100_recovery
-  first_boundary: hu_fast_forward_preflight_then_single_five_job_dag
+  name: obtain_exact_reauthorization_for_corrected_exclusive_a100_recovery
+  first_boundary: corrected_contract_d2a6d9_requires_exact_authorization
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -585,12 +585,12 @@ authorization:
       normalization_authorized: false
       m1_or_m2_authorized: false
     m0_seven_lane_exclusive_a100_recovery:
-      status: authorized_single_wave
-      execution_authorized: true
-      contract_sha256: 41215ef7be2ad18ea9c8f52581870955431ba7ff5ba8af20633650452c0dca01
-      pre_authorization_config_sha256: 9632b5274cda8012432aeb7837d4cb33ab7e2992354ede615eaf1f22eee9d689
-      config_sha256: 6f73a94344e6e0602338e55c84bc8fef550e44fb4d3ead8da3704f69ab7f8d28
-      authorization_record_sha256: 5ee57b18a2d55c0c2a11cb77a0ceed1ede76c9c1587ead4321a21e15accf36c4
+      status: corrected_exact_reauthorization_required
+      execution_authorized: false
+      contract_sha256: d2a6d9e35c60a00328380fe7ecfb68bfa3fdd0528ea469ecec0acfecdc849058
+      config_sha256: 0fcd32da2c29eb9f2c8d0d838d160746890ddbec0d51d833bce9c1cc9943aa35
+      prior_authorization_record_sha256: 5ee57b18a2d55c0c2a11cb77a0ceed1ede76c9c1587ead4321a21e15accf36c4
+      prior_attempt: blocked_preflight_scope_key_no_root_no_jobs
       wave_limit: 1
       slurm_job_count: 5
       recovery_lane_count: 7
@@ -599,8 +599,8 @@ authorization:
       m1_or_m2_authorized: false
 
 next_decision_required:
-  subject: none_until_exclusive_a100_wave_reaches_terminal_state
+  subject: exact_reauthorization_for_corrected_exclusive_a100_recovery
   note: >-
-    The exact exclusive-A100 wave is authorized. Perform preservation-checked HU fast-forward,
-    final fail-closed preflight and one five-job DAG. Preserve 17 source lanes and both prior roots.
-    Normalization and M1/M2 remain separate.
+    The first authorization attempt stopped at preflight because the operator read the consumed old
+    scope key. No root or jobs were created. A narrow correction is frozen under new contract/config
+    hashes and requires exact reauthorization. Normalization and M1/M2 remain separate.
