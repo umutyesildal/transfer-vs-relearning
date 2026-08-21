@@ -40,7 +40,7 @@ def test_frozen_plan_preserves_historical_exact_prefix_semantics() -> None:
 def test_recovery_plan_preserves_semantics_and_uses_fresh_a100_root() -> None:
     plan = load_exact_prefix_plan(RECOVERY_CONFIG, repo_root=ROOT)
     assert plan["classification"] == "operational_recovery"
-    assert plan["execution_authorized"] is False
+    assert plan["execution_authorized"] is True
     assert plan["authorization_scope"] == "m0_exact_prefix_recovery"
     assert plan["slurm"]["nodelist"] == "gruenau9"
     assert plan["slurm"]["gres"] == "gpu:a10080gb:1"
