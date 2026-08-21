@@ -23,7 +23,8 @@ CONFIG = ROOT / "configs/evaluation/m0_exact_prefix_three_model_v1.yaml"
 def test_frozen_plan_preserves_historical_exact_prefix_semantics() -> None:
     plan = load_exact_prefix_plan(CONFIG, repo_root=ROOT)
     assert plan["status"] == "frozen"
-    assert plan["execution_authorized"] is False
+    assert plan["execution_authorized"] is True
+    assert plan["execution_authorization"]["status"] == "authorized_single_wave"
     assert plan["semantic_classification"] == (
         "historical_exact_prefix_candidate_ranking_not_free_generation"
     )

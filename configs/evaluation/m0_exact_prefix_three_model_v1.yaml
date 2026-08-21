@@ -4,8 +4,21 @@ status: frozen
 as_of: "2026-08-21"
 classification: scientific_supplement
 semantic_classification: historical_exact_prefix_candidate_ranking_not_free_generation
-execution_authorized: false
-execution_authorization: null
+execution_authorized: true
+execution_authorization:
+  status: authorized_single_wave
+  execution_authorized: true
+  authorized_at: "2026-08-21"
+  authorized_contract_sha256: 83f43a3ebbc981f4e8f99609587a6a3c0d3fc1eabda95d3e640671aa109a633b
+  pre_authorization_config_sha256: 4d42a3700fb1f5302d38cba7fcb06f40a3eb0c288642d5e254f81b7c41f1178a
+  authorization_record: documentation/contracts/evaluation/m0-three-model-exact-prefix-supplement-v1-authorization-2026-08-21.md
+  authorization_record_sha256: e1c9166bebee4f2a81f2eac587d9661e45649759855759d3c9e230e2b83db992
+  wave_limit: 1
+  slurm_job_count: 4
+  robust_a_to_d_rerun_authorized: false
+  automatic_retry_authorized: false
+  normalization_authorized: false
+  m1_or_m2_authorized: false
 contract: documentation/contracts/evaluation/m0-three-model-exact-prefix-supplement-v1.md
 family_root: /vol/tmp2/yesildau/eval_v1_m0_three_model_exact_prefix_supplement_v1
 
