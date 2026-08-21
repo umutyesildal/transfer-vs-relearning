@@ -540,7 +540,7 @@ evaluation_target:
       m1_or_m2_authorized: false
       automatic_retry_authorized: false
     m0_exact_prefix_supplement:
-      status: authorized_single_wave
+      status: terminal_not_run_gpu_memory_guard_all_three
       classification: scientific_supplement
       semantic_classification: historical_exact_prefix_candidate_ranking_not_free_generation
       contract: documentation/contracts/evaluation/m0-three-model-exact-prefix-supplement-v1.md
@@ -552,13 +552,29 @@ evaluation_target:
       authorization_record_sha256: e1c9166bebee4f2a81f2eac587d9661e45649759855759d3c9e230e2b83db992
       operator: scripts/study/run_three_model_m0_exact_prefix.py
       implementation_commit: 246f4764ec5d2bfdcffa58012b25bcd31ea1f166
+      execution_commit: 409cc4bf0f6e123e51cdbe328c873f471733fc16
+      execution_record: documentation/records/evaluation/M0_THREE_MODEL_EXACT_PREFIX_SUPPLEMENT_EXECUTION_2026-08-21.md
       family_root: /vol/tmp2/yesildau/eval_v1_m0_three_model_exact_prefix_supplement_v1
       models: [olmo, qwen, smollm]
       probe_count_per_model: 500
       robust_a_to_d_rerun_authorized: false
       topology: one_parallel_three_task_rtxa6000_array_plus_afterany_finalizer
       slurm_job_count: 4
-      execution_authorized: true
+      execution_authorized: false
+      authorization_consumed: true
+      wave_consumed: true
+      resubmission_authorized: false
+      array_job: "473834"
+      array_task_jobs: ["473836", "473837", "473834"]
+      finalizer_job: "473835"
+      valid_scientific_score_count: 0
+      not_run_lane_count: 3
+      observed_free_gpu_bytes: 3142844416
+      min_free_gpu_bytes: 21474836480
+      final_preflight_sha256: 52a7df0d1700ac16c317f82869dc8e32ec01668e633ed967218df3a61560ed32
+      submission_manifest_sha256: c9337f506ddea6eada5b735a7ab3b03186352a8d9293cf306c5625209266f9f2
+      family_result_sha256: fee84e1ec4604c4a1a1dbc96a7f2a52a50d48a00ca9f6dbc2f1347b9bf3aaaa9
+      family_inventory_sha256: cbf35264fc5eef8394e2821bd63eeb047e64ac35b6712bff577595d4262d78c0
       automatic_retry_authorized: false
       normalization_authorized: false
       m1_or_m2_authorized: false
@@ -766,8 +782,8 @@ authorization:
       wave_consumed: true
       resubmission_authorized: false
     m0_exact_prefix_supplement:
-      status: authorized_single_wave
-      execution_authorized: true
+      status: consumed_terminal_not_run
+      execution_authorized: false
       contract_sha256: 83f43a3ebbc981f4e8f99609587a6a3c0d3fc1eabda95d3e640671aa109a633b
       pre_authorization_config_sha256: 4d42a3700fb1f5302d38cba7fcb06f40a3eb0c288642d5e254f81b7c41f1178a
       config_sha256: 5adc22f0512bd3e6331622d40b705893341990cea90ed58e4d23550a9ad1ae62
@@ -778,6 +794,8 @@ authorization:
       automatic_retry_authorized: false
       normalization_authorized: false
       m1_or_m2_authorized: false
+      wave_consumed: true
+      resubmission_authorized: false
 
 next_decision_required:
   subject: qwen_pile_single_lane_recovery_terminal_result

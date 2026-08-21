@@ -436,11 +436,13 @@ ayrı bir supplement olarak donduruldu. Bu panel mevcut robust A--D direct/QA la
 sonra literal prefix eşleştirmesi değil, aday cevapların mean answer-token log probability ile
 sıralanmasıdır.
 
-Tek wave üç modeli `0-2%3` RTX A6000 array ile paralel çalıştırır ve bir `afterany` CPU finalizer
-ekler. Fresh root, 20 GiB execution-time free-VRAM guard, exact input/model/runtime/implementation
-hash'leri ve partial-submission ledgeri fail-closed olarak donduruldu. Paket şu anda unexecuted;
-push, HU fast-forward, preflight ve dört-job DAG için exact contract/config SHA authorization
-gereklidir. Aktif Qwen Pile-10k recovery DAG'ı bundan bağımsızdır ve değiştirilmez.
+Tek wave üç modeli `0-2%3` RTX A6000 array ile paralel çalıştırdı ve bir `afterany` CPU finalizer
+ekledi. Final preflight 14/14 PASS oldu; array `473834`, task job'ları `473836/473837/473834` ve
+finalizer `473835` olarak bir kez submit edildi. Üç task da model load/scoring öncesi aynı
+execution-time guard'da durdu: `3,142,844,416 < 21,474,836,480` free byte. Sonuç üç model için de
+operational `NOT_RUN`; exact-prefix bilimsel skoru üretilmedi. Tek-wave yetki tüketildi ve retry
+yetkili değil. Aktif Qwen Pile-10k recovery DAG'ı bundan bağımsız kaldı ve değiştirilmedi. Kayıt:
+[`M0_THREE_MODEL_EXACT_PREFIX_SUPPLEMENT_EXECUTION_2026-08-21.md`](../records/evaluation/M0_THREE_MODEL_EXACT_PREFIX_SUPPLEMENT_EXECUTION_2026-08-21.md).
 
 Tek Qwen Pile lane geçerli biçimde tamamlanırsa 23 retained + 1 recovery artefaktı hash doğrulamalı
 bir composite M0 bundle'a bağlanır. Ardından eval-v1 normalizer:
