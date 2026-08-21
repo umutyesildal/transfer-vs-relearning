@@ -1,0 +1,109 @@
+schema_version: 1
+name: m0-qwen-pile-single-lane-a100-recovery-v1
+status: frozen
+as_of: "2026-08-21"
+mode: qwen_pile_single_lane
+execution_authorized: false
+execution_authorization: null
+contract: documentation/contracts/evaluation/m0-qwen-pile-single-lane-a100-recovery-v1.md
+
+base_recovery_config: configs/evaluation/m0_scientific_recovery_v1.yaml
+base_recovery_config_sha256: d934b782fe307d1d54b7fdce47be8ebc2409a6b6c2acf3f2aa435aa4577ac6d7
+source_lane_count: 24
+recovery_lane_count: 1
+model_order: [olmo, qwen, smollm]
+recovery_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_qwen_pile_single_lane_v1
+
+known_source_append_artifacts:
+  - path: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1/olmo/lanes/turkish_perplexity/raw/corpora/summary.json
+    bytes: 1991
+    sha256: 1b798928c52d1f5d2cb6fb2b4f7b284e22053ddd0f19772ad5c2b1c6d7cb206a
+  - path: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1/olmo/lanes/turkish_perplexity/raw/corpora/trwiki_cross_domain/loss_blocks.csv
+    bytes: 954202
+    sha256: 1a99a61613f267ef83b9151f0ac1142afbdb17cdc953368e439396b931bfc69c
+  - path: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1/olmo/lanes/turkish_perplexity/raw/corpora/trwiki_cross_domain/summary.json
+    bytes: 936
+    sha256: 630ab6f16573160df8a13343ffac05706df49892ee971b89fe05cd59f9ebb2e1
+
+prior_recovery_roots:
+  - /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_isolation_v1
+  - /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_retargeted_v1
+known_prior_recovery_artifacts:
+  - path: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_retargeted_v1/isolated_wave_ledger.json
+    bytes: 3197
+    sha256: 390c3b9baef8af85e9b10eefe13152475270bdd7ed8d70b7858251be809e6215
+  - path: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_retargeted_v1/three_model_m0_composite_bundle.json
+    bytes: 2261
+    sha256: 5871bc480d3b04027b25fd49b6eb1d65cdc234de1f34aaf39f21088e52b25243
+  - path: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_retargeted_v1/family_final_inventory.json
+    bytes: 36841
+    sha256: 0abd0be2d7501e31b8268bf138eb4f7a999d10ad4775bcc695b1c6b30ee90b26
+
+model_overrides:
+  olmo:
+    targets: {}
+    retained_recovery_lanes:
+      english_capability:
+        root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_isolation_v1/olmo
+        lane_result_sha256: b254691b103bfae7fb9294b3078ae2a794e6c282d7afd3892e68eff4238df598
+      turkish_capability:
+        root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_isolation_v1/olmo
+        lane_result_sha256: 3c934519740b45f62d6ead3c34e3e3871f62ef9ba9f8e748b663d17c12101c64
+      turkish_perplexity:
+        root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_retargeted_v1/olmo
+        lane_result_sha256: 79d32ebff7677b026478913f233bad3ed23041a96d31bcdb2634a2c7d5dd81bd
+  qwen:
+    targets:
+      english_retention_pile_10k:
+        route_id: a10080gb
+        min_free_gpu_bytes: 68719476736
+    retained_recovery_lanes:
+      turkish_capability:
+        root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_retargeted_v1/qwen
+        lane_result_sha256: d8391afcad0ece157da54858cdde25cd3b9aaa5ba1f0bbcdcde38c42421ec73b
+      turkish_perplexity:
+        root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_retargeted_v1/qwen
+        lane_result_sha256: d2548faccb9d15b1176310c429e7c4a61f68fd95ab70d78cdcef9bb4b6ccb904
+  smollm:
+    targets: {}
+    retained_recovery_lanes:
+      english_capability:
+        root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_retargeted_v1/smollm
+        lane_result_sha256: d4cf359cda792569ea9abe597d55759034c6b51b2c928f2f9991bc6f1ef60908
+
+isolation:
+  node: gruenau10
+  partition: gpu
+  gres: gpu:a10080gb:3
+  requested_gpu_count: 3
+  exclusive_node_allocation: true
+  expected_gpu_name: NVIDIA A100 80GB PCIe
+  min_total_gpu_bytes: 85899345920
+  selection_rule: maximum_free_bytes_then_uuid
+  max_wait_seconds: 7200
+  poll_interval_seconds: 60
+  cpus_per_task: 8
+  memory: 96G
+  time_limit: 1-00:00:00
+  target_order:
+    - qwen:english_retention_pile_10k
+
+implementation:
+  commit: 615d572e553884473bf56d5ac2917aff55d8264a
+  files:
+    scripts/study/recover_three_model_m0.py: 65cd5465e5bb1f4bad83094e85875ebdb112d629f63437756a77bc261d6bcdbc
+    src/transfer_vs_relearning/study/m0_family_recovery.py: 153b53b421c5e688d89333dbad5719c2df817af78329bfd1a2272df1cf4703d9
+    tests/study/test_m0_family_recovery.py: fa7a49d7268fa3d91c69edeb4171d5a02a30353a73d36f5e41eed931871e8f70
+
+prohibitions:
+  - rescore_twenty_three_valid_lanes
+  - change_qwen_pile_auto4_semantics
+  - lower_68719476736_byte_memory_gate
+  - change_eval_v1_data_or_metrics
+  - mutate_or_delete_prior_evidence
+  - automatic_resubmission
+  - second_single_lane_wave
+  - normalization_or_scientific_interpretation
+  - m1_or_m2_training
+  - cleanup_or_deletion
+  - hu_home_writes

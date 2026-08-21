@@ -122,6 +122,10 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["pipeline"]["m0_five_lane_retargeted_recovery"]["operator"],
         state["evaluation_target"]["pipeline"]["m0_five_lane_retargeted_recovery"]["authorization_record"],
         state["evaluation_target"]["pipeline"]["m0_five_lane_retargeted_recovery"]["submission_record"],
+        state["evaluation_target"]["pipeline"]["m0_five_lane_retargeted_recovery"]["terminal_record"],
+        state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]["contract"],
+        state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]["config"],
+        state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]["operator"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],
@@ -257,7 +261,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert isolated_authorization["slurm_job_count"] == 5
 
     retargeted = state["evaluation_target"]["pipeline"]["m0_five_lane_retargeted_recovery"]
-    assert retargeted["status"] == "submitted_controller_running"
+    assert retargeted["status"] == "terminal_partial_invalid_23_of_24"
     assert retargeted["contract_sha256"] == (
         "1b030869455d68aa0ecf933f881c1661e1fbf504997376fdba08a626e1bc0a55"
     )
@@ -272,6 +276,12 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert retargeted["resubmission_authorized"] is False
     assert retargeted["wave_job"] == "471536"
     assert retargeted["family_finalizer"] == "471540"
+    assert retargeted["valid_recovered_lane_count"] == 4
+    assert retargeted["blocked_recovery_lane_count"] == 1
+    assert retargeted["effective_valid_lane_count"] == 23
+    assert retargeted["terminal_composite_sha256"] == (
+        "5871bc480d3b04027b25fd49b6eb1d65cdc234de1f34aaf39f21088e52b25243"
+    )
     assert retargeted["normalization_authorized"] is False
     assert retargeted["m1_or_m2_authorized"] is False
     assert retargeted["automatic_retry_authorized"] is False
@@ -286,6 +296,30 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert retargeted_authorization["wave_limit"] == 1
     assert retargeted_authorization["retained_lane_count"] == 19
     assert retargeted_authorization["recovery_lane_count"] == 5
+
+    single = state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]
+    assert single["status"] == "frozen_unexecuted_exact_authorization_required"
+    assert single["contract_sha256"] == (
+        "88f135f74c8e1932660128e4e36f99cdb13923be15fb7ba82c6c3a2a98c40332"
+    )
+    assert single["config_sha256"] == (
+        "f394ca3ecf0e056f825545675b41f7fc7b970da240b41156fff030019a36cf36"
+    )
+    assert single["retained_lane_count"] == 23
+    assert single["recovery_lane_count"] == 1
+    assert single["target"] == "qwen:english_retention_pile_10k"
+    assert single["min_free_gpu_bytes"] == 64 * 1024**3
+    assert single["execution_authorized"] is False
+    assert single["normalization_authorized"] is False
+
+    single_authorization = state["authorization"]["scoped"][
+        "m0_qwen_pile_single_lane_recovery"
+    ]
+    assert single_authorization["status"] == (
+        "frozen_unexecuted_exact_authorization_required"
+    )
+    assert single_authorization["execution_authorized"] is False
+    assert single_authorization["wave_limit"] == 1
 
 
 def test_active_entrypoints_stay_within_context_budget():

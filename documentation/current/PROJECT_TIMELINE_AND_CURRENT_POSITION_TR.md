@@ -1,8 +1,8 @@
 # Proje timeline'ı ve güncel konum
 
-**Son doğrulama:** 2026-08-20T16:18:06+02:00
+**Son doğrulama:** 2026-08-21
 
-**Bilimsel faz:** eval-v1 donduruldu; 19 geçerli M0 lane korunuyor, beş-lane recovery controller running
+**Bilimsel faz:** eval-v1 donduruldu; 23/24 geçerli M0 lane, Qwen Pile single-lane recovery frozen
 
 **Training readiness:** `ready_to_train=false`
 
@@ -26,18 +26,17 @@ Ancak **tam M0→M1→M2-A/M2-B pipeline henüz başlamadı.** M0 wave sonucu:
 ```text
 24 required lane
 ├── 17 original complete raw lane
-├── 2 valid OLMo isolation-recovery lane
-└── 5 invalid/missing recovery target
+├── 6 valid recovery lane
+└── 1 operationally missing Qwen Pile-10k lane
 
 normalization_allowed = false
 cross-model scientific summary = yok
 M1 training = başlamadı ve yetkili değil
 ```
 
-Exclusive recovery controller'ı output-routing hatası doğrulandıktan sonra kullanıcı yetkisiyle
-iptal edildi. İki geçerli OLMo lane'i hash ile korundu. Yalnız kalan beş lane'i fresh output
-root'larına yazan yeni wave exact authorization sonrası submit edildi; controller `471536`
-şu anda çalışıyor.
+Beş-lane recovery dört yeni valid sonuç üretti; Qwen Pile-10k ise iki saat boyunca 64 GiB boş VRAM
+kapısını geçen A100 bulunamadığı için model load öncesi `NOT_RUN` kaldı. Yalnız bu lane'i hedefleyen
+yeni contract hazırdır fakat execution yetkili değildir.
 
 ## 2. Şu an tam olarak neredeyiz?
 
@@ -49,7 +48,7 @@ flowchart LR
     D --> E["3-model M0 preflight"]
     E --> F["24-lane M0 submit"]
     F --> G["17 complete + 7 partial_invalid"]
-    G --> H["19 retained + 5 target recovery authorization"]
+    G --> H["23 retained + Qwen Pile single-lane recovery"]
     H --> I["Canonical normalization + M0 gate"]
     I --> J["M1 recipe + training"]
     J --> K["M2-A / M2-B sibling training"]
@@ -61,8 +60,8 @@ flowchart LR
     style K fill:#e9ecef,stroke:#495057
 ```
 
-Güncel konum **H'dedir**. Beş-lane controller çalışıyor; finalizer'lar dependency pending.
-Normalization ve model karşılaştırması fail-closed tutulmuştur.
+Güncel konum **H'dedir**. Tek-lane contract exact authorization bekliyor. Normalization ve model
+karşılaştırması fail-closed tutulmuştur.
 
 ## 3. Kronolojik timeline
 
@@ -408,10 +407,20 @@ donduruldu:
 - submission record:
   [`M0_FIVE_LANE_RETARGETED_RECOVERY_SUBMISSION_2026-08-20.md`](../records/evaluation/M0_FIVE_LANE_RETARGETED_RECOVERY_SUBMISSION_2026-08-20.md);
 - tek-wave authorization tüketildi; resubmission yetkili değil.
+- terminal sonuç: dört lane complete, Qwen Pile-10k free-VRAM timeout nedeniyle `NOT_RUN`;
+- effective total: 23/24, composite SHA-256
+  `5871bc480d3b04027b25fd49b6eb1d65cdc234de1f34aaf39f21088e52b25243`;
+- terminal record:
+  [`M0_FIVE_LANE_RETARGETED_RECOVERY_TERMINAL_RESULT_2026-08-21.md`](../records/evaluation/M0_FIVE_LANE_RETARGETED_RECOVERY_TERMINAL_RESULT_2026-08-21.md).
+
+21 Ağustos'ta yalnız Qwen Pile-10k için 23+1 contract donduruldu. `auto:4`, full 10,000 rows ve
+`68,719,476,736`-byte guard aynen korunuyor. Hazırlık anındaki canlı snapshot iki A100-80GB kartın
+eşiği geçtiğini gösterdi; execution-time selector yine zorunlu. Contract/config exact SHA
+authorization olmadan job submit edilmez.
 
 ### Adım 2 — Complete raw bundle ve canonical normalization
 
-Beş recovery lane geçerli biçimde tamamlanırsa 19 retained + 5 recovery artefaktı hash doğrulamalı
+Tek Qwen Pile lane geçerli biçimde tamamlanırsa 23 retained + 1 recovery artefaktı hash doğrulamalı
 bir composite M0 bundle'a bağlanır. Ardından eval-v1 normalizer:
 
 - checkpoint registry;
@@ -477,6 +486,6 @@ Bu wave dışında:
 
 ## 8. Tek satırlık güncel hüküm
 
-**Pipeline başlatıldı; 17 original + 2 geçerli OLMo recovery lane'i korunuyor; kalan beş lane için
-output-retargeted controller `471536` çalışıyor ve dört finalizer dependency pending; sıradaki adım
-yeniden submit değil, bu tek wave'in terminal 24/24 composite sonucunu beklemektir.**
+**Pipeline 23/24 geçerli M0 lane'e ulaştı; yalnız Qwen Pile-10k operationally missing; 23 sonucu
+hash ile koruyan single-lane A100 contract hazır fakat unexecuted ve sıradaki adım exact
+contract/config authorization'dır.**

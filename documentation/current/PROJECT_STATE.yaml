@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m0-evaluation
-  status: m0_five_lane_retargeted_recovery_submitted_controller_running
+  status: m0_qwen_pile_single_lane_recovery_frozen_unexecuted
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -454,7 +454,7 @@ evaluation_target:
       prior_authorization_attempt: blocked_preflight_scope_key_no_root_no_jobs
       automatic_retry_authorized: false
     m0_five_lane_retargeted_recovery:
-      status: submitted_controller_running
+      status: terminal_partial_invalid_23_of_24
       contract: documentation/contracts/evaluation/m0-three-model-five-lane-retargeted-recovery-v1.md
       contract_sha256: 1b030869455d68aa0ecf933f881c1661e1fbf504997376fdba08a626e1bc0a55
       config: configs/evaluation/m0_scientific_recovery_retargeted_v1.yaml
@@ -486,11 +486,40 @@ evaluation_target:
       family_finalizer: "471540"
       submission_manifest_sha256: 4551a5c9266d354e06a0438f286b9d4063c0a2c4b5ff5bc8e3b699daaa3da6ad
       recovery_manifest_sha256: 9a2011a89a31a48e2a3f9b68a137c0e25d606a4d3da95b940abb098e3386ff8f
+      terminal_record: documentation/records/evaluation/M0_FIVE_LANE_RETARGETED_RECOVERY_TERMINAL_RESULT_2026-08-21.md
+      terminal_ledger_sha256: 390c3b9baef8af85e9b10eefe13152475270bdd7ed8d70b7858251be809e6215
+      terminal_composite_sha256: 5871bc480d3b04027b25fd49b6eb1d65cdc234de1f34aaf39f21088e52b25243
+      terminal_family_inventory_sha256: 0abd0be2d7501e31b8268bf138eb4f7a999d10ad4775bcc695b1c6b30ee90b26
+      valid_recovered_lane_count: 4
+      blocked_recovery_lane_count: 1
+      effective_valid_lane_count: 23
       normalization_authorized: false
       m1_or_m2_authorized: false
       automatic_retry_authorized: false
+    m0_qwen_pile_single_lane_recovery:
+      status: frozen_unexecuted_exact_authorization_required
+      contract: documentation/contracts/evaluation/m0-qwen-pile-single-lane-a100-recovery-v1.md
+      contract_sha256: 88f135f74c8e1932660128e4e36f99cdb13923be15fb7ba82c6c3a2a98c40332
+      config: configs/evaluation/m0_qwen_pile_single_lane_recovery_v1.yaml
+      config_sha256: f394ca3ecf0e056f825545675b41f7fc7b970da240b41156fff030019a36cf36
+      operator: scripts/study/recover_three_model_m0.py
+      implementation_commit: 615d572e553884473bf56d5ac2917aff55d8264a
+      source_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_v1
+      prior_recovery_roots:
+        - /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_isolation_v1
+        - /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_retargeted_v1
+      recovery_family_root: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_qwen_pile_single_lane_v1
+      retained_lane_count: 23
+      recovery_lane_count: 1
+      target: qwen:english_retention_pile_10k
+      min_free_gpu_bytes: 68719476736
+      batch_behavior: auto:4_unchanged
+      topology: one_exclusive_three_a100_single_lane_wave_plus_four_finalizers
+      slurm_job_count: 5
+      execution_authorized: false
       normalization_authorized: false
       m1_or_m2_authorized: false
+      automatic_retry_authorized: false
     m0_preflight:
       command: >-
         .venv/bin/python scripts/study/run_study.py preflight-m0
@@ -558,8 +587,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: execute_authorized_five_lane_retargeted_recovery
-  first_boundary: publication_hu_fast_forward_final_preflight_single_dag
+  name: obtain_exact_authorization_for_qwen_pile_single_lane_recovery
+  first_boundary: single_lane_contract_and_config_require_exact_authorization
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -601,8 +630,12 @@ active_priority:
     - nineteen_plus_five_composite_contract
     - exact_sha_bound_five_lane_recovery_authorization
     - five_lane_retargeted_recovery_submission
+    - five_lane_retargeted_recovery_terminal_23_of_24
+    - qwen_pile_single_lane_recovery_implementation
+    - qwen_pile_single_lane_frozen_contract
   required_outputs:
-    - five_lane_retargeted_recovery_execution_result
+    - exact_sha_bound_qwen_pile_single_lane_authorization
+    - qwen_pile_single_lane_execution_result
     - complete_composite_three_model_raw_bundle
     - frozen_normalization_and_gate_result
 
@@ -673,9 +706,23 @@ authorization:
       automatic_retry_authorized: false
       wave_consumed: true
       resubmission_authorized: false
+    m0_qwen_pile_single_lane_recovery:
+      status: frozen_unexecuted_exact_authorization_required
+      execution_authorized: false
+      contract_sha256: 88f135f74c8e1932660128e4e36f99cdb13923be15fb7ba82c6c3a2a98c40332
+      config_sha256: f394ca3ecf0e056f825545675b41f7fc7b970da240b41156fff030019a36cf36
+      wave_limit: 1
+      slurm_job_count: 5
+      retained_lane_count: 23
+      recovery_lane_count: 1
+      rescore_complete_lanes_authorized: false
+      normalization_authorized: false
+      m1_or_m2_authorized: false
+      automatic_retry_authorized: false
 
 next_decision_required:
-  subject: none_until_authorized_five_lane_wave_terminal
+  subject: exact_sha_bound_qwen_pile_single_lane_recovery_authorization
   note: >-
-    Exact authorization is recorded for publication, preservation-checked HU fast-forward, one
-    final preflight and one five-job DAG. No retry, normalization or M1/M2 work is authorized.
+    The five-lane wave closed at 23/24 because Qwen Pile-10k never crossed the unchanged 64 GiB
+    free-VRAM gate. A fresh single-lane contract preserves all 23 valid lanes and requires exact
+    authorization before publication, HU fast-forward, preflight or one five-job DAG.
