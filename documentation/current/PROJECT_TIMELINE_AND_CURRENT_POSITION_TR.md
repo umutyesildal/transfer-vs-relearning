@@ -446,8 +446,12 @@ yetkili değil. Aktif Qwen Pile-10k recovery DAG'ı bundan bağımsız kaldı ve
 
 Bu terminal sonuçtan sonra yalnız eksik üç exact-prefix lane için fresh-root A100 recovery contract
 donduruldu. Bilimsel kimlik ve 20 GiB guard değişmedi; route Slurm'un idle gösterdiği `gruenau9`
-üzerinde task başına bir A100-80GB olarak sabitlendi. Recovery henüz unexecuted ve yeni exact
-contract/config SHA authorization gerektiriyor.
+üzerinde task başına bir A100-80GB olarak sabitlendi. Authorized array `473839` ve finalizer
+`473840` bir kez çalıştı. OLMo 500/500 probe ile `0.022`, Qwen 500/500 probe ile `0.030` top-1
+accuracy üretti. SmolLM execution guard'da `19,032,768,512 < 21,474,836,480` byte nedeniyle model
+load öncesi durdu. Family 2/3 valid ve yeni SmolLM-only contract olmadan tamamlanmış sayılamaz.
+Kayıt:
+[`M0_THREE_MODEL_EXACT_PREFIX_A100_RECOVERY_EXECUTION_2026-08-21.md`](../records/evaluation/M0_THREE_MODEL_EXACT_PREFIX_A100_RECOVERY_EXECUTION_2026-08-21.md).
 
 Tek Qwen Pile lane geçerli biçimde tamamlanırsa 23 retained + 1 recovery artefaktı hash doğrulamalı
 bir composite M0 bundle'a bağlanır. Ardından eval-v1 normalizer:
