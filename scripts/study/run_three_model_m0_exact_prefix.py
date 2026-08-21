@@ -13,6 +13,7 @@ from typing import Any
 import yaml
 
 from transfer_vs_relearning.study.m0_exact_prefix import (
+    _validated_lane_result,
     audit_exact_prefix_inputs,
     finalize_exact_prefix_family,
     initialize_exact_prefix_namespace,
@@ -88,6 +89,24 @@ def assess_readiness(plan: dict[str, Any], *, repo_root: Path, project_state_pat
     except Exception as exc:
         audit = {"status": "blocked", "error": str(exc)}
     record("exact_prefix_input_audit", audit.get("status") == "pass", audit)
+
+    source_checks: dict[str, bool] = {}
+    if plan.get("preserved_source_root"):
+        source_root = Path(plan["preserved_source_root"])
+        for name, field in (
+            ("family_result.json", "preserved_source_family_result_sha256"),
+            ("family_inventory.json", "preserved_source_family_inventory_sha256"),
+        ):
+            path = source_root / name
+            source_checks[name] = path.is_file() and sha256_file(path) == plan.get(field)
+    for model_id, retained in plan["retained_lanes"].items():
+        valid, _ = _validated_lane_result(
+            Path(retained["lane_result_path"]),
+            model_id=model_id,
+            expected_result_sha256=retained["lane_result_sha256"],
+        )
+        source_checks[f"retained_lane:{model_id}"] = valid
+    record("preserved_source_and_retained_lane_identities", all(source_checks.values()), source_checks)
 
     model_checks: dict[str, Any] = {}
     for model in plan["models"]:
@@ -173,6 +192,8 @@ def _route_probe(plan: dict[str, Any]) -> dict[str, Any]:
     ]
     if slurm.get("nodelist"):
         argv.insert(-1, f"--nodelist={slurm['nodelist']}")
+    if slurm.get("exclusive"):
+        argv.insert(-1, "--exclusive")
     result = subprocess.run(argv, check=False, capture_output=True, text=True)
     output = "\n".join(value.strip() for value in (result.stdout, result.stderr) if value.strip())
     match = START_RE.search(output)
@@ -201,8 +222,9 @@ def submit_wave(plan: dict[str, Any], *, config_path: Path, repo_root: Path) -> 
                 "route_probe": probe,
             },
         )
-        raise RuntimeError("Frozen RTX A6000 route did not pass sbatch --test-only")
+        raise RuntimeError("Frozen GPU route did not pass sbatch --test-only")
     slurm = plan["slurm"]
+    array_spec = str(slurm["array"])
     script = repo_root / "scripts/study/run_three_model_m0_exact_prefix.py"
     lane_command = [
         plan["runtime"]["python"],
@@ -221,7 +243,7 @@ def submit_wave(plan: dict[str, Any], *, config_path: Path, repo_root: Path) -> 
             f"--account={slurm['account']}",
             f"--partition={slurm['partition']}",
             f"--job-name={slurm['job_name']}",
-            f"--array=0-2%3",
+            f"--array={array_spec}",
             f"--gres={slurm['gres']}",
             f"--cpus-per-task={slurm['cpus_per_task']}",
             f"--mem={slurm['memory']}",
@@ -233,6 +255,7 @@ def submit_wave(plan: dict[str, Any], *, config_path: Path, repo_root: Path) -> 
             f"--wrap=exec {shlex.join(lane_command)}",
         ]
         + ([f"--nodelist={slurm['nodelist']}"] if slurm.get("nodelist") else [])
+        + (["--exclusive"] if slurm.get("exclusive") else [])
     )
     final_command = [
         plan["runtime"]["python"],
@@ -270,7 +293,7 @@ def submit_wave(plan: dict[str, Any], *, config_path: Path, repo_root: Path) -> 
                 "plan_id": plan["plan_id"],
                 "config_sha256": plan["config_sha256"],
                 "array_job_id": array_id,
-                "array_spec": "0-2%3",
+                "array_spec": array_spec,
                 "finalizer_job_id": None,
                 "route_probe": probe,
             },
@@ -282,7 +305,7 @@ def submit_wave(plan: dict[str, Any], *, config_path: Path, repo_root: Path) -> 
         "plan_id": plan["plan_id"],
         "config_sha256": plan["config_sha256"],
         "array_job_id": array_id,
-        "array_spec": "0-2%3",
+        "array_spec": array_spec,
         "finalizer_job_id": finalizer_id,
         "finalizer_dependency": f"afterany:{array_id}",
         "route_probe": probe,

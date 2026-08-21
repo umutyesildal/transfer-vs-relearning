@@ -222,7 +222,7 @@ evaluation_target:
     full_study_template: configs/studies/m0_to_m2_eval_v1_template.yaml
     full_study_entrypoint: scripts/study/run_study.py
     luna_packet_manifest: .agents/task-packets/study-v1/manifest.json
-    full_study_stage_count: 15
+    full_study_stage_count: 19
     execution_adapter_ready: false
     m0_execution_adapter_ready: true
     m0_adapter_status: scientific_three_model_24_lane_family_submitted_once
@@ -238,12 +238,12 @@ evaluation_target:
       implementation_commit: 329afaa91b4b403b86eca82f60bb3649a6f38800
       models: [olmo, qwen, smollm]
       model_count: 3
-      wave_count: 9
+      wave_count: 13
       max_concurrent_jobs: 3
-      node_count: 27
+      node_count: 39
       training_node_count: 9
-      state_evaluation_node_count: 12
-      luna_packet_count: 27
+      state_evaluation_node_count: 24
+      luna_packet_count: 39
       hu_test_count: 29
       execution_authorized: false
     scientific_m0_family:

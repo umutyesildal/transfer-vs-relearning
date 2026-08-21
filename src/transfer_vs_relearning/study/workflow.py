@@ -77,6 +77,14 @@ def _validate_state_design(config: dict[str, Any]) -> None:
         raise ValueError("M2 sibling budgets must be matched")
     if design.get("evaluation_contract") != "eval-v1":
         raise ValueError("The full study must bind eval-v1 uniformly")
+    exact_prefix = _mapping(design, "mandatory_exact_prefix")
+    if exact_prefix != {
+        "required": True,
+        "states": ["M0", "M1", "M2-A", "M2-B"],
+        "semantic_classification": "historical_exact_prefix_candidate_ranking_not_free_generation",
+        "probe_count": 500,
+    }:
+        raise ValueError("Historical exact-prefix must be mandatory and identity-matched at every state")
 
 
 def _validate_stage(stage: dict[str, Any], seen: set[str], ordinal: int) -> dict[str, Any]:
@@ -137,14 +145,20 @@ def _validate_stage(stage: dict[str, Any], seen: set[str], ordinal: int) -> dict
 def _validate_required_causal_edges(stages: list[dict[str, Any]]) -> None:
     by_id = {stage["id"]: stage for stage in stages}
     required = {
+        "m0_normalization": {"m0_evaluation", "m0_probing", "m0_exact_prefix"},
         "m1_training": {"m0_normalization"},
-        "m1_checkpoint_selection": {"m1_evaluation", "m1_probing"},
+        "m1_checkpoint_selection": {"m1_evaluation", "m1_probing", "m1_exact_prefix"},
         "m2_sibling_preflight": {"m1_checkpoint_selection"},
         "m2a_training": {"m2_sibling_preflight"},
         "m2b_training": {"m2_sibling_preflight"},
         "m2a_evaluation_probing": {"m2a_training"},
         "m2b_evaluation_probing": {"m2b_training"},
-        "branch_analysis": {"m2a_evaluation_probing", "m2b_evaluation_probing"},
+        "branch_analysis": {
+            "m2a_evaluation_probing",
+            "m2a_exact_prefix",
+            "m2b_evaluation_probing",
+            "m2b_exact_prefix",
+        },
         "presentation_bundle": {"branch_analysis"},
     }
     if not set(required).issubset(by_id):
@@ -299,9 +313,9 @@ def assess_m0_readiness(
     m0_stages = {
         stage["id"]: stage
         for stage in plan["stages"]
-        if stage["id"] in {"m0_evaluation", "m0_probing"}
+        if stage["id"] in {"m0_evaluation", "m0_probing", "m0_exact_prefix"}
     }
-    for stage_id in ("m0_evaluation", "m0_probing"):
+    for stage_id in ("m0_evaluation", "m0_probing", "m0_exact_prefix"):
         stage = m0_stages[stage_id]
         adapter_paths = [
             repo_root / relative

@@ -23,11 +23,19 @@ PHASES = [
         "model_binding": "m0_scientific_evaluation",
     },
     {
+        "id": "m0_exact_prefix",
+        "state": "M0",
+        "kind": "evaluation",
+        "authority": "evaluation",
+        "depends_on": ["m0_evaluation"],
+        "contract": "evaluation",
+    },
+    {
         "id": "m1_training",
         "state": "M1",
         "kind": "training",
         "authority": "training",
-        "depends_on": ["m0_evaluation"],
+        "depends_on": ["m0_exact_prefix"],
         "contract": "m1_training",
         "model_binding": "m1_recipe",
     },
@@ -40,11 +48,19 @@ PHASES = [
         "contract": "evaluation",
     },
     {
+        "id": "m1_exact_prefix",
+        "state": "M1",
+        "kind": "evaluation",
+        "authority": "evaluation",
+        "depends_on": ["m1_evaluation"],
+        "contract": "evaluation",
+    },
+    {
         "id": "m2_sibling_preflight",
         "state": "M1",
         "kind": "preflight",
         "authority": "local_read_only",
-        "depends_on": ["m1_evaluation"],
+        "depends_on": ["m1_exact_prefix"],
     },
     {
         "id": "m2a_training",
@@ -73,6 +89,14 @@ PHASES = [
         "contract": "evaluation",
     },
     {
+        "id": "m2a_exact_prefix",
+        "state": "M2-A",
+        "kind": "evaluation",
+        "authority": "evaluation",
+        "depends_on": ["m2a_evaluation"],
+        "contract": "evaluation",
+    },
+    {
         "id": "m2b_evaluation",
         "state": "M2-B",
         "kind": "evaluation",
@@ -81,11 +105,19 @@ PHASES = [
         "contract": "evaluation",
     },
     {
+        "id": "m2b_exact_prefix",
+        "state": "M2-B",
+        "kind": "evaluation",
+        "authority": "evaluation",
+        "depends_on": ["m2b_evaluation"],
+        "contract": "evaluation",
+    },
+    {
         "id": "branch_analysis",
         "state": "M2-B",
         "kind": "analysis",
         "authority": "local_write",
-        "depends_on": ["m2a_evaluation", "m2b_evaluation"],
+        "depends_on": ["m2a_exact_prefix", "m2b_exact_prefix"],
     },
 ]
 EXECUTION_PHASES = {
@@ -232,6 +264,18 @@ def build_model_matrix_plan(config_path: Path, *, repo_root: Path | None = None)
         "matched_budget_required": True,
     }:
         raise ValueError("M2-A and M2-B must be matched siblings from the same M1 parent")
+    exact_prefix = _mapping(
+        state_design.get("mandatory_exact_prefix"), "state_design.mandatory_exact_prefix"
+    )
+    if exact_prefix != {
+        "required": True,
+        "states": STATES,
+        "semantic_classification": (
+            "historical_exact_prefix_candidate_ranking_not_free_generation"
+        ),
+        "probe_count": 500,
+    }:
+        raise ValueError("Exact-prefix evaluation must be mandatory for every scientific state")
     parallelism = _mapping(config.get("parallelism"), "parallelism")
     if parallelism.get("model_order") != MODEL_IDS:
         raise ValueError(f"Matrix model order must be {MODEL_IDS}")

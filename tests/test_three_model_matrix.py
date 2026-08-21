@@ -32,15 +32,15 @@ def _write_yaml(path: Path, value: dict) -> Path:
     return path
 
 
-def test_matrix_expands_three_models_into_nine_three_job_waves() -> None:
+def test_matrix_expands_three_models_into_thirteen_three_job_waves() -> None:
     plan = build_model_matrix_plan(CONFIG, repo_root=ROOT)
     assert plan["status"] == "planned_not_authorized"
     assert plan["execution_authorized"] is False
     assert plan["model_count"] == 3
-    assert plan["node_count"] == 27
-    assert plan["wave_count"] == 9
+    assert plan["node_count"] == 39
+    assert plan["wave_count"] == 13
     assert plan["training_node_count"] == 9
-    assert plan["state_evaluation_node_count"] == 12
+    assert plan["state_evaluation_node_count"] == 24
     assert [wave["id"] for wave in plan["waves"]] == [phase["id"] for phase in PHASES]
     assert all(len(wave["nodes"]) == 3 for wave in plan["waves"])
     assert all(wave["max_concurrent_jobs"] == 3 for wave in plan["waves"])
@@ -55,14 +55,17 @@ def test_matrix_preserves_same_m1_parent_and_matched_sibling_design() -> None:
         "arms": ["M2-A", "M2-B"],
         "matched_budget_required": True,
     }
+    assert plan["state_design"]["mandatory_exact_prefix"]["states"] == [
+        "M0", "M1", "M2-A", "M2-B"
+    ]
     nodes = {node["id"]: node for node in plan["nodes"]}
     for model_id in MODEL_IDS:
         preflight = f"{model_id}__m2_sibling_preflight"
         assert nodes[f"{model_id}__m2a_training"]["causal_dependencies"] == [preflight]
         assert nodes[f"{model_id}__m2b_training"]["causal_dependencies"] == [preflight]
         assert nodes[f"{model_id}__branch_analysis"]["causal_dependencies"] == [
-            f"{model_id}__m2a_evaluation",
-            f"{model_id}__m2b_evaluation",
+            f"{model_id}__m2a_exact_prefix",
+            f"{model_id}__m2b_exact_prefix",
         ]
 
 
@@ -127,7 +130,7 @@ def test_namespace_and_next_wave_remain_fail_closed(tmp_path: Path) -> None:
 def test_luna_packets_are_one_model_one_stage_micro_context(tmp_path: Path) -> None:
     plan = build_model_matrix_plan(CONFIG, repo_root=ROOT)
     packets = render_model_matrix_packets(plan, tmp_path / "packets")
-    assert len(packets) == 27
+    assert len(packets) == 39
     for packet in packets:
         text = packet.read_text(encoding="utf-8")
         assert len(text.splitlines()) <= 100

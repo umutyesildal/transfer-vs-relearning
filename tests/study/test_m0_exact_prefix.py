@@ -101,6 +101,62 @@ def test_finalizer_requires_all_three_hash_valid_lanes(tmp_path: Path) -> None:
     assert (Path(plan["family_root"]) / "family_inventory.json").is_file()
 
 
+def test_finalizer_hash_merges_two_retained_lanes_with_one_recovery(tmp_path: Path) -> None:
+    plan = load_exact_prefix_plan(CONFIG, repo_root=ROOT)
+    plan["family_root"] = str(tmp_path / "recovery")
+    plan["execution_model_indices"] = [2]
+    retained: dict[str, dict[str, str]] = {}
+    for index, model in enumerate(plan["models"][:2]):
+        model_root = tmp_path / "source" / model["model_id"]
+        model_root.mkdir(parents=True)
+        artifact = model_root / "metric.json"
+        write_json(artifact, {"accuracy": index / 10})
+        lane = model_root / "lane_result.json"
+        write_json(
+            lane,
+            {
+                "status": "complete",
+                "model_id": model["model_id"],
+                "plan_id": "historical-plan",
+                "primary_mean_logprob_top1_accuracy": index / 10,
+                "artifacts": [{
+                    "path": str(artifact),
+                    "bytes": artifact.stat().st_size,
+                    "sha256": sha256_file(artifact),
+                }],
+            },
+        )
+        retained[model["model_id"]] = {
+            "lane_result_path": str(lane),
+            "lane_result_sha256": sha256_file(lane),
+        }
+    plan["retained_lanes"] = retained
+    initialize_exact_prefix_namespace(plan)
+    smollm_root = Path(plan["family_root"]) / "smollm"
+    smollm_root.mkdir()
+    artifact = smollm_root / "metric.json"
+    write_json(artifact, {"accuracy": 0.2})
+    write_json(
+        smollm_root / "lane_result.json",
+        {
+            "status": "complete",
+            "model_id": "smollm",
+            "plan_id": plan["plan_id"],
+            "primary_mean_logprob_top1_accuracy": 0.2,
+            "artifacts": [{
+                "path": str(artifact),
+                "bytes": artifact.stat().st_size,
+                "sha256": sha256_file(artifact),
+            }],
+        },
+    )
+    result = finalize_exact_prefix_family(plan)
+    assert result["status"] == "complete"
+    assert [row["source"] for row in result["models"]] == [
+        "retained_hash_verified", "retained_hash_verified", "recovery_wave"
+    ]
+
+
 def test_submitter_launches_one_parallel_array_and_afterany_finalizer(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -178,3 +234,32 @@ def test_submitter_can_pin_the_gpu_array_to_one_node(
     )
     entrypoint.submit_wave(plan, config_path=CONFIG, repo_root=ROOT)
     assert "--nodelist=gruenau9" in submissions[0]
+
+
+def test_submitter_honors_single_lane_array_and_exclusive_route(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    entrypoint_path = ROOT / "scripts/study/run_three_model_m0_exact_prefix.py"
+    spec = importlib.util.spec_from_file_location("m0_exact_prefix_entrypoint_single", entrypoint_path)
+    assert spec and spec.loader
+    entrypoint = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(entrypoint)
+    plan = load_exact_prefix_plan(CONFIG, repo_root=ROOT)
+    plan["family_root"] = str(tmp_path / "wave")
+    plan["slurm"]["array"] = "2"
+    plan["slurm"]["exclusive"] = True
+    monkeypatch.setattr(
+        entrypoint,
+        "_route_probe",
+        lambda _plan: {"eligible": True, "returncode": 0, "estimated_start": "now", "output": "ok"},
+    )
+    submissions: list[list[str]] = []
+    monkeypatch.setattr(
+        entrypoint,
+        "_submit",
+        lambda argv: submissions.append(argv) or str(9400 + len(submissions)),
+    )
+    payload = entrypoint.submit_wave(plan, config_path=CONFIG, repo_root=ROOT)
+    assert payload["array_spec"] == "2"
+    assert "--array=2" in submissions[0]
+    assert "--exclusive" in submissions[0]

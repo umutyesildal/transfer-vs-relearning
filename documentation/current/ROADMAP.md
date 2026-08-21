@@ -74,7 +74,7 @@ per-training-contract checkpoint-binding rule. Any semantic change requires eval
 
 ## R3 — Pipeline productionization
 
-Status: active. The local checkpoint planner, full 15-stage study controller, 27-node OLMo/Qwen/SmolLM matrix,
+Status: active. The local checkpoint planner, full 19-stage study controller, 39-node OLMo/Qwen/SmolLM matrix,
 training trace, typed artifact scaffold, presentation contract, Luna micro-packets and seven-lane
 M0 parallel adapters prepared; frozen bindings and all later-state execution adapters remain
 blocked on R2 freeze.

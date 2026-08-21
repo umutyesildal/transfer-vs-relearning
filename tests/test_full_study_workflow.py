@@ -25,16 +25,20 @@ EXPECTED_STAGES = [
     "contract_preflight",
     "m0_evaluation",
     "m0_probing",
+    "m0_exact_prefix",
     "m0_normalization",
     "m1_training",
     "m1_evaluation",
     "m1_probing",
+    "m1_exact_prefix",
     "m1_checkpoint_selection",
     "m2_sibling_preflight",
     "m2a_training",
     "m2b_training",
     "m2a_evaluation_probing",
     "m2b_evaluation_probing",
+    "m2a_exact_prefix",
+    "m2b_exact_prefix",
     "branch_analysis",
     "presentation_bundle",
 ]
@@ -55,12 +59,20 @@ def test_full_study_plan_has_complete_causal_order_and_sibling_parent() -> None:
         "arms": ["M2-A", "M2-B"],
         "matched_budget_required": True,
     }
+    assert plan["state_design"]["mandatory_exact_prefix"] == {
+        "required": True,
+        "states": ["M0", "M1", "M2-A", "M2-B"],
+        "semantic_classification": "historical_exact_prefix_candidate_ranking_not_free_generation",
+        "probe_count": 500,
+    }
     stages = {stage["id"]: stage for stage in plan["stages"]}
     assert stages["m2a_training"]["depends_on"] == ["m2_sibling_preflight"]
     assert stages["m2b_training"]["depends_on"] == ["m2_sibling_preflight"]
     assert set(stages["branch_analysis"]["depends_on"]) == {
         "m2a_evaluation_probing",
+        "m2a_exact_prefix",
         "m2b_evaluation_probing",
+        "m2b_exact_prefix",
     }
 
 
@@ -71,6 +83,13 @@ def test_study_rejects_missing_causal_edge_and_context_overflow(tmp_path: Path) 
     by_id["m2b_training"]["depends_on"] = ["m1_checkpoint_selection"]
     with pytest.raises(ValueError, match="causal edge"):
         build_study_plan(_write_yaml(tmp_path / "broken.yaml", broken), repo_root=ROOT)
+    missing_exact = copy.deepcopy(payload)
+    missing_by_id = {stage["id"]: stage for stage in missing_exact["stages"]}
+    missing_by_id["m1_checkpoint_selection"]["depends_on"].remove("m1_exact_prefix")
+    with pytest.raises(ValueError, match="causal edge"):
+        build_study_plan(
+            _write_yaml(tmp_path / "missing-exact.yaml", missing_exact), repo_root=ROOT
+        )
     crowded = copy.deepcopy(payload)
     crowded["stages"][0]["context_files"] = [f"file-{index}" for index in range(9)]
     with pytest.raises(ValueError, match="eight-file context budget"):
@@ -133,7 +152,7 @@ def test_registered_adapter_runner_can_walk_every_stage_but_stops_without_scope(
 def test_luna_packets_are_micro_context_adapter_tasks(tmp_path: Path) -> None:
     plan = build_study_plan(CONFIG, repo_root=ROOT)
     packets = render_luna_packets(plan, tmp_path / "packets")
-    assert len(packets) == 15
+    assert len(packets) == 19
     for packet in packets:
         text = packet.read_text(encoding="utf-8")
         assert len(text.splitlines()) <= 160
@@ -171,6 +190,7 @@ def test_m0_preflight_reports_current_contract_and_adapter_blockers() -> None:
     checks = {row["id"]: row for row in payload["checks"]}
     assert checks["m0_evaluation_adapter_present"]["status"] == "pass"
     assert checks["m0_probing_adapter_present"]["status"] == "pass"
+    assert checks["m0_exact_prefix_adapter_present"]["status"] == "pass"
     assert checks["lm_eval_environment_identity"]["status"] == "pass"
     assert "version=0.4.12" in checks["lm_eval_environment_identity"]["detail"]
     assert "6d642546f4688648fced259eb3302efd36ece5af" in checks[

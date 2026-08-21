@@ -171,15 +171,15 @@ separate work. The full-study plan therefore remains `execution_authorized: fals
 
 ```text
 contract preflight
-→ M0 evaluation + M0 probing in parallel → normalization
-→ M1 training → evaluation + probing → checkpoint selection
+→ M0 evaluation + M0 probing + M0 exact-prefix → normalization
+→ M1 training → evaluation + probing + exact-prefix → checkpoint selection
 → matched M2 sibling preflight
 → M2-A training + M2-B training
-→ identical branch evaluation + probing
+→ identical branch evaluation + probing + exact-prefix
 → paired branch analysis → presentation bundle
 ```
 
-Render the complete 15-stage graph without scientific execution:
+Render the complete 19-stage graph without scientific execution:
 
 ```bash
 .venv/bin/python scripts/study/run_study.py run \
@@ -205,19 +205,21 @@ environment or adapter prerequisite is unresolved.
 ## Three-model cohort control
 
 [`../../scripts/study/run_model_matrix.py`](../../scripts/study/run_model_matrix.py) expands the
-single-model workflow across the exact OLMo, Qwen2.5-1.5B and SmolLM2-1.7B assets. It produces nine
+single-model workflow across the exact OLMo, Qwen2.5-1.5B and SmolLM2-1.7B assets. It produces thirteen
 three-job waves and keeps a barrier between waves:
 
 ```text
 3× M0 evaluation
-→ 3× M1 training → 3× M1 evaluation
+→ 3× M0 exact-prefix
+→ 3× M1 training → 3× M1 evaluation → 3× M1 exact-prefix
 → 3× M2 sibling preflight
 → 3× M2-A training → 3× M2-B training
-→ 3× M2-A evaluation → 3× M2-B evaluation
+→ 3× M2-A evaluation → 3× M2-A exact-prefix
+→ 3× M2-B evaluation → 3× M2-B exact-prefix
 → 3× paired branch analysis
 ```
 
-That is 27 nodes: 12 state-evaluation nodes, 9 training nodes and 6 local preflight/analysis
+That is 39 nodes: 24 state-evaluation nodes, 9 training nodes and 6 local preflight/analysis
 nodes. M2-A and M2-B remain siblings from the same exact M1 parent with matched budgets. Inspect the
 whole graph without execution:
 
@@ -225,7 +227,7 @@ whole graph without execution:
 .venv/bin/python scripts/study/run_model_matrix.py run --dry-run
 ```
 
-Generate 27 one-model/one-stage Luna packets with:
+Generate 39 one-model/one-stage Luna packets with:
 
 ```bash
 .venv/bin/python scripts/study/run_model_matrix.py packets \
@@ -236,3 +238,8 @@ The current matrix is `planned_not_authorized`. Its three scientific M0 bindings
 missing M1/M2 recipes remain explicit null bindings with named blockers, so `run` still refuses the
 full external workflow. See the
 [`three-model planning contract`](../contracts/three-model-study-matrix-v1.md).
+
+Historical exact-prefix is a mandatory candidate-ranking supplement, not a free-generation exact
+match metric. Every M0/M1/M2-A/M2-B checkpoint set must provide a complete, hash-bound 500-probe
+manifest. Missing probes, checkpoints, or identity drift fail closed before normalization,
+checkpoint selection, or branch analysis.

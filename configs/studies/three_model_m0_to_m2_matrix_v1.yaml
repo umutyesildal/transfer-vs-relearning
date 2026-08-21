@@ -6,6 +6,11 @@ execution_authorized: false
 
 state_design:
   states: [M0, M1, M2-A, M2-B]
+  mandatory_exact_prefix:
+    required: true
+    states: [M0, M1, M2-A, M2-B]
+    semantic_classification: historical_exact_prefix_candidate_ranking_not_free_generation
+    probe_count: 500
   m2_siblings:
     parent: M1
     arms: [M2-A, M2-B]
@@ -20,7 +25,7 @@ parallelism:
 
 workflow_template:
   path: configs/studies/m0_to_m2_eval_v1_template.yaml
-  sha256: 2fe1851eedd24061ad09f8d6db56ef82cd877c396d97dee38db2c1b6a1a4443c
+  sha256: 296e674f087d32b28dd3a0eef7a2aaf38a12eda4c523adb5e68e6a006912af0c
 
 contracts:
   evaluation:

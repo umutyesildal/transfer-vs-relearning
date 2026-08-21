@@ -22,7 +22,7 @@ schedule, records tokenization and optimization traces, preserves model-only epo
 storage guards, plans dense/full evaluation in order, and initializes typed `planned_not_run`
 artifact/presentation namespaces. It does not yet execute LM Eval or project evaluation stages.
 
-The full-study controller now expresses the 15-stage M0→M1→M2-A/M2-B dependency graph, preserves
+The full-study controller now expresses the 19-stage M0→M1→M2-A/M2-B dependency graph, preserves
 the sibling-parent and matched-budget gates, and produces one bounded Luna adapter packet per stage.
 The M0 standard and project adapters plus a single operator-facing controller now exist locally.
 That controller performs task-data preflight, submits seven independently GPU-routed lanes, joins
@@ -32,9 +32,10 @@ The former flat entrypoint roots were losslessly grouped: 129 scripts and 135 Sl
 by `configs/entrypoints/catalog.json`; historical numbered documents were not rewritten.
 
 The three-model matrix now expands that workflow across the exact OLMo, Qwen2.5-1.5B and
-SmolLM2-1.7B assets. It contains 27 nodes in nine three-job waves: 12 state-evaluation nodes, nine
-training nodes and six local preflight/analysis nodes. Its local/HU suite passed 29/29 and it can
-render 27 one-model/one-stage Luna packets. The matrix is `planned_not_authorized`; its scientific
+SmolLM2-1.7B assets. It contains 39 nodes in thirteen three-job waves: 24 state-evaluation nodes,
+nine training nodes and six local preflight/analysis nodes. It can render 39 one-model/one-stage
+Luna packets. Exact-prefix is mandatory at M0, M1, M2-A and M2-B and blocks downstream analysis
+when incomplete. The matrix is `planned_not_authorized`; its scientific
 M0 bindings now exist and have a separate single-wave authorization, while M1/M2 recipe configs
 remain explicit blockers rather than inferred placeholders.
 

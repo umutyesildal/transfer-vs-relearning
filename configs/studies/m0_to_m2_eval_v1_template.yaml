@@ -6,6 +6,11 @@ execution_authorized: false
 state_design:
   states: [M0, M1, M2-A, M2-B]
   evaluation_contract: eval-v1
+  mandatory_exact_prefix:
+    required: true
+    states: [M0, M1, M2-A, M2-B]
+    semantic_classification: historical_exact_prefix_candidate_ranking_not_free_generation
+    probe_count: 500
   m2_siblings:
     parent: M1
     arms: [M2-A, M2-B]
@@ -17,6 +22,7 @@ bindings:
   m2a_training_pipeline: __FROZEN_M2A_TRAINING_PIPELINE__
   m2b_training_pipeline: __FROZEN_M2B_TRAINING_PIPELINE__
   eval_registry: configs/evaluation/eval_v1_registry.yaml
+  exact_prefix_probe_registry: artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/exact_prefix_probes_en.csv
   result_namespace: __FRESH_STUDY_RESULT_NAMESPACE__
 
 stages:
@@ -81,11 +87,31 @@ stages:
     outputs:
       - stages/m0_probing/evaluation_manifest.json
 
+  - id: m0_exact_prefix
+    state: M0
+    kind: evaluation
+    objective: Run the frozen 500-probe historical exact-prefix candidate-ranking supplement on M0.
+    depends_on: [contract_preflight]
+    adapter_id: exact_prefix_gate
+    authority_class: evaluation
+    context_files:
+      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/evaluation/RESULT_SCHEMA_V1.md
+      - configs/studies/m0_to_m2_eval_v1_template.yaml
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/exact_prefix_gate.py
+      - tests/study/test_exact_prefix_gate.py
+    acceptance_criteria:
+      - Exactly 500 frozen probes are complete for the identical M0 checkpoint.
+      - Candidate-ranking semantics and probe-registry hash are explicit.
+    outputs:
+      - stages/m0_exact_prefix/exact_prefix_manifest.json
+
   - id: m0_normalization
     state: M0
     kind: normalization
     objective: Normalize M0 evaluation and probing into canonical long tables without rescoring.
-    depends_on: [m0_evaluation, m0_probing]
+    depends_on: [m0_evaluation, m0_probing, m0_exact_prefix]
     adapter_id: normalize_state
     authority_class: local_write
     context_files:
@@ -162,11 +188,31 @@ stages:
     outputs:
       - stages/m1_probing/evaluation_manifest.json
 
+  - id: m1_exact_prefix
+    state: M1
+    kind: evaluation
+    objective: Run the frozen historical exact-prefix supplement on the M1 parent and every required trajectory checkpoint.
+    depends_on: [m1_training]
+    adapter_id: exact_prefix_gate
+    authority_class: evaluation
+    context_files:
+      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/evaluation/RESULT_SCHEMA_V1.md
+      - configs/studies/m0_to_m2_eval_v1_template.yaml
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/exact_prefix_gate.py
+      - tests/study/test_exact_prefix_gate.py
+    acceptance_criteria:
+      - Parent and every required M1 trajectory checkpoint contain exactly 500 complete probes.
+      - Missing checkpoints or hash drift block checkpoint selection.
+    outputs:
+      - stages/m1_exact_prefix/exact_prefix_manifest.json
+
   - id: m1_checkpoint_selection
     state: M1
     kind: selection
     objective: Apply only the precommitted M1 checkpoint rule to normalized M1 evaluation and probing evidence.
-    depends_on: [m1_evaluation, m1_probing]
+    depends_on: [m1_evaluation, m1_probing, m1_exact_prefix]
     adapter_id: m1_checkpoint_selection
     authority_class: local_write
     context_files:
@@ -282,11 +328,51 @@ stages:
     outputs:
       - stages/m2b_evaluation_probing/evaluation_manifest.json
 
+  - id: m2a_exact_prefix
+    state: M2-A
+    kind: evaluation
+    objective: Run the unchanged historical exact-prefix supplement on every required M2-A checkpoint.
+    depends_on: [m2a_evaluation_probing]
+    adapter_id: exact_prefix_gate
+    authority_class: evaluation
+    context_files:
+      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/evaluation/RESULT_SCHEMA_V1.md
+      - configs/studies/m0_to_m2_eval_v1_template.yaml
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/exact_prefix_gate.py
+      - tests/study/test_exact_prefix_gate.py
+    acceptance_criteria:
+      - Every required M2-A checkpoint contains exactly 500 complete probes.
+      - Missing results or identity drift block branch analysis.
+    outputs:
+      - stages/m2a_exact_prefix/exact_prefix_manifest.json
+
+  - id: m2b_exact_prefix
+    state: M2-B
+    kind: evaluation
+    objective: Run the unchanged historical exact-prefix supplement on every required M2-B checkpoint.
+    depends_on: [m2b_evaluation_probing]
+    adapter_id: exact_prefix_gate
+    authority_class: evaluation
+    context_files:
+      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/evaluation/RESULT_SCHEMA_V1.md
+      - configs/studies/m0_to_m2_eval_v1_template.yaml
+    allowed_paths:
+      - src/transfer_vs_relearning/study/adapters/exact_prefix_gate.py
+      - tests/study/test_exact_prefix_gate.py
+    acceptance_criteria:
+      - Every required M2-B checkpoint contains exactly 500 complete probes.
+      - Missing results or identity drift block branch analysis.
+    outputs:
+      - stages/m2b_exact_prefix/exact_prefix_manifest.json
+
   - id: branch_analysis
     state: STUDY
     kind: analysis
     objective: Normalize both M2 branches and compute only precommitted transfer/relearning contrasts.
-    depends_on: [m2a_evaluation_probing, m2b_evaluation_probing]
+    depends_on: [m2a_evaluation_probing, m2a_exact_prefix, m2b_evaluation_probing, m2b_exact_prefix]
     adapter_id: branch_analysis
     authority_class: local_write
     context_files:

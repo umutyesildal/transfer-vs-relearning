@@ -162,9 +162,9 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     matrix = state["evaluation_target"]["pipeline"]["three_model_matrix"]
     assert matrix["status"] == "planned_not_authorized"
     assert matrix["model_count"] == 3
-    assert matrix["node_count"] == 27
+    assert matrix["node_count"] == 39
     assert matrix["training_node_count"] == 9
-    assert matrix["state_evaluation_node_count"] == 12
+    assert matrix["state_evaluation_node_count"] == 24
     assert matrix["execution_authorized"] is False
 
     scientific_m0 = state["evaluation_target"]["pipeline"]["scientific_m0_family"]

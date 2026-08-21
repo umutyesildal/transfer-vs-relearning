@@ -117,6 +117,26 @@ def load_exact_prefix_plan(config_path: Path, *, repo_root: Path) -> dict[str, A
     for model_id in MODEL_ORDER:
         row = _mapping(models[model_id], f"models.{model_id}")
         normalized_models.append({"model_id": model_id, **row})
+    execution_indices = payload.get("execution_model_indices", list(range(len(MODEL_ORDER))))
+    if (
+        not isinstance(execution_indices, list)
+        or not execution_indices
+        or any(not isinstance(index, int) or not 0 <= index < len(MODEL_ORDER) for index in execution_indices)
+        or len(set(execution_indices)) != len(execution_indices)
+    ):
+        raise ValueError("execution_model_indices must be a unique non-empty model-index subset")
+    retained_lanes = _mapping(payload.get("retained_lanes", {}), "retained_lanes")
+    expected_retained = {MODEL_ORDER[index] for index in range(len(MODEL_ORDER)) if index not in execution_indices}
+    if set(retained_lanes) != expected_retained:
+        raise ValueError("retained_lanes must exactly cover every non-executed model")
+    normalized_retained: dict[str, dict[str, Any]] = {}
+    for model_id, raw in retained_lanes.items():
+        retained = _mapping(raw, f"retained_lanes.{model_id}")
+        if not isinstance(retained.get("lane_result_path"), str) or not isinstance(
+            retained.get("lane_result_sha256"), str
+        ):
+            raise ValueError(f"retained_lanes.{model_id} requires path and SHA-256")
+        normalized_retained[model_id] = dict(retained)
     inputs = _mapping(payload.get("inputs"), "inputs")
     normalized_inputs = {
         **inputs,
@@ -133,6 +153,8 @@ def load_exact_prefix_plan(config_path: Path, *, repo_root: Path) -> dict[str, A
         "repo_root": str(repo_root),
         "inputs": normalized_inputs,
         "models": normalized_models,
+        "execution_model_indices": execution_indices,
+        "retained_lanes": normalized_retained,
     }
     plan["plan_id"] = sha256_text(
         json.dumps(
@@ -142,6 +164,8 @@ def load_exact_prefix_plan(config_path: Path, *, repo_root: Path) -> dict[str, A
                 "models": normalized_models,
                 "inputs": normalized_inputs,
                 "evaluation": plan["evaluation"],
+                "execution_model_indices": execution_indices,
+                "retained_lanes": normalized_retained,
             },
             sort_keys=True,
         )
@@ -164,6 +188,8 @@ def initialize_exact_prefix_namespace(plan: dict[str, Any]) -> Path:
             "config_sha256": plan["config_sha256"],
             "semantic_classification": plan["semantic_classification"],
             "model_order": list(MODEL_ORDER),
+            "execution_model_indices": plan["execution_model_indices"],
+            "retained_models": sorted(plan["retained_lanes"]),
             "created_at": datetime.now(timezone.utc).isoformat(),
         },
     )
@@ -215,6 +241,8 @@ def _gpu_guard(plan: dict[str, Any], output: Path) -> dict[str, Any]:
 def run_exact_prefix_model(plan: dict[str, Any], model_index: int) -> dict[str, Any]:
     if not 0 <= model_index < len(plan["models"]):
         raise IndexError(model_index)
+    if model_index not in plan["execution_model_indices"]:
+        raise ValueError(f"Model index {model_index} is retained and must not be rerun")
     model = plan["models"][model_index]
     root = Path(plan["family_root"]) / model["model_id"]
     root.mkdir(parents=True, exist_ok=False)
@@ -262,25 +290,54 @@ def run_exact_prefix_model(plan: dict[str, Any], model_index: int) -> dict[str, 
     return payload
 
 
+def _validated_lane_result(
+    result_path: Path,
+    *,
+    model_id: str,
+    expected_plan_id: str | None = None,
+    expected_result_sha256: str | None = None,
+) -> tuple[bool, dict[str, Any]]:
+    if not result_path.is_file():
+        return False, {}
+    if expected_result_sha256 is not None and sha256_file(result_path) != expected_result_sha256:
+        return False, {}
+    result = json.loads(result_path.read_text(encoding="utf-8"))
+    valid = result.get("status") == "complete" and result.get("model_id") == model_id
+    if expected_plan_id is not None:
+        valid = valid and result.get("plan_id") == expected_plan_id
+    for artifact in result.get("artifacts", []):
+        path = Path(artifact["path"])
+        valid = valid and path.is_file()
+        valid = valid and path.stat().st_size == artifact["bytes"]
+        valid = valid and sha256_file(path) == artifact["sha256"]
+    return valid, result
+
+
 def finalize_exact_prefix_family(plan: dict[str, Any]) -> dict[str, Any]:
     root = Path(plan["family_root"])
     rows: list[dict[str, Any]] = []
     for model in plan["models"]:
-        result_path = root / model["model_id"] / "lane_result.json"
-        valid = False
-        result: dict[str, Any] = {}
-        if result_path.is_file():
-            result = json.loads(result_path.read_text(encoding="utf-8"))
-            valid = result.get("status") == "complete" and result.get("plan_id") == plan["plan_id"]
-            for artifact in result.get("artifacts", []):
-                path = Path(artifact["path"])
-                valid = valid and path.is_file()
-                valid = valid and path.stat().st_size == artifact["bytes"]
-                valid = valid and sha256_file(path) == artifact["sha256"]
+        model_id = model["model_id"]
+        retained = plan["retained_lanes"].get(model_id)
+        if retained:
+            result_path = Path(retained["lane_result_path"])
+            valid, result = _validated_lane_result(
+                result_path,
+                model_id=model_id,
+                expected_result_sha256=retained["lane_result_sha256"],
+            )
+            source = "retained_hash_verified"
+        else:
+            result_path = root / model_id / "lane_result.json"
+            valid, result = _validated_lane_result(
+                result_path, model_id=model_id, expected_plan_id=plan["plan_id"]
+            )
+            source = "recovery_wave"
         rows.append(
             {
-                "model_id": model["model_id"],
+                "model_id": model_id,
                 "status": "complete" if valid else "partial_invalid",
+                "source": source,
                 "lane_result": str(result_path) if result_path.is_file() else None,
                 "lane_result_sha256": sha256_file(result_path) if result_path.is_file() else None,
                 "top1_accuracy": result.get("primary_mean_logprob_top1_accuracy") if valid else None,
