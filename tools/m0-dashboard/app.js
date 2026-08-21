@@ -85,6 +85,27 @@ const METRICS = {
   generation_distinct_2: { label: { tr: 'Generation distinct-2', en: 'Generation distinct-2' }, help: { tr: '30 completion · çeşitlilik yüksek daha iyi', en: '30 completions · higher diversity is better' }, format: v => v.toFixed(3), scale: 'fraction', direction: 'higher', measure: { tr: 'Üretimlerdeki distinct bigram oranını ölçer.', en: 'Measures the fraction of distinct bigrams in generated completions.' }, read: { tr: 'Yüksek değer daha çeşitli; fakat tek başına factual correctness anlamına gelmez.', en: 'A higher value means more variety, but not factual correctness by itself.' }, caveat: { tr: 'Generation integrity diagnostic’idir; ana scientific winner metriği değildir.', en: 'It is a generation-integrity diagnostic, not the primary scientific winner metric.' }, caption: { tr: 'Üretim çeşitliliği; generation integrity diagnostic.', en: 'Generation diversity; generation-integrity diagnostic.' } },
   generation_repeated_3gram: { label: { tr: 'Repeated 3-gram fraction', en: 'Repeated 3-gram fraction' }, help: { tr: '30 completion · tekrar düşük daha iyi', en: '30 completions · lower repetition is better' }, format: v => v.toFixed(3), scale: 'fraction', direction: 'lower', measure: { tr: 'Üretimlerde tekrar eden 3-gramların oranını ölçer.', en: 'Measures the fraction of repeated 3-grams in generated completions.' }, read: { tr: 'Düşük değer degeneration/repetition riskinin daha düşük olduğunu gösterir.', en: 'A lower value indicates less degeneration or repetition risk.' }, caveat: { tr: 'Kısa bir 30 completion panelidir; tek başına model kalitesi değildir.', en: 'This is a small 30-completion panel; it is not model quality by itself.' }, caption: { tr: 'Tekrarlı üretim oranı; düşük olması daha iyi.', en: 'Repeated-generation fraction; lower is better.' } }
 };
+const metricKeys = () => [...new Set(data.metric_rows.map(row => row.metric))];
+const metricMeta = metric => {
+  if (METRICS[metric]) return METRICS[metric];
+  const sample = data.metric_rows.find(row => row.metric === metric) ?? {};
+  const unit = sample.unit ?? '';
+  const direction = sample.direction ?? 'higher';
+  const isFraction = unit === 'fraction';
+  const family = FAMILY_LABELS[sample.family] ?? { tr: sample.family ?? 'Metric', en: sample.family ?? 'Metric' };
+  const label = metric.replaceAll('_', ' ');
+  const format = value => isFraction ? `${(value * 100).toFixed(2)}%` : unit === 'count' ? Math.round(value).toLocaleString('en-US') : unit === 'PPL' ? value.toFixed(4) : value.toFixed(6);
+  const preferenceTr = direction === 'lower' ? 'Düşük değer daha iyi okunur.' : 'Yüksek değer daha iyi okunur.';
+  const preferenceEn = direction === 'lower' ? 'Lower values are better.' : 'Higher values are better.';
+  return {
+    label: { tr: label, en: label }, help: { tr: `${tx(family)} · ${sample.sample_count?.toLocaleString('tr-TR') ?? '—'} örnek`, en: `${tx(family)} · ${sample.sample_count?.toLocaleString('en-US') ?? '—'} samples` },
+    format, scale: isFraction ? 'fraction' : 'relative', direction,
+    measure: { tr: `${tx(family)} içindeki ${label} değerini raporlar; birim: ${unit || '—'}.`, en: `Reports ${label} within ${tx(family)}; unit: ${unit || '—'}.` },
+    read: { tr: preferenceTr, en: preferenceEn },
+    caveat: { tr: 'Task-specific bir diagnostic’tir; farklı family metric’leriyle tek overall score yapılmaz.', en: 'This is task-specific evidence; do not collapse different metric families into one overall score.' },
+    caption: { tr: `${label} için ${direction === 'lower' ? 'düşük' : 'yüksek'} değer tercih edilir.`, en: `${direction === 'lower' ? 'Lower' : 'Higher'} is preferred for ${label}.` }
+  };
+};
 const HIGHLIGHTS = ['turkish_bpb', 'turblimp_acc_norm', 'hellaswag_acc_norm'];
 let data;
 let currentMetric = 'turkish_bpb';
@@ -147,7 +168,7 @@ function renderHighlights() {
   }
   $('home-empty').hidden = true;
   target.innerHTML = `<div class="highlight-heading"><p class="eyebrow">${escapeHtml(t('home.highlights'))}</p></div>${HIGHLIGHTS.map(metric => {
-    const meta = METRICS[metric];
+    const meta = metricMeta(metric);
     const rows = rowsFor(metric).filter(row => typeof row.value === 'number');
     const bestValue = meta.direction === 'lower' ? Math.min(...rows.map(row => row.value)) : Math.max(...rows.map(row => row.value));
     const best = rows.find(row => row.value === bestValue);
@@ -157,12 +178,12 @@ function renderHighlights() {
 
 function initMetricSelect() {
   const select = $('metric-select');
-  select.innerHTML = Object.entries(METRICS).map(([key, meta]) => `<option value="${key}">${escapeHtml(tx(meta.label))}</option>`).join('');
+  select.innerHTML = metricKeys().map(key => `<option value="${escapeHtml(key)}">${escapeHtml(tx(metricMeta(key).label))}</option>`).join('');
   select.value = currentMetric;
 }
 
 function renderChart() {
-  const meta = METRICS[currentMetric];
+  const meta = metricMeta(currentMetric);
   const rows = rowsFor(currentMetric);
   const present = rows.filter(row => typeof row.value === 'number');
   const max = present.length ? Math.max(...present.map(row => row.value)) : 1;
@@ -215,7 +236,7 @@ function renderMetricTable() {
   const byMetric = Object.fromEntries(data.metric_rows.map(row => [`${row.metric}/${row.model}`, row]));
   target.innerHTML = metricKeys.map(metric => {
     const sample = data.metric_rows.find(row => row.metric === metric);
-    const meta = METRICS[metric];
+    const meta = metricMeta(metric);
     const label = meta ? tx(meta.label) : metric;
     const family = FAMILY_LABELS[sample.family]?.[language] ?? sample.family;
     return `<tr><td><code>${escapeHtml(label)}</code><small class="row-key">${escapeHtml(metric)}</small></td><td>${escapeHtml(family)}</td>${MODEL_ORDER.map(model => { const row = byMetric[`${metric}/${model}`]; return `<td class="model-${model}">${row ? displayRow(row) : '—'}</td>`; }).join('')}<td>${sample.direction === 'lower' ? escapeHtml(t('directions.lower')) : escapeHtml(t('directions.higher'))}</td></tr>`;
