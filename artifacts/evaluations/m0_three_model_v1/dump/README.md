@@ -1,6 +1,7 @@
 # M0 three-model compact result dump
 
-This directory is the Git-sized, derived result layer for the 2026-08-21 M0 dashboard.
+This directory is the Git-sized, derived result layer for the 2026-08-21 M0 dashboard and the
+future M1/M2 dashboard slots.
 It contains normalized numeric rows and provenance pointers; it does **not** contain model
 weights, checkpoints, raw sample JSONL, corpus shards, or long logs.
 
@@ -14,7 +15,8 @@ weights, checkpoints, raw sample JSONL, corpus shards, or long logs.
 
 ## Interpretation
 
-- The dump is M0 only and uses the frozen eval-v1 metric names.
+- The numeric dump is M0 only and uses the frozen eval-v1 metric names. `dashboard_states` records
+  M0, M1, M2-A, and M2-B availability without fabricating result rows for states not yet run.
 - `value: null` with `status: pending` means that the lane has not produced a valid metric yet;
   it is not a score of zero.
 - BPB is the primary cross-tokenizer retention comparison. Token PPL is retained as companion
