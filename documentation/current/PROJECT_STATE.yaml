@@ -622,7 +622,7 @@ evaluation_target:
       normalization_authorized: false
       m1_or_m2_authorized: false
     m0_exact_prefix_smollm_recovery:
-      status: submitted_smollm_running
+      status: terminal_complete_3_of_3
       classification: operational_recovery
       semantic_classification: historical_exact_prefix_candidate_ranking_not_free_generation
       contract: documentation/contracts/evaluation/m0-exact-prefix-smollm-recovery-v1.md
@@ -640,6 +640,8 @@ evaluation_target:
       topology: one_exclusive_a100_smollm_lane_plus_afterany_finalizer
       slurm_job_count: 2
       execution_record: documentation/records/evaluation/M0_SMOLLM_EXACT_PREFIX_RECOVERY_SUBMISSION_2026-08-21.md
+      result_record: documentation/records/evaluation/M0_SMOLLM_EXACT_PREFIX_RECOVERY_RESULT_2026-08-21.md
+      result_record_sha256: 1dfe16cca821538b585a6e4f7ad5041134fd8d796e984ca729ee131fa2563811
       execution_commit: d827d6c23685cadd106bb76d66025cf54c7d8d73
       execution_authorized: false
       authorization_consumed: true
@@ -648,8 +650,17 @@ evaluation_target:
       array_job: "473844"
       array_task_job: "473844_2"
       finalizer_job: "473845"
-      observed_array_state: RUNNING
-      observed_finalizer_state: PENDING_DEPENDENCY
+      observed_array_state: TERMINAL_COMPLETE_ARTIFACT_VERIFIED
+      observed_finalizer_state: TERMINAL_COMPLETE_ARTIFACT_VERIFIED
+      valid_scientific_score_count: 3
+      olmo_top1_accuracy: 0.022
+      qwen_top1_accuracy: 0.030
+      smollm_top1_accuracy: 0.032
+      smollm_lane_result_sha256: c52447dd603691b5c135801633907abe7e8bf0ddacb38ec89120ce65b76e3771
+      family_result_sha256: 1bb5e066767d775b104965122490b873bd147b3f80292bb211175508b3aa03f8
+      family_inventory_sha256: 7095e5f0542ab6c7e1d776d00bb3e0ffae84940f7216cf95350171a34b4c3b69
+      family_inventory_file_count: 21
+      family_inventory_total_bytes: 618428
       family_manifest_sha256: ed51b84e069389aab876ead51ec58350154d87b3055207ccc7b29eea37e812f7
       route_probe_sha256: 25d8e31531c0b54b63b87dad09bc552020b19b2be650a39b306be4b394cb41e5
       submission_manifest_sha256: b48c84907f06d253102fe93d2d53d5a339e649860a0044ed712235f9cd2c67fe
@@ -906,8 +917,8 @@ authorization:
       resubmission_authorized: false
 
 next_decision_required:
-  subject: m0_exact_prefix_smollm_recovery_terminal_verification
+  subject: complete_remaining_m0_and_freeze_normalization_boundary
   note: >-
-    Wait for SmolLM task 473844_2 and finalizer 473845 to become terminal, then verify the lane and
-    combined family artifacts by hash. The wave is consumed; no retry, normalization, M1/M2 work
-    or cleanup is authorized. The independent Qwen Pile recovery remains unchanged.
+    The three-model M0 exact-prefix panel is complete and hash-verified. Keep it immutable while the
+    independent Qwen Pile recovery reaches terminal state; then freeze a separate canonical M0
+    normalization/comparison boundary. No normalization, M1/M2 work or cleanup is authorized yet.
