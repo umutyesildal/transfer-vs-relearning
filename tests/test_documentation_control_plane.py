@@ -318,7 +318,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     single_authorization = state["authorization"]["scoped"][
         "m0_qwen_pile_single_lane_recovery"
     ]
-    assert single_authorization["status"] == "authorized_single_wave_unsubmitted"
+    assert single_authorization["status"] == "authorized_single_wave"
     assert single_authorization["execution_authorized"] is True
     assert single_authorization["wave_consumed"] is False
     assert single_authorization["resubmission_authorized"] is False
