@@ -88,10 +88,10 @@ hu_home_gate:
   writes_authorized: false
 
 implementation:
-  commit: IMPLEMENTATION_COMMIT_PENDING
+  commit: 97831d167315f0ef34c7a554d1f7d2e4c74d71de
   files:
-    scripts/study/run_three_model_m0_exact_prefix.py: IMPLEMENTATION_SHA_PENDING
-    src/transfer_vs_relearning/study/m0_exact_prefix.py: e4c959ad48db673a448374ad201c3b6d4d92224e9b1b55edc690adbe4188ec12
+    scripts/study/run_three_model_m0_exact_prefix.py: d240e091e55953950792295dbb18f64219182147978d16cd0d4b0e453f8ddea9
+    src/transfer_vs_relearning/study/m0_exact_prefix.py: 384b6bf989e1aa0d0a6acca7f35d8a04ecf857a998c8711d80b33911a3497664
     scripts/evaluation/evaluate_facts.py: 0e58b7aa66532995abc6a8339c81a06e058e28427290e4add037dae779b9d07a
     src/transfer_vs_relearning/evaluation/evaluator.py: 4ee9edaad19a62e196456b09caf5bbb0bbc240ae0d0991f9690b4f3c43709b8f
 

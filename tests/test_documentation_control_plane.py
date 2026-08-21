@@ -133,6 +133,9 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["pipeline"]["m0_exact_prefix_supplement"]["operator"],
         state["evaluation_target"]["pipeline"]["m0_exact_prefix_supplement"]["authorization_record"],
         state["evaluation_target"]["pipeline"]["m0_exact_prefix_supplement"]["execution_record"],
+        state["evaluation_target"]["pipeline"]["m0_exact_prefix_recovery"]["contract"],
+        state["evaluation_target"]["pipeline"]["m0_exact_prefix_recovery"]["config"],
+        state["evaluation_target"]["pipeline"]["m0_exact_prefix_recovery"]["operator"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],
@@ -357,6 +360,21 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert exact_authorization["robust_a_to_d_rerun_authorized"] is False
     assert exact_authorization["wave_consumed"] is True
     assert exact_authorization["resubmission_authorized"] is False
+
+    exact_recovery = state["evaluation_target"]["pipeline"]["m0_exact_prefix_recovery"]
+    assert exact_recovery["status"] == "frozen_unexecuted_exact_authorization_required"
+    assert exact_recovery["models"] == ["olmo", "qwen", "smollm"]
+    assert exact_recovery["node"] == "gruenau9"
+    assert exact_recovery["gres"] == "gpu:a10080gb:1"
+    assert exact_recovery["slurm_job_count"] == 4
+    assert exact_recovery["execution_authorized"] is False
+
+    exact_recovery_authorization = state["authorization"]["scoped"]["m0_exact_prefix_recovery"]
+    assert exact_recovery_authorization["status"] == (
+        "frozen_unexecuted_exact_authorization_required"
+    )
+    assert exact_recovery_authorization["execution_authorized"] is False
+    assert exact_recovery_authorization["wave_limit"] == 1
 
 
 def test_active_entrypoints_stay_within_context_budget():

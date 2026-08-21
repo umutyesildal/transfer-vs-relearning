@@ -444,6 +444,11 @@ operational `NOT_RUN`; exact-prefix bilimsel skoru üretilmedi. Tek-wave yetki t
 yetkili değil. Aktif Qwen Pile-10k recovery DAG'ı bundan bağımsız kaldı ve değiştirilmedi. Kayıt:
 [`M0_THREE_MODEL_EXACT_PREFIX_SUPPLEMENT_EXECUTION_2026-08-21.md`](../records/evaluation/M0_THREE_MODEL_EXACT_PREFIX_SUPPLEMENT_EXECUTION_2026-08-21.md).
 
+Bu terminal sonuçtan sonra yalnız eksik üç exact-prefix lane için fresh-root A100 recovery contract
+donduruldu. Bilimsel kimlik ve 20 GiB guard değişmedi; route Slurm'un idle gösterdiği `gruenau9`
+üzerinde task başına bir A100-80GB olarak sabitlendi. Recovery henüz unexecuted ve yeni exact
+contract/config SHA authorization gerektiriyor.
+
 Tek Qwen Pile lane geçerli biçimde tamamlanırsa 23 retained + 1 recovery artefaktı hash doğrulamalı
 bir composite M0 bundle'a bağlanır. Ardından eval-v1 normalizer:
 
