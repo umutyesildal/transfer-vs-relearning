@@ -5,7 +5,20 @@ as_of: "2026-08-21"
 classification: operational_recovery
 semantic_classification: historical_exact_prefix_candidate_ranking_not_free_generation
 authorization_scope: m0_exact_prefix_smollm_recovery
-execution_authorized: false
+execution_authorized: true
+execution_authorization:
+  status: authorized_single_wave
+  execution_authorized: true
+  authorized_at: "2026-08-21"
+  authorized_contract_sha256: eb64a15cfcea03804f02968850349023a05f4f5f21dc43282ba386dd8f5e7843
+  pre_authorization_config_sha256: e8a5a2a6e97d90f83f9446ea88868e0a98cbdff0013096eae34259300d2205ea
+  authorization_record: documentation/contracts/evaluation/m0-exact-prefix-smollm-recovery-v1-authorization-2026-08-21.md
+  authorization_record_sha256: 91deab19cc6ea4de99aeedee80c5e81c7a2037b7446cd6e31c60b05be5dd4425
+  wave_limit: 1
+  slurm_job_count: 2
+  automatic_retry_authorized: false
+  normalization_authorized: false
+  m1_or_m2_authorized: false
 contract: documentation/contracts/evaluation/m0-exact-prefix-smollm-recovery-v1.md
 family_root: /vol/tmp2/yesildau/eval_v1_m0_exact_prefix_smollm_recovery_v1
 preserved_source_root: /vol/tmp2/yesildau/eval_v1_m0_three_model_exact_prefix_supplement_a100_recovery_v1

@@ -51,7 +51,8 @@ def test_recovery_plan_preserves_semantics_and_uses_fresh_a100_root() -> None:
 
 def test_smollm_recovery_executes_only_missing_lane_and_retains_two_hashes() -> None:
     plan = load_exact_prefix_plan(SMOLLM_RECOVERY_CONFIG, repo_root=ROOT)
-    assert plan["execution_authorized"] is False
+    assert plan["execution_authorized"] is True
+    assert plan["execution_authorization"]["status"] == "authorized_single_wave"
     assert plan["authorization_scope"] == "m0_exact_prefix_smollm_recovery"
     assert plan["execution_model_indices"] == [2]
     assert set(plan["retained_lanes"]) == {"olmo", "qwen"}
