@@ -540,7 +540,7 @@ evaluation_target:
       m1_or_m2_authorized: false
       automatic_retry_authorized: false
     m0_exact_prefix_supplement:
-      status: authorized_single_wave_unexecuted
+      status: authorized_single_wave
       classification: scientific_supplement
       semantic_classification: historical_exact_prefix_candidate_ranking_not_free_generation
       contract: documentation/contracts/evaluation/m0-three-model-exact-prefix-supplement-v1.md
@@ -766,7 +766,7 @@ authorization:
       wave_consumed: true
       resubmission_authorized: false
     m0_exact_prefix_supplement:
-      status: authorized_single_wave_unexecuted
+      status: authorized_single_wave
       execution_authorized: true
       contract_sha256: 83f43a3ebbc981f4e8f99609587a6a3c0d3fc1eabda95d3e640671aa109a633b
       pre_authorization_config_sha256: 4d42a3700fb1f5302d38cba7fcb06f40a3eb0c288642d5e254f81b7c41f1178a

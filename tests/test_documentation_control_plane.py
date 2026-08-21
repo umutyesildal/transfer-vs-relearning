@@ -334,7 +334,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert single_authorization["wave_limit"] == 1
 
     exact = state["evaluation_target"]["pipeline"]["m0_exact_prefix_supplement"]
-    assert exact["status"] == "authorized_single_wave_unexecuted"
+    assert exact["status"] == "authorized_single_wave"
     assert exact["semantic_classification"] == (
         "historical_exact_prefix_candidate_ranking_not_free_generation"
     )
@@ -345,7 +345,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert exact["robust_a_to_d_rerun_authorized"] is False
 
     exact_authorization = state["authorization"]["scoped"]["m0_exact_prefix_supplement"]
-    assert exact_authorization["status"] == "authorized_single_wave_unexecuted"
+    assert exact_authorization["status"] == "authorized_single_wave"
     assert exact_authorization["execution_authorized"] is True
     assert exact_authorization["wave_limit"] == 1
     assert exact_authorization["robust_a_to_d_rerun_authorized"] is False
