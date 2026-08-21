@@ -2,7 +2,7 @@
 
 **Son doğrulama:** 2026-08-21
 
-**Bilimsel faz:** eval-v1 donduruldu; 23/24 geçerli M0 lane, Qwen Pile single-lane recovery authorized
+**Bilimsel faz:** eval-v1 donduruldu; 23/24 geçerli M0 lane, Qwen Pile single-lane recovery submitted
 
 **Training readiness:** `ready_to_train=false`
 
@@ -36,7 +36,7 @@ M1 training = başlamadı ve yetkili değil
 
 Beş-lane recovery dört yeni valid sonuç üretti; Qwen Pile-10k ise iki saat boyunca 64 GiB boş VRAM
 kapısını geçen A100 bulunamadığı için model load öncesi `NOT_RUN` kaldı. Yalnız bu lane'i hedefleyen
-yeni contract exact SHA-bound olarak yetkilendirilmiştir; henüz submit edilmemiştir.
+yeni contract exact SHA-bound olarak yetkilendirilmiş ve tek wave olarak submit edilmiştir.
 
 ## 2. Şu an tam olarak neredeyiz?
 
@@ -60,8 +60,9 @@ flowchart LR
     style K fill:#e9ecef,stroke:#495057
 ```
 
-Güncel konum **H'dedir**. Tek-lane wave yalnız publication, HU fast-forward, final preflight ve
-bir adet beş-job DAG için yetkilidir. Normalization ve model karşılaştırması fail-closed tutulmuştur.
+Güncel konum **H'dedir**. Tek-lane controller `472809` kaynak bekliyor; finalizer'lar
+`472810--472813` dependency-pending. Tek-wave yetki tüketildi. Normalization ve model
+karşılaştırması fail-closed tutulmuştur.
 
 ## 3. Kronolojik timeline
 
@@ -419,6 +420,11 @@ eşiği geçtiğini gösterdi; execution-time selector yine zorunlu. Contract/co
 authorization 21 Ağustos'ta exact contract/config hash'leriyle verildi. Authorization record:
 [`m0-qwen-pile-single-lane-a100-recovery-v1-authorization-2026-08-21.md`](../contracts/evaluation/m0-qwen-pile-single-lane-a100-recovery-v1-authorization-2026-08-21.md).
 Bu yetki yalnız bir final preflight ve tek beş-job DAG içindir; retry ve normalization içermez.
+Final preflight 15/15 PASS oldu ve controller `472809`, model finalizer'lar `472810--472812`,
+family finalizer `472813` olarak submit edildi. İlk snapshot controller'ı `PENDING(Resources)`
+gösterdi; test-only scheduler tahmini `2026-08-22T23:05:06` olup garanti değildir. Submission
+record:
+[`M0_QWEN_PILE_SINGLE_LANE_RECOVERY_SUBMISSION_2026-08-21.md`](../records/evaluation/M0_QWEN_PILE_SINGLE_LANE_RECOVERY_SUBMISSION_2026-08-21.md).
 
 ### Adım 2 — Complete raw bundle ve canonical normalization
 

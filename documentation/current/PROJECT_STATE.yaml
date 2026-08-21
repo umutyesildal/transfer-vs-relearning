@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m0-evaluation
-  status: m0_qwen_pile_single_lane_recovery_authorized_unsubmitted
+  status: m0_qwen_pile_single_lane_recovery_submitted_pending_resources
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -497,7 +497,7 @@ evaluation_target:
       m1_or_m2_authorized: false
       automatic_retry_authorized: false
     m0_qwen_pile_single_lane_recovery:
-      status: authorized_single_wave_unsubmitted
+      status: submitted_pending_resources
       contract: documentation/contracts/evaluation/m0-qwen-pile-single-lane-a100-recovery-v1.md
       contract_sha256: 88f135f74c8e1932660128e4e36f99cdb13923be15fb7ba82c6c3a2a98c40332
       config: configs/evaluation/m0_qwen_pile_single_lane_recovery_v1.yaml
@@ -519,9 +519,23 @@ evaluation_target:
       batch_behavior: auto:4_unchanged
       topology: one_exclusive_three_a100_single_lane_wave_plus_four_finalizers
       slurm_job_count: 5
-      execution_authorized: true
-      authorization_consumed: false
+      execution_authorized: false
+      authorization_consumed: true
       resubmission_authorized: false
+      final_preflight_checks_passed: 15
+      final_preflight_blockers: []
+      hu_home_observed_bytes: 14545990549
+      submission_record: documentation/records/evaluation/M0_QWEN_PILE_SINGLE_LANE_RECOVERY_SUBMISSION_2026-08-21.md
+      wave_job: "472809"
+      model_finalizers:
+        olmo: "472810"
+        qwen: "472811"
+        smollm: "472812"
+      family_finalizer: "472813"
+      scheduler_estimate: "2026-08-22T23:05:06"
+      submission_manifest_sha256: af6ed4e5f87426d9120d2b31c0e20d8b5c122db6dc092161e4909b44a74a502f
+      recovery_manifest_sha256: 11922e408b53f46d9616d2069ee04d9890f0d59431b2a6f116abbabcf649a480
+      route_probe_sha256: 0d63ff5bb3f2915e482287aaf45b3bbdf5effb4387a6e4332f52b278194f29d4
       normalization_authorized: false
       m1_or_m2_authorized: false
       automatic_retry_authorized: false
@@ -592,8 +606,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: execute_authorized_qwen_pile_single_lane_recovery
-  first_boundary: publish_then_hu_fast_forward_then_final_preflight_then_one_five_job_dag
+  name: monitor_submitted_qwen_pile_single_lane_recovery
+  first_boundary: wait_for_controller_allocation_then_verify_terminal_five_job_dag
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -712,8 +726,8 @@ authorization:
       wave_consumed: true
       resubmission_authorized: false
     m0_qwen_pile_single_lane_recovery:
-      status: authorized_single_wave
-      execution_authorized: true
+      status: consumed_by_single_submission
+      execution_authorized: false
       contract_sha256: 88f135f74c8e1932660128e4e36f99cdb13923be15fb7ba82c6c3a2a98c40332
       pre_authorization_config_sha256: f394ca3ecf0e056f825545675b41f7fc7b970da240b41156fff030019a36cf36
       config_sha256: 381fce7c26769da86fb3f41f3caa94febf89b659a484f5f7c3af2fe8bf675fae
@@ -726,12 +740,12 @@ authorization:
       normalization_authorized: false
       m1_or_m2_authorized: false
       automatic_retry_authorized: false
-      wave_consumed: false
+      wave_consumed: true
       resubmission_authorized: false
 
 next_decision_required:
-  subject: authorized_qwen_pile_single_lane_recovery_execution
+  subject: qwen_pile_single_lane_recovery_terminal_result
   note: >-
-    Exact SHA-bound authorization was received. Publish the narrow authorization overlay,
-    preservation-check and fast-forward HU, run the final fail-closed preflight and submit exactly
-    one five-job DAG. No retry, normalization, M1/M2 work or cleanup is authorized.
+    The authorized five-job DAG was submitted once. Wait for controller 472809 and finalizers
+    472810--472813 to reach terminal state, then verify hashes and the 24/24 composite. No retry,
+    normalization, M1/M2 work or cleanup is authorized.

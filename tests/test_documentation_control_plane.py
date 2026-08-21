@@ -127,6 +127,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]["config"],
         state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]["operator"],
         state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]["authorization_record"],
+        state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]["submission_record"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],
@@ -299,7 +300,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert retargeted_authorization["recovery_lane_count"] == 5
 
     single = state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]
-    assert single["status"] == "authorized_single_wave_unsubmitted"
+    assert single["status"] == "submitted_pending_resources"
     assert single["contract_sha256"] == (
         "88f135f74c8e1932660128e4e36f99cdb13923be15fb7ba82c6c3a2a98c40332"
     )
@@ -310,17 +311,21 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert single["recovery_lane_count"] == 1
     assert single["target"] == "qwen:english_retention_pile_10k"
     assert single["min_free_gpu_bytes"] == 64 * 1024**3
-    assert single["execution_authorized"] is True
-    assert single["authorization_consumed"] is False
+    assert single["execution_authorized"] is False
+    assert single["authorization_consumed"] is True
     assert single["resubmission_authorized"] is False
+    assert single["final_preflight_checks_passed"] == 15
+    assert single["final_preflight_blockers"] == []
+    assert single["wave_job"] == "472809"
+    assert single["family_finalizer"] == "472813"
     assert single["normalization_authorized"] is False
 
     single_authorization = state["authorization"]["scoped"][
         "m0_qwen_pile_single_lane_recovery"
     ]
-    assert single_authorization["status"] == "authorized_single_wave"
-    assert single_authorization["execution_authorized"] is True
-    assert single_authorization["wave_consumed"] is False
+    assert single_authorization["status"] == "consumed_by_single_submission"
+    assert single_authorization["execution_authorized"] is False
+    assert single_authorization["wave_consumed"] is True
     assert single_authorization["resubmission_authorized"] is False
     assert single_authorization["wave_limit"] == 1
 
