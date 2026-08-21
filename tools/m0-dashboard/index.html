@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>M0 Evaluation Explorer</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">TRANSFER VS. RELEARNING · M0</p>
+        <h1>Evaluation Explorer</h1>
+        <p class="lede">OLMo, Qwen ve SmolLM için mevcut hash’li M0 sonuçlarını tek bir yerde karşılaştır.</p>
+      </div>
+      <a class="download" href="../../artifacts/evaluations/m0_three_model_v1/dump/m0_metrics.json" download>JSON dump’ı indir</a>
+    </header>
+
+    <section class="notice" aria-label="Data status">
+      <span class="notice-dot" aria-hidden="true"></span>
+      <div><strong>23/24 lane geçerli</strong><span> · Qwen Pile-10k halen pending · normalize edilmiş overall winner yok</span></div>
+    </section>
+
+    <section class="summary-grid" aria-label="M0 summary">
+      <article class="summary-card"><span>Geçerli lane</span><strong id="valid-lanes">—</strong><small>24 toplam lane</small></article>
+      <article class="summary-card"><span>Modeller</span><strong id="model-count">—</strong><small>aynı M0 paneli</small></article>
+      <article class="summary-card"><span>Bekleyen</span><strong id="pending-lanes">—</strong><small>metric yok; sıfır değil</small></article>
+      <article class="summary-card"><span>Kaynak artifact</span><strong id="source-count">—</strong><small>path + SHA-256 bağlı</small></article>
+    </section>
+
+    <section class="controls" aria-label="Metric controls">
+      <label for="metric-select">Karşılaştırılacak metric</label>
+      <select id="metric-select"></select>
+      <span id="metric-help" class="muted"></span>
+    </section>
+
+    <section class="chart-card" aria-labelledby="chart-title">
+      <div class="section-heading"><div><p class="eyebrow">SELECTED METRIC</p><h2 id="chart-title">—</h2></div><span id="chart-direction" class="direction">—</span></div>
+      <div id="chart" class="bars" role="img" aria-label="Model comparison chart"></div>
+      <p id="chart-caption" class="muted"></p>
+    </section>
+
+    <section class="two-column">
+      <article class="panel">
+        <div class="section-heading"><div><p class="eyebrow">COVERAGE</p><h2>Lane durumu</h2></div><span class="muted">complete / pending</span></div>
+        <div id="lane-matrix" class="lane-matrix"></div>
+      </article>
+      <article class="panel">
+        <div class="section-heading"><div><p class="eyebrow">READING GUIDE</p><h2>Bu sonuç ne söylüyor?</h2></div></div>
+        <ul class="guide-list">
+          <li><strong>Accuracy</strong> yüksekse daha iyi; <strong>BPB/PPL</strong> ve tekrar oranı düşükse daha iyi.</li>
+          <li>BPB, tokenizer’lar arası ana retention karşılaştırmasıdır. Token PPL companion evidence’tır.</li>
+          <li>Task’ler tek bir yapay overall score’a zorlanmaz.</li>
+          <li>Pending sonuçlar boş bırakılır; hiçbir eksik metric sıfıra çevrilmez.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="panel table-panel" aria-labelledby="all-metrics-title">
+      <div class="section-heading"><div><p class="eyebrow">DETAIL</p><h2 id="all-metrics-title">Tüm metric satırları</h2></div><input id="metric-filter" class="filter" type="search" placeholder="metric filtrele" aria-label="Metric filtrele"></div>
+      <div class="table-wrap"><table><thead><tr><th>Metric</th><th>Family</th><th>OLMo</th><th>Qwen</th><th>SmolLM</th><th>Yön</th></tr></thead><tbody id="metric-table"></tbody></table></div>
+    </section>
+
+    <section class="panel provenance-panel" aria-labelledby="provenance-title">
+      <div class="section-heading"><div><p class="eyebrow">PROVENANCE</p><h2 id="provenance-title">Kaynak ve güven sınırı</h2></div><span class="muted" id="generated-at">—</span></div>
+      <p id="provenance-note" class="muted"></p>
+      <details><summary>Kaynak artifact hash’lerini göster</summary><div id="sources" class="sources"></div></details>
+    </section>
+
+    <footer>Canonical data: <code>artifacts/evaluations/m0_three_model_v1/dump/m0_metrics.json</code> · Read-only derived dump · No raw weights/logs copied into Git.</footer>
+  </main>
+  <script src="./app.js" defer></script>
+</body>
+</html>

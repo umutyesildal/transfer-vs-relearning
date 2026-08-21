@@ -1,0 +1,14 @@
+{
+  "schema_version": "m0-dashboard-dump-manifest-v1",
+  "created_at": "2026-08-21",
+  "state": "M0",
+  "canonical_data": "m0_metrics.json",
+  "canonical_data_sha256": "0dc8ccf6928bd150cf64934d4d4aac78adcf9e37e5707cd211a72d974c18b3f6",
+  "canonical_data_bytes": 32951,
+  "metric_row_count": 75,
+  "source_record_count": 23,
+  "coverage": "23/24 valid; qwen/english_retention_pile_10k pending",
+  "retention_policy": "compact derived metrics and provenance are Git-sized; raw HU artifacts remain read-only on scratch storage",
+  "app_entrypoint": "tools/m0-dashboard/index.html",
+  "app_server": "tools/m0-dashboard/serve.py"
+}
