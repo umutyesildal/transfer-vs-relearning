@@ -3,72 +3,102 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>M0 Evaluation Explorer</title>
+  <title>M0–M2 Evaluation Explorer</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <main class="shell">
     <header class="hero">
       <div>
-        <p class="eyebrow">TRANSFER VS. RELEARNING · M0</p>
-        <h1>Evaluation Explorer</h1>
-        <p class="lede">OLMo, Qwen ve SmolLM için mevcut hash’li M0 sonuçlarını tek bir yerde karşılaştır.</p>
+        <p class="eyebrow" data-i18n="hero.eyebrow">TRANSFER VS. RELEARNING · EVALUATION</p>
+        <h1 data-i18n="hero.title">Evaluation Explorer</h1>
+        <p class="lede" data-i18n="hero.lede">M0, M1, M2-A ve M2-B sonuçlarını aynı ölçüm sözlüğüyle incele.</p>
       </div>
-      <a class="download" href="../../artifacts/evaluations/m0_three_model_v1/dump/m0_metrics.json" download>JSON dump’ı indir</a>
+      <div class="hero-actions">
+        <label class="compact-label" for="state-select" data-i18n="state.label">State</label>
+        <select id="state-select" aria-label="State selector"></select>
+        <button id="language-toggle" class="language-toggle" type="button" aria-pressed="false">EN</button>
+        <a class="download" href="../../artifacts/evaluations/m0_three_model_v1/dump/m0_metrics.json" download data-i18n="hero.download">JSON dump</a>
+      </div>
     </header>
 
-    <section class="notice" aria-label="Data status">
+    <nav class="tabs" role="tablist" aria-label="Dashboard sections">
+      <button class="tab is-active" type="button" role="tab" aria-selected="true" data-page="home" data-i18n="nav.home">Ana sayfa</button>
+      <button class="tab" type="button" role="tab" aria-selected="false" data-page="metrics" data-i18n="nav.metrics">Metrics</button>
+      <button class="tab" type="button" role="tab" aria-selected="false" data-page="detail" data-i18n="nav.detail">Detail</button>
+    </nav>
+
+    <section id="state-banner" class="notice" aria-live="polite">
       <span class="notice-dot" aria-hidden="true"></span>
-      <div><strong>23/24 lane geçerli</strong><span> · Qwen Pile-10k halen pending · normalize edilmiş overall winner yok</span></div>
+      <div><strong id="state-banner-title">M0</strong><span id="state-banner-text"></span></div>
     </section>
 
-    <section class="summary-grid" aria-label="M0 summary">
-      <article class="summary-card"><span>Geçerli lane</span><strong id="valid-lanes">—</strong><small>24 toplam lane</small></article>
-      <article class="summary-card"><span>Modeller</span><strong id="model-count">—</strong><small>aynı M0 paneli</small></article>
-      <article class="summary-card"><span>Bekleyen</span><strong id="pending-lanes">—</strong><small>metric yok; sıfır değil</small></article>
-      <article class="summary-card"><span>Kaynak artifact</span><strong id="source-count">—</strong><small>path + SHA-256 bağlı</small></article>
+    <section id="page-home" class="page" role="tabpanel">
+      <div class="home-intro">
+        <p class="eyebrow" data-i18n="home.eyebrow">OVERVIEW</p>
+        <h2 id="home-title">M0 snapshot</h2>
+        <p id="home-description" class="muted"></p>
+      </div>
+      <div class="summary-grid" aria-label="State summary">
+        <article class="summary-card"><span data-i18n="summary.valid">Valid lanes</span><strong id="valid-lanes">—</strong><small id="valid-lanes-note">—</small></article>
+        <article class="summary-card"><span data-i18n="summary.models">Models</span><strong id="model-count">—</strong><small data-i18n="summary.modelsNote">same evaluation panel</small></article>
+        <article class="summary-card"><span data-i18n="summary.pending">Pending</span><strong id="pending-lanes">—</strong><small data-i18n="summary.pendingNote">missing is not zero</small></article>
+        <article class="summary-card"><span data-i18n="summary.sources">Source artifacts</span><strong id="source-count">—</strong><small data-i18n="summary.sourcesNote">path + SHA-256 attached</small></article>
+      </div>
+      <div id="home-highlights" class="highlight-grid"></div>
+      <div id="home-empty" class="empty-state" hidden></div>
     </section>
 
-    <section class="controls" aria-label="Metric controls">
-      <label for="metric-select">Karşılaştırılacak metric</label>
-      <select id="metric-select"></select>
-      <span id="metric-help" class="muted"></span>
+    <section id="page-metrics" class="page" role="tabpanel" hidden>
+      <div class="controls" aria-label="Metric controls">
+        <div><p class="eyebrow" data-i18n="metrics.eyebrow">METRIC EXPLORER</p><h2 data-i18n="metrics.title">Bir metric’i derinlemesine incele</h2></div>
+        <label class="sr-only" for="metric-select" data-i18n="metrics.selectLabel">Metric seç</label>
+        <select id="metric-select" aria-label="Metric selector"></select>
+      </div>
+      <div id="metrics-empty" class="empty-state" hidden></div>
+      <section id="chart-card" class="chart-card" aria-labelledby="chart-title">
+        <div class="section-heading"><div><p class="eyebrow" data-i18n="selected.eyebrow">SELECTED METRIC</p><h2 id="chart-title">—</h2></div><span id="chart-direction" class="direction">—</span></div>
+        <div id="chart" class="bars" role="img" aria-label="Model comparison chart"></div>
+        <div class="metric-explanation">
+          <article><p class="explanation-label" data-i18n="selected.measureLabel">What does it measure?</p><p id="metric-measure">—</p></article>
+          <article><p class="explanation-label" data-i18n="selected.readLabel">How should I read it?</p><p id="metric-read">—</p></article>
+          <article><p class="explanation-label" data-i18n="selected.caveatLabel">Caveat</p><p id="metric-caveat">—</p></article>
+        </div>
+        <p id="chart-caption" class="muted"></p>
+      </section>
     </section>
 
-    <section class="chart-card" aria-labelledby="chart-title">
-      <div class="section-heading"><div><p class="eyebrow">SELECTED METRIC</p><h2 id="chart-title">—</h2></div><span id="chart-direction" class="direction">—</span></div>
-      <div id="chart" class="bars" role="img" aria-label="Model comparison chart"></div>
-      <p id="chart-caption" class="muted"></p>
+    <section id="page-detail" class="page" role="tabpanel" hidden>
+      <section class="panel table-panel" aria-labelledby="all-metrics-title">
+        <div class="section-heading"><div><p class="eyebrow" data-i18n="detail.eyebrow">DETAIL</p><h2 id="all-metrics-title" data-i18n="detail.metricsTitle">All metric rows</h2></div><input id="metric-filter" class="filter" type="search" data-i18n-placeholder="detail.filter" placeholder="filter metric" aria-label="Metric filter"></div>
+        <div id="detail-empty" class="empty-state" hidden></div>
+        <div id="detail-table-wrap" class="table-wrap"><table><thead><tr><th data-i18n="table.metric">Metric</th><th data-i18n="table.family">Family</th><th>OLMo</th><th>Qwen</th><th>SmolLM</th><th data-i18n="table.direction">Direction</th></tr></thead><tbody id="metric-table"></tbody></table></div>
+      </section>
+
+      <div class="two-column">
+        <article class="panel">
+          <div class="section-heading"><div><p class="eyebrow" data-i18n="coverage.eyebrow">COVERAGE</p><h2 data-i18n="coverage.title">Lane status</h2></div><span class="muted" data-i18n="coverage.legend">complete / pending</span></div>
+          <div id="lane-matrix" class="lane-matrix"></div>
+        </article>
+        <article class="panel">
+          <div class="section-heading"><div><p class="eyebrow" data-i18n="guide.eyebrow">READING GUIDE</p><h2 data-i18n="guide.title">How to interpret</h2></div></div>
+          <ul class="guide-list">
+            <li data-i18n="guide.accuracy"><strong>Accuracy</strong> yüksekse daha iyi; <strong>BPB/PPL</strong> ve repetition düşükse daha iyi.</li>
+            <li data-i18n="guide.bpb">BPB, tokenizer’lar arası ana retention karşılaştırmasıdır. Token PPL companion evidence’tır.</li>
+            <li data-i18n="guide.tasks">Task’ler tek bir yapay overall score’a zorlanmaz.</li>
+            <li data-i18n="guide.missing">Pending sonuçlar boş bırakılır; eksik metric sıfır değildir.</li>
+          </ul>
+        </article>
+      </div>
+
+      <section class="panel provenance-panel" aria-labelledby="provenance-title">
+        <div class="section-heading"><div><p class="eyebrow" data-i18n="provenance.eyebrow">PROVENANCE</p><h2 id="provenance-title" data-i18n="provenance.title">Source and trust boundary</h2></div><span class="muted" id="generated-at">—</span></div>
+        <p id="provenance-note" class="muted"></p>
+        <details><summary data-i18n="provenance.show">Show source artifact hashes</summary><div id="sources" class="sources"></div></details>
+      </section>
     </section>
 
-    <section class="two-column">
-      <article class="panel">
-        <div class="section-heading"><div><p class="eyebrow">COVERAGE</p><h2>Lane durumu</h2></div><span class="muted">complete / pending</span></div>
-        <div id="lane-matrix" class="lane-matrix"></div>
-      </article>
-      <article class="panel">
-        <div class="section-heading"><div><p class="eyebrow">READING GUIDE</p><h2>Bu sonuç ne söylüyor?</h2></div></div>
-        <ul class="guide-list">
-          <li><strong>Accuracy</strong> yüksekse daha iyi; <strong>BPB/PPL</strong> ve tekrar oranı düşükse daha iyi.</li>
-          <li>BPB, tokenizer’lar arası ana retention karşılaştırmasıdır. Token PPL companion evidence’tır.</li>
-          <li>Task’ler tek bir yapay overall score’a zorlanmaz.</li>
-          <li>Pending sonuçlar boş bırakılır; hiçbir eksik metric sıfıra çevrilmez.</li>
-        </ul>
-      </article>
-    </section>
-
-    <section class="panel table-panel" aria-labelledby="all-metrics-title">
-      <div class="section-heading"><div><p class="eyebrow">DETAIL</p><h2 id="all-metrics-title">Tüm metric satırları</h2></div><input id="metric-filter" class="filter" type="search" placeholder="metric filtrele" aria-label="Metric filtrele"></div>
-      <div class="table-wrap"><table><thead><tr><th>Metric</th><th>Family</th><th>OLMo</th><th>Qwen</th><th>SmolLM</th><th>Yön</th></tr></thead><tbody id="metric-table"></tbody></table></div>
-    </section>
-
-    <section class="panel provenance-panel" aria-labelledby="provenance-title">
-      <div class="section-heading"><div><p class="eyebrow">PROVENANCE</p><h2 id="provenance-title">Kaynak ve güven sınırı</h2></div><span class="muted" id="generated-at">—</span></div>
-      <p id="provenance-note" class="muted"></p>
-      <details><summary>Kaynak artifact hash’lerini göster</summary><div id="sources" class="sources"></div></details>
-    </section>
-
-    <footer>Canonical data: <code>artifacts/evaluations/m0_three_model_v1/dump/m0_metrics.json</code> · Read-only derived dump · No raw weights/logs copied into Git.</footer>
+    <footer><span data-i18n="footer.canonical">Canonical data</span>: <code>artifacts/evaluations/m0_three_model_v1/dump/m0_metrics.json</code> · <span data-i18n="footer.note">read-only derived dump; no raw weights/logs in Git.</span></footer>
   </main>
   <script src="./app.js" defer></script>
 </body>

@@ -21,6 +21,12 @@
     "pending": ["qwen/english_retention_pile_10k"],
     "normalization_status": "blocked_until_qwen_pile_10k_completion"
   },
+  "dashboard_states": [
+    {"id": "M0", "label": "M0", "status": "observed_partial", "available": true},
+    {"id": "M1", "label": "M1", "status": "no_result_snapshot", "available": false},
+    {"id": "M2-A", "label": "M2-A", "status": "no_result_snapshot", "available": false},
+    {"id": "M2-B", "label": "M2-B", "status": "no_result_snapshot", "available": false}
+  ],
   "models": {
     "olmo": {"label": "OLMo-2-0425-1B", "model_id": "allenai/OLMo-2-0425-1B", "valid_lanes": 8, "total_lanes": 8},
     "qwen": {"label": "Qwen2.5-1.5B", "model_id": "Qwen/Qwen2.5-1.5B", "valid_lanes": 7, "total_lanes": 8},
