@@ -18,6 +18,7 @@ from transfer_vs_relearning.utils.io import sha256_file, write_json
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "configs/evaluation/m0_exact_prefix_three_model_v1.yaml"
+RECOVERY_CONFIG = ROOT / "configs/evaluation/m0_exact_prefix_three_model_a100_recovery_v1.yaml"
 
 
 def test_frozen_plan_preserves_historical_exact_prefix_semantics() -> None:
@@ -34,6 +35,16 @@ def test_frozen_plan_preserves_historical_exact_prefix_semantics() -> None:
         "template": "{question}",
         "answer_separator": " ",
     }
+
+
+def test_recovery_plan_preserves_semantics_and_uses_fresh_a100_root() -> None:
+    plan = load_exact_prefix_plan(RECOVERY_CONFIG, repo_root=ROOT)
+    assert plan["classification"] == "operational_recovery"
+    assert plan["execution_authorized"] is False
+    assert plan["authorization_scope"] == "m0_exact_prefix_recovery"
+    assert plan["slurm"]["nodelist"] == "gruenau9"
+    assert plan["slurm"]["gres"] == "gpu:a10080gb:1"
+    assert plan["family_root"].endswith("_a100_recovery_v1")
     assert plan["evaluation"]["scoring"]["primary"] == "mean_logprob"
 
 

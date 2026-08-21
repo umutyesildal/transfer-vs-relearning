@@ -106,8 +106,8 @@ def load_exact_prefix_plan(config_path: Path, *, repo_root: Path) -> dict[str, A
     payload = _mapping(yaml.safe_load(config_path.read_text(encoding="utf-8")), "config")
     if payload.get("schema_version") != 1 or payload.get("status") != "frozen":
         raise ValueError("M0 exact-prefix supplement requires frozen schema_version 1")
-    if payload.get("classification") != "scientific_supplement":
-        raise ValueError("M0 exact-prefix classification must be scientific_supplement")
+    if payload.get("classification") not in {"scientific_supplement", "operational_recovery"}:
+        raise ValueError("M0 exact-prefix classification must be scientific_supplement or operational_recovery")
     if payload.get("semantic_classification") != "historical_exact_prefix_candidate_ranking_not_free_generation":
         raise ValueError("M0 exact-prefix semantics are not frozen")
     models = _mapping(payload.get("models"), "models")
