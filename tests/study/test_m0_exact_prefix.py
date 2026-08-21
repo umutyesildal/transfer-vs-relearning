@@ -141,3 +141,29 @@ def test_route_block_writes_a_terminal_no_job_manifest(
     manifest = json.loads((Path(plan["family_root"]) / "submission_manifest.json").read_text())
     assert manifest["status"] == "no_job_submitted_route_blocked"
     assert manifest["array_job_id"] is None
+
+
+def test_submitter_can_pin_the_gpu_array_to_one_node(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    entrypoint_path = ROOT / "scripts/study/run_three_model_m0_exact_prefix.py"
+    spec = importlib.util.spec_from_file_location("m0_exact_prefix_entrypoint_node", entrypoint_path)
+    assert spec and spec.loader
+    entrypoint = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(entrypoint)
+    plan = load_exact_prefix_plan(CONFIG, repo_root=ROOT)
+    plan["family_root"] = str(tmp_path / "wave")
+    plan["slurm"]["nodelist"] = "gruenau9"
+    monkeypatch.setattr(
+        entrypoint,
+        "_route_probe",
+        lambda _plan: {"eligible": True, "returncode": 0, "estimated_start": "now", "output": "ok"},
+    )
+    submissions: list[list[str]] = []
+    monkeypatch.setattr(
+        entrypoint,
+        "_submit",
+        lambda argv: submissions.append(argv) or str(9300 + len(submissions)),
+    )
+    entrypoint.submit_wave(plan, config_path=CONFIG, repo_root=ROOT)
+    assert "--nodelist=gruenau9" in submissions[0]

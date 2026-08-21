@@ -1,0 +1,107 @@
+schema_version: 1
+name: m0-three-model-exact-prefix-a100-recovery-v1
+status: frozen
+as_of: "2026-08-21"
+classification: operational_recovery
+semantic_classification: historical_exact_prefix_candidate_ranking_not_free_generation
+authorization_scope: m0_exact_prefix_recovery
+execution_authorized: false
+execution_authorization: null
+contract: documentation/contracts/evaluation/m0-three-model-exact-prefix-a100-recovery-v1.md
+family_root: /vol/tmp2/yesildau/eval_v1_m0_three_model_exact_prefix_supplement_a100_recovery_v1
+preserved_source_root: /vol/tmp2/yesildau/eval_v1_m0_three_model_exact_prefix_supplement_v1
+preserved_source_family_result_sha256: fee84e1ec4604c4a1a1dbc96a7f2a52a50d48a00ca9f6dbc2f1347b9bf3aaaa9
+preserved_source_family_inventory_sha256: cbf35264fc5eef8394e2821bd63eeb047e64ac35b6712bff577595d4262d78c0
+
+inputs:
+  dataset_dir: artifacts/datasets/relation_v2_gate_v1
+  dataset_manifest: artifacts/datasets/relation_v2_gate_v1/manifest.json
+  dataset_manifest_sha256: b37268d6f3afbb37f13ef746b80b99169c4d94ced3471aed2ae4aa09dc85b752
+  pilot_subject_file: artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/summary.json
+  pilot_subject_file_sha256: a975263abb03d887fa224fb94d402f1fad852afe1ec03cd69226c0874cc32d3b
+  probe_registry: artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/exact_prefix_probes_en.csv
+  probe_registry_sha256: 1644288d0d62c51c56ceaae71b9eef7225b88326267281c8df8aeef9d7619c8e
+  probe_count: 500
+  subject_count: 100
+  robust_registry: configs/evaluation/registries/eval_v1_factual_full_bilingual_12000.csv
+  robust_registry_sha256: 5125850a2db24c6b570971a58e9ba8a8586cabdec9084eb0e99bbd639691d93f
+  robust_relationship: same_500_fact_and_answer_identity_zero_prompt_overlap
+
+models:
+  olmo:
+    repository: allenai/OLMo-2-0425-1B
+    revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+    manifest_path: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
+    manifest_sha256: 8702b80d5b7e4c996c8ce2ff5fe771ada08ab0080bde1926c0b1f53c607303dc
+  qwen:
+    repository: Qwen/Qwen2.5-1.5B
+    revision: 8faed761d45a263340a0528343f099c05c9a4323
+    manifest_path: /vol/tmp2/yesildau/m1_cross_family_screen_v1/models/Qwen__Qwen2.5-1.5B/model_manifest.json
+    manifest_sha256: c9d3562b717784251fe14c2b7972660fe4a20fe4687e15f69746bc1713d2d4fb
+  smollm:
+    repository: HuggingFaceTB/SmolLM2-1.7B
+    revision: effd688a12921b4cc83e3312b6feb579f70f9c71
+    manifest_path: /vol/fob-vol6/mi25/yesildau/transfer-vs-relearning/artifacts/models/HuggingFaceTB__SmolLM2-1.7B/model_manifest.json
+    manifest_sha256: e5d04302087b8b41828f734c1d88c4620a74bb80d6919de62df37b9d57dadbfc
+
+evaluation:
+  dataset_version: relation_v2_gate_v1_100_subjects_500_facts_direct
+  languages: [en]
+  relations: [profession, born_in, lives_in, field_of_study, works_in_industry]
+  prompt:
+    format: direct
+    template: "{question}"
+    answer_separator: " "
+  scoring:
+    primary: mean_logprob
+    secondary: total_logprob
+    tie_breaker: canonical_object_id
+  runtime:
+    bf16: true
+    device: cuda
+    candidate_batch_size: 64
+    checkpoint_interval: 25
+    seed: 42
+
+runtime:
+  python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
+  environment_lock_path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/environment.lock.txt
+  environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
+
+slurm:
+  account: yesildau
+  partition: gpu
+  control_partition: std
+  gres: gpu:a10080gb:1
+  nodelist: gruenau9
+  array: 0-2%3
+  job_name: m0-exact-prefix-a100-r1
+  cpus_per_task: 8
+  memory: 64G
+  time_limit: "06:00:00"
+  min_free_gpu_bytes: 21474836480
+  bf16_capability_required: true
+
+hu_home_gate:
+  path: /vol/fob-vol6/mi25/yesildau
+  limit_bytes: 32212254720
+  writes_authorized: false
+
+implementation:
+  commit: IMPLEMENTATION_COMMIT_PENDING
+  files:
+    scripts/study/run_three_model_m0_exact_prefix.py: IMPLEMENTATION_SHA_PENDING
+    src/transfer_vs_relearning/study/m0_exact_prefix.py: e4c959ad48db673a448374ad201c3b6d4d92224e9b1b55edc690adbe4188ec12
+    scripts/evaluation/evaluate_facts.py: 0e58b7aa66532995abc6a8339c81a06e058e28427290e4add037dae779b9d07a
+    src/transfer_vs_relearning/evaluation/evaluator.py: 4ee9edaad19a62e196456b09caf5bbb0bbc240ae0d0991f9690b4f3c43709b8f
+
+prohibitions:
+  - mutate_or_delete_first_exact_prefix_root
+  - rerun_existing_robust_factual_lanes
+  - call_this_free_generation_exact_match
+  - change_probe_prompt_candidate_or_scoring_identity
+  - automatic_retry_or_second_recovery_wave
+  - normalize_or_interpret_before_complete_family
+  - m1_or_m2_training
+  - cleanup_or_deletion
+  - hu_home_writes

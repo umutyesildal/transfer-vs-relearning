@@ -100,7 +100,8 @@ def assess_readiness(plan: dict[str, Any], *, repo_root: Path, project_state_pat
     record("model_manifest_identities", all(model_checks.values()), model_checks)
 
     state = yaml.safe_load(project_state_path.read_text(encoding="utf-8"))
-    scoped = state.get("authorization", {}).get("scoped", {}).get("m0_exact_prefix_supplement", {})
+    authorization_scope = plan.get("authorization_scope", "m0_exact_prefix_supplement")
+    scoped = state.get("authorization", {}).get("scoped", {}).get(authorization_scope, {})
     record(
         "project_exact_prefix_authorization",
         scoped.get("status") == "authorized_single_wave"
@@ -170,6 +171,8 @@ def _route_probe(plan: dict[str, Any]) -> dict[str, Any]:
         f"--time={slurm['time_limit']}",
         "--wrap=true",
     ]
+    if slurm.get("nodelist"):
+        argv.insert(-1, f"--nodelist={slurm['nodelist']}")
     result = subprocess.run(argv, check=False, capture_output=True, text=True)
     output = "\n".join(value.strip() for value in (result.stdout, result.stderr) if value.strip())
     match = START_RE.search(output)
@@ -229,6 +232,7 @@ def submit_wave(plan: dict[str, Any], *, config_path: Path, repo_root: Path) -> 
             f"--chdir={repo_root}",
             f"--wrap=exec {shlex.join(lane_command)}",
         ]
+        + ([f"--nodelist={slurm['nodelist']}"] if slurm.get("nodelist") else [])
     )
     final_command = [
         plan["runtime"]["python"],
