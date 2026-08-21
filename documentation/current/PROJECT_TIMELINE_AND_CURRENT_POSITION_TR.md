@@ -2,7 +2,7 @@
 
 **Son doğrulama:** 2026-08-21
 
-**Bilimsel faz:** eval-v1 donduruldu; 23/24 geçerli M0 lane, Qwen Pile single-lane recovery frozen
+**Bilimsel faz:** eval-v1 donduruldu; 23/24 geçerli M0 lane, Qwen Pile single-lane recovery authorized
 
 **Training readiness:** `ready_to_train=false`
 
@@ -36,7 +36,7 @@ M1 training = başlamadı ve yetkili değil
 
 Beş-lane recovery dört yeni valid sonuç üretti; Qwen Pile-10k ise iki saat boyunca 64 GiB boş VRAM
 kapısını geçen A100 bulunamadığı için model load öncesi `NOT_RUN` kaldı. Yalnız bu lane'i hedefleyen
-yeni contract hazırdır fakat execution yetkili değildir.
+yeni contract exact SHA-bound olarak yetkilendirilmiştir; henüz submit edilmemiştir.
 
 ## 2. Şu an tam olarak neredeyiz?
 
@@ -60,8 +60,8 @@ flowchart LR
     style K fill:#e9ecef,stroke:#495057
 ```
 
-Güncel konum **H'dedir**. Tek-lane contract exact authorization bekliyor. Normalization ve model
-karşılaştırması fail-closed tutulmuştur.
+Güncel konum **H'dedir**. Tek-lane wave yalnız publication, HU fast-forward, final preflight ve
+bir adet beş-job DAG için yetkilidir. Normalization ve model karşılaştırması fail-closed tutulmuştur.
 
 ## 3. Kronolojik timeline
 
@@ -416,7 +416,9 @@ donduruldu:
 21 Ağustos'ta yalnız Qwen Pile-10k için 23+1 contract donduruldu. `auto:4`, full 10,000 rows ve
 `68,719,476,736`-byte guard aynen korunuyor. Hazırlık anındaki canlı snapshot iki A100-80GB kartın
 eşiği geçtiğini gösterdi; execution-time selector yine zorunlu. Contract/config exact SHA
-authorization olmadan job submit edilmez.
+authorization 21 Ağustos'ta exact contract/config hash'leriyle verildi. Authorization record:
+[`m0-qwen-pile-single-lane-a100-recovery-v1-authorization-2026-08-21.md`](../contracts/evaluation/m0-qwen-pile-single-lane-a100-recovery-v1-authorization-2026-08-21.md).
+Bu yetki yalnız bir final preflight ve tek beş-job DAG içindir; retry ve normalization içermez.
 
 ### Adım 2 — Complete raw bundle ve canonical normalization
 

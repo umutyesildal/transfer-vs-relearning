@@ -3,8 +3,20 @@ name: m0-qwen-pile-single-lane-a100-recovery-v1
 status: frozen
 as_of: "2026-08-21"
 mode: qwen_pile_single_lane
-execution_authorized: false
-execution_authorization: null
+execution_authorized: true
+execution_authorization:
+  status: authorized_single_wave
+  execution_authorized: true
+  authorized_at: "2026-08-21"
+  authorized_contract_sha256: 88f135f74c8e1932660128e4e36f99cdb13923be15fb7ba82c6c3a2a98c40332
+  pre_authorization_config_sha256: f394ca3ecf0e056f825545675b41f7fc7b970da240b41156fff030019a36cf36
+  authorization_record: documentation/contracts/evaluation/m0-qwen-pile-single-lane-a100-recovery-v1-authorization-2026-08-21.md
+  authorization_record_sha256: b583e23a78fbc458435d2a36575d84e5c28ec7469c39cd03e50f71b442b12f9f
+  wave_limit: 1
+  slurm_job_count: 5
+  automatic_retry_authorized: false
+  normalization_authorized: false
+  m1_or_m2_authorized: false
 contract: documentation/contracts/evaluation/m0-qwen-pile-single-lane-a100-recovery-v1.md
 
 base_recovery_config: configs/evaluation/m0_scientific_recovery_v1.yaml
