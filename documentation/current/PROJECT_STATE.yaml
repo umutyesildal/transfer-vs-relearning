@@ -539,6 +539,26 @@ evaluation_target:
       normalization_authorized: false
       m1_or_m2_authorized: false
       automatic_retry_authorized: false
+    m0_exact_prefix_supplement:
+      status: frozen_unexecuted_exact_authorization_required
+      classification: scientific_supplement
+      semantic_classification: historical_exact_prefix_candidate_ranking_not_free_generation
+      contract: documentation/contracts/evaluation/m0-three-model-exact-prefix-supplement-v1.md
+      contract_sha256: 83f43a3ebbc981f4e8f99609587a6a3c0d3fc1eabda95d3e640671aa109a633b
+      config: configs/evaluation/m0_exact_prefix_three_model_v1.yaml
+      pre_authorization_config_sha256: 4d42a3700fb1f5302d38cba7fcb06f40a3eb0c288642d5e254f81b7c41f1178a
+      operator: scripts/study/run_three_model_m0_exact_prefix.py
+      implementation_commit: 246f4764ec5d2bfdcffa58012b25bcd31ea1f166
+      family_root: /vol/tmp2/yesildau/eval_v1_m0_three_model_exact_prefix_supplement_v1
+      models: [olmo, qwen, smollm]
+      probe_count_per_model: 500
+      robust_a_to_d_rerun_authorized: false
+      topology: one_parallel_three_task_rtxa6000_array_plus_afterany_finalizer
+      slurm_job_count: 4
+      execution_authorized: false
+      automatic_retry_authorized: false
+      normalization_authorized: false
+      m1_or_m2_authorized: false
     m0_preflight:
       command: >-
         .venv/bin/python scripts/study/run_study.py preflight-m0
@@ -742,6 +762,17 @@ authorization:
       automatic_retry_authorized: false
       wave_consumed: true
       resubmission_authorized: false
+    m0_exact_prefix_supplement:
+      status: frozen_unexecuted_exact_authorization_required
+      execution_authorized: false
+      contract_sha256: 83f43a3ebbc981f4e8f99609587a6a3c0d3fc1eabda95d3e640671aa109a633b
+      pre_authorization_config_sha256: 4d42a3700fb1f5302d38cba7fcb06f40a3eb0c288642d5e254f81b7c41f1178a
+      wave_limit: 1
+      slurm_job_count: 4
+      robust_a_to_d_rerun_authorized: false
+      automatic_retry_authorized: false
+      normalization_authorized: false
+      m1_or_m2_authorized: false
 
 next_decision_required:
   subject: qwen_pile_single_lane_recovery_terminal_result

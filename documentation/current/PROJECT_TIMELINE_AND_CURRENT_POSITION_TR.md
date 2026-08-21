@@ -428,6 +428,20 @@ record:
 
 ### Adım 2 — Complete raw bundle ve canonical normalization
 
+### Ayrı M0 exact-prefix supplement — 2026-08-21
+
+Tarihsel 500-probe English completion-stem paneli OLMo, Qwen ve SmolLM M0 checkpoint'ları için
+ayrı bir supplement olarak donduruldu. Bu panel mevcut robust A--D direct/QA lane'lerini tekrar
+çalıştırmaz. Tarihsel adı yanıltıcı olabildiği için semantiği açıkça kaydedildi: serbest üretimden
+sonra literal prefix eşleştirmesi değil, aday cevapların mean answer-token log probability ile
+sıralanmasıdır.
+
+Tek wave üç modeli `0-2%3` RTX A6000 array ile paralel çalıştırır ve bir `afterany` CPU finalizer
+ekler. Fresh root, 20 GiB execution-time free-VRAM guard, exact input/model/runtime/implementation
+hash'leri ve partial-submission ledgeri fail-closed olarak donduruldu. Paket şu anda unexecuted;
+push, HU fast-forward, preflight ve dört-job DAG için exact contract/config SHA authorization
+gereklidir. Aktif Qwen Pile-10k recovery DAG'ı bundan bağımsızdır ve değiştirilmez.
+
 Tek Qwen Pile lane geçerli biçimde tamamlanırsa 23 retained + 1 recovery artefaktı hash doğrulamalı
 bir composite M0 bundle'a bağlanır. Ardından eval-v1 normalizer:
 

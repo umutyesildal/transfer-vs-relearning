@@ -128,6 +128,9 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]["operator"],
         state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]["authorization_record"],
         state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]["submission_record"],
+        state["evaluation_target"]["pipeline"]["m0_exact_prefix_supplement"]["contract"],
+        state["evaluation_target"]["pipeline"]["m0_exact_prefix_supplement"]["config"],
+        state["evaluation_target"]["pipeline"]["m0_exact_prefix_supplement"]["operator"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],
@@ -328,6 +331,23 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert single_authorization["wave_consumed"] is True
     assert single_authorization["resubmission_authorized"] is False
     assert single_authorization["wave_limit"] == 1
+
+    exact = state["evaluation_target"]["pipeline"]["m0_exact_prefix_supplement"]
+    assert exact["status"] == "frozen_unexecuted_exact_authorization_required"
+    assert exact["semantic_classification"] == (
+        "historical_exact_prefix_candidate_ranking_not_free_generation"
+    )
+    assert exact["models"] == ["olmo", "qwen", "smollm"]
+    assert exact["probe_count_per_model"] == 500
+    assert exact["slurm_job_count"] == 4
+    assert exact["execution_authorized"] is False
+    assert exact["robust_a_to_d_rerun_authorized"] is False
+
+    exact_authorization = state["authorization"]["scoped"]["m0_exact_prefix_supplement"]
+    assert exact_authorization["status"] == "frozen_unexecuted_exact_authorization_required"
+    assert exact_authorization["execution_authorized"] is False
+    assert exact_authorization["wave_limit"] == 1
+    assert exact_authorization["robust_a_to_d_rerun_authorized"] is False
 
 
 def test_active_entrypoints_stay_within_context_budget():
