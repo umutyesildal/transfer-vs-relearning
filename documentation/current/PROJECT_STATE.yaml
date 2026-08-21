@@ -232,10 +232,12 @@ evaluation_target:
       status: planned_not_authorized
       contract: documentation/contracts/three-model-study-matrix-v1.md
       contract_sha256: d2ddd3f9ca1a4593a4c61dc87e6415466fe7b18c719ba797a7451cd9eb32039d
+      exact_prefix_amendment: documentation/contracts/three-model-study-matrix-v1-exact-prefix-amendment.md
+      exact_prefix_amendment_sha256: adba4b49528ecd03b8dd702d2ea627dcca71c53e718c270651ba154d345f3949
       config: configs/studies/three_model_m0_to_m2_matrix_v1.yaml
-      config_sha256: e35f94345f67a53e44d91faa88507cb54a10e6cce2e875960b9b7810c6dae43a
+      config_sha256: 9b22c719d6d04127e91db15017d6dd97274fdeac7f689ab5bd0e4b55e32bc214
       entrypoint: scripts/study/run_model_matrix.py
-      implementation_commit: 329afaa91b4b403b86eca82f60bb3649a6f38800
+      implementation_commit: f95d7418e901755cca4380d276f0395856fa975c
       models: [olmo, qwen, smollm]
       model_count: 3
       wave_count: 13
@@ -619,6 +621,26 @@ evaluation_target:
       automatic_retry_authorized: false
       normalization_authorized: false
       m1_or_m2_authorized: false
+    m0_exact_prefix_smollm_recovery:
+      status: frozen_not_authorized
+      classification: operational_recovery
+      semantic_classification: historical_exact_prefix_candidate_ranking_not_free_generation
+      contract: documentation/contracts/evaluation/m0-exact-prefix-smollm-recovery-v1.md
+      contract_sha256: eb64a15cfcea03804f02968850349023a05f4f5f21dc43282ba386dd8f5e7843
+      config: configs/evaluation/m0_exact_prefix_smollm_recovery_v1.yaml
+      config_sha256: e8a5a2a6e97d90f83f9446ea88868e0a98cbdff0013096eae34259300d2205ea
+      implementation_commit: f95d7418e901755cca4380d276f0395856fa975c
+      preserved_source_root: /vol/tmp2/yesildau/eval_v1_m0_three_model_exact_prefix_supplement_a100_recovery_v1
+      family_root: /vol/tmp2/yesildau/eval_v1_m0_exact_prefix_smollm_recovery_v1
+      retained_models: [olmo, qwen]
+      recovery_models: [smollm]
+      topology: one_exclusive_a100_smollm_lane_plus_afterany_finalizer
+      slurm_job_count: 2
+      execution_authorized: false
+      wave_consumed: false
+      automatic_retry_authorized: false
+      normalization_authorized: false
+      m1_or_m2_authorized: false
     m0_preflight:
       command: >-
         .venv/bin/python scripts/study/run_study.py preflight-m0
@@ -851,10 +873,24 @@ authorization:
       m1_or_m2_authorized: false
       wave_consumed: true
       resubmission_authorized: false
+    m0_exact_prefix_smollm_recovery:
+      status: frozen_not_authorized
+      execution_authorized: false
+      contract_sha256: eb64a15cfcea03804f02968850349023a05f4f5f21dc43282ba386dd8f5e7843
+      config_sha256: e8a5a2a6e97d90f83f9446ea88868e0a98cbdff0013096eae34259300d2205ea
+      wave_limit: 1
+      slurm_job_count: 2
+      retained_lane_count: 2
+      recovery_lane_count: 1
+      automatic_retry_authorized: false
+      normalization_authorized: false
+      m1_or_m2_authorized: false
+      wave_consumed: false
+      resubmission_authorized: false
 
 next_decision_required:
-  subject: qwen_pile_single_lane_recovery_terminal_result
+  subject: m0_exact_prefix_smollm_recovery_authorization
   note: >-
-    The authorized five-job DAG was submitted once. Wait for controller 472809 and finalizers
-    472810--472813 to reach terminal state, then verify hashes and the 24/24 composite. No retry,
-    normalization, M1/M2 work or cleanup is authorized.
+    Review the frozen SmolLM-only exact-prefix recovery contract and config. A new exact SHA-bound
+    authorization is required before push, HU fast-forward, preflight or the two-job DAG. The
+    independent Qwen Pile recovery remains pending and is not changed by this decision.

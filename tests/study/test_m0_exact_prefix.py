@@ -19,6 +19,7 @@ from transfer_vs_relearning.utils.io import sha256_file, write_json
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "configs/evaluation/m0_exact_prefix_three_model_v1.yaml"
 RECOVERY_CONFIG = ROOT / "configs/evaluation/m0_exact_prefix_three_model_a100_recovery_v1.yaml"
+SMOLLM_RECOVERY_CONFIG = ROOT / "configs/evaluation/m0_exact_prefix_smollm_recovery_v1.yaml"
 
 
 def test_frozen_plan_preserves_historical_exact_prefix_semantics() -> None:
@@ -46,6 +47,16 @@ def test_recovery_plan_preserves_semantics_and_uses_fresh_a100_root() -> None:
     assert plan["slurm"]["gres"] == "gpu:a10080gb:1"
     assert plan["family_root"].endswith("_a100_recovery_v1")
     assert plan["evaluation"]["scoring"]["primary"] == "mean_logprob"
+
+
+def test_smollm_recovery_executes_only_missing_lane_and_retains_two_hashes() -> None:
+    plan = load_exact_prefix_plan(SMOLLM_RECOVERY_CONFIG, repo_root=ROOT)
+    assert plan["execution_authorized"] is False
+    assert plan["authorization_scope"] == "m0_exact_prefix_smollm_recovery"
+    assert plan["execution_model_indices"] == [2]
+    assert set(plan["retained_lanes"]) == {"olmo", "qwen"}
+    assert plan["slurm"]["array"] == "2"
+    assert plan["slurm"]["exclusive"] is True
 
 
 def test_exact_prefix_registry_has_same_facts_but_zero_prompt_overlap_with_robust() -> None:
