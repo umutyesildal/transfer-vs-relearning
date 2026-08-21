@@ -622,7 +622,7 @@ evaluation_target:
       normalization_authorized: false
       m1_or_m2_authorized: false
     m0_exact_prefix_smollm_recovery:
-      status: authorized_not_submitted
+      status: submitted_smollm_running
       classification: operational_recovery
       semantic_classification: historical_exact_prefix_candidate_ranking_not_free_generation
       contract: documentation/contracts/evaluation/m0-exact-prefix-smollm-recovery-v1.md
@@ -639,8 +639,20 @@ evaluation_target:
       recovery_models: [smollm]
       topology: one_exclusive_a100_smollm_lane_plus_afterany_finalizer
       slurm_job_count: 2
-      execution_authorized: true
-      wave_consumed: false
+      execution_record: documentation/records/evaluation/M0_SMOLLM_EXACT_PREFIX_RECOVERY_SUBMISSION_2026-08-21.md
+      execution_commit: d827d6c23685cadd106bb76d66025cf54c7d8d73
+      execution_authorized: false
+      authorization_consumed: true
+      wave_consumed: true
+      resubmission_authorized: false
+      array_job: "473844"
+      array_task_job: "473844_2"
+      finalizer_job: "473845"
+      observed_array_state: RUNNING
+      observed_finalizer_state: PENDING_DEPENDENCY
+      family_manifest_sha256: ed51b84e069389aab876ead51ec58350154d87b3055207ccc7b29eea37e812f7
+      route_probe_sha256: 25d8e31531c0b54b63b87dad09bc552020b19b2be650a39b306be4b394cb41e5
+      submission_manifest_sha256: b48c84907f06d253102fe93d2d53d5a339e649860a0044ed712235f9cd2c67fe
       automatic_retry_authorized: false
       normalization_authorized: false
       m1_or_m2_authorized: false
@@ -877,8 +889,8 @@ authorization:
       wave_consumed: true
       resubmission_authorized: false
     m0_exact_prefix_smollm_recovery:
-      status: authorized_single_wave
-      execution_authorized: true
+      status: consumed_by_single_submission
+      execution_authorized: false
       contract_sha256: eb64a15cfcea03804f02968850349023a05f4f5f21dc43282ba386dd8f5e7843
       pre_authorization_config_sha256: e8a5a2a6e97d90f83f9446ea88868e0a98cbdff0013096eae34259300d2205ea
       config_sha256: aa862896b333b8a13358a196d70254ee7c47e3e59b026fec0f326247f76022cc
@@ -890,12 +902,12 @@ authorization:
       automatic_retry_authorized: false
       normalization_authorized: false
       m1_or_m2_authorized: false
-      wave_consumed: false
+      wave_consumed: true
       resubmission_authorized: false
 
 next_decision_required:
-  subject: m0_exact_prefix_smollm_recovery_authorization
+  subject: m0_exact_prefix_smollm_recovery_terminal_verification
   note: >-
-    Review the frozen SmolLM-only exact-prefix recovery contract and config. A new exact SHA-bound
-    authorization is required before push, HU fast-forward, preflight or the two-job DAG. The
-    independent Qwen Pile recovery remains pending and is not changed by this decision.
+    Wait for SmolLM task 473844_2 and finalizer 473845 to become terminal, then verify the lane and
+    combined family artifacts by hash. The wave is consumed; no retry, normalization, M1/M2 work
+    or cleanup is authorized. The independent Qwen Pile recovery remains unchanged.
