@@ -349,6 +349,7 @@ def assess_recovery_readiness(
     scoped_key = {
         "exclusive_a100_sequential": "m0_seven_lane_exclusive_a100_recovery",
         "retargeted_five_lane": "m0_five_lane_retargeted_recovery",
+        "qwen_pile_single_lane": "m0_qwen_pile_single_lane_recovery",
     }.get(recovery.get("mode"), "m0_seven_lane_recovery")
     scoped = state.get("authorization", {}).get("scoped", {}).get(scoped_key, {})
     record(
@@ -568,7 +569,11 @@ def submit_family_recovery(
     config_path: Path,
     repo_root: Path,
 ) -> dict[str, Any]:
-    if recovery.get("mode") in {"exclusive_a100_sequential", "retargeted_five_lane"}:
+    if recovery.get("mode") in {
+        "exclusive_a100_sequential",
+        "retargeted_five_lane",
+        "qwen_pile_single_lane",
+    }:
         return submit_isolated_family_recovery(
             recovery, config_path=config_path, repo_root=repo_root
         )
@@ -734,7 +739,11 @@ def main() -> None:
         run_gpu_memory_guard(Path(model["recovery_root"]), args.lane_id, min_free_bytes=args.min_free_gpu_bytes)
         payload = run_m0_lane(plan, args.lane_index, output_root=Path(model["recovery_root"]))
     elif args.command == "run-isolated-wave":
-        if recovery.get("mode") not in {"exclusive_a100_sequential", "retargeted_five_lane"}:
+        if recovery.get("mode") not in {
+            "exclusive_a100_sequential",
+            "retargeted_five_lane",
+            "qwen_pile_single_lane",
+        }:
             raise ValueError("run-isolated-wave requires the exclusive A100 sequential contract")
         payload = run_isolated_wave(recovery, config_path=config_path, repo_root=repo_root)
     elif args.command == "finalize-model":

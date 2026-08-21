@@ -275,6 +275,86 @@ def _retargeted_five_lane_fixture(tmp_path: Path) -> Path:
     return path
 
 
+def _qwen_pile_single_lane_fixture(tmp_path: Path) -> Path:
+    base_path, plans = _fixture(tmp_path)
+    base = yaml.safe_load(base_path.read_text(encoding="utf-8"))
+    first_root = tmp_path / "prior-isolation" / "olmo"
+    latest_family_root = tmp_path / "prior-five-lane"
+    retained_by_model: dict[str, dict] = {"olmo": {}, "qwen": {}, "smollm": {}}
+    retained_layout = {
+        "olmo": {
+            "english_capability": first_root,
+            "turkish_capability": first_root,
+            "turkish_perplexity": latest_family_root / "olmo",
+        },
+        "qwen": {
+            "turkish_capability": latest_family_root / "qwen",
+            "turkish_perplexity": latest_family_root / "qwen",
+        },
+        "smollm": {"english_capability": latest_family_root / "smollm"},
+    }
+    for model_id, lanes in retained_layout.items():
+        for lane_id, root in lanes.items():
+            lane = next(row for row in plans[model_id]["lanes"] if row["id"] == lane_id)
+            _complete_lane(plans[model_id], root, lane)
+            result = root / "lanes" / lane_id / "lane_result.json"
+            retained_by_model[model_id][lane_id] = {
+                "root": str(root),
+                "lane_result_sha256": sha256_file(result),
+            }
+    terminal = latest_family_root / "three_model_m0_composite_bundle.json"
+    write_json(terminal, {"status": "partial_invalid", "retained_lane_count": 19})
+    payload = {
+        "schema_version": 1,
+        "name": "fixture-qwen-pile-single-lane",
+        "status": "frozen",
+        "mode": "qwen_pile_single_lane",
+        "execution_authorized": False,
+        "base_recovery_config": str(base_path),
+        "base_recovery_config_sha256": sha256_file(base_path),
+        "source_lane_count": 24,
+        "recovery_lane_count": 1,
+        "model_order": ["olmo", "qwen", "smollm"],
+        "recovery_family_root": str(tmp_path / "qwen-pile-single-lane"),
+        "prior_recovery_roots": [str(first_root.parent), str(latest_family_root)],
+        "known_prior_recovery_artifacts": [
+            {"path": str(terminal), "bytes": terminal.stat().st_size, "sha256": sha256_file(terminal)}
+        ],
+        "model_overrides": {
+            "olmo": {"targets": {}, "retained_recovery_lanes": retained_by_model["olmo"]},
+            "qwen": {
+                "targets": {
+                    "english_retention_pile_10k": base["models"]["qwen"]["targets"][
+                        "english_retention_pile_10k"
+                    ]
+                },
+                "retained_recovery_lanes": retained_by_model["qwen"],
+            },
+            "smollm": {"targets": {}, "retained_recovery_lanes": retained_by_model["smollm"]},
+        },
+        "isolation": {
+            "node": "gruenau10",
+            "partition": "gpu",
+            "gres": "gpu:a10080gb:3",
+            "requested_gpu_count": 3,
+            "exclusive_node_allocation": True,
+            "expected_gpu_name": "NVIDIA A100 80GB PCIe",
+            "min_total_gpu_bytes": 80 * 1024**3,
+            "selection_rule": "maximum_free_bytes_then_uuid",
+            "max_wait_seconds": 7200,
+            "poll_interval_seconds": 60,
+            "cpus_per_task": 8,
+            "memory": "96G",
+            "time_limit": "1-00:00:00",
+            "target_order": ["qwen:english_retention_pile_10k"],
+        },
+        "implementation": {"commit": "0" * 40, "files": {}},
+    }
+    path = tmp_path / "qwen-pile-single-lane.yaml"
+    path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+    return path
+
+
 def test_recovery_plan_binds_exactly_seventeen_plus_seven(tmp_path: Path) -> None:
     config_path, _ = _fixture(tmp_path)
     recovery = load_family_recovery_plan(config_path, repo_root=ROOT)
@@ -478,3 +558,30 @@ def test_retargeted_five_lane_operator_submits_one_wave_and_four_finalizers(
     assert len(submissions) == 5
     assert any("run-isolated-wave" in value for value in submissions[0])
     assert payload["wave_job"] == "9101"
+
+
+def test_qwen_pile_single_lane_retains_twenty_three_and_recovers_one(
+    tmp_path: Path,
+) -> None:
+    config_path = _qwen_pile_single_lane_fixture(tmp_path)
+    recovery = load_family_recovery_plan(config_path, repo_root=ROOT)
+    assert recovery["retained_lane_count"] == 23
+    assert recovery["target_lane_count"] == 1
+    assert [
+        f"{model['model_id']}:{lane_id}"
+        for model in recovery["models"]
+        for lane_id in model["targets"]
+    ] == ["qwen:english_retention_pile_10k"]
+    evidence = validate_family_recovery_source(recovery)
+    assert evidence["retained_lane_count"] == 23
+    assert len(evidence["known_prior_recovery_artifacts"]) == 1
+    initialize_family_recovery_namespace(recovery)
+    for model in recovery["models"]:
+        for lane in model["plan"]["lanes"]:
+            if lane["id"] in model["targets"]:
+                _complete_lane(model["plan"], Path(model["recovery_root"]), lane)
+        assert finalize_recovered_model(model)["status"] == "complete"
+    family = finalize_family_recovery(recovery)
+    assert family["normalization_allowed"] is True
+    assert family["retained_lane_count"] == 23
+    assert family["recovered_lane_count"] == 1

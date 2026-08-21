@@ -16,6 +16,13 @@ from transfer_vs_relearning.study.m0_parallel import (
 from transfer_vs_relearning.utils.io import sha256_file, write_json
 
 
+ISOLATED_OVERLAY_MODES = {
+    "exclusive_a100_sequential",
+    "retargeted_five_lane",
+    "qwen_pile_single_lane",
+}
+
+
 def _load_json(path: Path) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
@@ -72,7 +79,7 @@ def load_family_recovery_plan(config_path: Path, *, repo_root: Path) -> dict[str
     payload = yaml.safe_load(config_path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict) or payload.get("schema_version") != 1:
         raise ValueError("M0 family recovery config must be a schema-v1 mapping")
-    if payload.get("mode") in {"exclusive_a100_sequential", "retargeted_five_lane"}:
+    if payload.get("mode") in ISOLATED_OVERLAY_MODES:
         overlay = payload
         base_path = _resolve(overlay["base_recovery_config"], repo_root)
         expected_base = _sha256(
@@ -102,7 +109,7 @@ def load_family_recovery_plan(config_path: Path, *, repo_root: Path) -> dict[str
         }
     if payload.get("status") != "frozen":
         raise ValueError("M0 family recovery config must be frozen")
-    if payload.get("mode") in {"exclusive_a100_sequential", "retargeted_five_lane"}:
+    if payload.get("mode") in ISOLATED_OVERLAY_MODES:
         isolation = payload.get("isolation")
         seven_lane_order = [
             "olmo:english_capability",
@@ -120,9 +127,12 @@ def load_family_recovery_plan(config_path: Path, *, repo_root: Path) -> dict[str
             "qwen:turkish_perplexity",
             "smollm:english_capability",
         ]
-        expected_order = (
-            five_lane_order if payload.get("mode") == "retargeted_five_lane" else seven_lane_order
-        )
+        single_lane_order = ["qwen:english_retention_pile_10k"]
+        expected_order = {
+            "exclusive_a100_sequential": seven_lane_order,
+            "retargeted_five_lane": five_lane_order,
+            "qwen_pile_single_lane": single_lane_order,
+        }[payload["mode"]]
         valid_isolation = isinstance(isolation, dict) and (
             isolation.get("node") == "gruenau10"
             and isolation.get("partition") == "gpu"
@@ -139,8 +149,10 @@ def load_family_recovery_plan(config_path: Path, *, repo_root: Path) -> dict[str
         if not valid_isolation:
             raise ValueError("Exclusive A100 isolation policy changed or broadened")
     recovery_lane_count = payload.get("recovery_lane_count")
-    if payload.get("source_lane_count") != 24 or recovery_lane_count not in {5, 7}:
-        raise ValueError("Recovery contract must bind exactly 24 source lanes and five or seven targets")
+    if payload.get("source_lane_count") != 24 or recovery_lane_count not in {1, 5, 7}:
+        raise ValueError(
+            "Recovery contract must bind exactly 24 source lanes and one, five or seven targets"
+        )
     model_order = payload.get("model_order")
     if model_order != ["olmo", "qwen", "smollm"]:
         raise ValueError("Recovery model order must be olmo, qwen, smollm")
@@ -165,7 +177,7 @@ def load_family_recovery_plan(config_path: Path, *, repo_root: Path) -> dict[str
         }:
             raise ValueError(f"Source lane ledger mismatch: {model_id}")
         targets = raw.get("targets")
-        if not isinstance(targets, dict) or not targets:
+        if not isinstance(targets, dict) or (not targets and recovery_lane_count != 1):
             raise ValueError(f"Recovery targets are missing: {model_id}")
         if not set(targets) < set(expected_lanes):
             raise ValueError(f"Recovery targets must be a strict subset: {model_id}")
@@ -274,6 +286,29 @@ def validate_family_recovery_source(recovery: dict[str, Any]) -> dict[str, Any]:
         ):
             raise ValueError(f"Known source append changed: {path}")
         known_appends.append({"path": str(path), "sha256": expected, "bytes": expected_bytes})
+    prior_roots = [Path(str(value)).resolve() for value in recovery.get("prior_recovery_roots", [])]
+    known_prior_artifacts: list[dict[str, Any]] = []
+    for binding in recovery.get("known_prior_recovery_artifacts", []):
+        if not isinstance(binding, dict):
+            raise ValueError("Known prior recovery artifact binding must be a mapping")
+        path = Path(str(binding.get("path", ""))).resolve()
+        if not prior_roots or not any(
+            path == root or root in path.parents for root in prior_roots
+        ):
+            raise ValueError("Known prior recovery artifact escapes the frozen prior roots")
+        expected = _sha256(binding.get("sha256"), f"known_prior_recovery:{path}")
+        expected_bytes = binding.get("bytes")
+        if (
+            not isinstance(expected_bytes, int)
+            or expected_bytes <= 0
+            or not path.is_file()
+            or path.stat().st_size != expected_bytes
+            or sha256_file(path) != expected
+        ):
+            raise ValueError(f"Known prior recovery artifact changed: {path}")
+        known_prior_artifacts.append(
+            {"path": str(path), "sha256": expected, "bytes": expected_bytes}
+        )
     model_evidence: dict[str, Any] = {}
     for model in recovery["models"]:
         model_id = model["model_id"]
@@ -371,6 +406,7 @@ def validate_family_recovery_source(recovery: dict[str, Any]) -> dict[str, Any]:
         "retained_lane_count": recovery["retained_lane_count"],
         "target_lane_count": recovery["target_lane_count"],
         "known_source_append_artifacts": known_appends,
+        "known_prior_recovery_artifacts": known_prior_artifacts,
         "models": model_evidence,
     }
 
