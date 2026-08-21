@@ -76,7 +76,7 @@ stable rules, while `PROJECT_STATE.yaml` contains the changing project state.
 | `documentation/records/` | Immutable or superseded records and preserved guidance |
 | `documentation/*.md` | Existing chronological scientific record, Documents 00–178 |
 | `artifacts/evaluations/m0_three_model_v1/dump/` | Git-sized M0 metric dump with source hashes |
-| `tools/m0-dashboard/` | Dependency-free local M0 comparison app |
+| `tools/m0-dashboard/` | Dependency-free local M0–M2 bilingual evaluation explorer |
 | `artifacts/` and `runs/` | Local/generated scientific artifacts; generally not Git data |
 | `paper/`, `papers/`, `study-notes/` | Thesis sources, reference notes, and learning material |
 | `presentations/`, `reports/` | Authored and legacy presentation/report material |
@@ -97,7 +97,7 @@ uv run pytest .agents/tests
 The lockfile is versioned. GPU, network, model, and corpus operations are not part of the standard
 offline test suite.
 
-To inspect the compact three-model M0 result dump locally:
+To inspect the compact three-model M0 result dump locally (with prepared M1/M2 state slots):
 
 ```bash
 python3 tools/m0-dashboard/serve.py
@@ -105,7 +105,8 @@ python3 tools/m0-dashboard/serve.py
 ```
 
 The app reads `artifacts/evaluations/m0_three_model_v1/dump/m0_metrics.json`. It is read-only and
-does not contact HU or rerun an evaluation.
+does not contact HU or rerun an evaluation; M1/M2 states remain explicitly empty until their
+canonical snapshots exist.
 
 ## Documentation model
 

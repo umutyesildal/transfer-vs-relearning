@@ -37,9 +37,10 @@ Its exact single-wave execution authorization and hard 30 GiB HU-home gate are i
 
 The Git-sized derived result layer is
 [`../../artifacts/evaluations/m0_three_model_v1/dump/README.md`](../../artifacts/evaluations/m0_three_model_v1/dump/README.md).
-The dependency-free local comparison app is under
+The dependency-free local bilingual M0–M2 evaluation explorer is under
 [`../../tools/m0-dashboard/README.md`](../../tools/m0-dashboard/README.md); it reads the dump and
-does not contact HU or rerun evaluation.
+does not contact HU or rerun evaluation. M1/M2 states are shown as explicit no-snapshot states
+until their canonical result dumps are added.
 
 `eval-v1` is frozen. Only the authorization overlay grants its exact single M0 wave; this directory
 does not broaden that authority to downloads, training, later evaluations or cleanup.
