@@ -17,7 +17,8 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - M0: 21/21 non-Pile lanes available plus completed exact-prefix evidence;
 - M0 projector: implemented and tested; read-only source-binding discovery passed 24/24;
 - v1b SHA-bound reference projection: complete with 24 source rows and zero metric rows;
-- next boundary: freeze and separately authorize metric normalization;
+- metric normalization operator: implemented and fixture-validated; real source-schema audit is pending;
+- next boundary: separately authorize one read-only M0 metric-source audit;
 - M1/M2 training: not ready and not authorized.
 
 ## When to open larger files
