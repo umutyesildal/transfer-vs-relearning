@@ -1179,6 +1179,12 @@ next_decision_required:
     documentation/decisions/M1_EXECUTION_INPUT_SOURCE_AUDIT_2026-08-22.md; no current matched
     model/checkpoint/training manifest exists in the repository, so historical pilot artifacts
     remain non-authoritative and M1 execution stays blocked.
+    The user-authorized read-only source/tokenizer/storage/GPU preflight is preserved in
+    documentation/decisions/M1_READ_ONLY_SOURCE_TOKENIZER_STORAGE_GPU_PREFLIGHT_2026-08-22.md
+    (SHA-256 efc0b6044830166301d7efcb7810ef34a851abddeb3b0aa665c3053a5c130c63). All three
+    recorded external model manifests and both storage roots passed; RTX3090 process-level
+    cleanliness/access remains blocked_by_partition_access because the account cannot use
+    wbimlgpu or viscomgpu in this read-only test-only probe. No training or evaluation was run.
     Max feedback is now a mandatory traceability invariant; the run-recording protocol is
     documentation/decisions/MAX_FEEDBACK_AND_RUN_RECORDING_PROTOCOL_2026-08-22.md (SHA-256
     9a2c3e84d274ccb1efb2c4710a930670e94a49a987a01d9244e5fefbba22eee3). It binds epoch-level
