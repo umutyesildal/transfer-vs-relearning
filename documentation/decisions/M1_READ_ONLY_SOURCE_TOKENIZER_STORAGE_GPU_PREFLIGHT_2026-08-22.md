@@ -18,6 +18,7 @@
 | `/vol/fob-vol6` capacity/inodes | PASS | 605G available; 158,447,093 free inodes |
 | RTX3090 scheduler inventory | CONDITIONAL PASS | `guppi5–8` visible as `idle`; queue was empty |
 | RTX3090 allocation/process-level VRAM | BLOCKED | User group is not permitted to use `wbimlgpu` or `viscomgpu`; no allocation was made |
+| Account access to `gpu` routes | PASS | `yesildau` test-only requests accepted for A100, RTX A6000, RTX6000 and V100 |
 
 ## Exact manifest evidence
 
@@ -62,6 +63,12 @@ read-only `sacctmgr` association query was also unavailable because the HU Munge
 authentication socket failed. The 3090 suitability verdict is consequently
 `blocked_by_partition_access`, not a hardware failure.
 
+The existing account/partition route is usable for test-only requests on `gpu`: A100 80GB,
+RTX A6000, RTX6000 and V100 requests all returned scheduler acceptance with account
+`yesildau`. For the frozen M1 BF16 draft, A100 and RTX A6000 are the precision-compatible
+choices. RTX6000 and V100 would require a separately authorized precision change and are not
+silently substituted into the current recipe.
+
 ## Gate and next action
 
 The source/tokenizer and storage portions of the preflight pass. The M1 execution gate remains
@@ -69,7 +76,7 @@ closed because process-level GPU cleanliness/access and the project-level measur
 blockers are unresolved. No training contract, HU output root, Slurm job, model load, evaluation,
 download, cleanup or deletion was performed.
 
-The next safe operational step is to obtain the correct HU account/partition association (or a
-permitted RTX3090 route) and repeat only the test-only GPU preflight. Once that operational check
-and the existing benchmark/measurement evidence gates are closed, a separate SHA-bound M1
-execution contract can be prepared and explicitly authorized.
+The next safe operational step is to bind a permitted A100/RTX A6000 route (or obtain a permitted
+RTX3090 association) and repeat the allocation-level GPU preflight under a future execution
+contract. Once that operational check and the existing benchmark/measurement evidence gates are
+closed, a separate SHA-bound M1 execution contract can be prepared and explicitly authorized.

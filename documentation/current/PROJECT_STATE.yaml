@@ -1181,10 +1181,13 @@ next_decision_required:
     remain non-authoritative and M1 execution stays blocked.
     The user-authorized read-only source/tokenizer/storage/GPU preflight is preserved in
     documentation/decisions/M1_READ_ONLY_SOURCE_TOKENIZER_STORAGE_GPU_PREFLIGHT_2026-08-22.md
-    (SHA-256 efc0b6044830166301d7efcb7810ef34a851abddeb3b0aa665c3053a5c130c63). All three
+    (SHA-256 da2a007aef224896db26b859b94bc42ad784d2a2c177bf4bae68c34abbf6fee4). All three
     recorded external model manifests and both storage roots passed; RTX3090 process-level
     cleanliness/access remains blocked_by_partition_access because the account cannot use
-    wbimlgpu or viscomgpu in this read-only test-only probe. No training or evaluation was run.
+    wbimlgpu or viscomgpu in this read-only test-only probe. The account's `gpu` test-only
+    routes for A100, RTX A6000, RTX6000 and V100 were accepted; only A100/RTX A6000 preserve
+    the frozen BF16 recipe without a separately authorized precision change. No training or
+    evaluation was run.
     Max feedback is now a mandatory traceability invariant; the run-recording protocol is
     documentation/decisions/MAX_FEEDBACK_AND_RUN_RECORDING_PROTOCOL_2026-08-22.md (SHA-256
     9a2c3e84d274ccb1efb2c4710a930670e94a49a987a01d9244e5fefbba22eee3). It binds epoch-level
