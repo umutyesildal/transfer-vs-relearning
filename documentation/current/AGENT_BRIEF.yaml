@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 3fd2bacdc36856a96c5753696d3bddfe78a4d33872c32afd8e1bb5705ac12ff6
+  full_state_sha256: 99d6ad18e06f1124762455e51e4d9e14f56b79a265979124b490396859fac52d
   role: context_projection_only
   may_expand_authority: false
 
@@ -19,7 +19,7 @@ project:
 readiness:
   evaluation_contract: frozen
   corpus_contract: not_frozen
-  m1_training_contract: not_frozen
+  m1_training_contract: frozen_unexecuted
   m2_training_contract: not_frozen
   ready_to_measure: true
   ready_to_train: false
@@ -28,7 +28,8 @@ readiness:
 stage_readiness:
   m0: complete
   m1_scientific_inputs: ready
-  m1_adapter_and_contract: local_repair_active
+  m1_training_adapter_and_contract: frozen_awaiting_exact_authorization
+  m1_evaluation_adapter_and_contract: next_local_boundary
   m1_execution: not_authorized
   m2_corpus_and_sibling_contract: later_not_an_m1_blocker
 

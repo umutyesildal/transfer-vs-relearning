@@ -104,7 +104,7 @@ scientific_design:
 readiness:
   evaluation_contract: frozen
   corpus_contract: not_frozen
-  m1_training_contract: not_frozen
+  m1_training_contract: frozen_unexecuted
   m2_training_contract: not_frozen
   ready_to_measure: true
   ready_to_train: false
@@ -125,12 +125,14 @@ stage_readiness:
     synthetic_fact_dataset_ready: true
     recipe_matched: true
     epoch_trace_required: true
-    contract_ready_for_authorization: false
+    contract_ready_for_authorization: true
+    contract: documentation/contracts/m1-matched-three-model-training-wave-v1.md
+    contract_sha256: 1c541aee3bb7a614a5042b3fb9fdad66c35cd6bd4e93eb77adac8368aaf3194b
+    config: configs/training/m1_matched_three_model_training_wave_v1.yaml
+    config_sha256: dbb72feabad3248c5c73b21966b5b5ffca5dee2b262a788276d191e3d58fdc68
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - execution_adapter_not_frozen
-      - hash_bound_execution_contract_not_frozen
       - explicit_user_start_authorization_missing
   m1_evaluation:
     protocol_ready: true

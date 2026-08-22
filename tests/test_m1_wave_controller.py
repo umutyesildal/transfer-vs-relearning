@@ -27,7 +27,7 @@ def test_fresh_m1_wave_is_matched_and_fail_closed() -> None:
     assert "project_ready_to_train_and_checkpoint" not in plan["blockers"]
     assert "m1_checkpoint_manifest" not in plan["blockers"]
     assert "m1_training_manifest" not in plan["blockers"]
-    assert "m1_training_contract_ready_for_authorization" in plan["blockers"]
+    assert "m1_training_contract_ready_for_authorization" not in plan["blockers"]
     for subplan in plan["subplans"]:
         statuses = {row["id"]: row["status"] for row in subplan["checks"]}
         assert statuses["m1_checkpoint_manifest"] == "produced_by_training"

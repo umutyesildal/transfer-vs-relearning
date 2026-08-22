@@ -68,7 +68,8 @@ three identity/storage preflights
 |---|---|
 | M0 | complete |
 | M1 scientific inputs/recipe | ready locally |
-| M1 execution adapter/contract | being repaired and validated |
+| M1 training adapter/contract | frozen locally; awaiting exact user authorization |
+| M1 checkpoint evaluation adapter/contract | next implementation boundary |
 | M1 execution authorization | absent; user must explicitly provide it later |
 | M2 corpus and sibling contract | not frozen; does not block M1 preparation |
 

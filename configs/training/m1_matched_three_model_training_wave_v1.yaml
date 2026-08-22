@@ -1,0 +1,37 @@
+schema_version: 1
+name: m1-matched-three-model-training-wave-v1
+status: frozen_unexecuted
+execution_authorized: false
+family_root: /vol/tmp2/yesildau/m1_matched_three_model_v1
+models: [olmo, qwen, smollm]
+training_configs:
+  - path: configs/training/m1_matched_epoch_dense_olmo_seed42_draft.yaml
+    sha256: 0aa2c6653e2221bb397424e3f87772b9e27395444945c0385c5e71dc29c1dc6a
+  - path: configs/training/m1_matched_epoch_dense_qwen_seed42_draft.yaml
+    sha256: 5595b604d01bf91f31d64ba81946b2ee67999f6ff63b56287138fb3271d28ca6
+  - path: configs/training/m1_matched_epoch_dense_smollm_seed42_draft.yaml
+    sha256: 5eed39e6de60deafe1b37a31eeae50f81fdf630508d7595c331b47c9011729b5
+dataset_manifest:
+  path: artifacts/datasets/relation_v2_gate_v1/manifest.json
+  sha256: b37268d6f3afbb37f13ef746b80b99169c4d94ced3471aed2ae4aa09dc85b752
+slurm:
+  account: yesildau
+  partition: gpu
+  gpu: a10080gb
+  training_array: 0-2%3
+  jobs: 3
+  topology: preflight_afterok_training_array_afterany_audit
+tracking:
+  epochs: 36
+  updates: 252
+  states_per_model: 37
+  effective_batch: 500
+  epoch_model_snapshots_required: true
+  hash_closed_binding_required: true
+safety:
+  hu_home_writes: forbidden
+  offline_model_access: true
+  fresh_root_required: true
+  automatic_retry: false
+  evaluation_in_this_wave: false
+  cleanup: forbidden

@@ -68,6 +68,7 @@ def finalize_m1_training_outputs(run_dir: Path, binding_root: Path) -> dict[str,
     base_manifest_sha256 = str(training.get("model", {}).get("base_model_manifest_sha256", ""))
     if sha256_file(base_manifest_path) != base_manifest_sha256:
         raise ValueError("M1 base-model manifest identity changed")
+    base_manifest = _read_json(base_manifest_path)
 
     checkpoints: list[dict[str, Any]] = [
         {
@@ -110,6 +111,27 @@ def finalize_m1_training_outputs(run_dir: Path, binding_root: Path) -> dict[str,
         )
 
     binding_root.mkdir(parents=True)
+    model_manifest_root = binding_root / "model_manifests"
+    model_manifest_root.mkdir()
+    for checkpoint in checkpoints[1:]:
+        checkpoint_id = str(checkpoint["checkpoint_id"])
+        model_manifest_path = model_manifest_root / f"{checkpoint_id}.json"
+        write_json(
+            model_manifest_path,
+            {
+                "schema_version": 1,
+                "model_id": base_manifest.get("model_id"),
+                "resolved_revision": base_manifest.get("resolved_revision") or base_manifest.get("revision"),
+                "local_path_absolute": checkpoint["model_path"],
+                "tokenizer_source_path_absolute": checkpoint["model_path"],
+                "training_run_dir": str(run_dir),
+                "training_manifest": str(training_manifest_path),
+                "training_checkpoint": checkpoint_id,
+                "checkpoint_sha256": checkpoint["checkpoint_sha256"],
+            },
+        )
+        checkpoint["model_manifest"] = str(model_manifest_path)
+        checkpoint["model_manifest_sha256"] = sha256_file(model_manifest_path)
     training_binding = {
         "schema_version": 1,
         "status": "complete",
