@@ -951,6 +951,7 @@ active_priority:
     - m1_contract_preparation_plan
     - m1_blocker_resolution_packet
     - m1_read_only_evidence_audit
+    - m1_benchmark_identity_reconciliation_memo
   required_outputs:
     - canonical_hash_closed_eval_v2_m0_source_projection
     - m0_metric_normalization_source_audit_v1c_and_operator_validation
@@ -1115,5 +1116,8 @@ next_decision_required:
     653a15a88897eb8d3e02da2a0ee794326f73e284744568e2abcb1bcc7eb32e81); eval-v2 protocol identity
     passed, but benchmark registry, source provenance, measurement design and primary corpus
     remain blocked. Prepare only the evidence-resolution boundary before any executable M1
-    contract.
+    contract. The TurBLiMP identity reconciliation memo is
+    documentation/decisions/M1_BENCHMARK_IDENTITY_RECONCILIATION_2026-08-22.md (SHA-256
+    b2c4a60f15634678bfa05765aea2ebf5ae784947e1ae1c93814016e071758702); it preserves the M0
+    `juletxara` route and the separate 151ab `ezgibasar` candidate without changing eval-v2.
     M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.
