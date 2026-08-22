@@ -389,7 +389,9 @@ def audit_normalization(config_path: Path, *, repo_root: Path) -> dict[str, Any]
                     "lane_id": lane_id,
                     "metric": metric,
                     "value": match["value"],
-                    "raw_artifact_path": match["path"],
+                    # audit_normalization emits the canonicalized field name;
+                    # do not reach back into the adapter's internal match shape.
+                    "raw_artifact_path": match["raw_artifact_path"],
                     "raw_artifact_json_path": match["json_path"],
                     "raw_artifact_sha256": sha256_file(Path(match["path"])),
                     "source_lane_sha256": row.get("sha256", row.get("source_sha256")),

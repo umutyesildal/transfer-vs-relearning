@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+import transfer_vs_relearning.study.m0_metric_normalization as normalization_operator
 from transfer_vs_relearning.study.m0_metric_normalization import (
     ALL_LANES,
     METRIC_ALIASES,
@@ -164,6 +165,23 @@ def test_normalization_refuses_unauthorized_config_without_output(tmp_path: Path
     with pytest.raises(PermissionError, match="not authorized"):
         normalize(config, repo_root=ROOT)
     assert not (tmp_path / "normalized").exists()
+
+
+def test_normalization_assembles_audited_rows_without_internal_key_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config = _fixture(tmp_path, authorized=True)
+
+    # Keep this regression test independent of optional Parquet engines while exercising
+    # the complete post-audit row assembly that previously raised KeyError("path").
+    monkeypatch.setattr(normalization_operator, "_write_parquet", lambda path, rows, fields: path.write_bytes(b"parquet"))
+    monkeypatch.setattr(normalization_operator, "write_json", lambda path, payload: path.write_text(json.dumps(payload), encoding="utf-8"))
+
+    manifest = normalize(config, repo_root=ROOT)
+
+    assert manifest["metric_rows_written"] == 42
+    assert (tmp_path / "normalized" / "metric_observations.parquet").is_file()
+    assert (tmp_path / "normalized" / "normalization_manifest.json").is_file()
 
 
 def test_normalization_audit_blocks_ambiguous_metric(tmp_path: Path) -> None:
