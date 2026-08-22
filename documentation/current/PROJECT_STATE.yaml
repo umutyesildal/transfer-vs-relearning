@@ -966,6 +966,7 @@ active_priority:
     - m1_measurement_review_ledger_draft
     - m1_primary_turkish_corpus_decision_memo
     - m1_design_decisions_confirmed
+    - max_feedback_run_recording_protocol
   required_outputs:
     - canonical_hash_closed_eval_v2_m0_source_projection
     - m0_metric_normalization_source_audit_v1c_and_operator_validation
@@ -1151,4 +1152,9 @@ next_decision_required:
     documentation/decisions/M1_DESIGN_DECISIONS_CONFIRMED_2026-08-22.md (SHA-256
     19685a3eb1c657e11b23cd8fbfab3490ebda5a95eb34b1b25968b042a20d3d64). Operational corpus
     evidence, materialization, M1 contract and training remain blocked.
+    Max feedback is now a mandatory traceability invariant; the run-recording protocol is
+    documentation/decisions/MAX_FEEDBACK_AND_RUN_RECORDING_PROTOCOL_2026-08-22.md (SHA-256
+    9a2c3e84d274ccb1efb2c4710a930670e94a49a987a01d9244e5fefbba22eee3). It binds epoch-level
+    factual/retention rows, hyperparameters, immutable snapshots, raw hashes and generated
+    presentation views without opening execution.
     M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.

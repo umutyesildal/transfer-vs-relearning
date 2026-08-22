@@ -57,3 +57,10 @@ No missing value is converted to zero, forward-filled or estimated from a later 
 The historical table answers “what can be reused without retraining?” It cannot by itself answer a
 matched OLMo–Qwen–SmolLM model-family comparison when recipes, fact counts or objectives differ.
 That comparison requires a prospective frozen M1 contract with every-epoch snapshots enabled.
+
+## Traceability to supervisor feedback
+
+The epoch-by-epoch fact-access/retention requirement and presentation handoff are operationalized
+in [`MAX_FEEDBACK_AND_RUN_RECORDING_PROTOCOL_2026-08-22.md`](../decisions/MAX_FEEDBACK_AND_RUN_RECORDING_PROTOCOL_2026-08-22.md).
+That protocol binds each trajectory row to immutable training/evaluation artifacts, resolved
+hyperparameters, checkpoint hashes and generated figure metadata.
