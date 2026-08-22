@@ -883,8 +883,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: prepare_hash_closed_eval_v2_m0_projection_v1a
-  first_boundary: local_read_only_source_identity_and_hash_closure
+  name: prepare_m1_measurement_blocker_resolution_packet
+  first_boundary: local_read_only_benchmark_provenance_and_measurement_audit
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -947,6 +947,9 @@ active_priority:
     - eval_v2_m0_projection_fail_closed_implementation
     - m1_historical_trajectory_inventory_implementation
     - m1_fact_access_retention_table_schema
+    - m0_metric_normalization_v1f_complete
+    - m1_contract_preparation_plan
+    - m1_blocker_resolution_packet
   required_outputs:
     - canonical_hash_closed_eval_v2_m0_source_projection
     - m0_metric_normalization_source_audit_v1c_and_operator_validation
@@ -1087,7 +1090,7 @@ authorization:
       resubmission_authorized: false
 
 next_decision_required:
-  subject: prepare_m1_training_contract
+  subject: prepare_m1_measurement_blocker_resolution_packet
   note: >-
     Pile-10k is retired prospectively and no retry is required. The three-model M0 exact-prefix
     panel is complete and the 21 required non-Pile lanes already exist. The v1b reference
@@ -1099,6 +1102,13 @@ next_decision_required:
     output-root creation. v1d/v1e failures are preserved append-only. The authorized v1f
     correction now passes with 24/24 source rows and 42/42 observations, writes the five tracked
     canonical artifacts under the fresh v1f root, and leaves all historical sources unchanged.
-    M0 normalization is complete pending interpretation; prepare the separate M1 training
-    contract. M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.
+    M0 normalization is complete pending interpretation. The non-executable preparation plan is
+    documentation/decisions/M1_CONTRACT_PREPARATION_PLAN_2026-08-22.md with SHA-256
+    ee140cd420e1bb11f15d1febeead33fd72d683af122725a635e9828077a5b09e. The current global gate
+    remains blocked_by_measurement_design, with benchmark-registry and source-model-provenance
+    contributors. The read-only blocker-resolution packet is
+    documentation/decisions/M1_BLOCKER_RESOLUTION_PACKET_2026-08-22.md (SHA-256
+    93631f133b3d2df8eefb1d19cb3e95a4c2e0b03d0ab0ac95e07e08182c352c96); it closes no gate and
+    creates no executable contract. Prepare only the evidence-resolution boundary before any
+    executable M1 contract.
     M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.

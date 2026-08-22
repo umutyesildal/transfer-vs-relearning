@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 3d3db24388cd2e5a8d3f0e89453eb197cbf37f7679c7280dc3455e5d044fb496
+  full_state_sha256: e47e1027e3c26cdf3d711c2982edd777ffd6267d69bf436cf7ef18e0c53c7c57
   role: context_projection_only
   may_expand_authority: false
 
@@ -40,13 +40,17 @@ evaluation:
   source_binding_discovery: complete_read_only_24_bindings
 
 next_boundary:
-  subject: prepare_m1_training_contract
+  subject: prepare_m1_measurement_blocker_resolution_packet
   allowed_now:
     - local_read_only_source_identity_validation
+    - local_read_only_benchmark_registry_audit
+    - local_read_only_model_provenance_audit
+    - local_read_only_measurement_design_alignment
     - documentation_alignment_explicitly_requested_by_user
   not_implied:
     - projection_execution
     - config_rewrite_without_new_sha_bound_authorization
+    - executable_m1_contract_creation_before_gate_closure
     - normalization_execution
     - hu_or_slurm
     - evaluation_or_scoring
