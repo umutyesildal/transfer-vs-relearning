@@ -18,7 +18,7 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - M0 projector: implemented and tested; read-only source-binding discovery passed 24/24;
 - v1b SHA-bound reference projection: complete with 24 source rows and zero metric rows;
 - metric normalization operator: the authorized v1c path-aware source audit passes 24/24 rows and 42/42 observations;
-- next boundary: prepare the read-only M1 measurement/provenance blocker-resolution packet; M0 normalization is complete;
+- next boundary: resolve the remaining read-only M1 benchmark/provenance/measurement blockers; M0 normalization is complete;
 - M1/M2 training: not ready and not authorized.
 
 ## When to open larger files

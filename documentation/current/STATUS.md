@@ -1,6 +1,6 @@
 # Current project status
 
-**As of:** 2026-08-22 | **Phase:** Pile-10k retired; eval-v2 frozen; M0 projection, source audit and canonical normalization complete; M1 evidence gate resolution pending
+**As of:** 2026-08-22 | **Phase:** Pile-10k retired; eval-v2 frozen; M0 projection, source audit and canonical normalization complete; M1 evidence blockers under read-only resolution
 **Readiness:** `ready_to_measure = true`, `ready_to_train = false`
 
 ## Executive state
@@ -40,6 +40,9 @@ The authorized v1f correction now completes the audit and writes 42 canonical me
 under its fresh root, with no source mutation or rescoring. M0 normalization is complete pending
 scientific interpretation. The M1 executable contract is not yet allowed: the global gate remains
 `blocked_by_measurement_design` with benchmark-registry and source-model-provenance contributors.
+The local read-only audit confirms eval-v2 protocol identity but finds the Turkish benchmark
+identity reconciliation, model artifact provenance, measurement review fields and primary
+in-domain corpus split still unresolved.
 M1/M2 work and cleanup remain closed.
 eval-v2 freeze does not authorize normalization execution, M1/M2 training, HU/Slurm work, cleanup
 or publication; `ready_to_train` remains false.

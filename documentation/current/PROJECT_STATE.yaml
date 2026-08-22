@@ -883,8 +883,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: prepare_m1_measurement_blocker_resolution_packet
-  first_boundary: local_read_only_benchmark_provenance_and_measurement_audit
+  name: resolve_m1_measurement_and_provenance_blockers_read_only
+  first_boundary: local_read_only_identity_reconciliation
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -950,6 +950,7 @@ active_priority:
     - m0_metric_normalization_v1f_complete
     - m1_contract_preparation_plan
     - m1_blocker_resolution_packet
+    - m1_read_only_evidence_audit
   required_outputs:
     - canonical_hash_closed_eval_v2_m0_source_projection
     - m0_metric_normalization_source_audit_v1c_and_operator_validation
@@ -1090,7 +1091,7 @@ authorization:
       resubmission_authorized: false
 
 next_decision_required:
-  subject: prepare_m1_measurement_blocker_resolution_packet
+  subject: resolve_m1_measurement_and_provenance_blockers_read_only
   note: >-
     Pile-10k is retired prospectively and no retry is required. The three-model M0 exact-prefix
     panel is complete and the 21 required non-Pile lanes already exist. The v1b reference
@@ -1109,6 +1110,10 @@ next_decision_required:
     contributors. The read-only blocker-resolution packet is
     documentation/decisions/M1_BLOCKER_RESOLUTION_PACKET_2026-08-22.md (SHA-256
     93631f133b3d2df8eefb1d19cb3e95a4c2e0b03d0ab0ac95e07e08182c352c96); it closes no gate and
-    creates no executable contract. Prepare only the evidence-resolution boundary before any
-    executable M1 contract.
+    creates no executable contract. The follow-up local audit is
+    documentation/decisions/M1_READ_ONLY_EVIDENCE_AUDIT_2026-08-22.md (SHA-256
+    653a15a88897eb8d3e02da2a0ee794326f73e284744568e2abcb1bcc7eb32e81); eval-v2 protocol identity
+    passed, but benchmark registry, source provenance, measurement design and primary corpus
+    remain blocked. Prepare only the evidence-resolution boundary before any executable M1
+    contract.
     M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.
