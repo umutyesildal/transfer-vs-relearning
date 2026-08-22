@@ -806,6 +806,18 @@ current_evidence:
     execution_authorized: false
     training_authorized: false
     evaluation_authorized: false
+  m0_metric_normalization:
+    status: contract_prepared_unexecuted
+    contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1.md
+    config: configs/evaluation/eval_v2_m0_metric_normalization_v1.yaml
+    contract_sha256: 7b01b8a3075f9ef6777337ed66bca8d7fed11d9a372aedac461e023bf9281ebe
+    config_sha256: 3fe87fe978dd128ac3e890ee8ee4e22f149f96bab72e81af4b5b7cb30d86f966
+    input_projection_root: /vol/tmp2/yesildau/eval_v2_m0_three_model_projection_v1b
+    input_projection_registry_sha256: a0dca252afe7c1d03e458a60a8b48d7e8d8858e0ad95e6e8be696311a0b34265
+    output_root: /vol/tmp2/yesildau/eval_v2_m0_metric_normalization_v1
+    operator_status: contract_only_operator_not_implemented
+    execution_authorized: false
+    normalization_authorized: false
   vngrs_corpus_route:
     role: conditional_primary_materialization_candidate
     materialized: false
@@ -874,12 +886,14 @@ active_priority:
     - read_only_m0_source_binding_discovery_24_of_24
     - hash_closed_eval_v2_m0_projection_v1a_preparation
     - hash_closed_eval_v2_m0_projection_v1b_complete
+    - m0_metric_normalization_contract_prepared
     - m0_projection_v1a_fail_closed_execution_record
     - eval_v2_m0_projection_fail_closed_implementation
     - m1_historical_trajectory_inventory_implementation
     - m1_fact_access_retention_table_schema
   required_outputs:
     - canonical_hash_closed_eval_v2_m0_source_projection
+    - m0_metric_normalization_operator_and_schema_validation
     - canonical_non_pile_normalization_design
     - explicit_missingness_and_comparison_boundary
     - read_only_m1_historical_checkpoint_inventory
@@ -1017,10 +1031,12 @@ authorization:
       resubmission_authorized: false
 
 next_decision_required:
-  subject: freeze_m0_metric_normalization_contract
+  subject: implement_and_validate_m0_metric_normalization_operator
   note: >-
     Pile-10k is retired prospectively and no retry is required. The three-model M0 exact-prefix
     panel is complete and the 21 required non-Pile lanes already exist. The v1b reference
     projection now contains 24 hash-verified source rows and zero metric rows. Freeze a separate
-    metric-normalization contract next; M1 inventory/evaluation, M1/M2 training and cleanup remain
-    separately controlled.
+    the metric-normalization contract is now prepared but its operator is not implemented. First
+    implement and locally validate the fail-closed adapter against the frozen 24-row projection;
+    only then request a new exact authorization for one normalization wave. M1 inventory/evaluation,
+    M1/M2 training and cleanup remain separately controlled.
