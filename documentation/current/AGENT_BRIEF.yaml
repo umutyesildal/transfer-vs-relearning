@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 7795c984aba5e8013a48ffd8cd8ddc5239fa28aaf07276ab9ddaa2e9672baa5c
+  full_state_sha256: 423e2a02025289b7449c148941f9cc2d85ff1c46ba97f17d398a19dc809a872d
   role: context_projection_only
   may_expand_authority: false
 
@@ -40,7 +40,7 @@ evaluation:
   source_binding_discovery: complete_read_only_24_bindings
 
 next_boundary:
-  subject: resolve_m1_measurement_and_provenance_blockers_read_only
+  subject: prepare_m1_execution_input_packet
   allowed_now:
     - local_read_only_source_identity_validation
     - local_read_only_benchmark_registry_audit

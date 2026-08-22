@@ -97,3 +97,18 @@ retention values.
 The next safe implementation task is a read-only blocker-resolution packet for items 1–3. Once
 that packet is complete, this plan can be converted into a fully bound M1 execution contract
 without changing the M0 evaluation protocol or losing historical evidence.
+
+## User-confirmed design update (2026-08-22)
+
+The user has now fixed the following design inputs for the future contract:
+
+- M1 inherits the exact M0/eval-v2 TurBLiMP route (`juletxra/turblimp`, revision
+  `cce94ca73ac04a0fabd9fbd7a56068261e6348ad`);
+- every active M0 eval-v2 metric/task family is mandatory in M1;
+- Pile-10k remains retired and is not reintroduced by the phrase “all M0 evals”;
+- `vngrs-ai/vngrs-web-corpus` is the primary Turkish adaptation-corpus design choice;
+- `trwiki-20260601` remains cross-domain control only.
+
+These choices narrow the future contract but do not close the remaining manifest, split, license,
+overlap, model-provenance or measurement-review gates. Corpus materialization and M1 training
+remain separately unauthorized until those inputs are hash-bound.

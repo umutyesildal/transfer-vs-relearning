@@ -110,6 +110,16 @@ readiness:
   ready_to_train: false
   selected_primary_model: null
 
+m1_confirmed_design:
+  turblimp_route: inherit_m0_eval_v2_juletxra_turblimp
+  turblimp_revision: cce94ca73ac04a0fabd9fbd7a56068261e6348ad
+  inherit_all_active_m0_eval_v2_metrics: true
+  pile_10k_inherited: false
+  primary_turkish_corpus: vngrs-ai/vngrs-web-corpus
+  primary_corpus_role: in_domain_turkish_adaptation_corpus
+  primary_corpus_operational_status: conditional_not_materialized
+  trwiki_20260601_role: cross_domain_control_only
+
 evaluation_target:
   contract_name: eval-v2
   status: frozen_execution_not_authorized
@@ -883,8 +893,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: resolve_m1_measurement_and_provenance_blockers_read_only
-  first_boundary: local_read_only_identity_reconciliation
+  name: prepare_m1_execution_input_packet_vngrs_eval_v2_inherited
+  first_boundary: local_read_only_vngrs_manifest_and_m1_input_audit
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -955,6 +965,7 @@ active_priority:
     - m1_model_provenance_reconciliation_memo
     - m1_measurement_review_ledger_draft
     - m1_primary_turkish_corpus_decision_memo
+    - m1_design_decisions_confirmed
   required_outputs:
     - canonical_hash_closed_eval_v2_m0_source_projection
     - m0_metric_normalization_source_audit_v1c_and_operator_validation
@@ -1095,7 +1106,7 @@ authorization:
       resubmission_authorized: false
 
 next_decision_required:
-  subject: resolve_m1_measurement_and_provenance_blockers_read_only
+  subject: prepare_m1_execution_input_packet
   note: >-
     Pile-10k is retired prospectively and no retry is required. The three-model M0 exact-prefix
     panel is complete and the 21 required non-Pile lanes already exist. The v1b reference
@@ -1109,7 +1120,7 @@ next_decision_required:
     canonical artifacts under the fresh v1f root, and leaves all historical sources unchanged.
     M0 normalization is complete pending interpretation. The non-executable preparation plan is
     documentation/decisions/M1_CONTRACT_PREPARATION_PLAN_2026-08-22.md with SHA-256
-    ee140cd420e1bb11f15d1febeead33fd72d683af122725a635e9828077a5b09e. The current global gate
+    3cc2f4dde59e571a69cc66b70e7df3006823960eaad1b00af57c29224474bc9a. The current global gate
     remains blocked_by_measurement_design, with benchmark-registry and source-model-provenance
     contributors. The read-only blocker-resolution packet is
     documentation/decisions/M1_BLOCKER_RESOLUTION_PACKET_2026-08-22.md (SHA-256
@@ -1135,4 +1146,9 @@ next_decision_required:
     documentation/decisions/M1_PRIMARY_TURKISH_CORPUS_DECISION_MEMO_2026-08-22.md (SHA-256
     89acc2e9c4a80b22d685cfd696edb176150e92123a06723bc8f7b14a53f026e0); vngrs remains conditional,
     trwiki remains control-only, and no corpus is selected or materialized.
+    User-confirmed M1 design decisions now bind the M0/eval-v2 TurBLiMP route, all active M0
+    eval-v2 metrics, and vngrs as the primary Turkish corpus; the decision record is
+    documentation/decisions/M1_DESIGN_DECISIONS_CONFIRMED_2026-08-22.md (SHA-256
+    19685a3eb1c657e11b23cd8fbfab3490ebda5a95eb34b1b25968b042a20d3d64). Operational corpus
+    evidence, materialization, M1 contract and training remain blocked.
     M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.
