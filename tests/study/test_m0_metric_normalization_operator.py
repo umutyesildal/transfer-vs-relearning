@@ -25,27 +25,27 @@ def _fixture(tmp_path: Path, *, authorized: bool = False) -> Path:
         for lane_id in ALL_LANES:
             lane_root = source_root / model_id / lane_id
             lane_root.mkdir(parents=True)
-            metrics = {key: float(index + 1) for index, key in enumerate(METRIC_ALIASES[lane_id])}
+            metrics = {
+                aliases[0]: float(index + 1)
+                for index, aliases in enumerate(METRIC_ALIASES[lane_id].values())
+            }
             summary = lane_root / "summary.json"
             summary.write_text(json.dumps({"metrics": metrics}), encoding="utf-8")
             lane_result = lane_root / "lane_result.json"
-            lane_result.write_text(
-                json.dumps(
+            lane_payload = {
+                "lane_id": lane_id,
+                "status": "complete",
+                "artifacts": [
                     {
-                        "lane_id": lane_id,
-                        "status": "complete",
-                        "returncode": 0,
-                        "artifacts": [
-                            {
-                                "path": str(summary),
-                                "bytes": summary.stat().st_size,
-                                "sha256": sha256_file(summary),
-                            }
-                        ],
+                        "path": str(summary),
+                        "bytes": summary.stat().st_size,
+                        "sha256": sha256_file(summary),
                     }
-                ),
-                encoding="utf-8",
-            )
+                ],
+            }
+            if lane_id != "exact_prefix":
+                lane_payload["returncode"] = 0
+            lane_result.write_text(json.dumps(lane_payload), encoding="utf-8")
             registry_rows.append(
                 {
                     "model_id": model_id,

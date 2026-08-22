@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: dab4e47e2b86cbdc9011f74290837b32442f269d87339a1f3ef348388f4452b7
+  full_state_sha256: 4534fac39b487a22249c62261103c88943b15e8f7a9e5b690e624b25d207745b
   role: context_projection_only
   may_expand_authority: false
 
@@ -40,7 +40,7 @@ evaluation:
   source_binding_discovery: complete_read_only_24_bindings
 
 next_boundary:
-  subject: authorize_read_only_m0_metric_source_audit
+  subject: authorize_read_only_m0_metric_source_audit_v1b
   allowed_now:
     - local_read_only_source_identity_validation
     - local_projection_design_and_tests

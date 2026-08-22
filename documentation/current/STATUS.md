@@ -1,6 +1,6 @@
 # Current project status
 
-**As of:** 2026-08-22 | **Phase:** Pile-10k retired; eval-v2 frozen; M0 projection complete; metric-source audit pending
+**As of:** 2026-08-22 | **Phase:** Pile-10k retired; eval-v2 frozen; M0 projection complete; v1b metric-source audit pending
 **Readiness:** `ready_to_measure = true`, `ready_to_train = false`
 
 ## Executive state
@@ -27,12 +27,14 @@ pre-discovery config remains unchanged, so projection still requires a new SHA-b
 separate authority.
 The execution-enabled v1b projection completed in its fresh HU root with exactly 24 hash-verified
 source rows and zero metric rows. The reference closure is complete, but metric extraction and
-normalization remain a separate authority boundary. A fail-closed normalization operator is now
-implemented locally and fixture-validated: it expects 24 rows and 42 canonical metric observations,
-blocks missing or ambiguous aliases, never rescoring or mutating historical sources, and writes no
-output while unauthorized. The next bounded action is one read-only audit of the real source metric
-schema; only an audit PASS can open a separately authorized normalization wave. M1/M2 work and
-cleanup remain closed.
+normalization remain a separate authority boundary. The first authorized v1a source audit stopped
+fail-closed on the historical exact-prefix schema: those complete lane payloads omit `returncode`,
+and their unique primary metric is `primary_mean_logprob_top1_accuracy`, not generic `top1_accuracy`.
+The append-only result is preserved. A narrow v1b adapter correction is now locally fixture-
+validated: it still expects 24 rows and 42 canonical observations, blocks missing/ambiguous aliases,
+never rescoring or mutating historical sources, and writes no output while unauthorized. The next
+bounded action is one read-only v1b source audit; only an audit PASS can open a separately
+authorized normalization wave. M1/M2 work and cleanup remain closed.
 eval-v2 freeze does not authorize normalization execution, M1/M2 training, HU/Slurm work, cleanup
 or publication; `ready_to_train` remains false.
 
@@ -201,11 +203,11 @@ These are constraints and evidence, not reasons to throw away existing implement
 
 ## Active work boundary
 
-The active task is a read-only-to-source eval-v2 M0 metric-schema audit:
+The active task is a read-only-to-source eval-v2 M0 metric-schema audit v1b:
 
 1. read the completed v1b projection registry and its declared lane artifacts;
 2. verify every selected source path and SHA-256 without model load, inference or rescoring;
-3. resolve the narrow canonical aliases for all 24 lanes and report missing/ambiguous fields;
+3. resolve the corrected exact-prefix and canonical aliases for all 24 lanes and report missing/ambiguous fields;
 4. normalize only after the real 24-row / 42-observation audit passes and a new exact authorization is supplied;
 5. preserve the historical eval-v1 family, every Pile attempt and all failure evidence unchanged.
 

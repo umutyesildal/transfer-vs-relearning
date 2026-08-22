@@ -56,7 +56,10 @@ METRIC_ALIASES: dict[str, dict[str, tuple[str, ...]]] = {
         "repeated_3gram_fraction": ("repeated_3gram_fraction",),
     },
     "exact_prefix": {
-        "exact_prefix_accuracy": ("exact_prefix_accuracy", "top1_accuracy", "accuracy"),
+        # Historical exact-prefix lane_result.json exposes this one unambiguous
+        # primary ranking value. Generic top1_accuracy is intentionally excluded:
+        # summary_metrics.json contains chance and sensitivity top-1 values too.
+        "exact_prefix_accuracy": ("primary_mean_logprob_top1_accuracy",),
     },
 }
 
@@ -155,8 +158,12 @@ def _lane_documents(row: dict[str, Any]) -> tuple[list[tuple[Path, dict[str, Any
     lane_sha = row.get("sha256", row.get("source_sha256"))
     _verify(lane_path, str(lane_sha), "lane result")
     lane = _json(lane_path)
-    if lane.get("status") != "complete" or lane.get("returncode") != 0:
+    if lane.get("status") != "complete":
         raise ValueError(f"Lane is not complete: {row.get('model_id')}:{row.get('lane_id')}")
+    # Canonical eval-v2 lanes carry a process return code; historical exact-prefix
+    # supplements predate that field and are complete by status plus hash binding.
+    if row.get("lane_id") != "exact_prefix" and lane.get("returncode") != 0:
+        raise ValueError(f"Canonical lane returncode is not zero: {row.get('model_id')}:{row.get('lane_id')}")
     documents: list[tuple[Path, dict[str, Any]]] = [(lane_path, lane)]
     for artifact in lane.get("artifacts", []):
         item = _mapping(artifact, "lane artifact")
