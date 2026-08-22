@@ -842,6 +842,12 @@ current_evidence:
     source_audit_status: pass_24_source_rows_42_metric_observations
     execution_authorized: false
     normalization_authorized: false
+    next_contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1d.md
+    next_contract_sha256: bc258b243c053f938e9e4fa6a30fe3b6628531aa62204a4c4386e8d6bcbe37cf
+    next_config: configs/evaluation/eval_v2_m0_metric_normalization_v1d.yaml
+    next_config_sha256: 206f0c23e4f16b5c02c2b4e897b8ead9960b00e3c12fa6ef640e03d63c964b66
+    next_output_root: /vol/tmp2/yesildau/eval_v2_m0_metric_normalization_v1d
+    normalization_execution_status: prepared_pending_exact_authorization
   vngrs_corpus_route:
     role: conditional_primary_materialization_candidate
     materialized: false
@@ -1059,7 +1065,7 @@ authorization:
       resubmission_authorized: false
 
 next_decision_required:
-  subject: authorize_m0_metric_normalization_execution
+  subject: authorize_m0_metric_normalization_execution_v1d
   note: >-
     Pile-10k is retired prospectively and no retry is required. The three-model M0 exact-prefix
     panel is complete and the 21 required non-Pile lanes already exist. The v1b reference
@@ -1068,5 +1074,6 @@ next_decision_required:
     canonical metrics use path-specific lm-eval/project schemas and factual robust evidence is in
     declared CSVs. The append-only result is preserved. The authorized path-aware v1c audit now
     passes with 24/24 source rows and 42/42 metric observations, with no source mutation and no
-    output-root creation. Request a new exact authorization only for one normalization wave.
+    output-root creation. The v1d normalization contract/config are prepared for one fresh-root
+    execution; request exact authorization bound to both v1d hashes before pushing or running it.
     M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.

@@ -35,8 +35,9 @@ summary, factual robust evidence is tabular, and the primary held-out Turkish co
 this M0 lane. Both append-only results are preserved. The authorized path-aware v1c audit now
 binds exact JSON paths, verified CSV aggregates and denominator metadata across all 24 source
 rows and 42 metric observations. It performed no rescoring or historical-source mutation, and
-the normalization output root remained absent. Only a separately authorized normalization wave
-can now create canonical tables; M1/M2 work and cleanup remain closed.
+the normalization output root remained absent. Only the prepared v1d normalization wave, after
+exact contract/config authorization, can now create canonical tables; M1/M2 work and cleanup
+remain closed.
 eval-v2 freeze does not authorize normalization execution, M1/M2 training, HU/Slurm work, cleanup
 or publication; `ready_to_train` remains false.
 

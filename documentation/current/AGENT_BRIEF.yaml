@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 2a13b3e50e540d2b228937f8a1395745457e4f08a517e09d110a3679e49942f4
+  full_state_sha256: 449ba8e43ab5eba806d77bddf7f9508adff0a1539c5f6c1c42cc5b60977c2095
   role: context_projection_only
   may_expand_authority: false
 
@@ -40,7 +40,7 @@ evaluation:
   source_binding_discovery: complete_read_only_24_bindings
 
 next_boundary:
-  subject: authorize_m0_metric_normalization_execution
+  subject: authorize_m0_metric_normalization_execution_v1d
   allowed_now:
     - local_read_only_source_identity_validation
     - documentation_alignment_explicitly_requested_by_user
