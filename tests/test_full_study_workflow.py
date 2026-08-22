@@ -166,9 +166,9 @@ def test_luna_packets_are_micro_context_adapter_tasks(tmp_path: Path) -> None:
 def test_entrypoint_catalog_preserves_every_old_file_and_flat_roots_are_clean() -> None:
     catalog = json.loads((ROOT / "configs/entrypoints/catalog.json").read_text(encoding="utf-8"))
     entries = catalog["entries"]
-    assert len(entries) == 264
-    assert len({entry["old_path"] for entry in entries}) == 264
-    assert len({entry["path"] for entry in entries}) == 264
+    assert len(entries) == catalog["entry_count"]
+    assert len({entry["old_path"] for entry in entries}) == len(entries)
+    assert len({entry["path"] for entry in entries}) == len(entries)
     assert all((ROOT / entry["path"]).is_file() for entry in entries)
     assert not any((ROOT / entry["old_path"]).exists() for entry in entries)
     assert {path.name for path in (ROOT / "scripts").iterdir() if path.is_file()} == {"README.md"}

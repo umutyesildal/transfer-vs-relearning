@@ -1,17 +1,18 @@
 schema_version: 1
-brief_id: agent-brief-v1
+brief_id: agent-brief-v2
 as_of: "2026-08-22"
 status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 9ba3f356dede50cf7a584f36e0026d917e3f398bf3d0a7b27a13e002d5a28753
+  full_state_sha256: 3fd2bacdc36856a96c5753696d3bddfe78a4d33872c32afd8e1bb5705ac12ff6
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: evaluation_foundation_design
+  phase: m1_pipeline_repair
+  branch: agent/m1-pipeline-repair
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
 
@@ -23,6 +24,13 @@ readiness:
   ready_to_measure: true
   ready_to_train: false
   selected_primary_model: null
+
+stage_readiness:
+  m0: complete
+  m1_scientific_inputs: ready
+  m1_adapter_and_contract: local_repair_active
+  m1_execution: not_authorized
+  m2_corpus_and_sibling_contract: later_not_an_m1_blocker
 
 evaluation:
   active_contract_name: eval-v2
@@ -37,42 +45,45 @@ evaluation:
   exact_prefix_panel: complete_three_of_three_models
   normalization: complete_v1f_42_observations
   projection: complete_24_row_reference_registry
-  source_binding_discovery: complete_read_only_24_bindings
+
+m1:
+  models: [olmo, qwen, smollm]
+  corpus: relation_v2_synthetic_english_facts
+  evaluation: inherit_eval_v2_with_mandatory_exact_prefix
+  epoch_states_per_model: 37
+  total_checkpoint_states: 111
+  max_feedback_trace: mandatory
+  training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: prepare_m1_execution_input_packet
+  subject: finish_m1_pipeline_repair_and_prepare_reviewable_execution_contract
   allowed_now:
-    - local_read_only_source_identity_validation
-    - local_read_only_benchmark_registry_audit
-    - local_read_only_model_provenance_audit
-    - local_read_only_measurement_design_alignment
-    - documentation_alignment_explicitly_requested_by_user
+    - local_code_config_documentation_changes_requested_by_user
+    - offline_tests_and_dry_runs
+    - execution_disabled_contract_preparation
   not_implied:
-    - projection_execution
-    - config_rewrite_without_new_sha_bound_authorization
-    - executable_m1_contract_creation_before_gate_closure
-    - normalization_execution
-    - hu_or_slurm
+    - hu_or_ssh
+    - slurm_or_gpu
+    - model_training
     - evaluation_or_scoring
-    - m1_or_m2_training
+    - corpus_materialization
+    - push_or_merge
     - cleanup_or_deletion
 
 agent_routing:
   start_here: documentation/current/START_HERE.md
-  reading_profile: documentation/current/READING_PROFILE.yaml
-  active_task_packets: .agents/task-packets/study-v2/manifest.json
-  chronological_numbered_documents: preserved_default_retired
-  legacy_handoffs: preserved_default_retired
+  full_state_required_for_external_execution: true
   recursive_documentation_read: forbidden_by_default
-  full_state_required_for_scientific_or_external_execution: true
+  chronological_documents: preserved_default_retired
 
 authority:
-  local_repository_changes: require_current_user_instruction
+  local_repository_changes: current_user_instruction_active
   hu_ssh: false
   network_retrieval: false
   slurm_gpu: false
   training: false
   evaluation_or_scoring: false
   corpus_materialization: false
+  push_or_merge: false
   cleanup_or_deletion: false
   old_authorization_reuse: forbidden

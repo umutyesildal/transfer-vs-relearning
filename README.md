@@ -18,25 +18,18 @@ M2-A and M2-B are parallel sibling arms. M2-B is not a continuation of M2-A.
 
 ## Current status
 
-The project is in an **evaluation-foundation design phase**. Document 178 remains the end-to-end
-design input; the 2026-08-22 Pile retirement decision defines the current measurement boundary.
-`eval-v1` is preserved as historical execution evidence; `eval-v2` is the active Pile-free
-evaluation contract. The corpus contract and future training contracts are not frozen.
-`ready_to_measure=true` and `ready_to_train=false`. No remote,
-Slurm, training, evaluation, corpus-download, publication, or cleanup action follows from this
-README.
+M0 is closed under the active Pile-free `eval-v2` contract: all 21 non-Pile lanes, the three-model
+exact-prefix panel and 42 normalized metric observations are complete. Work is now local M1
+pipeline/contract repair for the fixed OLMo/Qwen/SmolLM cohort. M1 has not started and remains
+execution-disabled until the user later authorizes the final hash-bound contract.
 
 A local planner/tracing foundation now renders the future
 preflight→train→epoch-eval→normalize→presentation sequence without executing it. See
 [`documentation/pipeline/README.md`](documentation/pipeline/README.md).
 
-The bounded OLMo qualification bundle is complete 7/7 but remains non-scientific and blocked on
-WikiText/TurBLiMP parity. A fail-closed 27-node OLMo/Qwen/SmolLM matrix now exposes the future
-three-model waves and Luna micro-packets; no matrix evaluation or training is authorized.
-
-The verified monorepo is now published on `main`. Active evaluation-foundation work continues on
-`agent/m0-evaluation`. Both source histories and all workspace material were preserved; the
-original worktrees and private pre-filter bundle remain rollback sources.
+The current local branch is `agent/m1-pipeline-repair`. vngrs is reserved for M2-A/M2-B and does
+not block M1 preparation. No remote, HU, Slurm, model training/evaluation, corpus materialization,
+push, merge, cleanup or deletion follows from this README.
 
 Read the concise live state in
 [`documentation/current/STATUS.md`](documentation/current/STATUS.md). The machine-readable state

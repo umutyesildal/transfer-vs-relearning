@@ -43,8 +43,24 @@ def _sha_matches(path: Path | None, expected: Any) -> bool:
     return path is not None and path.is_file() and isinstance(expected, str) and sha256_file(path) == expected
 
 
+def _is_sha256(value: Any) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in "0123456789abcdef" for character in value.lower())
+    )
+
+
+def _is_placeholder(value: Any) -> bool:
+    return isinstance(value, str) and value.startswith("__") and value.endswith("__")
+
+
 def _check(checks: list[dict[str, Any]], check_id: str, passed: bool, detail: str) -> None:
     checks.append({"id": check_id, "status": "pass" if passed else "blocked", "detail": detail})
+
+
+def _planned_output(checks: list[dict[str, Any]], check_id: str, detail: str) -> None:
+    checks.append({"id": check_id, "status": "produced_by_training", "detail": detail})
 
 
 def _bundle_names(config: dict[str, Any]) -> tuple[str, ...]:
@@ -66,6 +82,7 @@ def build_m1_eval_plan(
     *,
     repo_root: Path,
     project_state_path: Path,
+    planned_training_outputs: bool = False,
 ) -> dict[str, Any]:
     """Build a parallel, non-executing M1 evaluation plan and readiness ledger."""
 
@@ -95,6 +112,11 @@ def build_m1_eval_plan(
     inputs = config.get("inputs") if isinstance(config.get("inputs"), dict) else {}
     execution = config.get("execution") if isinstance(config.get("execution"), dict) else {}
     readiness = project_state.get("readiness") if isinstance(project_state.get("readiness"), dict) else {}
+    stage_readiness = (
+        project_state.get("stage_readiness")
+        if isinstance(project_state.get("stage_readiness"), dict)
+        else {}
+    )
     design = project_state.get("m1_confirmed_design") if isinstance(project_state.get("m1_confirmed_design"), dict) else {}
 
     _check(
@@ -123,12 +145,25 @@ def build_m1_eval_plan(
         readiness.get("ready_to_measure") is True,
         f"ready_to_measure={readiness.get('ready_to_measure')!r}",
     )
-    _check(
-        checks,
-        "project_ready_to_train_and_checkpoint",
-        readiness.get("ready_to_train") is True,
-        f"ready_to_train={readiness.get('ready_to_train')!r}; an M1 checkpoint is required before scoring",
-    )
+    if planned_training_outputs:
+        m1_training = (
+            stage_readiness.get("m1_training")
+            if isinstance(stage_readiness.get("m1_training"), dict)
+            else {}
+        )
+        _check(
+            checks,
+            "m1_training_contract_ready_for_authorization",
+            m1_training.get("contract_ready_for_authorization") is True,
+            "the combined wave may plan evaluation outputs only after the M1 training contract is review-ready",
+        )
+    else:
+        _check(
+            checks,
+            "project_ready_to_train_and_checkpoint",
+            readiness.get("ready_to_train") is True,
+            f"ready_to_train={readiness.get('ready_to_train')!r}; an M1 checkpoint is required before scoring",
+        )
     _check(
         checks,
         "turblimp_identity_inherited",
@@ -175,30 +210,77 @@ def build_m1_eval_plan(
         f"registry={eval_registry}",
     )
 
-    for label, manifest_key, hash_key in (
-        ("m0_model_manifest", "m0_model_manifest", "m0_model_manifest_sha256"),
-        ("m1_checkpoint_manifest", "m1_checkpoint_manifest", "m1_checkpoint_manifest_sha256"),
-        ("m1_training_manifest", "m1_training_manifest", "m1_training_manifest_sha256"),
-        ("m1_fact_dataset_manifest", "m1_fact_dataset_manifest", "m1_fact_dataset_manifest_sha256"),
-    ):
-        path = _resolve(repo_root, inputs.get(manifest_key))
-        _check(checks, label, _sha_matches(path, inputs.get(hash_key)), f"path={path}")
+    m0_manifest_value = inputs.get("m0_model_manifest")
+    m0_manifest_path = _resolve(repo_root, m0_manifest_value)
+    if planned_training_outputs:
+        _check(
+            checks,
+            "m0_model_manifest_binding",
+            m0_manifest_path is not None
+            and m0_manifest_path.is_absolute()
+            and not _is_placeholder(m0_manifest_value)
+            and _is_sha256(inputs.get("m0_model_manifest_sha256")),
+            f"external source binding path={m0_manifest_path}; exact bytes are reverified by the HU preflight",
+        )
+        _planned_output(
+            checks,
+            "m1_checkpoint_manifest",
+            "created and hash-closed by the successful M1 training task before evaluation",
+        )
+        _planned_output(
+            checks,
+            "m1_training_manifest",
+            "created and hash-closed by the successful M1 training task before evaluation",
+        )
+    else:
+        _check(
+            checks,
+            "m0_model_manifest",
+            _sha_matches(m0_manifest_path, inputs.get("m0_model_manifest_sha256")),
+            f"path={m0_manifest_path}",
+        )
+        for label, manifest_key, hash_key in (
+            ("m1_checkpoint_manifest", "m1_checkpoint_manifest", "m1_checkpoint_manifest_sha256"),
+            ("m1_training_manifest", "m1_training_manifest", "m1_training_manifest_sha256"),
+        ):
+            path = _resolve(repo_root, inputs.get(manifest_key))
+            _check(checks, label, _sha_matches(path, inputs.get(hash_key)), f"path={path}")
 
+    dataset_manifest = _resolve(repo_root, inputs.get("m1_fact_dataset_manifest"))
+    _check(
+        checks,
+        "m1_fact_dataset_manifest",
+        _sha_matches(dataset_manifest, inputs.get("m1_fact_dataset_manifest_sha256")),
+        f"path={dataset_manifest}",
+    )
+
+    _check(
+        checks,
+        "execution_adapter_registered",
+        execution.get("adapter_registered") is True
+        and execution.get("adapter") == "slurm_m1_matched_wave_v1"
+        and (repo_root / "src/transfer_vs_relearning/study/m1_wave_executor.py").is_file(),
+        f"adapter={execution.get('adapter')!r}; requires the registered Slurm M1 wave executor",
+    )
     _check(
         checks,
         "execution_contract_authorized",
-        config.get("execution_authorized") is True and execution.get("adapter_registered") is True,
-        "requires a separately frozen, hash-bound execution contract and registered adapter",
+        config.get("execution_authorized") is True,
+        "requires a separately frozen, hash-bound contract plus the user's explicit authorization",
     )
-    output_root = _resolve(repo_root, (config.get("outputs") or {}).get("root"))
+    output_value = (config.get("outputs") or {}).get("root")
+    output_root = _resolve(repo_root, output_value)
     _check(
         checks,
         "fresh_output_root",
-        output_root is not None and output_root.is_absolute() and not output_root.exists(),
+        output_root is not None
+        and output_root.is_absolute()
+        and not _is_placeholder(output_value)
+        and not output_root.exists(),
         f"root={output_root}",
     )
 
-    blockers = [item["id"] for item in checks if item["status"] != "pass"]
+    blockers = [item["id"] for item in checks if item["status"] == "blocked"]
     if pipeline_plan is None:
         tasks: list[dict[str, Any]] = []
         plan_identity = {"config_sha256": sha256_file(config_path), "blockers": blockers}
@@ -272,7 +354,7 @@ def build_m1_eval_plan(
         "blockers": blockers,
         "tasks": tasks,
         "safety": {
-            "planner_only": True,
+            "planner_only": not bool(config.get("execution_authorized")),
             "network": False,
             "model_load": False,
             "training": False,
@@ -288,13 +370,19 @@ def build_m1_eval_matrix_plan(
     *,
     repo_root: Path,
     project_state_path: Path,
+    planned_training_outputs: bool = False,
 ) -> dict[str, Any]:
     """Compose exactly the fixed OLMo/Qwen/SmolLM M1 plans behind one barrier."""
 
     if len(config_paths) != len(FIXED_M1_MODELS):
         raise ValueError("The M1 matrix requires exactly three model configs")
     plans = [
-        build_m1_eval_plan(path, repo_root=repo_root, project_state_path=project_state_path)
+        build_m1_eval_plan(
+            path,
+            repo_root=repo_root,
+            project_state_path=project_state_path,
+            planned_training_outputs=planned_training_outputs,
+        )
         for path in config_paths
     ]
     model_ids = [str(plan["model"]["id"]) for plan in plans]

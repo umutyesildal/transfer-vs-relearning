@@ -1,6 +1,6 @@
 # Experiment pipeline — active eval-v2 boundary
 
-**Status:** eval-v2 frozen; M0 retained-result projection pending; later stages planner-only | **Execution authorization:** none
+**Status:** M0 complete; M1 local productionization active | **Execution authorization:** none
 
 This layer turns one reviewed experiment manifest into a deterministic sequence:
 
@@ -15,7 +15,9 @@ identity/storage preflight
 
 It reuses the existing trainer and evaluators. Pile-10k is retired from eval-v2 and is never
 scheduled by the prospective study pipeline. Historical eval-v1 configs and artifacts remain
-preserved. This layer does not download inputs, submit Slurm jobs or grant execution authority.
+preserved. Training-produced checkpoint and training manifests are dependency outputs, not
+training preconditions; standalone post-training evaluation still requires their exact files and
+hashes. This layer does not download inputs, submit Slurm jobs or grant execution authority.
 
 The human-oriented Turkish deep dive covering the full design, metric formulas, thresholds,
 artifacts and current scientific M0 wave is
@@ -162,11 +164,10 @@ reroute is allowed.
 
 ## Active eval-v2 production boundary
 
-The historical eval-v1 raw-result layer is immutable. eval-v2 requires seven non-Pile lanes per
-model, all 21 of which already exist, plus the completed exact-prefix supplement. The next work is
-a local hash-closed projection/normalizer that reuses those results without rescoring. Every M1/M2
-training adapter and execution contract remains separate work, so the full-study plan stays
-`execution_authorized: false`.
+The historical eval-v1 raw-result layer is immutable. M0 eval-v2 closure is complete with 21/21
+active lanes, three exact-prefix supplements and 42 canonical v1f observations. The active work is
+the matched M1 adapter/contract; M2 corpus and sibling work remain separate. The full-study plan
+stays `execution_authorized: false`.
 
 ## Full M0→M2 study control
 

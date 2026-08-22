@@ -50,7 +50,7 @@ evaluation:
   full_epochs: [0, 18, 36]
 
 outputs:
-  root: __FRESH_SCRATCH_M1_SMOLLM_EVAL_ROOT__
+  root: /vol/tmp2/yesildau/m1_matched_three_model_v1/evaluation/smollm
   raw_namespaces_immutable: true
   normalized_tables_required: true
   presentation_bundle_required: true
@@ -69,4 +69,5 @@ inputs:
 
 execution:
   adapter_registered: false
+  adapter: slurm_m1_matched_wave_v1
   max_concurrent_jobs: 3

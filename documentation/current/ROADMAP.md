@@ -1,125 +1,53 @@
 # Current roadmap
 
-This roadmap orders work; it does not authorize external execution.
+This file orders work; it never authorizes external execution.
 
-## R0 — Documentation control plane
+## Completed
 
-Status: completed, validated, and published on `main`.
+- repository migration, history sanitation and documentation control plane;
+- evaluator inventory and LM Evaluation Harness qualification;
+- frozen Pile-free `eval-v2` protocol;
+- three-model M0 evidence closure: 21/21 active lanes, 3/3 exact-prefix and 42 normalized rows;
+- Relation V2 M1 dataset identity and fixed OLMo/Qwen/SmolLM cohort;
+- epoch-level training trace, model-only snapshots and presentation schema.
 
-- keep root README and AGENTS compact;
-- preserve previous guidance byte-for-byte;
-- establish machine-readable project state;
-- separate contracts, decisions, and records;
-- update the Luna/Sol orchestrator for one monorepo and micro-context prompts;
-- validate links, state invariants, preservation hashes, and tests.
+## R1 — Finish local M1 productionization
 
-Exit condition: a fresh agent can identify the current gate and one next task without reading the
-full chronological archive. This condition is covered by control-plane tests and the accepted
-documentation decision.
+Status: active; execution disabled.
 
-## R0.5 — Publication policy
+- remove the circular dependency on training-produced manifests;
+- produce stable training and checkpoint binding manifests after each training run;
+- validate the matched three-model DAG and immutable output roots;
+- complete the registered Slurm adapter without submitting it;
+- freeze one reviewable execution-disabled M1 contract/config pair;
+- run offline unit, control-plane and dry-run tests.
 
-Status: completed and verified on remote `main`.
+Exit condition: one command can validate the future preflight → three parallel trainings →
+checkpoint eval fan-out → normalization → presentation DAG, while refusing to execute without the
+new exact user authorization.
 
-- preserved the exact pre-filter branch in a verified private Git bundle;
-- removed generated `output/` and `tools/synthetic-data/output/` paths from reachable history;
-- retained the original source repositories and local scientific/user artifacts;
-- verified zero reachable blobs at or above 10 MiB.
+## R2 — Execute M1 only after the user says start
 
-Exit condition: passed. A fresh secret and reachable-blob audit is still required immediately
-before any later separately authorized publication.
+Status: not authorized.
 
-## R1 — Evaluation inventory
+- synchronize the reviewed commit to HU;
+- run final read-only identity/storage/scheduler preflight;
+- submit exactly the contract-bound M1 DAG once;
+- record every job, manifest, checkpoint, metric, failure and missing value;
+- produce Max's epoch-level fact-access/retention tables and figures.
 
-Status: completed locally on `agent/eval-harness`.
+## R3 — Freeze the M2 corpus and sibling contract
 
-Working branch: `agent/eval-harness`.
+Status: later; it does not block M1 preparation.
 
-- inventory every current evaluation script, config, task, metric, denominator, output schema, and
-  historical artifact shape;
-- map each item to M0/M1/M2-A/M2-B and to factual access, retention, capability, or integrity;
-- classify each item as reuse, repair, replace, or retire-with-history;
-- identify exact parity and schema gaps.
+- freeze vngrs revision, shards, quality/provenance, held-out split and token budget;
+- preserve `trwiki-20260601` as cross-domain control;
+- bind M2-A and M2-B to the same selected M1 parent and matched budgets;
+- define controlled Turkish factual re-exposure only for M2-B.
 
-Exit condition: a reviewed inventory with no unowned metric or evaluator.
+## R4 — Execute and compare M2-A/M2-B
 
-Exit evidence: [`../evaluation/EVALUATOR_INVENTORY_V1.md`](../evaluation/EVALUATOR_INVENTORY_V1.md)
-classifies the existing implementation as reuse, repair, replace, or historical-only. The hybrid
-architecture and normalized schema own the previously missing integration surface.
+Status: not authorized.
 
-## R2 — Evaluation qualification and freeze
-
-Status: completed. eval-v1 is preserved historically; eval-v2 is the frozen active protocol;
-execution is not authorized.
-
-- pin LM Evaluation Harness and exact task/dataset revisions;
-- validate task IDs, prompts, few-shot settings, metrics, and availability;
-- reconcile official WikiText word/byte PPL and BPB with custom retention evaluation;
-- qualify the factual hard suite and generic degeneration panel;
-- freeze normalized checkpoint rows, confidence intervals, missingness, cheap/full cadence, and
-  gates;
-- create the versioned evaluation contract and acceptance tests.
-
-Exit condition: all future states use eval-v2 unchanged; another semantic change requires eval-v3.
-
-Freeze evidence:
-
-- [`../evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md`](../evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md);
-- [`../evaluation/RESULT_SCHEMA_V1.md`](../evaluation/RESULT_SCHEMA_V1.md);
-- [`../contracts/evaluation/eval-v1.md`](../contracts/evaluation/eval-v1.md);
-- [`../../configs/evaluation/eval_v1_registry.yaml`](../../configs/evaluation/eval_v1_registry.yaml);
-- [`../contracts/evaluation/eval-v2.md`](../contracts/evaluation/eval-v2.md);
-- [`../../configs/evaluation/eval_v2_registry.yaml`](../../configs/evaluation/eval_v2_registry.yaml).
-
-Document 180 preserves the eval-v1 freeze. The 2026-08-22 Pile retirement decision creates
-eval-v2, removes only Pile-10k, and inherits the remaining exact identities, gates and cadence.
-
-## R3 — Pipeline productionization
-
-Status: active. The local checkpoint planner, full 19-stage study controller, 39-node OLMo/Qwen/SmolLM matrix,
-training trace, typed artifact scaffold, presentation contract, Luna micro-packets and seven-lane
-M0 parallel adapters prepared; frozen bindings and all later-state execution adapters remain
-blocked on R2 freeze.
-
-- expose one validated pipeline interface for state/checkpoint evaluation;
-- make manifests, resume, failure states, and output namespaces deterministic;
-- normalize historical compatible evidence without rewriting raw outputs;
-- generate trajectory tables and figures from normalized rows;
-- add local smoke fixtures and bounded runtime estimates.
-
-Exit condition: the same command/config family can evaluate M0, M1, M2-A, and M2-B.
-
-Current local evidence: [`../pipeline/README.md`](../pipeline/README.md), the pipeline config under
-`configs/pipelines/`, the full-study config under `configs/studies/`, the M0 entrypoint under
-`scripts/study/`, the
-[`three-model planning contract`](../contracts/three-model-study-matrix-v1.md), and fail-closed
-planner/trace/artifact/study tests. The historical 24-lane eval-v1 operator and evidence are
-preserved. eval-v2 has 21 required non-Pile lanes available and now needs a hash-closed local
-projection and normalization without rescoring. Later-state training adapters remain blocked
-without changing eval-v2 semantics.
-
-## R4 — Corpus contract
-
-- freeze the vngrs revision/shards, minimal quality checks, licence/provenance, held-out split,
-  contamination policy, tokenizer/token budget, and `trwiki` control role;
-- materialize only after a separately authorized bounded wave.
-
-Exit condition: corpus inputs and splits are immutable and compatible with the M2 estimands.
-
-## R5 — Training contracts
-
-- freeze M1 model/recipe selection rules and checkpoint grid;
-- freeze matched M2-A/M2-B objectives, total tokens, data order, seeds, sequence policy, and factual
-  replacement mechanism;
-- bind `eval-v2` without modifying it.
-
-Exit condition: exact contracts are reviewable before any new training.
-
-## R6 — Execution and analysis
-
-- run separately authorized M0/M1/M2-A/M2-B waves;
-- preserve raw artifacts and manifests;
-- compute precommitted transfer/relearning contrasts and uncertainty;
-- freeze results, figures, retention decisions, and thesis-ready evidence.
-
-No R4–R6 step is authorized by this roadmap.
+Run the sibling arms, apply the unchanged eval-v2 bundle, compute the precommitted transfer versus
+relearning contrasts, and generate thesis-ready tables and figures.

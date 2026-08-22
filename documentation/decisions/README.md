@@ -24,6 +24,10 @@ replaced, preserve it and link both directions.
 Run IDs, job progress, large evidence tables, and temporary plans do not belong here. Use an
 immutable result record, current state, or a task plan instead.
 
+The older 2026-08-22 `M1_*PLAN`, `M1_*AUDIT`, reconciliation and preflight files already stored in
+this directory are preserved scientific history but are default-retired. They do not compete with
+`documentation/current/` as live status and must not be copied as a pattern for new run records.
+
 Use [`../templates/DECISION_TEMPLATE.md`](../templates/DECISION_TEMPLATE.md).
 
 ## Current decisions

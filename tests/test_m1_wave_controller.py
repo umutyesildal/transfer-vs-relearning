@@ -24,7 +24,14 @@ def test_fresh_m1_wave_is_matched_and_fail_closed() -> None:
     assert plan["training"]["expected_total_eval_states"] == 111
     assert plan["evaluation"]["checkpoint_evaluation_tasks"] == 111
     assert not [row for row in plan["training"]["recipe_checks"] if row["status"] != "pass"]
-    assert "project_ready_to_train_and_checkpoint" in plan["blockers"]
+    assert "project_ready_to_train_and_checkpoint" not in plan["blockers"]
+    assert "m1_checkpoint_manifest" not in plan["blockers"]
+    assert "m1_training_manifest" not in plan["blockers"]
+    assert "m1_training_contract_ready_for_authorization" in plan["blockers"]
+    for subplan in plan["subplans"]:
+        statuses = {row["id"]: row["status"] for row in subplan["checks"]}
+        assert statuses["m1_checkpoint_manifest"] == "produced_by_training"
+        assert statuses["m1_training_manifest"] == "produced_by_training"
 
 
 def test_fresh_m1_wave_has_parallel_training_barriers_and_final_barrier() -> None:

@@ -25,6 +25,8 @@ from transfer_vs_relearning.pipeline.training_trace import (
     make_epoch_trace_payload,
     summarize_tokenized_rows,
 )
+from transfer_vs_relearning.pipeline.m1_training_outputs import finalize_m1_training_outputs
+from transfer_vs_relearning.utils.io import sha256_file, write_json
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -252,3 +254,62 @@ def test_artifact_scaffold_is_typed_explicitly_not_run_and_never_overwrites(tmp_
     }
     with pytest.raises(FileExistsError):
         initialize_artifact_scaffold(output, plan)
+
+
+def test_completed_training_trace_materializes_stable_output_bindings(tmp_path: Path) -> None:
+    run_dir = tmp_path / "run"
+    trace_root = run_dir / "training_trace"
+    snapshot_root = run_dir / "epoch_snapshots"
+    trace_root.mkdir(parents=True)
+    snapshot_root.mkdir()
+    base_manifest = tmp_path / "base_model_manifest.json"
+    write_json(base_manifest, {"model_id": "model", "local_path_absolute": "/model"})
+    write_json(
+        run_dir / "training_manifest.json",
+        {
+            "status": "complete",
+            "model": {
+                "base_model_manifest": str(base_manifest),
+                "base_model_manifest_sha256": sha256_file(base_manifest),
+            },
+        },
+    )
+    write_json(
+        trace_root / "training_trace_manifest.json",
+        {"schedule": {"epochs": 2, "updates_per_epoch": 7}},
+    )
+    event_refs = []
+    for epoch in (1, 2):
+        snapshot = snapshot_root / f"epoch-{epoch:03d}"
+        snapshot.mkdir()
+        (snapshot / "model.safetensors").write_bytes(f"weights-{epoch}".encode())
+        checkpoint_sha = f"{epoch}" * 64
+        write_json(
+            snapshot / "snapshot_manifest.json",
+            {"epoch": epoch, "update": epoch * 7, "checkpoint_sha256": checkpoint_sha},
+        )
+        event_path = trace_root / f"event-{epoch}.json"
+        write_json(
+            event_path,
+            {
+                "event": "epoch_end",
+                "epoch": epoch,
+                "update": epoch * 7,
+                "snapshot_path": str(snapshot),
+                "checkpoint_sha256": checkpoint_sha,
+            },
+        )
+        event_refs.append(
+            {"event": "epoch_end", "path": str(event_path), "sha256": sha256_file(event_path)}
+        )
+    write_json(trace_root / "trace_index.json", {"status": "complete", "events": event_refs})
+
+    result = finalize_m1_training_outputs(run_dir, tmp_path / "bindings")
+    assert result["status"] == "complete"
+    checkpoints = json.loads(Path(result["checkpoint_manifest"]).read_text(encoding="utf-8"))
+    assert checkpoints["checkpoint_count"] == 3
+    assert [row["checkpoint_id"] for row in checkpoints["checkpoints"]] == [
+        "parent",
+        "epoch-001",
+        "epoch-002",
+    ]

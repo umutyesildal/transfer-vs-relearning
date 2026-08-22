@@ -20,7 +20,7 @@ model:
 
 training:
   run_name: m1_matched_epoch_dense_olmo_seed42
-  output_root: __FRESH_SCRATCH_M1_OLMO_ROOT__
+  output_root: /vol/tmp2/yesildau/m1_matched_three_model_v1/training/olmo
   block_size: 128
   learning_rate: 5.0e-5
   num_train_epochs: 36.0

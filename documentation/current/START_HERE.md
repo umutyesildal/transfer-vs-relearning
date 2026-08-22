@@ -14,12 +14,11 @@ the master synthesis, the long timeline, or a previous chat transcript.
 
 - active evaluation protocol: eval-v2;
 - Pile-10k: retired from canonical evaluation;
-- M0: 21/21 non-Pile lanes available plus completed exact-prefix evidence;
-- M0 projector: implemented and tested; read-only source-binding discovery passed 24/24;
-- v1b SHA-bound reference projection: complete with 24 source rows and zero metric rows;
-- metric normalization operator: the authorized v1c path-aware source audit passes 24/24 rows and 42/42 observations;
-- next boundary: resolve the remaining read-only M1 benchmark/provenance/measurement blockers; M0 normalization is complete;
-- M1/M2 training: not ready and not authorized.
+- M0: closed with 21/21 active lanes, 3/3 exact-prefix and 42 v1f normalized observations;
+- M1: fixed OLMo/Qwen/SmolLM cohort, Relation V2 facts and eval-v2 policy;
+- current boundary: local M1 pipeline/contract repair only;
+- vngrs: M2 input and not an M1 blocker;
+- M1/M2 execution: not authorized; wait for the user's later explicit start instruction.
 
 ## When to open larger files
 

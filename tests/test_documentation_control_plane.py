@@ -187,7 +187,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert matrix["execution_authorized"] is False
 
     projection = state["evaluation_target"]["pipeline"]["m0_eval_v2_projection"]
-    assert projection["status"] == "projection_complete_pending_metric_normalization_v1b"
+    assert projection["status"] == "projection_complete_v1b_normalization_complete_separately_v1f"
     assert projection["execution_attempt_record"] == (
         "documentation/records/evaluation/M0_EVAL_V2_PROJECTION_V1A_EXECUTION_BLOCKED_2026-08-22.md"
     )
@@ -204,7 +204,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         "documentation/evaluation/M0_EVAL_V2_SOURCE_BINDING_DISCOVERY_2026-08-22.md"
     )
     assert projection["projection_execution_authorized"] == "consumed_passed"
-    assert projection["metric_normalization_authorized"] is False
+    assert projection["metric_normalization_authorized"] == "consumed_passed_v1f"
     assert projection["rescore_authorized"] is False
 
     historical = state["current_evidence"]["m1_historical_trajectory_inventory"]

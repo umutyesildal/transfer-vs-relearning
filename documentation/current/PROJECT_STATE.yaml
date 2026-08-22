@@ -4,8 +4,8 @@ project: transfer-vs-relearning
 
 repository:
   layout: monorepo_v1
-  branch: agent/m0-evaluation
-  status: pile_10k_retired_eval_v2_frozen_m0_normalization_complete_m1_contract_pending
+  branch: agent/m1-pipeline-repair
+  status: m0_complete_m1_local_pipeline_repair_execution_not_authorized
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -110,6 +110,48 @@ readiness:
   ready_to_train: false
   selected_primary_model: null
 
+# Stage-specific gates prevent an unresolved M2 corpus decision from becoming an M1 blocker.
+# `ready_to_start` is the only execution-facing boolean; it remains false until the user later
+# authorizes the hash-bound M1 contract.
+stage_readiness:
+  m0:
+    scientific_evaluation_complete: true
+    canonical_non_pile_lane_count: 21
+    exact_prefix_models_complete: 3
+    normalized_observation_count: 42
+  m1_training:
+    scientific_inputs_ready: true
+    fixed_model_set_ready: true
+    synthetic_fact_dataset_ready: true
+    recipe_matched: true
+    epoch_trace_required: true
+    contract_ready_for_authorization: false
+    execution_authorized: false
+    ready_to_start: false
+    blockers:
+      - execution_adapter_not_frozen
+      - hash_bound_execution_contract_not_frozen
+      - explicit_user_start_authorization_missing
+  m1_evaluation:
+    protocol_ready: true
+    exact_prefix_required: true
+    checkpoint_outputs_produced_by_training: true
+    execution_authorized: false
+    ready_to_start: false
+    blockers:
+      - m1_training_outputs_not_yet_produced
+      - execution_adapter_not_frozen
+      - explicit_user_start_authorization_missing
+  m2_training:
+    corpus_contract_ready: false
+    sibling_contract_ready: false
+    execution_authorized: false
+    ready_to_start: false
+    blockers:
+      - vngrs_corpus_contract_not_frozen
+      - m2_a_m2_b_matched_contract_not_frozen
+      - m1_parent_not_yet_selected
+
 m1_confirmed_design:
   m1_models: [olmo, qwen, smollm]
   m1_model_binding: inherit_m0_model_and_tokenizer_revisions
@@ -146,7 +188,7 @@ evaluation_target:
     historical_artifacts_preserved: true
     canonical_m0_non_pile_lanes_available: 21
     canonical_m0_non_pile_lanes_required: 21
-    normalization_status: pending_hash_closed_local_projection
+    normalization_status: complete_v1f_42_observations
     decision: documentation/decisions/PILE_10K_RETIREMENT_AND_EVAL_V2_DECISION_2026-08-22.md
   factual_registry_manifest: configs/evaluation/registries/eval_v1_factual_registry_manifest.json
   inventory: documentation/evaluation/EVALUATOR_INVENTORY_V1.md
@@ -257,7 +299,7 @@ evaluation_target:
   architecture: hybrid_harness_custom_factual_and_normalizer
   canonical_result_shape: long_tables_with_generated_checkpoint_view
   pipeline:
-    status: eval_v2_m0_21_of_21_available_projection_complete_metric_source_audit_pass_normalization_pending_later_stages_blocked
+    status: eval_v2_m0_complete_m1_pipeline_repair_active_execution_not_authorized
     documentation: documentation/pipeline/README.md
     deep_dive_guide: documentation/evaluation/EVAL_V1_AND_END_TO_END_PIPELINE_DEEP_DIVE_TR.md
     prospective_template: configs/pipelines/eval_v1_olmo_epoch_trajectory_template.yaml
@@ -271,7 +313,7 @@ evaluation_target:
     m0_parallel_entrypoint: scripts/study/run_three_model_m0_evaluation.py
     execution_authorized: false
     m0_eval_v2_projection:
-      status: projection_complete_metric_source_audit_pass_normalization_pending
+      status: projection_complete_v1b_normalization_complete_separately_v1f
       supersedes_contract: documentation/contracts/evaluation/eval-v2-m0-projection-v1.md
       supersedes_contract_sha256: 926cfb019d316e993ee080ab2e2109599bbec9ee504f26b5475262fc45b910c8
       supersedes_config: configs/evaluation/eval_v2_m0_projection_v1.yaml
@@ -283,7 +325,7 @@ evaluation_target:
       operator: scripts/study/project_eval_v2_m0.py
       source_discovery_authorized: consumed_passed
       projection_execution_authorized: consumed_passed
-      metric_normalization_authorized: false
+      metric_normalization_authorized: consumed_passed_v1f
       source_manifest_hashes_resolved: 4
       source_manifest_hashes_required: 4
       discovery_record: documentation/evaluation/M0_EVAL_V2_SOURCE_BINDING_DISCOVERY_2026-08-22.md
@@ -896,7 +938,7 @@ current_evidence:
   culturax:
     role: excluded_access_blocked
 
-active_priority:
+historical_active_priority_2026_08_22:
   name: prepare_m1_execution_input_packet_synthetic_facts_eval_v2_inherited
   first_boundary: local_read_only_m1_synthetic_fact_manifest_and_checkpoint_input_audit
   training_before_completion: forbidden
@@ -985,6 +1027,37 @@ active_priority:
     - historical_m1_trajectory_backfill
     - hash_closed_m1_synthetic_fact_dataset_manifest
     - separate_execution_authorization_if_normalization_will_run
+
+active_priority:
+  name: finish_local_m1_pipeline_repair_then_wait_for_user
+  m0_status: complete
+  m1_status: local_preparation_only
+  execution_boundary: explicit_future_user_authorization
+  current_work:
+    - separate_m1_and_m2_readiness
+    - remove_training_output_circular_dependency
+    - finalize_hash_closed_training_output_adapter
+    - align_current_documentation_and_tests
+    - freeze_reviewable_m1_execution_contract_only_after_adapter_validation
+  forbidden_until_user_says_start:
+    - hu_ssh
+    - slurm_submission
+    - model_training
+    - evaluation_or_scoring
+    - push_or_merge
+
+next_decision_required:
+  subject: finish_m1_pipeline_repair_and_prepare_reviewable_execution_contract
+  decision_owner: user
+  start_m1_now: false
+  note: >-
+    M0 is closed with 21/21 active non-Pile lanes, three-model exact-prefix completion and
+    42 canonical v1f observations. M1 uses the same frozen OLMo/Qwen/SmolLM revisions,
+    Relation V2 synthetic English facts and eval-v2. Training outputs are products of the
+    training stage, not preconditions for it. vngrs and the primary Turkish held-out corpus
+    belong to M2 and do not block M1 preparation. The current local task is limited to making
+    the M1 contract and adapter reviewable; no M1 execution starts until the user explicitly
+    authorizes that final hash-bound contract.
 
 authorization:
   local_repository_changes: require_current_user_instruction
@@ -1116,7 +1189,7 @@ authorization:
       wave_consumed: true
       resubmission_authorized: false
 
-next_decision_required:
+historical_next_decision_record_2026_08_22:
   subject: prepare_m1_execution_input_packet
   note: >-
     Pile-10k is retired prospectively and no retry is required. The three-model M0 exact-prefix

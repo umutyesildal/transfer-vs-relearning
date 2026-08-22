@@ -151,6 +151,7 @@ def build_m1_wave_plan(
         config_paths,
         repo_root=repo_root,
         project_state_path=project_state_path,
+        planned_training_outputs=True,
     )
     training_checks, training_blockers = _recipe_checks(config_paths, repo_root=repo_root)
     tasks: list[dict[str, Any]] = []
