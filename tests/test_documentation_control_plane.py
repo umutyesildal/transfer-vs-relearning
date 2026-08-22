@@ -105,6 +105,9 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["pipeline"]["full_study_template"],
         state["evaluation_target"]["pipeline"]["full_study_entrypoint"],
         state["evaluation_target"]["pipeline"]["luna_packet_manifest"],
+        state["evaluation_target"]["pipeline"]["m0_eval_v2_projection"]["contract"],
+        state["evaluation_target"]["pipeline"]["m0_eval_v2_projection"]["config"],
+        state["evaluation_target"]["pipeline"]["m0_eval_v2_projection"]["operator"],
         state["evaluation_target"]["pipeline"]["three_model_matrix"]["contract"],
         state["evaluation_target"]["pipeline"]["three_model_matrix"]["pile_retirement_amendment"],
         state["evaluation_target"]["pipeline"]["three_model_matrix"]["config"],
@@ -152,6 +155,10 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["pipeline"]["m0_exact_prefix_recovery"]["execution_record"],
         state["current_evidence"]["m1_three_model_screen"]["authority"],
         *state["current_evidence"]["dose_pareto_family"]["authorities"],
+        state["current_evidence"]["m1_historical_trajectory_inventory"]["contract"],
+        state["current_evidence"]["m1_historical_trajectory_inventory"]["config"],
+        state["current_evidence"]["m1_historical_trajectory_inventory"]["table_schema"],
+        state["current_evidence"]["m1_historical_trajectory_inventory"]["operator"],
         state["current_evidence"]["vngrs_corpus_route"]["latest_contract"],
     ]
     for relative in referenced_paths:
@@ -178,6 +185,25 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert matrix["training_node_count"] == 9
     assert matrix["state_evaluation_node_count"] == 24
     assert matrix["execution_authorized"] is False
+
+    projection = state["evaluation_target"]["pipeline"]["m0_eval_v2_projection"]
+    assert projection["status"] == "prepared_hash_closed_projection_v1a_unexecuted"
+    assert projection["canonical_lane_count"] == 21
+    assert projection["exact_prefix_supplement_count"] == 3
+    assert projection["source_discovery_authorized"] == "consumed_passed"
+    assert projection["source_manifest_hashes_resolved"] == 4
+    assert projection["discovery_record"] == (
+        "documentation/evaluation/M0_EVAL_V2_SOURCE_BINDING_DISCOVERY_2026-08-22.md"
+    )
+    assert projection["projection_execution_authorized"] is False
+    assert projection["metric_normalization_authorized"] is False
+    assert projection["rescore_authorized"] is False
+
+    historical = state["current_evidence"]["m1_historical_trajectory_inventory"]
+    assert historical["status"] == "prepared_unexecuted"
+    assert historical["execution_authorized"] is False
+    assert historical["training_authorized"] is False
+    assert historical["evaluation_authorized"] is False
 
     scientific_m0 = state["evaluation_target"]["pipeline"]["scientific_m0_family"]
     assert scientific_m0["status"] == "terminal_partial_invalid_17_of_24"

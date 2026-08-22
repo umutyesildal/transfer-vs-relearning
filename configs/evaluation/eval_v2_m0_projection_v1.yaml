@@ -1,0 +1,80 @@
+schema_version: 1
+name: eval-v2-m0-three-model-hash-closed-projection-v1
+status: prepared_source_hashes_unresolved
+as_of: "2026-08-22"
+execution_authorized: false
+eval_contract: eval-v2
+rescore_authorized: false
+historical_sources_read_only: true
+contract: documentation/contracts/evaluation/eval-v2-m0-projection-v1.md
+contract_sha256: 926cfb019d316e993ee080ab2e2109599bbec9ee504f26b5475262fc45b910c8
+
+identities:
+  contract:
+    path: documentation/contracts/evaluation/eval-v2.md
+    sha256: 95eec6fc5a9dd7ce6da3185dfe20e2a183ad3850194c15f88a1299f09a43c6a3
+  registry:
+    path: configs/evaluation/eval_v2_registry.yaml
+    sha256: 0721412c651f5b112f531e69b53c98ccdb3633bee4888571bd7039d3f693229d
+
+models:
+  olmo:
+    repository: allenai/OLMo-2-0425-1B
+    revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+    required_lane_ids: &required_lanes
+      - english_retention_wikitext
+      - english_grammar_blimp
+      - english_capability
+      - turkish_capability
+      - turkish_perplexity
+      - factual_access
+      - generation_integrity
+    evaluation_results:
+      path: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_retargeted_v1/olmo/evaluation_results.json
+      sha256: null
+  qwen:
+    repository: Qwen/Qwen2.5-1.5B
+    revision: 8faed761d45a263340a0528343f099c05c9a4323
+    required_lane_ids: *required_lanes
+    evaluation_results:
+      path: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_retargeted_v1/qwen/evaluation_results.json
+      sha256: null
+  smollm:
+    repository: HuggingFaceTB/SmolLM2-1.7B
+    revision: effd688a12921b4cc83e3312b6feb579f70f9c71
+    required_lane_ids: *required_lanes
+    evaluation_results:
+      path: /vol/tmp2/yesildau/eval_v1_m0_scientific_three_model_recovery_retargeted_v1/smollm/evaluation_results.json
+      sha256: null
+
+exact_prefix:
+  semantic_classification: historical_exact_prefix_candidate_ranking_not_free_generation
+  family_result:
+    path: /vol/tmp2/yesildau/eval_v1_m0_exact_prefix_smollm_recovery_v1/family_result.json
+    sha256: 1bb5e066767d775b104965122490b873bd147b3f80292bb211175508b3aa03f8
+
+output_root: /vol/tmp2/yesildau/eval_v2_m0_three_model_projection_v1
+
+implementation:
+  commit: null
+  files:
+    src/transfer_vs_relearning/study/m0_eval_v2_projection.py: 357478a51ff09ab5631dc756f9840682fd902cfb9c1ffdf2f721e61244845c2e
+    scripts/study/project_eval_v2_m0.py: 22e9d67edeb7d8d7079399c4c016f018c6329ffc165704a424093df1176583fd
+    tests/study/test_m0_eval_v2_projection.py: a611a52683ee8f7781b6cf50f0369fdbe5f0dc2e73fa4a0d234fe1bdcb9b000f
+
+freeze_blockers:
+  - three_retargeted_evaluation_results_sha256_values_not_yet_read_only_verified
+  - implementation_commit_not_yet_frozen
+  - projection_execution_not_separately_authorized
+  - metric_normalization_contract_not_yet_frozen
+
+prohibitions:
+  - rescore_any_lane
+  - include_pile_10k
+  - mutate_or_delete_historical_sources
+  - overwrite_existing_output_root
+  - infer_missing_metrics
+  - perform_metric_normalization_from_source_projection_authority
+  - select_a_primary_model
+  - m1_or_m2_training
+  - cleanup_or_deletion

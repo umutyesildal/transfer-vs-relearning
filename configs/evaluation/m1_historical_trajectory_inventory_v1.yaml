@@ -1,0 +1,71 @@
+schema_version: 1
+name: m1-historical-checkpoint-trajectory-inventory-v1
+status: prepared_unexecuted
+as_of: "2026-08-22"
+execution_authorized: false
+contract: documentation/contracts/evaluation/m1-historical-trajectory-inventory-v1.md
+source_roots_read_only: true
+hash_large_weights_in_inventory: false
+evaluation_authorized: false
+training_authorized: false
+
+families:
+  qwen_seed42:
+    role: replicated_positive_control_historical_backfill
+    model: Qwen/Qwen2.5-1.5B
+    revision: 8faed761d45a263340a0528343f099c05c9a4323
+    root: /vol/tmp2/yesildau/qwen_scale_probe_v3
+    expected_steps: [25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 252]
+    expected_epochs: 36
+    expected_updates_per_epoch: 7
+    selected_step: 75
+    selected_manifest_path: /vol/tmp2/yesildau/qwen_scale_selected_v1/seed42_step75/selected_artifact_manifest.json
+    selected_manifest_sha256: aed52ff8baeb01b89efef443caa560b707871dfe52fde6bcec1d8ae3e46fb032
+  qwen_seed43:
+    role: replicated_positive_control_historical_backfill
+    model: Qwen/Qwen2.5-1.5B
+    revision: 8faed761d45a263340a0528343f099c05c9a4323
+    root: /vol/tmp2/yesildau/qwen_scale_probe_seed43_v1
+    expected_steps: [25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 252]
+    expected_epochs: 36
+    expected_updates_per_epoch: 7
+    selected_step: 50
+    selected_manifest_path: /vol/tmp2/yesildau/qwen_scale_selected_v1/seed43_step50/selected_artifact_manifest.json
+    selected_manifest_sha256: af3569aae2bd8066f51bb0ff1fecd4eec13eb74b5ba794915eae565f13f8bd53
+  olmo_seed42_dose_pareto:
+    role: historical_negative_sparse_backfill
+    model: allenai/OLMo-2-0425-1B
+    revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+    root: /vol/tmp2/yesildau/m1_provenance_screen_v4_dose_pareto_v1/training/olmo
+    expected_steps: [42, 84, 126, 168, 210, 252]
+    expected_epochs: 36
+    expected_updates_per_epoch: 7
+    selected_step: null
+  smollm_control_seed42:
+    role: historical_negative_sparse_backfill
+    model: HuggingFaceTB/SmolLM2-1.7B
+    revision: effd688a12921b4cc83e3312b6feb579f70f9c71
+    root: /vol/tmp2/yesildau/smollm_binding_control_v1/training/seed42
+    expected_steps: [25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 252]
+    expected_epochs: 36
+    expected_updates_per_epoch: 7
+    selected_step: null
+
+output_root: /vol/tmp2/yesildau/m1_historical_trajectory_inventory_v1
+
+implementation:
+  commit: null
+  files:
+    src/transfer_vs_relearning/study/m1_historical_inventory.py: 276785a6494ed0220f25739406e16097909883ca7b7c2c23fd80d8c694b92687
+    scripts/study/inventory_m1_historical_trajectory.py: f2aa5e3220728d10798b54e74fb3ff5b10edca335543cbe7f8c70abeb9d74fd7
+    tests/study/test_m1_historical_inventory.py: fbd4ce1881f9f7f29b1ebcdba23b8fa968a67ad11cc1b6e765ddd95189b7a644
+
+prohibitions:
+  - model_load_or_inference
+  - evaluation_or_scoring
+  - training_or_resume
+  - recursive_read_outside_exact_family_roots
+  - hash_optimizer_state_or_large_weights_during_first_inventory
+  - infer_missing_epoch_checkpoints
+  - mutate_delete_move_or_cleanup_sources
+  - select_primary_model

@@ -18,9 +18,23 @@ and operational failures remain immutable evidence.
 
 All seven non-Pile lanes already exist for each of OLMo, Qwen and SmolLM, giving 21/21 source lanes
 for a hash-closed eval-v2 M0 projection. The three-model exact-prefix supplement is also complete.
-The next local boundary is to validate and normalize that retained evidence without rescoring.
+The fail-closed projector is implemented and tested locally. Its authorized read-only discovery
+pass resolved exactly 21 non-Pile scientific lanes plus three exact-prefix supplement rows, with
+all 24 lane hashes and four top-manifest hashes verified. It rejected no source, mutated no HU
+file, and performed no rescoring. The observed hashes are preserved in
+`documentation/evaluation/M0_EVAL_V2_SOURCE_BINDING_DISCOVERY_2026-08-22.md`; the frozen
+pre-discovery config remains unchanged, so projection still requires a new SHA-bound config and
+separate authority.
+The corrected v1a binding is now prepared locally with a fresh output root and execution disabled.
+The next boundary is a separate exact authorization for the reference projection only; metric
+normalization, M1/M2 work and cleanup remain closed.
 eval-v2 freeze does not authorize normalization execution, M1/M2 training, HU/Slurm work, cleanup
 or publication; `ready_to_train` remains false.
+
+A separate no-retraining M1 historical inventory and trajectory-table schema are also prepared.
+They cover the retained Qwen seed-42/43, OLMo dose/Pareto and SmolLM control families, preserve
+missing epochs explicitly and defer all large-weight hashing. They have not run and do not make the
+heterogeneous historical recipes a matched three-model M1 comparison.
 
 The local pipeline foundation is now opt-in and fail-closed. It derives an exact epoch/update/batch
 schedule, records tokenization and optimization traces, preserves model-only epoch snapshots behind

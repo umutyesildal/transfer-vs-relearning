@@ -15,7 +15,9 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - active evaluation protocol: eval-v2;
 - Pile-10k: retired from canonical evaluation;
 - M0: 21/21 non-Pile lanes available plus completed exact-prefix evidence;
-- next local step: hash-closed M0 projection and normalization design/validation;
+- M0 projector: implemented and tested; read-only source-binding discovery passed 24/24;
+- v1a SHA-bound projection config/contract: prepared and unexecuted;
+- next boundary: separately authorize the reference projection;
 - M1/M2 training: not ready and not authorized.
 
 ## When to open larger files

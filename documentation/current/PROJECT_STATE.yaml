@@ -256,6 +256,33 @@ evaluation_target:
     m0_adapter_status: historical_eval_v1_24_lane_family_preserved_eval_v2_uses_21_lane_projection
     m0_parallel_entrypoint: scripts/study/run_three_model_m0_evaluation.py
     execution_authorized: false
+    m0_eval_v2_projection:
+      status: prepared_hash_closed_projection_v1a_unexecuted
+      supersedes_contract: documentation/contracts/evaluation/eval-v2-m0-projection-v1.md
+      supersedes_contract_sha256: 926cfb019d316e993ee080ab2e2109599bbec9ee504f26b5475262fc45b910c8
+      supersedes_config: configs/evaluation/eval_v2_m0_projection_v1.yaml
+      supersedes_config_sha256: 59e41e8e8fc017063e40974579ee60bfd77c8650278b875bc2a88efa9f5b1884
+      contract: documentation/contracts/evaluation/eval-v2-m0-projection-v1a.md
+      contract_sha256: 5f428ef85622867dcbe6f55db4333586862880b33afb9a8fc4eb84094cb53144
+      config: configs/evaluation/eval_v2_m0_projection_v1a.yaml
+      config_sha256: 5f10ca3713829df59027a5bc622615aaee023af17bec2a992829ff816d1761d6
+      operator: scripts/study/project_eval_v2_m0.py
+      source_discovery_authorized: consumed_passed
+      projection_execution_authorized: false
+      metric_normalization_authorized: false
+      source_manifest_hashes_resolved: 4
+      source_manifest_hashes_required: 4
+      discovery_record: documentation/evaluation/M0_EVAL_V2_SOURCE_BINDING_DISCOVERY_2026-08-22.md
+      output_root: /vol/tmp2/yesildau/eval_v2_m0_three_model_projection_v1a
+      discovery_top_manifest_sha256:
+        olmo: 2adcbea6caeec9a3731b9f3fec4f9c3f3abf1b8c65caff750907e4b0d98c78a1
+        qwen: 18053c89efcafa7bc01f2b90988afbcf036786d3617f85ab8538e4a82c400f21
+        smollm: 2ecc937cedd3860b84e999dbbd311b85c28db1b586d36b08a747419a64675ec4
+        exact_prefix: 1bb5e066767d775b104965122490b873bd147b3f80292bb211175508b3aa03f8
+      canonical_lane_count: 21
+      exact_prefix_supplement_count: 3
+      rescore_authorized: false
+      historical_sources_read_only: true
     three_model_matrix:
       status: planned_not_authorized
       contract: documentation/contracts/three-model-study-matrix-v1.md
@@ -756,6 +783,18 @@ current_evidence:
       - documentation/160_M1_DOSE_PARETO_OLMO_BF16_EXECUTION_AND_FAMILY_STATUS_TR.md
       - documentation/161_M1_DOSE_PARETO_POST_EXECUTION_GATE_TR.md
       - documentation/176_M1_DOSE_PARETO_POST_FALCON_AUDIT_PERSISTENT_RECOVERY_GATE_TR.md
+  m1_historical_trajectory_inventory:
+    status: prepared_unexecuted
+    contract: documentation/contracts/evaluation/m1-historical-trajectory-inventory-v1.md
+    contract_sha256: 4e96ef2a7976840a887ea978fd3135a30090ee75cf881572a6476fae4d96357d
+    config: configs/evaluation/m1_historical_trajectory_inventory_v1.yaml
+    config_sha256: 1a027df534fa06636f95bb6d1507e18fef8613c39c64d8aa4cd002043513285c
+    table_schema: documentation/evaluation/M1_TRAJECTORY_TABLE_V1.md
+    table_schema_sha256: a3b33a65432d050c35a877ff4622e2e77fe5a7a0b030ef31804f731967c10389
+    operator: scripts/study/inventory_m1_historical_trajectory.py
+    execution_authorized: false
+    training_authorized: false
+    evaluation_authorized: false
   vngrs_corpus_route:
     role: conditional_primary_materialization_candidate
     materialized: false
@@ -769,7 +808,7 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: validate_hash_closed_eval_v2_m0_projection
+  name: prepare_hash_closed_eval_v2_m0_projection_v1a
   first_boundary: local_read_only_source_identity_and_hash_closure
   training_before_completion: forbidden
   completed_outputs:
@@ -821,10 +860,17 @@ active_priority:
     - pile_10k_retired_from_canonical_protocol
     - eval_v2_contract_and_registry_frozen
     - twenty_one_of_twenty_one_non_pile_m0_source_lanes_available
+    - read_only_m0_source_binding_discovery_24_of_24
+    - hash_closed_eval_v2_m0_projection_v1a_preparation
+    - eval_v2_m0_projection_fail_closed_implementation
+    - m1_historical_trajectory_inventory_implementation
+    - m1_fact_access_retention_table_schema
   required_outputs:
     - hash_closed_eval_v2_m0_source_projection
     - canonical_non_pile_normalization_design
     - explicit_missingness_and_comparison_boundary
+    - read_only_m1_historical_checkpoint_inventory
+    - historical_m1_trajectory_backfill
     - separate_execution_authorization_if_normalization_will_run
 
 authorization:
@@ -958,10 +1004,12 @@ authorization:
       resubmission_authorized: false
 
 next_decision_required:
-  subject: validate_hash_closed_eval_v2_m0_projection_and_freeze_normalization_boundary
+  subject: authorize_hash_closed_m0_projection_v1a
   note: >-
     Pile-10k is retired prospectively and no retry is required. The three-model M0 exact-prefix
-    panel is complete and the 21 required non-Pile lanes already exist. Preserve all historical
-    evidence, validate a hash-closed local eval-v2 projection, then freeze the canonical M0
-    normalization/comparison boundary. No normalization execution, M1/M2 work or cleanup is
-    authorized yet.
+    panel is complete and the 21 required non-Pile lanes already exist. The authorized read-only
+    discovery passed for all four top manifests and 24 lane bindings; its hashes are preserved in
+    the append-only discovery record. The corrected v1a config and contract now bind those hashes
+    and point to one fresh projection root. Only the reference projection is now eligible for a
+    separate exact SHA-bound authorization; metric normalization, M1 inventory/evaluation, M1/M2
+    training and cleanup remain separately controlled.
