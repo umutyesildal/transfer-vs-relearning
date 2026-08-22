@@ -1151,7 +1151,7 @@ next_decision_required:
     remain preserved, but new M1 artifact/tokenizer manifests are still required.
     The pre-contract measurement review ledger is
     documentation/decisions/M1_MEASUREMENT_REVIEW_LEDGER_DRAFT_2026-08-22.md (SHA-256
-    e5073c90bb8e4ab9bf79b7a47a8f1fc13ececea0cccc638825b16f2e0a399c0a); it leaves all five 151ab
+    6fe0b3291966d733698c548b5622fea54c2bd9374848298d1b919838e36e6696); it leaves all five 151ab
     review fields explicit and unresolved.
     The primary Turkish corpus decision memo is
     documentation/decisions/M1_PRIMARY_TURKISH_CORPUS_DECISION_MEMO_2026-08-22.md (SHA-256

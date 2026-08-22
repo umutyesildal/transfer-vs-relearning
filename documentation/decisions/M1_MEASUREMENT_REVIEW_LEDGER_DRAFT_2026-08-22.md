@@ -86,3 +86,50 @@ for the raw values or the predeclared CI decision.
 This ledger is a review aid only. It does not rewrite eval-v2, add tasks, select a model, create a
 corpus, open HU/Slurm or authorize M1. The M1 training contract remains blocked until every
 `REVIEW_REQUIRED` field has an exact value, source/reference and immutable hash where required.
+
+## Current operational binding (read-only, 2026-08-22)
+
+The implementation route is now identified without opening execution. These bindings can be
+carried into the later contract; they are not a training authorization:
+
+| Binding | Frozen value |
+|---|---|
+| eval-v2 registry | `configs/evaluation/eval_v2_registry.yaml` — SHA-256 `0721412c651f5b112f531e69b53c98ccdb3633bee4888571bd7039d3f693229d` |
+| scientific inputs | `configs/evaluation/eval_v2_scientific_inputs_v1.yaml` — SHA-256 `e6afb5ed3cd210d9c429622995ccbf8a0da5fee4cf444e6fc979d8377d68b879` |
+| Harness | `lm_eval` v0.4.12, commit `6d642546f4688648fced259eb3302efd36ece5af`, immutable offline environment |
+| active lanes | WikiText, BLiMP, HellaSwag, WinoGender (3 roles), TurBLiMP; project-native factual and integrity lanes remain mandatory |
+| Turkish route | `juletxara/turblimp` at `cce94ca73ac04a0fabd9fbd7a56068261e6348ad`; `trwiki-20260601` is cross-domain control only |
+| retired input | Pile-10k is excluded from M1 and cannot be reintroduced by “all M0 evals” |
+| synthetic facts | Relation V2 `100 subjects / 500 facts / 3,500 train rows`, manifest SHA-256 `b37268d6f3afbb37f13ef746b80b99169c4d94ced3471aed2ae4aa09dc85b752` |
+| exact-prefix registry | `exact_prefix_probes_en.csv`, SHA-256 `1644288d0d62c51c56ceaae71b9eef7225b88326267281c8df8aeef9d7619c8e` |
+| historical launcher | `account=yesildau`, `partition=gpu`, prior A100 route, `xfer-relearn`, `scripts/training/train_clm.py` |
+
+The fixed prospective cohort is OLMo-2-0425-1B, Qwen2.5-1.5B and SmolLM2-1.7B. Their recorded
+read-only source-manifest hashes are respectively
+`8702b80d5b7e4c996c8ce2ff5fe771ada08ab0080bde1926c0b1f53c607303dc`,
+`c9d3562b717784251fe14c2b7972660fe4a20fe4687e15f69746bc1713d2d4fb` and
+`e5d04302087b8b41828f734c1d88c4620a74bb80d6919de62df37b9d57dadbfc`.
+
+The three draft training configurations preserve one matched recipe (seed 42, 36 epochs,
+7 updates/epoch, effective batch 500, block size 128, answer-only masking, epoch-end model-only
+snapshots and fact-exposure trace). The three draft trajectory pipelines preserve the same eval-v2
+registry, exact-prefix registry and entry/midpoint/endpoint full-bundle cadence. Their
+`m1_checkpoint_manifest` and `m1_training_manifest` fields intentionally remain placeholders:
+those manifests do not exist until a separately authorized run creates them.
+
+## Immediate decision boundary
+
+The next useful action is not another historical launcher submission. Before an executable M1
+contract can be written, the following five cells must be reviewed and filled with a source and,
+where applicable, a hash:
+
+1. primary in-domain Turkish held-out split;
+2. exact English retention manifest/bytes;
+3. TurBLiMP no-harm/equivalence margin;
+4. English-retention directional margin;
+5. benchmark floor/ceiling/saturation rule.
+
+Once those cells are closed, we can bind the already prepared three-model recipe and trajectory
+pipelines into one SHA-closed contract, run local/HU preflight, and request a separate execution
+authorization. Until then, `ready_to_train=false` remains intentional and no checkpoint or metric
+is fabricated.
