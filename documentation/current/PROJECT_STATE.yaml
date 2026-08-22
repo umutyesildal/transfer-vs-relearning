@@ -1188,6 +1188,11 @@ next_decision_required:
     routes for A100, RTX A6000, RTX6000 and V100 were accepted; only A100/RTX A6000 preserve
     the frozen BF16 recipe without a separately authorized precision change. No training or
     evaluation was run.
+    The historical launcher reuse audit is documentation/decisions/M1_HISTORICAL_SLURM_REUSE_AUDIT_2026-08-22.md
+    (SHA-256 3dd9e63b87fc3b8cc59da3fcf73634249d5c742bcb9faa29146090136d1d74dc). It confirms that
+    prior M1 training repeatedly used `account=yesildau`, `partition=gpu`, A100, the xfer-relearn
+    environment and `scripts/training/train_clm.py`; the new three-model wrapper must reuse that
+    path rather than invent a trainer.
     Max feedback is now a mandatory traceability invariant; the run-recording protocol is
     documentation/decisions/MAX_FEEDBACK_AND_RUN_RECORDING_PROTOCOL_2026-08-22.md (SHA-256
     9a2c3e84d274ccb1efb2c4710a930670e94a49a987a01d9244e5fefbba22eee3). It binds epoch-level
