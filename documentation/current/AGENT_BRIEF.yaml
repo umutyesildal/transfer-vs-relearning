@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 38a84c832e81bb1aeb0c6456ac01016c3509fdf5f4ee395afcad233ed951670e
+  full_state_sha256: d5d5dd4bac5e21dc09b9da0018c89457b79bd37bd9f6c4b155fc3d409730e590
   role: context_projection_only
   may_expand_authority: false
 

@@ -8,5 +8,6 @@
 set -euo pipefail
 : "${FAMILY_ROOT:?}"
 cd "${SLURM_SUBMIT_DIR:?}"
+export PYTHONPATH="$PWD/src"
 module load anaconda/3-2024.06
 conda run --name xfer-relearn python scripts/m1/audit_m1_matched_training.py --family-root "${FAMILY_ROOT}"

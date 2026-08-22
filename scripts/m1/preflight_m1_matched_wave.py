@@ -31,7 +31,8 @@ def main() -> None:
         raise ValueError(f"commit mismatch: {observed_commit} != {args.expected_commit}")
     configs = []
     outputs = set()
-    for raw in args.config:
+    labels = ("olmo", "qwen", "smollm")
+    for index, raw in enumerate(args.config):
         path = raw if raw.is_absolute() else repo / raw
         config = load_training_config(path.resolve())
         dataset = config["dataset"]
@@ -47,8 +48,8 @@ def main() -> None:
         model_manifest = Path(config["model"]["base_model_manifest"])
         if not model_manifest.is_file():
             raise FileNotFoundError(model_manifest)
-        output = Path(config["training"]["output_root"]).resolve()
-        if output.exists() or family not in output.parents:
+        output = family / "training" / labels[index]
+        if output.exists():
             raise ValueError(f"fresh family-owned output required: {output}")
         outputs.add(str(output))
         configs.append({"path": str(path.resolve()), "sha256": sha256_file(path), "model_manifest": str(model_manifest), "model_manifest_sha256": sha256_file(model_manifest), "output_root": str(output)})

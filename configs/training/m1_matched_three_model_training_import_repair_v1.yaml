@@ -1,0 +1,23 @@
+schema_version: 1
+name: m1-matched-three-model-training-import-repair-v1
+status: frozen_unexecuted
+execution_authorized: false
+supersedes_wave_config: configs/training/m1_matched_three_model_training_wave_v1.yaml
+preserved_failed_root: /vol/tmp2/yesildau/m1_matched_three_model_v1
+fresh_family_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1
+failed_jobs: {preflight: 475832, training_array: 475833, audit: 475834}
+failure_boundary: before_model_load_before_optimizer_before_scientific_training
+only_corrections:
+  - bind_checkout_src_as_PYTHONPATH_in_all_slurm_jobs
+  - derive_only_output_root_to_fresh_retry_family
+implementation:
+  scripts/m1/preflight_m1_matched_wave.py: 537c39375974aaf4ca0a1b63738d98b5e0c2c0ab8767803882e616450df97181
+  scripts/m1/run_m1_matched_training.py: 9121c71231e8d1a94d9c8cf13649fb98ddcea994e13f481ed0398279b9b57ca6
+  scripts/m1/audit_m1_matched_training.py: 5435783e4371f1c8c045503db124cabafb0dc79419a99b411fc1e631c2a94125
+  scripts/m1/submit_m1_matched_wave.sh: 0e3e333592ad3490155de554a89a79c35ab056a781208ed464292301829fd6cb
+  slurm/m1/preflight_m1_matched_wave.slurm: 57f84825372f6cedbad77b7ef8e13ed6c9453def571d7aed1e67eb5bbae5f681
+  slurm/m1/train_m1_matched_wave.slurm: b18f6e6497995878c6ca533ae8b0a0d9ec033bda8bf95b31fe8093bb6962a9b6
+  slurm/m1/audit_m1_matched_wave.slurm: 69a7bfe11a7f0374d47999b61fdacb957470cc5ad86193b1123dc1ab2ae9a49c
+  src/transfer_vs_relearning/pipeline/m1_training_outputs.py: 81d3a5d7a4d3a9c98a047b6932ffb4aa2fee9c519df8a861e8c6c43063378a41
+scientific_recipe_change: false
+automatic_retry: false

@@ -8,6 +8,7 @@
 set -euo pipefail
 : "${EXPECTED_COMMIT:?}" "${FAMILY_ROOT:?}" "${PREFLIGHT_MANIFEST:?}"
 cd "${SLURM_SUBMIT_DIR:?}"
+export PYTHONPATH="$PWD/src"
 module load anaconda/3-2024.06
 conda run --name xfer-relearn python scripts/m1/preflight_m1_matched_wave.py \
   --repo-root "$PWD" --family-root "${FAMILY_ROOT}" --expected-commit "${EXPECTED_COMMIT}" \

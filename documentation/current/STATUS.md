@@ -68,7 +68,8 @@ three identity/storage preflights
 |---|---|
 | M0 | complete |
 | M1 scientific inputs/recipe | ready locally |
-| M1 training adapter/contract | frozen locally; awaiting exact user authorization |
+| M1 first training wave | NOT_RUN: import-path failure before model load, jobs 475832–475834 |
+| M1 training correction | frozen locally; awaiting exact user authorization |
 | M1 checkpoint evaluation adapter/contract | next implementation boundary |
 | M1 execution authorization | absent; user must explicitly provide it later |
 | M2 corpus and sibling contract | not frozen; does not block M1 preparation |

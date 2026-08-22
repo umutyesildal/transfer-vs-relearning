@@ -126,10 +126,12 @@ stage_readiness:
     recipe_matched: true
     epoch_trace_required: true
     contract_ready_for_authorization: true
-    contract: documentation/contracts/m1-matched-three-model-training-wave-v1.md
-    contract_sha256: d6a589362a11b25ba628df8f51af91d4b8f773b6aec810ea60805a689fdf15ed
-    config: configs/training/m1_matched_three_model_training_wave_v1.yaml
-    config_sha256: 2e5c4b524146788412d20b05b77d5b14665cd2c503fa7777bbbbb8572fe36b09
+    contract: documentation/contracts/m1-matched-three-model-training-import-repair-v1.md
+    contract_sha256: f2a166eaf357eddda0e3fbbe866873b2b738b46c7d036b2f12ee88db1ca963a4
+    config: configs/training/m1_matched_three_model_training_import_repair_v1.yaml
+    config_sha256: 7cb8d4d80d9a942c872ca83db7bec9f7b7659527f70bcbd5d474f80e54342e85
+    prior_wave_status: not_run_import_path_failure_before_model_load
+    prior_jobs: [475832, 475833, 475834]
     execution_authorized: false
     ready_to_start: false
     blockers:
