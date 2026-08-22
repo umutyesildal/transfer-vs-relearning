@@ -75,8 +75,8 @@ def _validate_state_design(config: dict[str, Any]) -> None:
         raise ValueError("M2-A and M2-B must be sibling arms with the same M1 parent")
     if siblings.get("matched_budget_required") is not True:
         raise ValueError("M2 sibling budgets must be matched")
-    if design.get("evaluation_contract") != "eval-v1":
-        raise ValueError("The full study must bind eval-v1 uniformly")
+    if design.get("evaluation_contract") != "eval-v2":
+        raise ValueError("The full study must bind eval-v2 uniformly")
     exact_prefix = _mapping(design, "mandatory_exact_prefix")
     if exact_prefix != {
         "required": True,

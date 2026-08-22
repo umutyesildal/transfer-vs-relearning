@@ -1,11 +1,11 @@
 schema_version: 1
-study_id: transfer-vs-relearning-m0-to-m2-eval-v1
+study_id: transfer-vs-relearning-m0-to-m2-eval-v2
 status: draft
 execution_authorized: false
 
 state_design:
   states: [M0, M1, M2-A, M2-B]
-  evaluation_contract: eval-v1
+  evaluation_contract: eval-v2
   mandatory_exact_prefix:
     required: true
     states: [M0, M1, M2-A, M2-B]
@@ -21,7 +21,7 @@ bindings:
   m1_training_pipeline: __FROZEN_M1_TRAINING_PIPELINE__
   m2a_training_pipeline: __FROZEN_M2A_TRAINING_PIPELINE__
   m2b_training_pipeline: __FROZEN_M2B_TRAINING_PIPELINE__
-  eval_registry: configs/evaluation/eval_v1_registry.yaml
+  eval_registry: configs/evaluation/eval_v2_registry.yaml
   exact_prefix_probe_registry: artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/exact_prefix_probes_en.csv
   result_namespace: __FRESH_STUDY_RESULT_NAMESPACE__
 
@@ -35,8 +35,8 @@ stages:
     authority_class: local_read_only
     context_files:
       - documentation/current/PROJECT_STATE.yaml
-      - documentation/contracts/evaluation/eval-v1.md
-      - configs/evaluation/eval_v1_registry.yaml
+      - documentation/contracts/evaluation/eval-v2.md
+      - configs/evaluation/eval_v2_registry.yaml
       - configs/studies/m0_to_m2_eval_v1_template.yaml
     allowed_paths:
       - src/transfer_vs_relearning/study/**
@@ -55,8 +55,8 @@ stages:
     adapter_id: m0_evaluation
     authority_class: evaluation
     context_files:
-      - documentation/contracts/evaluation/eval-v1.md
-      - configs/evaluation/eval_v1_registry.yaml
+      - documentation/contracts/evaluation/eval-v2.md
+      - configs/evaluation/eval_v2_registry.yaml
       - documentation/evaluation/RESULT_SCHEMA_V1.md
     allowed_paths:
       - src/transfer_vs_relearning/study/adapters/m0_evaluation.py
@@ -75,7 +75,7 @@ stages:
     adapter_id: m0_probing
     authority_class: evaluation
     context_files:
-      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/contracts/evaluation/eval-v2.md
       - documentation/evaluation/RESULT_SCHEMA_V1.md
       - documentation/evaluation/EVALUATOR_INVENTORY_V1.md
     allowed_paths:
@@ -95,7 +95,7 @@ stages:
     adapter_id: exact_prefix_gate
     authority_class: evaluation
     context_files:
-      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/contracts/evaluation/eval-v2.md
       - documentation/evaluation/RESULT_SCHEMA_V1.md
       - configs/studies/m0_to_m2_eval_v1_template.yaml
     allowed_paths:
@@ -138,7 +138,7 @@ stages:
     context_files:
       - documentation/pipeline/README.md
       - configs/training/eval_v1_olmo_epoch_tracked_template.yaml
-      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/contracts/evaluation/eval-v2.md
     allowed_paths:
       - src/transfer_vs_relearning/study/adapters/m1_training.py
       - tests/study/test_m1_training_adapter.py
@@ -152,13 +152,13 @@ stages:
   - id: m1_evaluation
     state: M1
     kind: evaluation
-    objective: Apply the unchanged eval-v1 standard bundle to every required M1 trajectory point.
+    objective: Apply the unchanged eval-v2 standard bundle to every required M1 trajectory point.
     depends_on: [m1_training]
     adapter_id: m1_evaluation
     authority_class: evaluation
     context_files:
-      - documentation/contracts/evaluation/eval-v1.md
-      - configs/evaluation/eval_v1_registry.yaml
+      - documentation/contracts/evaluation/eval-v2.md
+      - configs/evaluation/eval_v2_registry.yaml
       - documentation/pipeline/README.md
     allowed_paths:
       - src/transfer_vs_relearning/study/adapters/m1_evaluation.py
@@ -177,7 +177,7 @@ stages:
     adapter_id: m1_probing
     authority_class: evaluation
     context_files:
-      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/contracts/evaluation/eval-v2.md
       - documentation/evaluation/RESULT_SCHEMA_V1.md
     allowed_paths:
       - src/transfer_vs_relearning/study/adapters/m1_probing.py
@@ -196,7 +196,7 @@ stages:
     adapter_id: exact_prefix_gate
     authority_class: evaluation
     context_files:
-      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/contracts/evaluation/eval-v2.md
       - documentation/evaluation/RESULT_SCHEMA_V1.md
       - configs/studies/m0_to_m2_eval_v1_template.yaml
     allowed_paths:
@@ -216,7 +216,7 @@ stages:
     adapter_id: m1_checkpoint_selection
     authority_class: local_write
     context_files:
-      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/contracts/evaluation/eval-v2.md
       - documentation/evaluation/RESULT_SCHEMA_V1.md
       - documentation/current/PROJECT_STATE.yaml
     allowed_paths:
@@ -236,7 +236,7 @@ stages:
     adapter_id: m2_sibling_preflight
     authority_class: local_read_only
     context_files:
-      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/contracts/evaluation/eval-v2.md
       - documentation/178_END_TO_END_EXPERIMENTAL_PLAN_AND_EVALUATION_PROTOCOL_EN.md
       - configs/studies/m0_to_m2_eval_v1_template.yaml
     allowed_paths:
@@ -258,7 +258,7 @@ stages:
     context_files:
       - documentation/178_END_TO_END_EXPERIMENTAL_PLAN_AND_EVALUATION_PROTOCOL_EN.md
       - documentation/pipeline/README.md
-      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/contracts/evaluation/eval-v2.md
     allowed_paths:
       - src/transfer_vs_relearning/study/adapters/m2a_training.py
       - tests/study/test_m2a_training_adapter.py
@@ -278,7 +278,7 @@ stages:
     context_files:
       - documentation/178_END_TO_END_EXPERIMENTAL_PLAN_AND_EVALUATION_PROTOCOL_EN.md
       - documentation/pipeline/README.md
-      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/contracts/evaluation/eval-v2.md
     allowed_paths:
       - src/transfer_vs_relearning/study/adapters/m2b_training.py
       - tests/study/test_m2b_training_adapter.py
@@ -291,13 +291,13 @@ stages:
   - id: m2a_evaluation_probing
     state: M2-A
     kind: evaluation
-    objective: Apply unchanged eval-v1 standard and factual probe bundles to M2-A.
+    objective: Apply unchanged eval-v2 standard and factual probe bundles to M2-A.
     depends_on: [m2a_training]
     adapter_id: m2a_evaluation_probing
     authority_class: evaluation
     context_files:
-      - documentation/contracts/evaluation/eval-v1.md
-      - configs/evaluation/eval_v1_registry.yaml
+      - documentation/contracts/evaluation/eval-v2.md
+      - configs/evaluation/eval_v2_registry.yaml
       - documentation/evaluation/RESULT_SCHEMA_V1.md
     allowed_paths:
       - src/transfer_vs_relearning/study/adapters/m2a_evaluation.py
@@ -311,13 +311,13 @@ stages:
   - id: m2b_evaluation_probing
     state: M2-B
     kind: evaluation
-    objective: Apply the identical eval-v1 standard and factual probe bundles to M2-B.
+    objective: Apply the identical eval-v2 standard and factual probe bundles to M2-B.
     depends_on: [m2b_training]
     adapter_id: m2b_evaluation_probing
     authority_class: evaluation
     context_files:
-      - documentation/contracts/evaluation/eval-v1.md
-      - configs/evaluation/eval_v1_registry.yaml
+      - documentation/contracts/evaluation/eval-v2.md
+      - configs/evaluation/eval_v2_registry.yaml
       - documentation/evaluation/RESULT_SCHEMA_V1.md
     allowed_paths:
       - src/transfer_vs_relearning/study/adapters/m2b_evaluation.py
@@ -336,7 +336,7 @@ stages:
     adapter_id: exact_prefix_gate
     authority_class: evaluation
     context_files:
-      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/contracts/evaluation/eval-v2.md
       - documentation/evaluation/RESULT_SCHEMA_V1.md
       - configs/studies/m0_to_m2_eval_v1_template.yaml
     allowed_paths:
@@ -356,7 +356,7 @@ stages:
     adapter_id: exact_prefix_gate
     authority_class: evaluation
     context_files:
-      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/contracts/evaluation/eval-v2.md
       - documentation/evaluation/RESULT_SCHEMA_V1.md
       - configs/studies/m0_to_m2_eval_v1_template.yaml
     allowed_paths:
@@ -376,7 +376,7 @@ stages:
     adapter_id: branch_analysis
     authority_class: local_write
     context_files:
-      - documentation/contracts/evaluation/eval-v1.md
+      - documentation/contracts/evaluation/eval-v2.md
       - documentation/evaluation/RESULT_SCHEMA_V1.md
       - documentation/178_END_TO_END_EXPERIMENTAL_PLAN_AND_EVALUATION_PROTOCOL_EN.md
     allowed_paths:

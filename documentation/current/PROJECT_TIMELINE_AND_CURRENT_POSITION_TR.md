@@ -1,8 +1,8 @@
 # Proje timeline'ı ve güncel konum
 
-**Son doğrulama:** 2026-08-21
+**Son doğrulama:** 2026-08-22
 
-**Bilimsel faz:** eval-v1 donduruldu; 23/24 geçerli M0 lane, Qwen Pile single-lane recovery submitted
+**Bilimsel faz:** Pile-10k canonical protokolden çıkarıldı; eval-v2 donduruldu; 21/21 non-Pile M0 lane mevcut
 
 **Training readiness:** `ready_to_train=false`
 
@@ -519,6 +519,6 @@ Bu wave dışında:
 
 ## 8. Tek satırlık güncel hüküm
 
-**Pipeline 23/24 geçerli M0 lane'e ulaştı; yalnız Qwen Pile-10k operationally missing; 23 sonucu
-hash ile koruyan single-lane A100 contract hazır fakat unexecuted ve sıradaki adım exact
-contract/config authorization'dır.**
+**Pile-10k artık canonical metric, gate veya blocker değildir. Üç modelde 21/21 gerekli non-Pile
+M0 lane ve tamamlanmış exact-prefix paneli korunuyor; sıradaki adım hiçbir lane'i tekrar
+skorlamadan hash-closed eval-v2 M0 projection/normalization sınırını doğrulamaktır.**

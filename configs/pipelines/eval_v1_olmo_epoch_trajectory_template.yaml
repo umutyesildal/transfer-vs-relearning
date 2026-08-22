@@ -1,10 +1,10 @@
 schema_version: 1
-pipeline_id: eval-v1-olmo-m1-epoch-trajectory-template
+pipeline_id: eval-v2-olmo-m1-epoch-trajectory-template
 status: draft
 execution_authorized: false
 
 experiment:
-  experiment_id: prospective-olmo-m1-eval-v1
+  experiment_id: prospective-olmo-m1-eval-v2
   state: M1
   parent_state: M0
   arm: M1
@@ -29,7 +29,7 @@ training_plan:
     fact_exposures_per_epoch: 3500
 
 evaluation:
-  contract: eval-v1
+  contract: eval-v2
   dense_bundles:
     - identity_and_training_trace
     - factual_access_cheap

@@ -10,6 +10,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 STATE_PATH = ROOT / "documentation/current/PROJECT_STATE.yaml"
 EVAL_REGISTRY_PATH = ROOT / "configs/evaluation/eval_v1_registry.yaml"
+ACTIVE_EVAL_REGISTRY_PATH = ROOT / "configs/evaluation/eval_v2_registry.yaml"
 M0_QUALIFICATION_PATH = ROOT / "configs/evaluation/m0_olmo_eval_v1_qualification_v1.yaml"
 LEGACY_DIR = ROOT / "documentation/records/workspace-guidance"
 MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
@@ -28,6 +29,9 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert state["readiness"]["ready_to_train"] is False
     assert state["readiness"]["selected_primary_model"] is None
     assert state["evaluation_target"]["status"] == "frozen_execution_not_authorized"
+    assert state["evaluation_target"]["contract_name"] == "eval-v2"
+    assert state["evaluation_target"]["pile_10k_retirement"]["active_task"] is False
+    assert state["evaluation_target"]["pile_10k_retirement"]["canonical_m0_non_pile_lanes_available"] == 21
     assert state["evaluation_target"]["harness"]["git_commit"] == (
         "6d642546f4688648fced259eb3302efd36ece5af"
     )
@@ -96,6 +100,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["pipeline"]["full_study_entrypoint"],
         state["evaluation_target"]["pipeline"]["luna_packet_manifest"],
         state["evaluation_target"]["pipeline"]["three_model_matrix"]["contract"],
+        state["evaluation_target"]["pipeline"]["three_model_matrix"]["pile_retirement_amendment"],
         state["evaluation_target"]["pipeline"]["three_model_matrix"]["config"],
         state["evaluation_target"]["pipeline"]["three_model_matrix"]["entrypoint"],
         state["evaluation_target"]["pipeline"]["scientific_m0_family"]["contract"],
@@ -128,6 +133,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
         state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]["operator"],
         state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]["authorization_record"],
         state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]["submission_record"],
+        state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]["terminal_record"],
         state["evaluation_target"]["pipeline"]["m0_exact_prefix_supplement"]["contract"],
         state["evaluation_target"]["pipeline"]["m0_exact_prefix_supplement"]["config"],
         state["evaluation_target"]["pipeline"]["m0_exact_prefix_supplement"]["operator"],
@@ -310,7 +316,7 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert retargeted_authorization["recovery_lane_count"] == 5
 
     single = state["evaluation_target"]["pipeline"]["m0_qwen_pile_single_lane_recovery"]
-    assert single["status"] == "submitted_pending_resources"
+    assert single["status"] == "terminal_failed_pre_scoring_retired_from_eval_v2"
     assert single["contract_sha256"] == (
         "88f135f74c8e1932660128e4e36f99cdb13923be15fb7ba82c6c3a2a98c40332"
     )
@@ -328,6 +334,8 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert single["final_preflight_blockers"] == []
     assert single["wave_job"] == "472809"
     assert single["family_finalizer"] == "472813"
+    assert single["valid_scientific_score"] is False
+    assert single["eval_v2_retry_required"] is False
     assert single["normalization_authorized"] is False
 
     single_authorization = state["authorization"]["scoped"][
@@ -465,6 +473,36 @@ def test_eval_v1_registry_is_frozen_but_execution_stays_unauthorized():
     assert registry["scientific_gates"]["transfer_m2_a_minus_m1"][
         "tr_to_en_top1_minimum_gain"
     ] == 0.05
+
+
+def test_eval_v2_retires_pile_without_changing_historical_eval_v1():
+    registry = yaml.safe_load(ACTIVE_EVAL_REGISTRY_PATH.read_text(encoding="utf-8"))
+
+    assert registry["name"] == "eval-v2"
+    assert registry["status"] == "frozen"
+    assert registry["execution_authorized"] is False
+    assert registry["active_harness_task_ids"] == [
+        "wikitext",
+        "blimp",
+        "hellaswag",
+        "winogender_female",
+        "winogender_male",
+        "winogender_neutral",
+        "turblimp_core",
+    ]
+    assert "pile_10k" not in registry["active_harness_task_ids"]
+    retired = {row["id"]: row for row in registry["retired_tasks"]}
+    assert retired["pile_10k"]["submission_lane"] == "forbidden"
+    assert retired["pile_10k"]["gate"] == "none"
+    assert registry["canonical_lane_policy"]["lanes_per_model"] == 7
+    assert registry["canonical_lane_policy"]["three_model_total_lanes"] == 21
+    assert registry["scientific_gates"]["english_retention"] == {
+        "wikitext_delta_bpb_max": 0.32192809488736235,
+        "wikitext_equivalent_byte_perplexity_ratio_max": 1.25,
+        "blimp_absolute_accuracy_drop_max": 0.05,
+        "hellaswag_acc_norm_absolute_drop_max": 0.05,
+        "winogender_role": "diagnostic_no_gate",
+    }
 
 
 def test_m0_qualification_is_non_scientific_and_fail_closed():

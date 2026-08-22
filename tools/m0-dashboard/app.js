@@ -2,10 +2,9 @@ const DATA_URL = '../../artifacts/evaluations/m0_three_model_v1/dump/m0_metrics.
 const MODEL_ORDER = ['olmo', 'qwen', 'smollm'];
 const MODEL_LABELS = { olmo: 'OLMo', qwen: 'Qwen', smollm: 'SmolLM' };
 const MODEL_CLASSES = { olmo: 'olmo', qwen: 'qwen', smollm: 'smollm' };
-const LANE_ORDER = ['english_retention_wikitext', 'english_retention_pile_10k', 'english_grammar_blimp', 'english_capability', 'turkish_capability', 'turkish_perplexity', 'factual_access', 'generation_integrity'];
+const LANE_ORDER = ['english_retention_wikitext', 'english_grammar_blimp', 'english_capability', 'turkish_capability', 'turkish_perplexity', 'factual_access', 'generation_integrity'];
 const LANE_LABELS = {
   english_retention_wikitext: { tr: 'WikiText', en: 'WikiText' },
-  english_retention_pile_10k: { tr: 'Pile-10k', en: 'Pile-10k' },
   english_grammar_blimp: { tr: 'BLiMP', en: 'BLiMP' },
   english_capability: { tr: 'English cap.', en: 'English cap.' },
   turkish_capability: { tr: 'Turkish cap.', en: 'Turkish cap.' },
@@ -23,8 +22,8 @@ const FAMILY_LABELS = {
 };
 const STATE_COPY = {
   M0: {
-    tr: { title: 'M0 — frozen pretrained base', description: 'Mevcut snapshot 3 modelin frozen base-model eval sonuçlarını gösterir. 24 lane’in 23’ü geçerli; Qwen Pile-10k beklemede.' },
-    en: { title: 'M0 — frozen pretrained base', description: 'This snapshot contains frozen base-model evaluation results for three models. 23 of 24 lanes are valid; Qwen Pile-10k is pending.' }
+    tr: { title: 'M0 — frozen pretrained base', description: 'eval-v2 canonical panelinde üç model için 21/21 non-Pile lane mevcuttur. Tarihsel Pile sonuçları bu görünümden çıkarılmıştır.' },
+    en: { title: 'M0 — frozen pretrained base', description: 'The eval-v2 canonical panel has all 21/21 non-Pile lanes across three models. Historical Pile observations are retired from this view.' }
   },
   M1: {
     tr: { title: 'M1 — English factual adaptation', description: 'M1 için bu dump içinde henüz training/evaluation result snapshot’ı yok. Sayı uydurulmuyor; state yalnızca UI’da hazırlanmış durumda.' },
@@ -80,7 +79,6 @@ const METRICS = {
   blimp_accuracy: { label: { tr: 'English BLiMP accuracy', en: 'English BLiMP accuracy' }, help: { tr: '67.000 İngilizce grammar örneği · yüksek daha iyi', en: '67,000 English grammar examples · higher is better' }, format: v => `${(v * 100).toFixed(2)}%`, scale: 'fraction', direction: 'higher', measure: { tr: 'İngilizce grammar minimal pair örneklerindeki genel doğruluk oranıdır.', en: 'Measures overall accuracy on English grammar minimal pairs.' }, read: { tr: 'Aynı 67.000 örnek üzerinde yüksek değer daha iyi grammar acceptability demektir.', en: 'On the same 67,000 examples, a higher value means better grammar acceptability.' }, caveat: { tr: 'Task-specific bir capability metriğidir; HellaSwag veya Turkish task’leriyle doğrudan karıştırılmaz.', en: 'It is task-specific capability; do not compare it directly with HellaSwag or Turkish tasks.' }, caption: { tr: 'İngilizce grammar acceptability.', en: 'English grammar acceptability.' } },
   hellaswag_acc_norm: { label: { tr: 'HellaSwag acc_norm', en: 'HellaSwag acc_norm' }, help: { tr: '10.042 commonsense örneği · yüksek daha iyi', en: '10,042 commonsense examples · higher is better' }, format: v => `${(v * 100).toFixed(2)}%`, scale: 'fraction', direction: 'higher', measure: { tr: 'Commonsense completion seçeneklerinde normalized accuracy’yi ölçer.', en: 'Measures normalized accuracy on commonsense completion choices.' }, read: { tr: 'Yüksek değer, genel English commonsense completion başarısının daha iyi olduğunu gösterir.', en: 'A higher value indicates stronger English commonsense completion.' }, caveat: { tr: 'Factual access veya Türkçe adaptation etkisini doğrudan ölçmez.', en: 'It does not directly measure factual access or Turkish adaptation.' }, caption: { tr: 'Commonsense completion capability.', en: 'Commonsense completion capability.' } },
   wikitext_bpb: { label: { tr: 'WikiText-2 BPB', en: 'WikiText-2 BPB' }, help: { tr: '62 WikiText segmenti · düşük daha iyi', en: '62 WikiText segments · lower is better' }, format: v => v.toFixed(6), scale: 'relative', direction: 'lower', measure: { tr: 'İngilizce WikiText üzerinde byte-level retention loss’unu ölçer.', en: 'Measures byte-level retention loss on English WikiText.' }, read: { tr: 'Düşük BPB, pretrained English distribution üzerinde daha iyi likelihood demektir.', en: 'Lower BPB means better likelihood on the pretrained English distribution.' }, caveat: { tr: 'Retention ölçümüdür; factual knowledge veya Turkish capability değildir.', en: 'This is retention; it is not factual knowledge or Turkish capability.' }, caption: { tr: 'English retention için byte-level metric.', en: 'Byte-level metric for English retention.' } },
-  pile_bpb: { label: { tr: 'Pile-10k BPB', en: 'Pile-10k BPB' }, help: { tr: '10.000 Pile örneği · düşük daha iyi', en: '10,000 Pile examples · lower is better' }, format: v => v.toFixed(6), scale: 'relative', direction: 'lower', measure: { tr: 'Pile-10k corpus üzerinde byte-level retention loss’unu ölçer.', en: 'Measures byte-level retention loss on the Pile-10k corpus.' }, read: { tr: 'OLMo ve SmolLM için mevcut; Qwen lane’i bitmeden üçlü yorum tamamlanmaz.', en: 'Available for OLMo and SmolLM; the three-model reading is incomplete until Qwen finishes.' }, caveat: { tr: 'Qwen sonucu pending; eksik değer sıfır değildir.', en: 'Qwen is pending; a missing value is not zero.' }, caption: { tr: 'Qwen lane’i pending; eksik değer sıfır değildir.', en: 'Qwen is pending; the missing value is not zero.' } },
   factual_top1_rate: { label: { tr: 'Factual access top-1 rate', en: 'Factual access top-1 rate' }, help: { tr: '12.000 factual probe · yüksek daha iyi', en: '12,000 factual probes · higher is better' }, format: v => `${(v * 100).toFixed(2)}%`, scale: 'fraction', direction: 'higher', measure: { tr: 'Modelin factual probe’a doğru ilk cevabı verme oranıdır.', en: 'Measures the rate of correct first answers on factual probes.' }, read: { tr: 'Yüksek değer, probe formatında daha fazla doğru ilk cevap demektir.', en: 'A higher value means more correct first answers in the probe format.' }, caveat: { tr: 'Prompt-form failures ve robust intersection sonuçlarıyla beraber okunmalıdır.', en: 'Read together with prompt-form failures and robust intersection results.' }, caption: { tr: 'Doğru ilk cevap oranı; canonical normalized winner değildir.', en: 'Correct first-answer rate; not a canonical normalized winner.' } },
   generation_distinct_2: { label: { tr: 'Generation distinct-2', en: 'Generation distinct-2' }, help: { tr: '30 completion · çeşitlilik yüksek daha iyi', en: '30 completions · higher diversity is better' }, format: v => v.toFixed(3), scale: 'fraction', direction: 'higher', measure: { tr: 'Üretimlerdeki distinct bigram oranını ölçer.', en: 'Measures the fraction of distinct bigrams in generated completions.' }, read: { tr: 'Yüksek değer daha çeşitli; fakat tek başına factual correctness anlamına gelmez.', en: 'A higher value means more variety, but not factual correctness by itself.' }, caveat: { tr: 'Generation integrity diagnostic’idir; ana scientific winner metriği değildir.', en: 'It is a generation-integrity diagnostic, not the primary scientific winner metric.' }, caption: { tr: 'Üretim çeşitliliği; generation integrity diagnostic.', en: 'Generation diversity; generation-integrity diagnostic.' } },
   generation_repeated_3gram: { label: { tr: 'Repeated 3-gram fraction', en: 'Repeated 3-gram fraction' }, help: { tr: '30 completion · tekrar düşük daha iyi', en: '30 completions · lower repetition is better' }, format: v => v.toFixed(3), scale: 'fraction', direction: 'lower', measure: { tr: 'Üretimlerde tekrar eden 3-gramların oranını ölçer.', en: 'Measures the fraction of repeated 3-grams in generated completions.' }, read: { tr: 'Düşük değer degeneration/repetition riskinin daha düşük olduğunu gösterir.', en: 'A lower value indicates less degeneration or repetition risk.' }, caveat: { tr: 'Kısa bir 30 completion panelidir; tek başına model kalitesi değildir.', en: 'This is a small 30-completion panel; it is not model quality by itself.' }, caption: { tr: 'Tekrarlı üretim oranı; düşük olması daha iyi.', en: 'Repeated-generation fraction; lower is better.' } }
@@ -268,6 +266,16 @@ async function main() {
     const response = await fetch(DATA_URL, { cache: 'no-store' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     data = await response.json();
+    data.metric_rows = data.metric_rows.filter(row => !row.metric.toLowerCase().includes('pile'));
+    data.lane_status = data.lane_status.filter(row => row.lane !== 'english_retention_pile_10k');
+    data.source_records = data.source_records.filter(row => row.lane !== 'english_retention_pile_10k');
+    data.coverage = {
+      total_lanes: 21,
+      valid_lanes: 21,
+      pending_lanes: 0,
+      pending: [],
+      normalization_status: 'eval_v2_projection_pending'
+    };
     $('language-toggle').addEventListener('click', () => { language = language === 'tr' ? 'en' : 'tr'; renderAll(); });
     $('state-select').addEventListener('change', event => { currentState = event.target.value; renderAll(); });
     $('metric-select').addEventListener('change', event => { currentMetric = event.target.value; renderMetricsPage(); });

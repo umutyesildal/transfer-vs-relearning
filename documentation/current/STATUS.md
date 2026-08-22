@@ -1,6 +1,6 @@
 # Current project status
 
-**As of:** 2026-08-16 | **Phase:** three-model scientific M0 submitted; results pending
+**As of:** 2026-08-22 | **Phase:** Pile-10k retired; eval-v2 frozen; M0 projection pending
 **Readiness:** `ready_to_measure = true`, `ready_to_train = false`
 
 ## Executive state
@@ -9,13 +9,18 @@ The project is not restarting and the existing code is not disposable. The compl
 model-screening runs, evaluation scripts, corpus tooling, Slurm launchers, scientific records,
 papers, and study notes have been preserved in one verified local monorepo.
 
-The measurement-stability boundary is now closed. Document 180 freezes eval-v1's hybrid
-architecture, exact Harness environment/dataset identities, final task set, Pile cadence,
-full/cheap bilingual factual registries, normalized schema, numeric gates, uncertainty and
-checkpoint-binding policy. Any semantic change requires eval-v2. Freeze does not authorize
-scientific execution. The exact three-model M0 configs and bounded execution contract are now
-frozen. HU read-only identity preflight passed for all three models, and the exactly authorized
-24-lane wave was submitted once. Its authorization is consumed; M1/M2 remain blocked.
+The active measurement boundary is now eval-v2. On 2026-08-22, before M1 training and before any
+M1/M2 scientific result, the user retired Pile-10k from the canonical protocol. eval-v2 inherits
+every other eval-v1 identity, metric, gate, cadence and missingness rule; WikiText remains primary
+English retention. Pile is no longer a task, lane, gate, normalization denominator or blocker, and
+no Qwen Pile retry is required. The historical eval-v1 contract, 24-lane submission, raw results
+and operational failures remain immutable evidence.
+
+All seven non-Pile lanes already exist for each of OLMo, Qwen and SmolLM, giving 21/21 source lanes
+for a hash-closed eval-v2 M0 projection. The three-model exact-prefix supplement is also complete.
+The next local boundary is to validate and normalize that retained evidence without rescoring.
+eval-v2 freeze does not authorize normalization execution, M1/M2 training, HU/Slurm work, cleanup
+or publication; `ready_to_train` remains false.
 
 The local pipeline foundation is now opt-in and fail-closed. It derives an exact epoch/update/batch
 schedule, records tokenization and optimization traces, preserves model-only epoch snapshots behind
@@ -134,9 +139,10 @@ full and 1,500-row cheap factual registries, numeric margins and checkpoint-bind
 - LM Evaluation Harness is pinned prospectively to v0.4.12 commit
   `6d642546f4688648fced259eb3302efd36ece5af` in the frozen dedicated environment lock.
 - Official WikiText BPB is primary English retention; word/byte PPL remain reported.
-- v0.4.12 already includes `pile_10k`, so no custom replacement is currently needed.
+- Pile-10k was qualified historically under eval-v1 but is retired from eval-v2; it has no active
+  task, gate, lane or retry.
 - BLiMP, HellaSwag, WinoGender slices and TurBLiMP form the frozen capability bundle;
-  TurkishMMLU and XCOPA-TR are outside eval-v1.
+  TurkishMMLU and XCOPA-TR remain outside eval-v2.
 - Project-native factual ranking, robust intersections, relation swaps, paired subject bootstrap
   and generation integrity are preserved.
 - Canonical results are long tables; one-row-per-checkpoint output is a generated view.
@@ -145,9 +151,9 @@ full and 1,500-row cheap factual registries, numeric margins and checkpoint-bind
 - Retention is raw BPB plus ΔBPB; PPL ratio is companion evidence and retention score is plot-only.
 - Training trace, typed normalized tables and presentation metadata are mandatory future outputs.
 
-See the [`evaluation read set`](../evaluation/README.md) and
-[`frozen eval-v1`](../contracts/evaluation/eval-v1.md) and
-[`freeze record`](../180_EVAL_V1_SCIENTIFIC_INPUT_AND_PROTOCOL_FREEZE_TR.md).
+See the [`evaluation read set`](../evaluation/README.md), the active
+[`eval-v2`](../contracts/evaluation/eval-v2.md), and the
+[`Pile retirement decision`](../decisions/PILE_10K_RETIREMENT_AND_EVAL_V2_DECISION_2026-08-22.md).
 
 ## Fixed design direction
 
@@ -176,28 +182,17 @@ These are constraints and evidence, not reasons to throw away existing implement
 
 ## Active work boundary
 
-The three-model scientific M0 binding package is complete:
+The active task is a local, read-only-to-source eval-v2 M0 projection:
 
-1. exact OLMo, Qwen and SmolLM model/tokenizer manifests are bound;
-2. each model has one frozen scientific config using unchanged eval-v1;
-3. each model has eight full lanes, including Turkish BPB, with no scientific limits;
-4. one operator preflights all models before creating any job, then can submit 24 lanes and one
-   family finalizer without keeping an agent blocked;
-5. V100/A100 routes explicitly fall back to RTX3090 and then RTX6000/RTXA6000.
+1. select exactly the seven completed non-Pile lanes for each of OLMo, Qwen and SmolLM;
+2. verify every selected source path and SHA-256 without rescoring;
+3. attach the completed three-model exact-prefix supplement;
+4. normalize only after 21/21 lane identity and schema checks pass;
+5. preserve the historical eval-v1 family, every Pile attempt and all failure evidence unchanged.
 
-HU read-only identity preflight passed: 39/39 focused tests plus model-manifest, environment, cache,
-config, commit, task-overlay and fresh-output checks for all three models. The single-wave
-authorization was published and the final preflight returned no blockers. Exact HU home use was
-14,545,990,549 bytes against the 32,212,254,720-byte hard limit at submit time; home writes remain
-forbidden. CPU/data preflights `461860`, `461874` and `461888` started concurrently. The 24 GPU lanes
-are dependency-bound to those checks, model finalizers are `461869`/`461883`/`461897`, and family
-finalizer is `461898`.
-
-All three data preflights subsequently passed 8/8 task resolution and the exact frozen cache gate.
-OLMo `461864` and SmolLM `461892` then failed before scoring on `gruenau2`: a foreign process used
-approximately 20.41 GiB of each exposed RTX6000 allocation, leaving 1.39 GiB free during model-load
-warm-up. No scientific metric came from those lanes. Other lanes continue running or queued; no
-automatic retry, reroute or foreign-process intervention is authorized.
+No Qwen Pile retry is needed. No evaluation, training, HU synchronization, Slurm work, cleanup or
+publication is authorized by the eval-v2 decision. M1/M2 remain blocked until their exact model,
+corpus and training contracts are frozen and separately authorized.
 
 M1/M2 training, corpus materialization and scientific scoring remain unauthorized. They must not be
 bypassed with ad-hoc commands.

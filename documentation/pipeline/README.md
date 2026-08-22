@@ -1,6 +1,6 @@
-# Experiment pipeline v1
+# Experiment pipeline — active eval-v2 boundary
 
-**Status:** scientific M0 operator frozen; later stages planner-only | **Execution authorization:** one M0 wave only
+**Status:** eval-v2 frozen; M0 retained-result projection pending; later stages planner-only | **Execution authorization:** none
 
 This layer turns one reviewed experiment manifest into a deterministic sequence:
 
@@ -13,8 +13,9 @@ identity/storage preflight
   → presentation bundle
 ```
 
-It reuses the existing trainer and evaluators. It does not replace them, choose scientific gates,
-download inputs, submit Slurm jobs or grant execution authority.
+It reuses the existing trainer and evaluators. Pile-10k is retired from eval-v2 and is never
+scheduled by the prospective study pipeline. Historical eval-v1 configs and artifacts remain
+preserved. This layer does not download inputs, submit Slurm jobs or grant execution authority.
 
 The human-oriented Turkish deep dive covering the full design, metric formulas, thresholds,
 artifacts and current scientific M0 wave is
@@ -23,7 +24,8 @@ It is explanatory reference material, not an execution contract.
 
 ## Current entry point
 
-The prospective OLMo planning example is
+The prospective OLMo planning example retains its historical filename for link compatibility but
+now binds eval-v2:
 [`../../configs/pipelines/eval_v1_olmo_epoch_trajectory_template.yaml`](../../configs/pipelines/eval_v1_olmo_epoch_trajectory_template.yaml).
 Render and validate its non-executable plan with:
 
@@ -114,11 +116,11 @@ bundle remains `test_only_non_scientific`. WikiText and TurBLiMP parity subseque
 eval-v1 was frozen by Documents 179 and 180. See the
 [`v8 recovery contract`](../contracts/evaluation/m0-olmo-v8-english-capability-recovery-v1.md).
 
-## Scientific three-model M0 entrypoint
+## Historical scientific three-model M0 entrypoint
 
 [`../../scripts/study/run_three_model_m0_evaluation.py`](../../scripts/study/run_three_model_m0_evaluation.py)
-is the current operator-facing scientific M0 entrypoint. It binds the exact OLMo, Qwen2.5-1.5B and
-SmolLM2-1.7B assets to the same frozen eval-v1 inputs. Every model receives eight independent lanes:
+is the preserved eval-v1 M0 entrypoint that was executed once. It is not the active prospective
+eval-v2 launcher. Its eight-lane-per-model topology below is historical evidence:
 
 | Lane | Work |
 |---|---|
@@ -158,12 +160,13 @@ That single wave was submitted on 2026-08-16. Its 24 GPU lane IDs are `461861`�
 The authorization is consumed. Status inspection is read-only and no second submit or automatic
 reroute is allowed.
 
-## Remaining production boundary
+## Active eval-v2 production boundary
 
-The planner, trace/artifact contracts and fail-closed M0 Harness/project/parallel adapters are
-implemented. The scientific three-model M0 raw-result layer is frozen and authorized for one
-standalone wave. Its canonical scientific normalizer and every M1/M2 training adapter remain
-separate work. The full-study plan therefore remains `execution_authorized: false`.
+The historical eval-v1 raw-result layer is immutable. eval-v2 requires seven non-Pile lanes per
+model, all 21 of which already exist, plus the completed exact-prefix supplement. The next work is
+a local hash-closed projection/normalizer that reuses those results without rescoring. Every M1/M2
+training adapter and execution contract remains separate work, so the full-study plan stays
+`execution_authorized: false`.
 
 ## Full M0→M2 study control
 

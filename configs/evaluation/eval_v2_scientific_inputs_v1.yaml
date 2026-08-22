@@ -1,0 +1,47 @@
+schema_version: 1
+name: eval-v2-scientific-inputs-v1
+status: frozen
+as_of: "2026-08-22"
+
+inheritance:
+  base: configs/evaluation/eval_v1_scientific_inputs_v1.yaml
+  base_sha256: 845cb891c9a74c98becb4c50e397124c8ab1f47aefdf91dfdd5548b4dcd3b62f
+  rule: reuse_exact_environment_cache_and_all_non_pile_input_identities
+
+harness_environment:
+  root: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3
+  environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
+  environment_identity_sha256: 9061cbc59d021676ca6b768f7688eb7da10e5460bf4919b963c9931eefcc7d71
+  access_mode: immutable_read_only_offline
+
+active_datasets:
+  wikitext:
+    repository: EleutherAI/wikitext_document_level
+    revision: 647234772b9554e208af6c826f23b99e3cac88c8
+    config: wikitext-2-raw-v1
+    split: test
+  blimp:
+    repository: nyu-mll/blimp
+    revision: 877fba0801ffb7cbd8c39c1ff314a46f053f6036
+  hellaswag:
+    repository: Rowan/hellaswag
+    revision: 218ec52e09a7e7462a5400043bb9a69a41d06b76
+  winogender:
+    repository: oskarvanderwal/winogender
+    revision: d1cdb5b708800c151d09c5d8817290d3f6ced9f4
+  turblimp:
+    repository: juletxara/turblimp
+    revision: cce94ca73ac04a0fabd9fbd7a56068261e6348ad
+
+retired_inputs:
+  pile_10k:
+    active: false
+    preserve_cached_bytes: true
+    read_for_eval_v2: false
+    score_for_eval_v2: false
+
+project_inputs:
+  trwiki_cross_domain_sha256: 15480c1f543acf6df7aac1b2a2ee15fdcb3a544814f0063a181bd7a9cb0ca4f8
+  factual_registry_manifest: configs/evaluation/registries/eval_v1_factual_registry_manifest.json
+  factual_full_bilingual_sha256: 5125850a2db24c6b570971a58e9ba8a8586cabdec9084eb0e99bbd639691d93f
+  factual_cheap_bilingual_sha256: 9619339d5d0373036d26d39c88f36976bd4a9248f64ed346241a6ce54e658fc2

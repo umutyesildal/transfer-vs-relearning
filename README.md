@@ -18,9 +18,11 @@ M2-A and M2-B are parallel sibling arms. M2-B is not a continuation of M2-A.
 
 ## Current status
 
-The project is in an **evaluation-foundation design phase**. Document 178 is the current
-end-to-end study plan, but the exact `eval-v1` contract, corpus contract, and future training
-contracts are not frozen. `ready_to_measure` and `ready_to_train` are both false. No remote,
+The project is in an **evaluation-foundation design phase**. Document 178 remains the end-to-end
+design input; the 2026-08-22 Pile retirement decision defines the current measurement boundary.
+`eval-v1` is preserved as historical execution evidence; `eval-v2` is the active Pile-free
+evaluation contract. The corpus contract and future training contracts are not frozen.
+`ready_to_measure=true` and `ready_to_train=false`. No remote,
 Slurm, training, evaluation, corpus-download, publication, or cleanup action follows from this
 README.
 

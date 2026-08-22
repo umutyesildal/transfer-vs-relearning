@@ -1,0 +1,93 @@
+schema_version: 1
+name: eval-v2
+status: frozen
+as_of: "2026-08-22"
+execution_ready: true
+execution_authorized: false
+
+inheritance:
+  base_contract: documentation/contracts/evaluation/eval-v1.md
+  base_contract_sha256: 72403598d7f9c8ba35bdfcc3e4791d097d41c6ef8f4e79c55cf9a6f34a37479e
+  base_registry: configs/evaluation/eval_v1_registry.yaml
+  base_registry_sha256: 71d6f76e91f7891f32f9a1fffbc7493e3f85373b4c0737c9a734de9ec2d67d37
+  rule: inherit_every_eval_v1_field_except_the_explicit_overrides_below
+
+decision:
+  path: documentation/decisions/PILE_10K_RETIREMENT_AND_EVAL_V2_DECISION_2026-08-22.md
+  sha256: 39e75bfa1e2f1588a861aab72014a3b40bd8aecabaa61319b76107a6c027c10c
+  timing: before_m1_training_and_before_any_m1_or_m2_scientific_result
+
+harness:
+  package: lm_eval
+  release: v0.4.12
+  git_commit: 6d642546f4688648fced259eb3302efd36ece5af
+  scientific_inputs: configs/evaluation/eval_v2_scientific_inputs_v1.yaml
+  environment_root: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3
+  environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
+  offline_only: true
+
+active_harness_task_ids:
+  - wikitext
+  - blimp
+  - hellaswag
+  - winogender_female
+  - winogender_male
+  - winogender_neutral
+  - turblimp_core
+
+retired_tasks:
+  - id: pile_10k
+    status: retired_not_in_eval_v2
+    cadence: not_in_contract
+    gate: none
+    normalization_role: excluded
+    submission_lane: forbidden
+    historical_artifacts: preserve_read_only
+    reason: redundant_secondary_control_with_model_dependent_context_and_disproportionate_resource_cost
+
+retention:
+  english_primary: wikitext_raw_bits_per_byte_and_absolute_delta_to_parent
+  english_secondary: null
+  turkish_primary: frozen_heldout_turkish_raw_bits_per_byte_and_absolute_delta_to_parent
+  turkish_cross_domain_control:
+    source: trwiki-20260601_validation
+    sha256: 15480c1f543acf6df7aac1b2a2ee15fdcb3a544814f0063a181bd7a9cb0ca4f8
+    documents: 10034
+  report_always:
+    - raw_value
+    - parent_value
+    - absolute_delta
+    - word_perplexity
+    - byte_perplexity
+    - perplexity_ratio_to_parent
+
+scientific_gates:
+  english_retention:
+    wikitext_delta_bpb_max: 0.32192809488736235
+    wikitext_equivalent_byte_perplexity_ratio_max: 1.25
+    blimp_absolute_accuracy_drop_max: 0.05
+    hellaswag_acc_norm_absolute_drop_max: 0.05
+    winogender_role: diagnostic_no_gate
+  inherited_non_english_and_factual_gates: unchanged_from_eval_v1
+
+canonical_lane_policy:
+  lanes_per_model: 7
+  three_model_total_lanes: 21
+  lane_ids:
+    - english_retention_wikitext
+    - english_grammar_blimp
+    - english_capability
+    - turkish_capability
+    - turkish_perplexity
+    - factual_access
+    - generation_integrity
+  exact_prefix_supplement_required: true
+  m0_reuse: hash_closed_projection_without_rescoring
+
+pipeline:
+  applies_to: [M0, M1, M2-A, M2-B]
+  checkpoint_policy: inherited_unchanged_from_eval_v1
+  result_schema: documentation/evaluation/RESULT_SCHEMA_V1.md
+  missingness: missing_is_not_zero
+
+freeze_blockers: []

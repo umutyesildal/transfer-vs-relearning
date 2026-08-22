@@ -1,7 +1,7 @@
 schema_version: 1
-matrix_id: olmo-qwen-smollm-m0-to-m2-eval-v1
+matrix_id: olmo-qwen-smollm-m0-to-m2-eval-v2
 status: prepared
-as_of: "2026-08-16"
+as_of: "2026-08-22"
 execution_authorized: false
 
 state_design:
@@ -25,15 +25,15 @@ parallelism:
 
 workflow_template:
   path: configs/studies/m0_to_m2_eval_v1_template.yaml
-  sha256: 296e674f087d32b28dd3a0eef7a2aaf38a12eda4c523adb5e68e6a006912af0c
+  sha256: dab6615745be934268667baf0205dee892704d2f08dad49319a2e3ee8e2f1256
 
 contracts:
   evaluation:
     status: frozen
     execution_authorized: false
-    path: documentation/contracts/evaluation/eval-v1.md
-    sha256: 72403598d7f9c8ba35bdfcc3e4791d097d41c6ef8f4e79c55cf9a6f34a37479e
-    blocker: scientific_m0_execution_not_authorized
+    path: documentation/contracts/evaluation/eval-v2.md
+    sha256: 95eec6fc5a9dd7ce6da3185dfe20e2a183ad3850194c15f88a1299f09a43c6a3
+    blocker: canonical_m0_eval_v2_projection_not_yet_normalized
   m1_training:
     status: not_frozen
     execution_authorized: false

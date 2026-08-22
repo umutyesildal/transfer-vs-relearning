@@ -49,7 +49,8 @@ architecture and normalized schema own the previously missing integration surfac
 
 ## R2 — Evaluation qualification and freeze
 
-Status: completed. eval-v1 is frozen; execution is not authorized.
+Status: completed. eval-v1 is preserved historically; eval-v2 is the frozen active protocol;
+execution is not authorized.
 
 - pin LM Evaluation Harness and exact task/dataset revisions;
 - validate task IDs, prompts, few-shot settings, metrics, and availability;
@@ -57,20 +58,21 @@ Status: completed. eval-v1 is frozen; execution is not authorized.
 - qualify the factual hard suite and generic degeneration panel;
 - freeze normalized checkpoint rows, confidence intervals, missingness, cheap/full cadence, and
   gates;
-- create `eval-v1` contract and acceptance tests.
+- create the versioned evaluation contract and acceptance tests.
 
-Exit condition: semantic changes require `eval-v2`; all states use `eval-v1` unchanged.
+Exit condition: all future states use eval-v2 unchanged; another semantic change requires eval-v3.
 
 Freeze evidence:
 
 - [`../evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md`](../evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md);
 - [`../evaluation/RESULT_SCHEMA_V1.md`](../evaluation/RESULT_SCHEMA_V1.md);
 - [`../contracts/evaluation/eval-v1.md`](../contracts/evaluation/eval-v1.md);
-- [`../../configs/evaluation/eval_v1_registry.yaml`](../../configs/evaluation/eval_v1_registry.yaml).
+- [`../../configs/evaluation/eval_v1_registry.yaml`](../../configs/evaluation/eval_v1_registry.yaml);
+- [`../contracts/evaluation/eval-v2.md`](../contracts/evaluation/eval-v2.md);
+- [`../../configs/evaluation/eval_v2_registry.yaml`](../../configs/evaluation/eval_v2_registry.yaml).
 
-Document 180 binds the exact scientific dataset/environment identities, Pile cadence,
-TurkishMMLU/XCOPA exclusions, full/cheap factual registries, numeric margins and the
-per-training-contract checkpoint-binding rule. Any semantic change requires eval-v2.
+Document 180 preserves the eval-v1 freeze. The 2026-08-22 Pile retirement decision creates
+eval-v2, removes only Pile-10k, and inherits the remaining exact identities, gates and cadence.
 
 ## R3 — Pipeline productionization
 
@@ -91,11 +93,10 @@ Current local evidence: [`../pipeline/README.md`](../pipeline/README.md), the pi
 `configs/pipelines/`, the full-study config under `configs/studies/`, the M0 entrypoint under
 `scripts/study/`, the
 [`three-model planning contract`](../contracts/three-model-study-matrix-v1.md), and fail-closed
-planner/trace/artifact/study tests. The three scientific M0 bindings and one 24-lane family
-operator are frozen. The exact standalone wave was submitted once after HU read-only identity and
-30 GiB home gates passed; its authorization is consumed. Remaining work is read-only monitoring,
-raw completion, complete-result normalization and figure rendering. Later-state training adapters
-remain blocked without changing eval-v1 semantics.
+planner/trace/artifact/study tests. The historical 24-lane eval-v1 operator and evidence are
+preserved. eval-v2 has 21 required non-Pile lanes available and now needs a hash-closed local
+projection and normalization without rescoring. Later-state training adapters remain blocked
+without changing eval-v2 semantics.
 
 ## R4 — Corpus contract
 
@@ -110,7 +111,7 @@ Exit condition: corpus inputs and splits are immutable and compatible with the M
 - freeze M1 model/recipe selection rules and checkpoint grid;
 - freeze matched M2-A/M2-B objectives, total tokens, data order, seeds, sequence policy, and factual
   replacement mechanism;
-- bind `eval-v1` without modifying it.
+- bind `eval-v2` without modifying it.
 
 Exit condition: exact contracts are reviewable before any new training.
 

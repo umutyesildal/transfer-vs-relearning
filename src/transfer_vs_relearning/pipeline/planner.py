@@ -121,7 +121,7 @@ def _training_schedule(
         raise ValueError("Training rows and batch factors must be positive")
     if expected_train_rows % effective_batch:
         raise ValueError(
-            "eval-v1 epoch mapping requires training rows divisible by effective row batch; "
+            "eval-v2 epoch mapping requires training rows divisible by effective row batch; "
             "freeze an explicit non-uniform last-step trace before using this recipe"
         )
     updates_per_epoch = expected_train_rows // effective_batch
@@ -351,9 +351,9 @@ def build_pipeline_plan(config_path: Path, *, repo_root: Path | None = None) -> 
     mode = str(training_plan.get("trajectory_mode", "prospective"))
     tracking = _require_mapping(training_plan, "tracking")
     if tracking.get("dense_cadence") != "every_epoch_end_including_parent":
-        raise ValueError("eval-v1 prospective tracking requires every epoch end including parent")
+        raise ValueError("eval-v2 prospective tracking requires every epoch end including parent")
     if tracking.get("epoch_snapshot_policy") != "model_only_every_epoch":
-        raise ValueError("eval-v1 requires model-only epoch snapshots")
+        raise ValueError("eval-v2 requires model-only epoch snapshots")
     if tracking.get("storage_preflight_required") is not True:
         raise ValueError("Epoch snapshots require a storage preflight")
     for required in ("fact_exposures_per_epoch", "estimated_snapshot_bytes", "minimum_free_bytes"):
@@ -382,8 +382,8 @@ def build_pipeline_plan(config_path: Path, *, repo_root: Path | None = None) -> 
             )
 
     evaluation = _require_mapping(payload, "evaluation")
-    if evaluation.get("contract") != "eval-v1":
-        raise ValueError("This pipeline planner currently supports eval-v1 only")
+    if evaluation.get("contract") != "eval-v2":
+        raise ValueError("This pipeline planner currently supports eval-v2 only")
     if mode == "prospective":
         points = _prospective_points(
             epochs=epochs,

@@ -156,7 +156,8 @@ frozen:
   and gate directions;
 - prove deterministic identity, resume safety, and base/checkpoint correctness with tests.
 
-Document 178 is a design input, not the frozen `eval-v1` contract.
+Document 178 is a design input, not the active frozen `eval-v2` contract. eval-v1 remains preserved
+historical execution evidence.
 
 ## Reproducibility and artifacts
 

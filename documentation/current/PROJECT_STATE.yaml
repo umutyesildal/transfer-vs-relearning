@@ -1,11 +1,11 @@
 schema_version: 1
-as_of: "2026-08-20"
+as_of: "2026-08-22"
 project: transfer-vs-relearning
 
 repository:
   layout: monorepo_v1
   branch: agent/m0-evaluation
-  status: m0_qwen_pile_single_lane_recovery_submitted_pending_resources
+  status: pile_10k_retired_eval_v2_frozen_m0_projection_pending
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -84,7 +84,7 @@ scientific_design:
       - M2-A
       - M2-B
     matched_budget_required: true
-  current_design_plan: documentation/178_END_TO_END_EXPERIMENTAL_PLAN_AND_EVALUATION_PROTOCOL_EN.md
+  current_design_plan: documentation/decisions/PILE_10K_RETIREMENT_AND_EVAL_V2_DECISION_2026-08-22.md
   current_timeline: documentation/current/PROJECT_TIMELINE_AND_CURRENT_POSITION_TR.md
   supervisor_realignments:
     - documentation/144_SUPERVISOR_FEEDBACK_AND_SCIENTIFIC_REALIGNMENT_TR.md
@@ -100,12 +100,29 @@ readiness:
   selected_primary_model: null
 
 evaluation_target:
-  contract_name: eval-v1
+  contract_name: eval-v2
   status: frozen_execution_not_authorized
-  contract: documentation/contracts/evaluation/eval-v1.md
-  freeze_record: documentation/180_EVAL_V1_SCIENTIFIC_INPUT_AND_PROTOCOL_FREEZE_TR.md
-  registry: configs/evaluation/eval_v1_registry.yaml
-  scientific_inputs: configs/evaluation/eval_v1_scientific_inputs_v1.yaml
+  contract: documentation/contracts/evaluation/eval-v2.md
+  contract_sha256: 95eec6fc5a9dd7ce6da3185dfe20e2a183ad3850194c15f88a1299f09a43c6a3
+  freeze_record: documentation/decisions/PILE_10K_RETIREMENT_AND_EVAL_V2_DECISION_2026-08-22.md
+  registry: configs/evaluation/eval_v2_registry.yaml
+  registry_sha256: 0721412c651f5b112f531e69b53c98ccdb3633bee4888571bd7039d3f693229d
+  scientific_inputs: configs/evaluation/eval_v2_scientific_inputs_v1.yaml
+  scientific_inputs_sha256: e6afb5ed3cd210d9c429622995ccbf8a0da5fee4cf444e6fc979d8377d68b879
+  supersedes:
+    contract: documentation/contracts/evaluation/eval-v1.md
+    status: frozen_historical_preserved
+  pile_10k_retirement:
+    status: retired_not_in_canonical_protocol
+    active_task: false
+    active_gate: false
+    active_lane: false
+    retry_authorized: false
+    historical_artifacts_preserved: true
+    canonical_m0_non_pile_lanes_available: 21
+    canonical_m0_non_pile_lanes_required: 21
+    normalization_status: pending_hash_closed_local_projection
+    decision: documentation/decisions/PILE_10K_RETIREMENT_AND_EVAL_V2_DECISION_2026-08-22.md
   factual_registry_manifest: configs/evaluation/registries/eval_v1_factual_registry_manifest.json
   inventory: documentation/evaluation/EVALUATOR_INVENTORY_V1.md
   task_qualification: documentation/evaluation/LM_EVAL_TASK_QUALIFICATION_V1.md
@@ -215,7 +232,7 @@ evaluation_target:
   architecture: hybrid_harness_custom_factual_and_normalizer
   canonical_result_shape: long_tables_with_generated_checkpoint_view
   pipeline:
-    status: scientific_three_model_m0_submitted_later_stages_blocked
+    status: eval_v2_m0_21_of_21_available_projection_pending_later_stages_blocked
     documentation: documentation/pipeline/README.md
     deep_dive_guide: documentation/evaluation/EVAL_V1_AND_END_TO_END_PIPELINE_DEEP_DIVE_TR.md
     prospective_template: configs/pipelines/eval_v1_olmo_epoch_trajectory_template.yaml
@@ -225,7 +242,7 @@ evaluation_target:
     full_study_stage_count: 19
     execution_adapter_ready: false
     m0_execution_adapter_ready: true
-    m0_adapter_status: scientific_three_model_24_lane_family_submitted_once
+    m0_adapter_status: historical_eval_v1_24_lane_family_preserved_eval_v2_uses_21_lane_projection
     m0_parallel_entrypoint: scripts/study/run_three_model_m0_evaluation.py
     execution_authorized: false
     three_model_matrix:
@@ -234,8 +251,10 @@ evaluation_target:
       contract_sha256: d2ddd3f9ca1a4593a4c61dc87e6415466fe7b18c719ba797a7451cd9eb32039d
       exact_prefix_amendment: documentation/contracts/three-model-study-matrix-v1-exact-prefix-amendment.md
       exact_prefix_amendment_sha256: adba4b49528ecd03b8dd702d2ea627dcca71c53e718c270651ba154d345f3949
+      pile_retirement_amendment: documentation/contracts/three-model-study-matrix-v1-pile-retirement-amendment.md
+      pile_retirement_amendment_sha256: af9f7019bc0a116eced67fff9591b8c5eb2e443c66b2fc2527042be667b9165b
       config: configs/studies/three_model_m0_to_m2_matrix_v1.yaml
-      config_sha256: 9b22c719d6d04127e91db15017d6dd97274fdeac7f689ab5bd0e4b55e32bc214
+      config_sha256: 369c67b03c22af677e05b866d002c5694c4f5c9b935be56fce25f31c5a6aafc8
       entrypoint: scripts/study/run_model_matrix.py
       implementation_commit: f95d7418e901755cca4380d276f0395856fa975c
       models: [olmo, qwen, smollm]
@@ -499,7 +518,7 @@ evaluation_target:
       m1_or_m2_authorized: false
       automatic_retry_authorized: false
     m0_qwen_pile_single_lane_recovery:
-      status: submitted_pending_resources
+      status: terminal_failed_pre_scoring_retired_from_eval_v2
       contract: documentation/contracts/evaluation/m0-qwen-pile-single-lane-a100-recovery-v1.md
       contract_sha256: 88f135f74c8e1932660128e4e36f99cdb13923be15fb7ba82c6c3a2a98c40332
       config: configs/evaluation/m0_qwen_pile_single_lane_recovery_v1.yaml
@@ -534,7 +553,12 @@ evaluation_target:
         qwen: "472811"
         smollm: "472812"
       family_finalizer: "472813"
-      scheduler_estimate: "2026-08-22T23:05:06"
+      terminal_record: documentation/records/evaluation/M0_QWEN_PILE_SINGLE_LANE_TERMINAL_RESULT_2026-08-22.md
+      terminal_classification: operational_failed_pre_scoring_not_model_score
+      lane_returncode: 1
+      lane_duration_seconds_approx: 553
+      valid_scientific_score: false
+      eval_v2_retry_required: false
       submission_manifest_sha256: af6ed4e5f87426d9120d2b31c0e20d8b5c122db6dc092161e4909b44a74a502f
       recovery_manifest_sha256: 11922e408b53f46d9616d2069ee04d9890f0d59431b2a6f116abbabcf649a480
       route_probe_sha256: 0d63ff5bb3f2915e482287aaf45b3bbdf5effb4387a6e4332f52b278194f29d4
@@ -917,8 +941,10 @@ authorization:
       resubmission_authorized: false
 
 next_decision_required:
-  subject: complete_remaining_m0_and_freeze_normalization_boundary
+  subject: validate_hash_closed_eval_v2_m0_projection_and_freeze_normalization_boundary
   note: >-
-    The three-model M0 exact-prefix panel is complete and hash-verified. Keep it immutable while the
-    independent Qwen Pile recovery reaches terminal state; then freeze a separate canonical M0
-    normalization/comparison boundary. No normalization, M1/M2 work or cleanup is authorized yet.
+    Pile-10k is retired prospectively and no retry is required. The three-model M0 exact-prefix
+    panel is complete and the 21 required non-Pile lanes already exist. Preserve all historical
+    evidence, validate a hash-closed local eval-v2 projection, then freeze the canonical M0
+    normalization/comparison boundary. No normalization execution, M1/M2 work or cleanup is
+    authorized yet.
