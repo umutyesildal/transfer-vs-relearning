@@ -187,7 +187,10 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert matrix["execution_authorized"] is False
 
     projection = state["evaluation_target"]["pipeline"]["m0_eval_v2_projection"]
-    assert projection["status"] == "prepared_hash_closed_projection_v1a_unexecuted"
+    assert projection["status"] == "execution_blocked_by_config_flag_v1a"
+    assert projection["execution_attempt_record"] == (
+        "documentation/records/evaluation/M0_EVAL_V2_PROJECTION_V1A_EXECUTION_BLOCKED_2026-08-22.md"
+    )
     assert projection["canonical_lane_count"] == 21
     assert projection["exact_prefix_supplement_count"] == 3
     assert projection["source_discovery_authorized"] == "consumed_passed"

@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 9226369c5caeb936c81d73d7c37053d67507d5e18a377890428d5c16eff07a41
+  full_state_sha256: cbbb5421839198be8d5c6d6b456c5c0463f262fda23aa2d227e34c1d9fd069ff
   role: context_projection_only
   may_expand_authority: false
 
@@ -39,7 +39,7 @@ evaluation:
   source_binding_discovery: complete_read_only_24_bindings
 
 next_boundary:
-  subject: authorize_hash_closed_m0_projection_v1a
+  subject: prepare_execution_enabled_m0_projection_v1b
   allowed_now:
     - local_read_only_source_identity_validation
     - local_projection_design_and_tests
