@@ -1,6 +1,6 @@
 # Current project status
 
-**As of:** 2026-08-22 | **Phase:** Pile-10k retired; eval-v2 frozen; M0 projection complete; v1c audit passed; v1d/v1e normalization attempts stopped on field-binding bugs; v1f retry pending authorization
+**As of:** 2026-08-22 | **Phase:** Pile-10k retired; eval-v2 frozen; M0 projection, source audit and canonical normalization complete; M1 contract pending
 **Readiness:** `ready_to_measure = true`, `ready_to_train = false`
 
 ## Executive state
@@ -35,10 +35,10 @@ summary, factual robust evidence is tabular, and the primary held-out Turkish co
 this M0 lane. Both append-only results are preserved. The authorized path-aware v1c audit now
 binds exact JSON paths, verified CSV aggregates and denominator metadata across all 24 source
 rows and 42 metric observations. It performed no rescoring or historical-source mutation, and
-the normalization output root remained absent. The authorized v1d attempt stopped before writing
-tables on an operator key mismatch and its partial root is preserved; v1e stopped earlier on the
-corresponding adapter regression. Both are recorded. A v1f correction with a new fresh root is
-prepared and requires exact contract/config authorization. M1/M2 work and cleanup remain closed.
+the normalization output root remained absent. The v1d/v1e failures are preserved append-only.
+The authorized v1f correction now completes the audit and writes 42 canonical metric observations
+under its fresh root, with no source mutation or rescoring. M0 normalization is complete pending
+scientific interpretation; M1/M2 work and cleanup remain closed.
 eval-v2 freeze does not authorize normalization execution, M1/M2 training, HU/Slurm work, cleanup
 or publication; `ready_to_train` remains false.
 
@@ -207,12 +207,13 @@ These are constraints and evidence, not reasons to throw away existing implement
 
 ## Active work boundary
 
-The completed bounded task was the read-only eval-v2 M0 metric-schema audit v1c:
+The completed bounded tasks were the read-only eval-v2 M0 metric-schema audit v1c and the v1f
+canonical normalization:
 
 1. read the completed v1b projection registry and its declared lane artifacts;
 2. verify every selected source path and SHA-256 without model load, inference or rescoring;
 3. resolve the corrected exact JSON paths and factual CSV aggregates for all 24 lanes and report missing/ambiguous fields;
-4. the audit passed with 24 source rows and 42 observations; normalization still requires a new exact authorization;
+4. the audit passed with 24 source rows and 42 observations, and v1f wrote the canonical 42-row metric table;
 5. preserve the historical eval-v1 family, every Pile attempt and all failure evidence unchanged.
 
 No Qwen Pile retry is needed. No normalization, new evaluation, training, HU synchronization,

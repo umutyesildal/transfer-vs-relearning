@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m0-evaluation
-  status: pile_10k_retired_eval_v2_frozen_m0_normalization_correction_regression_retry_pending
+  status: pile_10k_retired_eval_v2_frozen_m0_normalization_complete_m1_contract_pending
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -807,7 +807,7 @@ current_evidence:
     training_authorized: false
     evaluation_authorized: false
   m0_metric_normalization:
-    status: normalization_failed_two_field_binding_regressions_retry_pending
+    status: normalization_complete_pending_m0_interpretation
     supersedes_contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1.md
     supersedes_config: configs/evaluation/eval_v2_m0_metric_normalization_v1.yaml
     prior_contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1a.md
@@ -864,6 +864,12 @@ current_evidence:
     final_retry_config_sha256: 3781cd62e6bfa1d3484bd87f54b44000eb9aae35a8b0260ad31b93cc15d56047
     final_retry_output_root: /vol/tmp2/yesildau/eval_v2_m0_metric_normalization_v1f
     final_corrected_operator_commit: 90fe7d9
+    execution_result: documentation/evaluation/M0_METRIC_NORMALIZATION_V1F_EXECUTION_RESULT_2026-08-22.md
+    execution_result_sha256: ad1e8c9712c53d468b7ea0ce45ae017533263d87a36739e80795f8d1cb8149cf
+    final_output_root: /vol/tmp2/yesildau/eval_v2_m0_metric_normalization_v1f
+    final_inventory_sha256: c0da9b2b38965eafecacd3e9c8fd79daa1543890403c83d053c4bde4595dfea7
+    metric_rows_written: 42
+    normalization_status: complete_pending_m0_interpretation
   vngrs_corpus_route:
     role: conditional_primary_materialization_candidate
     materialized: false
@@ -1081,7 +1087,7 @@ authorization:
       resubmission_authorized: false
 
 next_decision_required:
-  subject: authorize_m0_metric_normalization_execution_v1f
+  subject: prepare_m1_training_contract
   note: >-
     Pile-10k is retired prospectively and no retry is required. The three-model M0 exact-prefix
     panel is complete and the 21 required non-Pile lanes already exist. The v1b reference
@@ -1090,8 +1096,9 @@ next_decision_required:
     canonical metrics use path-specific lm-eval/project schemas and factual robust evidence is in
     declared CSVs. The append-only result is preserved. The authorized path-aware v1c audit now
     passes with 24/24 source rows and 42/42 metric observations, with no source mutation and no
-    output-root creation. v1d stopped before output on an operator key mismatch; its partial root
-    is preserved. v1e stopped earlier on the corresponding adapter regression and its root is
-    absent. A v1f correction now separates both field schemas and uses a new fresh root; exact
-    authorization bound to both v1f hashes is required before pushing or running it.
+    output-root creation. v1d/v1e failures are preserved append-only. The authorized v1f
+    correction now passes with 24/24 source rows and 42/42 observations, writes the five tracked
+    canonical artifacts under the fresh v1f root, and leaves all historical sources unchanged.
+    M0 normalization is complete pending interpretation; prepare the separate M1 training
+    contract. M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.
     M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.
