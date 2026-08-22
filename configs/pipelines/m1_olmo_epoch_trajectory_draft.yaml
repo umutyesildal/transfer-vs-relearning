@@ -58,8 +58,8 @@ outputs:
 inputs:
   eval_registry: configs/evaluation/eval_v2_registry.yaml
   eval_registry_sha256: 0721412c651f5b112f531e69b53c98ccdb3633bee4888571bd7039d3f693229d
-  m0_model_manifest: __FROZEN_M0_OLMO_MODEL_MANIFEST__
-  m0_model_manifest_sha256: __FROZEN_M0_OLMO_MODEL_MANIFEST_SHA256__
+  m0_model_manifest: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
+  m0_model_manifest_sha256: 8702b80d5b7e4c996c8ce2ff5fe771ada08ab0080bde1926c0b1f53c607303dc
   m1_checkpoint_manifest: __FROZEN_M1_OLMO_CHECKPOINT_MANIFEST__
   m1_checkpoint_manifest_sha256: __FROZEN_M1_OLMO_CHECKPOINT_MANIFEST_SHA256__
   m1_training_manifest: __FROZEN_M1_OLMO_TRAINING_MANIFEST__

@@ -16,7 +16,7 @@ dataset:
 model:
   model_id: HuggingFaceTB/SmolLM2-1.7B
   model_revision: effd688a12921b4cc83e3312b6feb579f70f9c71
-  base_model_manifest: __FROZEN_M0_SMOLLM_MODEL_MANIFEST__
+  base_model_manifest: /vol/fob-vol6/mi25/yesildau/transfer-vs-relearning/artifacts/models/HuggingFaceTB__SmolLM2-1.7B/model_manifest.json
 
 training:
   run_name: m1_matched_epoch_dense_smollm_seed42

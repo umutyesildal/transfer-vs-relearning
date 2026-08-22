@@ -16,7 +16,7 @@ dataset:
 model:
   model_id: Qwen/Qwen2.5-1.5B
   model_revision: 8faed761d45a263340a0528343f099c05c9a4323
-  base_model_manifest: __FROZEN_M0_QWEN_MODEL_MANIFEST__
+  base_model_manifest: /vol/tmp2/yesildau/m1_cross_family_screen_v1/models/Qwen__Qwen2.5-1.5B/model_manifest.json
 
 training:
   run_name: m1_matched_epoch_dense_qwen_seed42

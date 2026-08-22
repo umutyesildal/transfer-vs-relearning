@@ -58,8 +58,8 @@ outputs:
 inputs:
   eval_registry: configs/evaluation/eval_v2_registry.yaml
   eval_registry_sha256: 0721412c651f5b112f531e69b53c98ccdb3633bee4888571bd7039d3f693229d
-  m0_model_manifest: __FROZEN_M0_QWEN_MODEL_MANIFEST__
-  m0_model_manifest_sha256: __FROZEN_M0_QWEN_MODEL_MANIFEST_SHA256__
+  m0_model_manifest: /vol/tmp2/yesildau/m1_cross_family_screen_v1/models/Qwen__Qwen2.5-1.5B/model_manifest.json
+  m0_model_manifest_sha256: c9d3562b717784251fe14c2b7972660fe4a20fe4687e15f69746bc1713d2d4fb
   m1_checkpoint_manifest: __FROZEN_M1_QWEN_CHECKPOINT_MANIFEST__
   m1_checkpoint_manifest_sha256: __FROZEN_M1_QWEN_CHECKPOINT_MANIFEST_SHA256__
   m1_training_manifest: __FROZEN_M1_QWEN_TRAINING_MANIFEST__

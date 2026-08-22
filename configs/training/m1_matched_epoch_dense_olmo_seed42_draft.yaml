@@ -16,7 +16,7 @@ dataset:
 model:
   model_id: allenai/OLMo-2-0425-1B
   model_revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
-  base_model_manifest: __FROZEN_M0_OLMO_MODEL_MANIFEST__
+  base_model_manifest: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
 
 training:
   run_name: m1_matched_epoch_dense_olmo_seed42
