@@ -1,6 +1,6 @@
 # Current project status
 
-**As of:** 2026-08-22 | **Phase:** Pile-10k retired; eval-v2 frozen; M0 projection complete; v1c audit passed; v1d normalization stopped on an operator bug; v1e retry pending authorization
+**As of:** 2026-08-22 | **Phase:** Pile-10k retired; eval-v2 frozen; M0 projection complete; v1c audit passed; v1d/v1e normalization attempts stopped on field-binding bugs; v1f retry pending authorization
 **Readiness:** `ready_to_measure = true`, `ready_to_train = false`
 
 ## Executive state
@@ -36,9 +36,9 @@ this M0 lane. Both append-only results are preserved. The authorized path-aware 
 binds exact JSON paths, verified CSV aggregates and denominator metadata across all 24 source
 rows and 42 metric observations. It performed no rescoring or historical-source mutation, and
 the normalization output root remained absent. The authorized v1d attempt stopped before writing
-tables on an operator key mismatch; its partial root is preserved as failure evidence. A v1e
-correction with a new fresh root is prepared and requires exact contract/config authorization.
-M1/M2 work and cleanup remain closed.
+tables on an operator key mismatch and its partial root is preserved; v1e stopped earlier on the
+corresponding adapter regression. Both are recorded. A v1f correction with a new fresh root is
+prepared and requires exact contract/config authorization. M1/M2 work and cleanup remain closed.
 eval-v2 freeze does not authorize normalization execution, M1/M2 training, HU/Slurm work, cleanup
 or publication; `ready_to_train` remains false.
 

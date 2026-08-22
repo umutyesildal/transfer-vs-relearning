@@ -1,0 +1,92 @@
+schema_version: 1
+name: eval-v2-m0-metric-normalization-v1f
+status: frozen_corrected_normalization_retry_pending_exact_authorization
+as_of: "2026-08-22"
+execution_authorized: true
+normalization_authorized: true
+rescore_authorized: false
+historical_sources_read_only: true
+eval_contract: eval-v2
+contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1f.md
+contract_sha256: fdc4e89f1dcfdd0a84b0fbb0b823a73370948992fe790cc08cdf3553e197352a
+
+identities:
+  eval_contract:
+    path: documentation/contracts/evaluation/eval-v2.md
+    sha256: 95eec6fc5a9dd7ce6da3185dfe20e2a183ad3850194c15f88a1299f09a43c6a3
+  eval_registry:
+    path: configs/evaluation/eval_v2_registry.yaml
+    sha256: 0721412c651f5b112f531e69b53c98ccdb3633bee4888571bd7039d3f693229d
+  result_schema:
+    path: documentation/evaluation/RESULT_SCHEMA_V1.md
+    sha256: 239d00c83aaa0a9bc169a22dfcfe9ece6f8a5b3d5be4f55dabbf254d7b2b64c1
+
+input_projection:
+  contract_path: documentation/contracts/evaluation/eval-v2-m0-projection-v1b.md
+  contract_sha256: 4ee1d08f06f789c01f563cccd7ef80772fa403f51a7fe2bb440c577418f42500
+  config_path: configs/evaluation/eval_v2_m0_projection_v1b.yaml
+  config_sha256: debc12012e77b323ac1ad73331a5ab4a7d66a7900e5b16efeaa3c274ad1d3f82
+  root: /vol/tmp2/yesildau/eval_v2_m0_three_model_projection_v1b
+  source_registry: /vol/tmp2/yesildau/eval_v2_m0_three_model_projection_v1b/source_registry.jsonl
+  source_registry_sha256: a0dca252afe7c1d03e458a60a8b48d7e8d8858e0ad95e6e8be696311a0b34265
+  projection_manifest: /vol/tmp2/yesildau/eval_v2_m0_three_model_projection_v1b/projection_manifest.json
+  projection_manifest_sha256: 9081b8eabef1ddfe1139754176cdcb1a26757fa3367d511cf81183536c8a9e0c
+  required_source_rows: 24
+  canonical_non_pile_rows: 21
+  exact_prefix_rows: 3
+
+models: [olmo, qwen, smollm]
+required_lane_ids:
+  - english_retention_wikitext
+  - english_grammar_blimp
+  - english_capability
+  - turkish_capability
+  - turkish_perplexity
+  - factual_access
+  - generation_integrity
+
+metric_mapping_version: eval-v2-m0-normalization-map-v1c
+primary_retention_unit: bits_per_byte
+parent_comparison_at_m0: not_applicable
+missingness_policy: missing_is_not_zero
+bootstrap_policy: copy_verified_source_intervals_without_recomputation
+output_root: /vol/tmp2/yesildau/eval_v2_m0_metric_normalization_v1f
+
+operator:
+  module: src/transfer_vs_relearning/study/m0_metric_normalization.py
+  script: scripts/study/normalize_m0_eval_v2.py
+  module_sha256: 6ea61e845685c9d8a9f6ddc79bac7e7c1a0c2d51ac85610a1f3df886c394fcfd
+  script_sha256: 79772ab237061c29a635fcc5303c330af2387f889681d339cdb18c3ffc984427
+  status: corrected_audit_writer_field_separation
+
+prior_audit:
+  contract_sha256: 23f215696f25a9a3287dd058f3c50ff9e7f4a441cfed578756c4df68f0b21ad1
+  config_sha256: 7127a8fd66b494347a1d7c71cee92775e49283493d3be5ebd8e99e0b59f1dffc
+  result_path: documentation/evaluation/M0_METRIC_SOURCE_AUDIT_V1C_2026-08-22.md
+  result_sha256: 58a9295d686b732601f1bed538d58dcfa4f8cc6e05eb9a10b6c2145d07b4927a
+  status: audit_pass_24_rows_42_observations
+
+failed_attempts:
+  v1d:
+    contract_sha256: bc258b243c053f938e9e4fa6a30fe3b6628531aa62204a4c4386e8d6bcbe37cf
+    config_sha256: 206f0c23e4f16b5c02c2b4e897b8ead9960b00e3c12fa6ef640e03d63c964b66
+    output_root: /vol/tmp2/yesildau/eval_v2_m0_metric_normalization_v1d
+    status: operator_key_error_after_root_creation
+  v1e:
+    contract_sha256: c1be111e18a294db60baec57a0694089524f72458b76cdc8906a405546b71e0f
+    config_sha256: b2eee5b475976cfe37061a001232846920ea2617e07d72515bb7a9b62f840c6c
+    output_root: /vol/tmp2/yesildau/eval_v2_m0_metric_normalization_v1e
+    status: adapter_key_error_before_root_creation
+
+prohibitions:
+  - model_load_or_inference
+  - rescore_any_lane
+  - include_pile_10k
+  - mutate_or_delete_historical_sources
+  - overwrite_existing_output_root
+  - infer_missing_metrics
+  - recompute_bootstrap_or_significance
+  - apply_scientific_gates
+  - select_a_primary_model
+  - m1_or_m2_training
+  - cleanup_or_deletion

@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m0-evaluation
-  status: pile_10k_retired_eval_v2_frozen_m0_normalization_operator_failure_retry_pending
+  status: pile_10k_retired_eval_v2_frozen_m0_normalization_correction_regression_retry_pending
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -807,7 +807,7 @@ current_evidence:
     training_authorized: false
     evaluation_authorized: false
   m0_metric_normalization:
-    status: normalization_failed_operator_key_error_retry_pending
+    status: normalization_failed_two_field_binding_regressions_retry_pending
     supersedes_contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1.md
     supersedes_config: configs/evaluation/eval_v2_m0_metric_normalization_v1.yaml
     prior_contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1a.md
@@ -856,6 +856,14 @@ current_evidence:
     retry_config_sha256: b2eee5b475976cfe37061a001232846920ea2617e07d72515bb7a9b62f840c6c
     retry_output_root: /vol/tmp2/yesildau/eval_v2_m0_metric_normalization_v1e
     corrected_operator_commit: 9ae239a
+    retry_failure_result: documentation/evaluation/M0_METRIC_NORMALIZATION_V1E_EXECUTION_FAILURE_2026-08-22.md
+    retry_failure_result_sha256: 492538545a302d532aad07cba8faae979e358a90a7e86f0ae7aef54c709c26c2
+    final_retry_contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1f.md
+    final_retry_contract_sha256: fdc4e89f1dcfdd0a84b0fbb0b823a73370948992fe790cc08cdf3553e197352a
+    final_retry_config: configs/evaluation/eval_v2_m0_metric_normalization_v1f.yaml
+    final_retry_config_sha256: 3781cd62e6bfa1d3484bd87f54b44000eb9aae35a8b0260ad31b93cc15d56047
+    final_retry_output_root: /vol/tmp2/yesildau/eval_v2_m0_metric_normalization_v1f
+    final_corrected_operator_commit: 90fe7d9
   vngrs_corpus_route:
     role: conditional_primary_materialization_candidate
     materialized: false
@@ -1073,7 +1081,7 @@ authorization:
       resubmission_authorized: false
 
 next_decision_required:
-  subject: authorize_m0_metric_normalization_execution_v1e
+  subject: authorize_m0_metric_normalization_execution_v1f
   note: >-
     Pile-10k is retired prospectively and no retry is required. The three-model M0 exact-prefix
     panel is complete and the 21 required non-Pile lanes already exist. The v1b reference
@@ -1083,6 +1091,7 @@ next_decision_required:
     declared CSVs. The append-only result is preserved. The authorized path-aware v1c audit now
     passes with 24/24 source rows and 42/42 metric observations, with no source mutation and no
     output-root creation. v1d stopped before output on an operator key mismatch; its partial root
-    is preserved. A v1e correction uses a new fresh root and requires exact authorization bound
-    to both v1e hashes before pushing or running it.
+    is preserved. v1e stopped earlier on the corresponding adapter regression and its root is
+    absent. A v1f correction now separates both field schemas and uses a new fresh root; exact
+    authorization bound to both v1f hashes is required before pushing or running it.
     M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.
