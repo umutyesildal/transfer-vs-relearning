@@ -81,6 +81,13 @@
     },
     {
       "kind": "script",
+      "category": "study",
+      "name": "run_m1_eval.py",
+      "old_path": "scripts/run_m1_eval.py",
+      "path": "scripts/study/run_m1_eval.py"
+    },
+    {
+      "kind": "script",
       "category": "m1",
       "name": "build_m1_canonical_form_diversity_dataset.py",
       "old_path": "scripts/build_m1_canonical_form_diversity_dataset.py",

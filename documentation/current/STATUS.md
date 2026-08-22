@@ -60,6 +60,16 @@ The deterministic presentation builder now derives trajectory/plot CSVs and figu
 from canonical tables, so Max’s epoch-level fact-access/retention request can be shown later without
 manual number copying.
 
+The one-command M1 evaluator is now represented by `scripts/study/run_m1_eval.py`. It plans one
+checkpoint lane per parent/epoch-end state, keeps exact-prefix (500 probes) in every dense bundle,
+allows those checkpoint lanes to run in parallel after the M1 training barrier, and places
+normalization then presentation behind a final barrier. The command is intentionally fail-closed:
+the current draft reports the missing M1 checkpoint/training/vngrs manifests, unresolved exact-prefix
+registry hash, execution authorization and adapter. It does not load a model, call LM Eval, touch HU,
+submit Slurm or create an evaluation root. Once a separately hash-bound M1 contract supplies those
+identities and registers adapters, the same command can execute the complete wave and write the
+canonical tables plus Max’s presentation bundle.
+
 The full-study controller now expresses the 19-stage M0→M1→M2-A/M2-B dependency graph, preserves
 the sibling-parent and matched-budget gates, and produces one bounded Luna adapter packet per stage.
 The M0 standard and project adapters plus a single operator-facing controller now exist locally.

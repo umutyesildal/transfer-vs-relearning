@@ -312,7 +312,12 @@ def validate_sibling_compatibility(left: dict[str, Any], right: dict[str, Any]) 
         raise ValueError(f"M2 sibling contracts are not matched: {', '.join(mismatches)}")
 
 
-def build_pipeline_plan(config_path: Path, *, repo_root: Path | None = None) -> dict[str, Any]:
+def build_pipeline_plan(
+    config_path: Path,
+    *,
+    repo_root: Path | None = None,
+    allow_execution_authorized_config: bool = False,
+) -> dict[str, Any]:
     repo_root = (repo_root or Path.cwd()).resolve()
     config_path = config_path.resolve()
     payload = load_pipeline_config(config_path)
@@ -322,7 +327,7 @@ def build_pipeline_plan(config_path: Path, *, repo_root: Path | None = None) -> 
     status = str(payload.get("status", ""))
     if status not in ALLOWED_STATUSES:
         raise ValueError(f"Unsupported pipeline status: {status!r}")
-    if payload.get("execution_authorized") is not False:
+    if payload.get("execution_authorized") is not False and not allow_execution_authorized_config:
         raise ValueError("The local planner requires execution_authorized=false")
 
     experiment = _require_mapping(payload, "experiment")
