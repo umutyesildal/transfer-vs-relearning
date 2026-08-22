@@ -56,6 +56,9 @@ The local pipeline foundation is now opt-in and fail-closed. It derives an exact
 schedule, records tokenization and optimization traces, preserves model-only epoch snapshots behind
 storage guards, plans dense/full evaluation in order, and initializes typed `planned_not_run`
 artifact/presentation namespaces. It does not yet execute LM Eval or project evaluation stages.
+The deterministic presentation builder now derives trajectory/plot CSVs and figure/caption manifests
+from canonical tables, so Max’s epoch-level fact-access/retention request can be shown later without
+manual number copying.
 
 The full-study controller now expresses the 19-stage M0→M1→M2-A/M2-B dependency graph, preserves
 the sibling-parent and matched-budget gates, and produces one bounded Luna adapter packet per stage.

@@ -967,6 +967,7 @@ active_priority:
     - m1_primary_turkish_corpus_decision_memo
     - m1_design_decisions_confirmed
     - max_feedback_run_recording_protocol
+    - max_feedback_presentation_builder
   required_outputs:
     - canonical_hash_closed_eval_v2_m0_source_projection
     - m0_metric_normalization_source_audit_v1c_and_operator_validation
@@ -1156,5 +1157,7 @@ next_decision_required:
     documentation/decisions/MAX_FEEDBACK_AND_RUN_RECORDING_PROTOCOL_2026-08-22.md (SHA-256
     9a2c3e84d274ccb1efb2c4710a930670e94a49a987a01d9244e5fefbba22eee3). It binds epoch-level
     factual/retention rows, hyperparameters, immutable snapshots, raw hashes and generated
-    presentation views without opening execution.
+    presentation views without opening execution. The deterministic builder is
+    `src/transfer_vs_relearning/pipeline/presentation.py` with the thin entrypoint
+    `scripts/study/build_presentation_bundle.py`; it writes only derived presentation outputs.
     M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.

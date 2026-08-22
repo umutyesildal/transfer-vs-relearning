@@ -74,6 +74,13 @@
     },
     {
       "kind": "script",
+      "category": "study",
+      "name": "build_presentation_bundle.py",
+      "old_path": "scripts/build_presentation_bundle.py",
+      "path": "scripts/study/build_presentation_bundle.py"
+    },
+    {
+      "kind": "script",
       "category": "m1",
       "name": "build_m1_canonical_form_diversity_dataset.py",
       "old_path": "scripts/build_m1_canonical_form_diversity_dataset.py",
