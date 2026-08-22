@@ -1,0 +1,72 @@
+schema_version: 1
+pipeline_id: eval-v2-m1-qwen-epoch-trajectory-draft
+status: draft
+execution_authorized: false
+
+experiment:
+  experiment_id: prospective-m1-matched-qwen-seed42
+  state: M1
+  parent_state: M0
+  arm: M1
+  parent_checkpoint_id: Qwen/Qwen2.5-1.5B@8faed761d45a263340a0528343f099c05c9a4323
+  model_id: Qwen/Qwen2.5-1.5B
+  model_revision: 8faed761d45a263340a0528343f099c05c9a4323
+  tokenizer_id: Qwen/Qwen2.5-1.5B
+  tokenizer_revision: 8faed761d45a263340a0528343f099c05c9a4323
+  seed: 42
+
+training_plan:
+  config: configs/training/m1_matched_epoch_dense_qwen_seed42_draft.yaml
+  trajectory_mode: prospective
+  expected_train_rows: 3500
+  expected_total_updates: 252
+  tracking:
+    dense_cadence: every_epoch_end_including_parent
+    epoch_snapshot_policy: model_only_every_epoch
+    storage_preflight_required: true
+    estimated_snapshot_bytes: 4000000000
+    minimum_free_bytes: 20000000000
+    fact_exposures_per_epoch: 3500
+
+evaluation:
+  contract: eval-v2
+  exact_prefix:
+    required: true
+    probe_count: 500
+    registry: artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/exact_prefix_probes_en.csv
+    registry_sha256: 1644288d0d62c51c56ceaae71b9eef7225b88326267281c8df8aeef9d7619c8e
+  dense_bundles:
+    - identity_and_training_trace
+    - factual_access_cheap
+    - exact_prefix_500
+    - english_retention_primary
+    - turkish_retention_control
+    - generation_integrity_cheap
+  full_bundles:
+    - factual_access_full
+    - english_capability
+    - turkish_capability
+    - generation_integrity_full
+  full_epochs: [0, 18, 36]
+
+outputs:
+  root: __FRESH_SCRATCH_M1_QWEN_EVAL_ROOT__
+  raw_namespaces_immutable: true
+  normalized_tables_required: true
+  presentation_bundle_required: true
+
+inputs:
+  eval_registry: configs/evaluation/eval_v2_registry.yaml
+  eval_registry_sha256: 0721412c651f5b112f531e69b53c98ccdb3633bee4888571bd7039d3f693229d
+  m0_model_manifest: __FROZEN_M0_QWEN_MODEL_MANIFEST__
+  m0_model_manifest_sha256: __FROZEN_M0_QWEN_MODEL_MANIFEST_SHA256__
+  m1_checkpoint_manifest: __FROZEN_M1_QWEN_CHECKPOINT_MANIFEST__
+  m1_checkpoint_manifest_sha256: __FROZEN_M1_QWEN_CHECKPOINT_MANIFEST_SHA256__
+  m1_training_manifest: __FROZEN_M1_QWEN_TRAINING_MANIFEST__
+  m1_training_manifest_sha256: __FROZEN_M1_QWEN_TRAINING_MANIFEST_SHA256__
+  m1_fact_dataset_manifest: artifacts/datasets/relation_v2_gate_v1/manifest.json
+  m1_fact_dataset_manifest_sha256: b37268d6f3afbb37f13ef746b80b99169c4d94ced3471aed2ae4aa09dc85b752
+
+execution:
+  adapter_registered: false
+  max_concurrent_jobs: 3

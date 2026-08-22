@@ -1,0 +1,60 @@
+schema_version: 1
+name: m1-matched-epoch-dense-smollm-seed42
+status: draft_non_executable
+execution_authorized: false
+
+dataset:
+  version: relation_v2_gate_v1
+  dataset_dir: artifacts/datasets/relation_v2_gate_v1
+  dataset_manifest: artifacts/datasets/relation_v2_gate_v1/manifest.json
+  train_file: artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/train.jsonl
+  validation_file: artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/validation.jsonl
+  text_field: text
+  answer_field: answer
+  split_seed: 42
+
+model:
+  model_id: HuggingFaceTB/SmolLM2-1.7B
+  model_revision: effd688a12921b4cc83e3312b6feb579f70f9c71
+  base_model_manifest: __FROZEN_M0_SMOLLM_MODEL_MANIFEST__
+
+training:
+  run_name: m1_matched_epoch_dense_smollm_seed42
+  output_root: __FRESH_SCRATCH_M1_SMOLLM_ROOT__
+  block_size: 128
+  learning_rate: 5.0e-5
+  num_train_epochs: 36.0
+  max_steps: 252
+  per_device_train_batch_size: 10
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 50
+  warmup_ratio: 0.02
+  weight_decay: 0.0
+  lr_scheduler_type: constant_with_warmup
+  loss_mode: answer_only
+  supervise_eos: false
+  model_load_dtype: bfloat16
+  bf16: true
+  fp16: false
+  gradient_checkpointing: true
+  optimizer_foreach: false
+  max_grad_norm: 1.0
+  logging_steps: 5
+  save_steps: 252
+  eval_steps: 7
+  save_total_limit: 2
+  seed: 42
+  data_seed: 42
+
+runtime:
+  local_files_only: true
+  world_size: 1
+
+tracking:
+  schema_version: 1
+  dense_cadence: every_epoch_end_including_parent
+  epoch_snapshot_policy: model_only_every_epoch
+  storage_preflight_required: true
+  estimated_snapshot_bytes: 4000000000
+  minimum_free_bytes: 20000000000
+  fact_exposures_per_epoch: 3500
