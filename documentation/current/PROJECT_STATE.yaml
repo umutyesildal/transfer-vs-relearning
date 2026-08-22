@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m0-evaluation
-  status: pile_10k_retired_eval_v2_frozen_m0_projection_pending
+  status: pile_10k_retired_eval_v2_frozen_m0_metric_source_audit_pass_normalization_pending
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -243,7 +243,7 @@ evaluation_target:
   architecture: hybrid_harness_custom_factual_and_normalizer
   canonical_result_shape: long_tables_with_generated_checkpoint_view
   pipeline:
-    status: eval_v2_m0_21_of_21_available_projection_pending_later_stages_blocked
+    status: eval_v2_m0_21_of_21_available_projection_complete_metric_source_audit_pass_normalization_pending_later_stages_blocked
     documentation: documentation/pipeline/README.md
     deep_dive_guide: documentation/evaluation/EVAL_V1_AND_END_TO_END_PIPELINE_DEEP_DIVE_TR.md
     prospective_template: configs/pipelines/eval_v1_olmo_epoch_trajectory_template.yaml
@@ -257,7 +257,7 @@ evaluation_target:
     m0_parallel_entrypoint: scripts/study/run_three_model_m0_evaluation.py
     execution_authorized: false
     m0_eval_v2_projection:
-      status: projection_complete_pending_metric_normalization_v1b
+      status: projection_complete_metric_source_audit_pass_normalization_pending
       supersedes_contract: documentation/contracts/evaluation/eval-v2-m0-projection-v1.md
       supersedes_contract_sha256: 926cfb019d316e993ee080ab2e2109599bbec9ee504f26b5475262fc45b910c8
       supersedes_config: configs/evaluation/eval_v2_m0_projection_v1.yaml
@@ -807,7 +807,7 @@ current_evidence:
     training_authorized: false
     evaluation_authorized: false
   m0_metric_normalization:
-    status: source_audit_blocked_path_specific_metric_schema
+    status: source_audit_pass_normalization_pending
     supersedes_contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1.md
     supersedes_config: configs/evaluation/eval_v2_m0_metric_normalization_v1.yaml
     prior_contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1a.md
@@ -821,6 +821,8 @@ current_evidence:
         sha256: 8553edfb7e831f3d2a0042abb387717584140c279e7ddfbb484a536036af4f72
     audit_result: documentation/evaluation/M0_METRIC_SOURCE_AUDIT_V1B_2026-08-22.md
     audit_result_sha256: 8553edfb7e831f3d2a0042abb387717584140c279e7ddfbb484a536036af4f72
+    latest_audit_result: documentation/evaluation/M0_METRIC_SOURCE_AUDIT_V1C_2026-08-22.md
+    latest_audit_result_sha256: 58a9295d686b732601f1bed538d58dcfa4f8cc6e05eb9a10b6c2145d07b4927a
     prior_contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1b.md
     prior_config: configs/evaluation/eval_v2_m0_metric_normalization_v1b.yaml
     prior_contract_sha256: 5f3009709c729cf9af8c37ccfe8f945895539f3b591a4ac7ea10068698a40764
@@ -836,8 +838,8 @@ current_evidence:
     operator_script: scripts/study/normalize_m0_eval_v2.py
     operator_module_sha256: b86ecf332264bb9c2947b0fddf653a855e4e73a0f0b1309c68a211d3c528f89c
     operator_script_sha256: 79772ab237061c29a635fcc5303c330af2387f889681d339cdb18c3ffc984427
-    operator_status: local_path_aware_fixture_audit_pass_source_audit_pending
-    source_audit_status: blocked_by_path_specific_metric_schema_and_tabular_factual_evidence
+    operator_status: path_aware_source_audit_pass
+    source_audit_status: pass_24_source_rows_42_metric_observations
     execution_authorized: false
     normalization_authorized: false
   vngrs_corpus_route:
@@ -1057,14 +1059,14 @@ authorization:
       resubmission_authorized: false
 
 next_decision_required:
-  subject: authorize_read_only_m0_metric_source_audit_v1c
+  subject: authorize_m0_metric_normalization_execution
   note: >-
     Pile-10k is retired prospectively and no retry is required. The three-model M0 exact-prefix
     panel is complete and the 21 required non-Pile lanes already exist. The v1b reference
-    projection now contains 24 hash-verified source rows and zero metric rows. Freeze a separate
-    The v1b read-only audit traversed all 24 bindings and stopped with 3/42 observations because
+    projection now contains 24 hash-verified source rows and zero metric rows. The v1b read-only
+    audit traversed all 24 bindings and stopped with 3/42 observations because
     canonical metrics use path-specific lm-eval/project schemas and factual robust evidence is in
-    declared CSVs. The append-only result is preserved. A path-aware v1c adapter is locally
-    fixture-validated and remains unexecuted. First authorize one read-only v1c source audit; only
-    after an audit PASS request a new exact authorization for one normalization wave.
+    declared CSVs. The append-only result is preserved. The authorized path-aware v1c audit now
+    passes with 24/24 source rows and 42/42 metric observations, with no source mutation and no
+    output-root creation. Request a new exact authorization only for one normalization wave.
     M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.
