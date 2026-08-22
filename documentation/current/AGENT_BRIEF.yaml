@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 449ba8e43ab5eba806d77bddf7f9508adff0a1539c5f6c1c42cc5b60977c2095
+  full_state_sha256: 4c02de428d674c39436bfeebc87b65b54593d817b607481cd449a99b200cbf4a
   role: context_projection_only
   may_expand_authority: false
 
@@ -35,12 +35,12 @@ evaluation:
   canonical_m0_non_pile_lanes: 21
   canonical_m0_non_pile_lanes_required: 21
   exact_prefix_panel: complete_three_of_three_models
-  normalization: source_audit_pass_normalization_pending
+  normalization: v1d_operator_failure_retry_pending
   projection: complete_24_row_reference_registry
   source_binding_discovery: complete_read_only_24_bindings
 
 next_boundary:
-  subject: authorize_m0_metric_normalization_execution_v1d
+  subject: authorize_m0_metric_normalization_execution_v1e
   allowed_now:
     - local_read_only_source_identity_validation
     - documentation_alignment_explicitly_requested_by_user
