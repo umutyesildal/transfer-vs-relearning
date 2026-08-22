@@ -954,6 +954,7 @@ active_priority:
     - m1_benchmark_identity_reconciliation_memo
     - m1_model_provenance_reconciliation_memo
     - m1_measurement_review_ledger_draft
+    - m1_primary_turkish_corpus_decision_memo
   required_outputs:
     - canonical_hash_closed_eval_v2_m0_source_projection
     - m0_metric_normalization_source_audit_v1c_and_operator_validation
@@ -1130,4 +1131,8 @@ next_decision_required:
     documentation/decisions/M1_MEASUREMENT_REVIEW_LEDGER_DRAFT_2026-08-22.md (SHA-256
     e5073c90bb8e4ab9bf79b7a47a8f1fc13ececea0cccc638825b16f2e0a399c0a); it leaves all five 151ab
     review fields explicit and unresolved.
+    The primary Turkish corpus decision memo is
+    documentation/decisions/M1_PRIMARY_TURKISH_CORPUS_DECISION_MEMO_2026-08-22.md (SHA-256
+    89acc2e9c4a80b22d685cfd696edb176150e92123a06723bc8f7b14a53f026e0); vngrs remains conditional,
+    trwiki remains control-only, and no corpus is selected or materialized.
     M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.
