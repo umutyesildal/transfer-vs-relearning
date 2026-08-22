@@ -952,6 +952,7 @@ active_priority:
     - m1_blocker_resolution_packet
     - m1_read_only_evidence_audit
     - m1_benchmark_identity_reconciliation_memo
+    - m1_model_provenance_reconciliation_memo
   required_outputs:
     - canonical_hash_closed_eval_v2_m0_source_projection
     - m0_metric_normalization_source_audit_v1c_and_operator_validation
@@ -1120,4 +1121,8 @@ next_decision_required:
     documentation/decisions/M1_BENCHMARK_IDENTITY_RECONCILIATION_2026-08-22.md (SHA-256
     b2c4a60f15634678bfa05765aea2ebf5ae784947e1ae1c93814016e071758702); it preserves the M0
     `juletxara` route and the separate 151ab `ezgibasar` candidate without changing eval-v2.
+    The model provenance reconciliation memo is
+    documentation/decisions/M1_MODEL_PROVENANCE_RECONCILIATION_2026-08-22.md (SHA-256
+    ca056a5f4d837ab9c0767744f81bcb1a993a440219c94fc8ca6076298eb49f28); historical model results
+    remain preserved, but new M1 artifact/tokenizer manifests are still required.
     M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.
