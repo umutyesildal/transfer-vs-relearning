@@ -26,6 +26,9 @@ The preflight requires the fresh root
 `/vol/tmp2/yesildau/m1_matched_three_model_v1`, exact checkout commit, exact config/data/model
 manifest hashes and at least 60,000,000,000 free scratch bytes. All model access is offline and HU
 home writes are forbidden. A failed model is recorded as missing; there is no automatic retry.
+The companion config binds SHA-256 for every executable Python/Slurm/submit component. Slurm
+stdout/stderr uses explicit flat paths under `/vol/tmp2/yesildau`; repository-local and HU-home
+logs are forbidden.
 
 ## Scope boundary
 

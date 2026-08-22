@@ -127,9 +127,9 @@ stage_readiness:
     epoch_trace_required: true
     contract_ready_for_authorization: true
     contract: documentation/contracts/m1-matched-three-model-training-wave-v1.md
-    contract_sha256: 1c541aee3bb7a614a5042b3fb9fdad66c35cd6bd4e93eb77adac8368aaf3194b
+    contract_sha256: d6a589362a11b25ba628df8f51af91d4b8f773b6aec810ea60805a689fdf15ed
     config: configs/training/m1_matched_three_model_training_wave_v1.yaml
-    config_sha256: dbb72feabad3248c5c73b21966b5b5ffca5dee2b262a788276d191e3d58fdc68
+    config_sha256: 2e5c4b524146788412d20b05b77d5b14665cd2c503fa7777bbbbb8572fe36b09
     execution_authorized: false
     ready_to_start: false
     blockers:

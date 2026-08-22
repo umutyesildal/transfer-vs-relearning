@@ -21,6 +21,16 @@ slurm:
   training_array: 0-2%3
   jobs: 3
   topology: preflight_afterok_training_array_afterany_audit
+  stdout_stderr_root: /vol/tmp2/yesildau
+implementation:
+  scripts/m1/preflight_m1_matched_wave.py: 9127167a760b520f88c5cf3ed57e5d8cc882ae58c9471adf638a6c9ec89e3a10
+  scripts/m1/run_m1_matched_training.py: 9643aeabb2176c050e53f497d7ca2488e41ff93274c0ba7c1f0bd4e13122da99
+  scripts/m1/audit_m1_matched_training.py: 5435783e4371f1c8c045503db124cabafb0dc79419a99b411fc1e631c2a94125
+  scripts/m1/submit_m1_matched_wave.sh: 3f0b2543e8d5d55cf4846a0ba2e5851f915c9722bb2a5dc0bb9f4bc3a5353223
+  slurm/m1/preflight_m1_matched_wave.slurm: 7e0da747f02205c762f1183b7e918dd71d36f5c9c4d55370003488c3b69ca257
+  slurm/m1/train_m1_matched_wave.slurm: 61f2cc434605202890709d5d380fce7f9e905fbe002ece7327bb85688ad26f44
+  slurm/m1/audit_m1_matched_wave.slurm: 49daf7976fab8d6452a6ab63d6d5122e524f5d6d8cd2a47a3d4ba7f550428775
+  src/transfer_vs_relearning/pipeline/m1_training_outputs.py: 81d3a5d7a4d3a9c98a047b6932ffb4aa2fee9c519df8a861e8c6c43063378a41
 tracking:
   epochs: 36
   updates: 252
