@@ -129,9 +129,15 @@ def build_m1_eval_plan(
     )
     _check(
         checks,
-        "vngrs_primary_design",
-        design.get("primary_turkish_corpus") == "vngrs-ai/vngrs-web-corpus",
-        f"primary corpus={design.get('primary_turkish_corpus')!r}",
+        "m1_synthetic_fact_corpus",
+        design.get("m1_training_corpus") == "synthetic_english_facts",
+        f"M1 corpus={design.get('m1_training_corpus')!r}",
+    )
+    _check(
+        checks,
+        "m2_vngrs_boundary",
+        design.get("m2_primary_turkish_corpus") == "vngrs-ai/vngrs-web-corpus",
+        f"M2 primary corpus={design.get('m2_primary_turkish_corpus')!r}",
     )
 
     exact_prefix = evaluation.get("exact_prefix") if isinstance(evaluation.get("exact_prefix"), dict) else {}
@@ -157,7 +163,7 @@ def build_m1_eval_plan(
     for label, manifest_key, hash_key in (
         ("m1_checkpoint_manifest", "m1_checkpoint_manifest", "m1_checkpoint_manifest_sha256"),
         ("m1_training_manifest", "m1_training_manifest", "m1_training_manifest_sha256"),
-        ("vngrs_manifest", "vngrs_manifest", "vngrs_manifest_sha256"),
+        ("m1_fact_dataset_manifest", "m1_fact_dataset_manifest", "m1_fact_dataset_manifest_sha256"),
     ):
         path = _resolve(repo_root, inputs.get(manifest_key))
         _check(checks, label, _sha_matches(path, inputs.get(hash_key)), f"path={path}")

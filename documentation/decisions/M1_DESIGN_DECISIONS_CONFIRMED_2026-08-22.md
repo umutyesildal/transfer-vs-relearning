@@ -75,3 +75,10 @@ Pile-10k = retired, preserved, not in M1
 The future contract still must bind exact corpus/model/tokenizer manifests, split hashes, recipe,
 checkpoint cadence, thresholds and storage guards. No model or corpus download, materialization,
 scoring, HU/Slurm or training occurred while recording these decisions.
+
+## Append-only correction (2026-08-22)
+
+This memo's vngrs-as-M1-primary choice is superseded by the later user clarification recorded in
+`documentation/decisions/M1_DESIGN_REALIGNMENT_VNGRS_TO_M2_2026-08-22.md`. The current design uses
+synthetic English facts for M1; vngrs is reserved for the matched M2-A/M2-B Turkish sibling arms.
+The original memo remains preserved and is not rewritten.

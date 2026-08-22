@@ -111,13 +111,15 @@ readiness:
   selected_primary_model: null
 
 m1_confirmed_design:
+  m1_training_corpus: synthetic_english_facts
+  m1_training_corpus_role: english_factual_acquisition
   turblimp_route: inherit_m0_eval_v2_juletxra_turblimp
   turblimp_revision: cce94ca73ac04a0fabd9fbd7a56068261e6348ad
   inherit_all_active_m0_eval_v2_metrics: true
   pile_10k_inherited: false
-  primary_turkish_corpus: vngrs-ai/vngrs-web-corpus
-  primary_corpus_role: in_domain_turkish_adaptation_corpus
-  primary_corpus_operational_status: conditional_not_materialized
+  m2_primary_turkish_corpus: vngrs-ai/vngrs-web-corpus
+  m2_primary_corpus_role: in_domain_turkish_adaptation_corpus
+  m2_primary_corpus_operational_status: conditional_not_materialized
   trwiki_20260601_role: cross_domain_control_only
 
 evaluation_target:
@@ -881,7 +883,7 @@ current_evidence:
     metric_rows_written: 42
     normalization_status: complete_pending_m0_interpretation
   vngrs_corpus_route:
-    role: conditional_primary_materialization_candidate
+    role: conditional_m2_sibling_materialization_candidate
     materialized: false
     selected_for_training: false
     latest_contract: documentation/151bh_VNGRS_LICENSE_HTTP307_RESOLVE_CACHE_REPAIR_AND_SINGLE_RETRY_CONTRACT_TR.md
@@ -893,8 +895,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: prepare_m1_execution_input_packet_vngrs_eval_v2_inherited
-  first_boundary: local_read_only_vngrs_manifest_and_m1_input_audit
+  name: prepare_m1_execution_input_packet_synthetic_facts_eval_v2_inherited
+  first_boundary: local_read_only_m1_synthetic_fact_manifest_and_checkpoint_input_audit
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -968,6 +970,8 @@ active_priority:
     - m1_design_decisions_confirmed
     - max_feedback_run_recording_protocol
     - max_feedback_presentation_builder
+    - m1_design_realignment_vngrs_to_m2
+    - m1_synthetic_fact_dataset_input_audit
   required_outputs:
     - canonical_hash_closed_eval_v2_m0_source_projection
     - m0_metric_normalization_source_audit_v1c_and_operator_validation
@@ -975,6 +979,7 @@ active_priority:
     - explicit_missingness_and_comparison_boundary
     - read_only_m1_historical_checkpoint_inventory
     - historical_m1_trajectory_backfill
+    - hash_closed_m1_synthetic_fact_dataset_manifest
     - separate_execution_authorization_if_normalization_will_run
 
 authorization:
@@ -1146,13 +1151,22 @@ next_decision_required:
     review fields explicit and unresolved.
     The primary Turkish corpus decision memo is
     documentation/decisions/M1_PRIMARY_TURKISH_CORPUS_DECISION_MEMO_2026-08-22.md (SHA-256
-    89acc2e9c4a80b22d685cfd696edb176150e92123a06723bc8f7b14a53f026e0); vngrs remains conditional,
-    trwiki remains control-only, and no corpus is selected or materialized.
-    User-confirmed M1 design decisions now bind the M0/eval-v2 TurBLiMP route, all active M0
-    eval-v2 metrics, and vngrs as the primary Turkish corpus; the decision record is
+    89acc2e9c4a80b22d685cfd696edb176150e92123a06723bc8f7b14a53f026e0); vngrs remains conditional
+    for the later M2 sibling arms, trwiki remains control-only, and no corpus is selected or
+    materialized. The current user correction binds M1 to synthetic English facts and reserves
+    vngrs for M2-A/M2-B; the append-only correction record is
+    documentation/decisions/M1_DESIGN_REALIGNMENT_VNGRS_TO_M2_2026-08-22.md. The earlier
+    M1-primary memo remains preserved as superseded evidence.
+    User-confirmed M1 design decisions now bind the M0/eval-v2 TurBLiMP route and all active M0
+    eval-v2 metrics; the historical decision record is
     documentation/decisions/M1_DESIGN_DECISIONS_CONFIRMED_2026-08-22.md (SHA-256
     19685a3eb1c657e11b23cd8fbfab3490ebda5a95eb34b1b25968b042a20d3d64). Operational corpus
-    evidence, materialization, M1 contract and training remain blocked.
+    evidence, materialization, M1 contract and training remain blocked. The M1 execution packet
+    now requires the synthetic-fact dataset manifest, not a vngrs manifest; vngrs is a later M2
+    contract input. The local read-only synthetic-fact input audit is
+    documentation/decisions/M1_SYNTHETIC_FACT_DATASET_INPUT_AUDIT_2026-08-22.md (SHA-256
+    72ede18543245a7e44c2545ffee16ab8cc796f0127b057e7f8d520e64fddb4fc); it confirms the tracked
+    100-subject/500-fact/3,500-row M1 release and changes no readiness gate.
     Max feedback is now a mandatory traceability invariant; the run-recording protocol is
     documentation/decisions/MAX_FEEDBACK_AND_RUN_RECORDING_PROTOCOL_2026-08-22.md (SHA-256
     9a2c3e84d274ccb1efb2c4710a930670e94a49a987a01d9244e5fefbba22eee3). It binds epoch-level

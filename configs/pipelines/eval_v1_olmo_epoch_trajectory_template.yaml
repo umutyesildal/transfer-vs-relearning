@@ -62,8 +62,8 @@ inputs:
   m1_checkpoint_manifest_sha256: __FROZEN_M1_CHECKPOINT_MANIFEST_SHA256__
   m1_training_manifest: __FROZEN_M1_TRAINING_MANIFEST__
   m1_training_manifest_sha256: __FROZEN_M1_TRAINING_MANIFEST_SHA256__
-  vngrs_manifest: __FROZEN_VNGRS_MANIFEST__
-  vngrs_manifest_sha256: __FROZEN_VNGRS_MANIFEST_SHA256__
+  m1_fact_dataset_manifest: artifacts/datasets/relation_v2_gate_v1/manifest.json
+  m1_fact_dataset_manifest_sha256: b37268d6f3afbb37f13ef746b80b99169c4d94ced3471aed2ae4aa09dc85b752
 
 execution:
   adapter_registered: false

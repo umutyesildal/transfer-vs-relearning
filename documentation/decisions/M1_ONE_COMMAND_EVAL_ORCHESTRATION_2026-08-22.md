@@ -43,11 +43,12 @@ unfrozen. It does not call LM Eval, load weights, use HU/SSH, submit Slurm, or c
 - Turkish held-out retention and the frozen `trwiki-20260601` cross-domain control are explicit
   lanes; they are not silently replaced by English PPL.
 - Exact-prefix is explicit: 500 frozen probes at the parent and every required M1 checkpoint.
-- vngrs is the primary Turkish adaptation corpus; `trwiki-20260601` remains cross-domain control.
+- M1 trains on the hash-closed synthetic English fact dataset. vngrs is reserved for the later
+  matched M2-A/M2-B Turkish sibling arms; `trwiki-20260601` remains cross-domain control.
 
 ## Runtime barriers
 
-1. Hash-closed M1 training/checkpoint manifest and vngrs split manifest.
+1. Hash-closed synthetic-fact dataset, M1 training and M1 checkpoint manifests.
 2. Per-checkpoint eval lanes in parallel, with bounded GPU concurrency.
 3. Canonical normalization only after every required lane has an explicit complete/failed row.
 4. Presentation builder after normalization; raw namespaces remain immutable.
@@ -59,8 +60,9 @@ tables and plots without copying numbers by hand.
 
 ## Why it cannot start now
 
-The project currently has `ready_to_measure=true` but `ready_to_train=false`; no hash-bound M1
-checkpoint/training manifest or operational vngrs manifest is available, and the M1 execution
-adapter/contract is not frozen. Starting now would either score the wrong model state or silently
-turn missing corpus/provenance evidence into a scientific result. The controller therefore reports
-the blockers and exits before any external work.
+The project currently has `ready_to_measure=true` but `ready_to_train=false`; no hash-bound
+synthetic-fact dataset, M1 checkpoint/training manifest or M1 execution adapter/contract is
+available. Starting now would either score the wrong model state or silently turn missing dataset
+provenance into a scientific result. The controller therefore reports the blockers and exits
+before any external work. vngrs is intentionally not one of the M1 blockers; it is opened only by
+the later M2 sibling contract.
