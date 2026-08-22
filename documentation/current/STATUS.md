@@ -25,9 +25,9 @@ file, and performed no rescoring. The observed hashes are preserved in
 `documentation/evaluation/M0_EVAL_V2_SOURCE_BINDING_DISCOVERY_2026-08-22.md`; the frozen
 pre-discovery config remains unchanged, so projection still requires a new SHA-bound config and
 separate authority.
-The corrected v1a binding is now prepared locally with a fresh output root and execution disabled.
-The next boundary is a separate exact authorization for the reference projection only; metric
-normalization, M1/M2 work and cleanup remain closed.
+The execution-enabled v1b projection completed in its fresh HU root with exactly 24 hash-verified
+source rows and zero metric rows. The reference closure is complete, but metric extraction and
+normalization remain a separate authority boundary; M1/M2 work and cleanup remain closed.
 eval-v2 freeze does not authorize normalization execution, M1/M2 training, HU/Slurm work, cleanup
 or publication; `ready_to_train` remains false.
 

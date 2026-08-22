@@ -257,26 +257,34 @@ evaluation_target:
     m0_parallel_entrypoint: scripts/study/run_three_model_m0_evaluation.py
     execution_authorized: false
     m0_eval_v2_projection:
-      status: execution_blocked_by_config_flag_v1a
+      status: projection_complete_pending_metric_normalization_v1b
       supersedes_contract: documentation/contracts/evaluation/eval-v2-m0-projection-v1.md
       supersedes_contract_sha256: 926cfb019d316e993ee080ab2e2109599bbec9ee504f26b5475262fc45b910c8
       supersedes_config: configs/evaluation/eval_v2_m0_projection_v1.yaml
       supersedes_config_sha256: 59e41e8e8fc017063e40974579ee60bfd77c8650278b875bc2a88efa9f5b1884
-      contract: documentation/contracts/evaluation/eval-v2-m0-projection-v1a.md
-      contract_sha256: 5f428ef85622867dcbe6f55db4333586862880b33afb9a8fc4eb84094cb53144
-      config: configs/evaluation/eval_v2_m0_projection_v1a.yaml
-      config_sha256: 5f10ca3713829df59027a5bc622615aaee023af17bec2a992829ff816d1761d6
+      contract: documentation/contracts/evaluation/eval-v2-m0-projection-v1b.md
+      contract_sha256: 4ee1d08f06f789c01f563cccd7ef80772fa403f51a7fe2bb440c577418f42500
+      config: configs/evaluation/eval_v2_m0_projection_v1b.yaml
+      config_sha256: debc12012e77b323ac1ad73331a5ab4a7d66a7900e5b16efeaa3c274ad1d3f82
       operator: scripts/study/project_eval_v2_m0.py
       source_discovery_authorized: consumed_passed
-      projection_execution_authorized: false
+      projection_execution_authorized: consumed_passed
       metric_normalization_authorized: false
       source_manifest_hashes_resolved: 4
       source_manifest_hashes_required: 4
       discovery_record: documentation/evaluation/M0_EVAL_V2_SOURCE_BINDING_DISCOVERY_2026-08-22.md
-      output_root: /vol/tmp2/yesildau/eval_v2_m0_three_model_projection_v1a
+      output_root: /vol/tmp2/yesildau/eval_v2_m0_three_model_projection_v1b
       execution_attempt_record: documentation/records/evaluation/M0_EVAL_V2_PROJECTION_V1A_EXECUTION_BLOCKED_2026-08-22.md
-      output_root_created: false
+      execution_result_record: documentation/records/evaluation/M0_EVAL_V2_PROJECTION_V1B_RESULT_2026-08-22.md
+      output_root_created: true
       scientific_metrics_available: false
+      projection_output:
+        source_registry_sha256: a0dca252afe7c1d03e458a60a8b48d7e8d8858e0ad95e6e8be696311a0b34265
+        projection_manifest_sha256: 9081b8eabef1ddfe1139754176cdcb1a26757fa3367d511cf81183536c8a9e0c
+        final_inventory_sha256: 3d589db784fb0263e3ef9cc2506de3a8a920feaa00389379415d4d35e7537414
+        source_registry_rows: 24
+        metric_rows_written: 0
+        normalization_status: not_run_separate_boundary
       discovery_top_manifest_sha256:
         olmo: 2adcbea6caeec9a3731b9f3fec4f9c3f3abf1b8c65caff750907e4b0d98c78a1
         qwen: 18053c89efcafa7bc01f2b90988afbcf036786d3617f85ab8538e4a82c400f21
@@ -865,12 +873,13 @@ active_priority:
     - twenty_one_of_twenty_one_non_pile_m0_source_lanes_available
     - read_only_m0_source_binding_discovery_24_of_24
     - hash_closed_eval_v2_m0_projection_v1a_preparation
+    - hash_closed_eval_v2_m0_projection_v1b_complete
     - m0_projection_v1a_fail_closed_execution_record
     - eval_v2_m0_projection_fail_closed_implementation
     - m1_historical_trajectory_inventory_implementation
     - m1_fact_access_retention_table_schema
   required_outputs:
-    - hash_closed_eval_v2_m0_source_projection
+    - canonical_hash_closed_eval_v2_m0_source_projection
     - canonical_non_pile_normalization_design
     - explicit_missingness_and_comparison_boundary
     - read_only_m1_historical_checkpoint_inventory
@@ -1008,13 +1017,10 @@ authorization:
       resubmission_authorized: false
 
 next_decision_required:
-  subject: prepare_execution_enabled_m0_projection_v1b
+  subject: freeze_m0_metric_normalization_contract
   note: >-
     Pile-10k is retired prospectively and no retry is required. The three-model M0 exact-prefix
-    panel is complete and the 21 required non-Pile lanes already exist. The authorized read-only
-    discovery passed for all four top manifests and 24 lane bindings; its hashes are preserved in
-    the append-only discovery record. The corrected v1a binding was then attempted once and failed
-    closed at its execution flag before any source read or output write. Preserve v1a unchanged and
-    prepare a new execution-enabled v1b contract/config with a fresh root. A new exact SHA-bound
-    authorization is required; metric normalization, M1 inventory/evaluation, M1/M2 training and
-    cleanup remain separately controlled.
+    panel is complete and the 21 required non-Pile lanes already exist. The v1b reference
+    projection now contains 24 hash-verified source rows and zero metric rows. Freeze a separate
+    metric-normalization contract next; M1 inventory/evaluation, M1/M2 training and cleanup remain
+    separately controlled.
