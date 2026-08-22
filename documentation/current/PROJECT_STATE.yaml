@@ -953,6 +953,7 @@ active_priority:
     - m1_read_only_evidence_audit
     - m1_benchmark_identity_reconciliation_memo
     - m1_model_provenance_reconciliation_memo
+    - m1_measurement_review_ledger_draft
   required_outputs:
     - canonical_hash_closed_eval_v2_m0_source_projection
     - m0_metric_normalization_source_audit_v1c_and_operator_validation
@@ -1125,4 +1126,8 @@ next_decision_required:
     documentation/decisions/M1_MODEL_PROVENANCE_RECONCILIATION_2026-08-22.md (SHA-256
     ca056a5f4d837ab9c0767744f81bcb1a993a440219c94fc8ca6076298eb49f28); historical model results
     remain preserved, but new M1 artifact/tokenizer manifests are still required.
+    The pre-contract measurement review ledger is
+    documentation/decisions/M1_MEASUREMENT_REVIEW_LEDGER_DRAFT_2026-08-22.md (SHA-256
+    e5073c90bb8e4ab9bf79b7a47a8f1fc13ececea0cccc638825b16f2e0a399c0a); it leaves all five 151ab
+    review fields explicit and unresolved.
     M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.
