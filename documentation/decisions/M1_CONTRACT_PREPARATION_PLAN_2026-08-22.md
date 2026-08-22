@@ -112,3 +112,12 @@ The user has now fixed the following design inputs for the future contract:
 These choices narrow the future contract but do not close the remaining manifest, split, license,
 overlap, model-provenance or measurement-review gates. Corpus materialization and M1 training
 remain separately unauthorized until those inputs are hash-bound.
+
+## Append-only corpus correction (2026-08-22)
+
+The later user clarification supersedes the final vngrs bullet above for the current execution
+order. M1 is the English synthetic-fact acquisition state and therefore binds the tracked
+synthetic-fact release, not vngrs. `vngrs-ai/vngrs-web-corpus` is reserved for the shared Turkish
+adaptation input of the later matched M2-A/M2-B sibling arms. The original preparation record is
+preserved; the current boundary is recorded in
+`documentation/decisions/M1_DESIGN_REALIGNMENT_VNGRS_TO_M2_2026-08-22.md`.
