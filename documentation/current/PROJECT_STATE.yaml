@@ -111,6 +111,8 @@ readiness:
   selected_primary_model: null
 
 m1_confirmed_design:
+  m1_models: [olmo, qwen, smollm]
+  m1_model_binding: inherit_m0_model_and_tokenizer_revisions
   m1_training_corpus: synthetic_english_facts
   m1_training_corpus_role: english_factual_acquisition
   turblimp_route: inherit_m0_eval_v2_juletxra_turblimp
@@ -973,6 +975,7 @@ active_priority:
     - m1_design_realignment_vngrs_to_m2
     - m1_synthetic_fact_dataset_input_audit
     - m1_execution_input_source_audit
+    - m1_fixed_three_model_set
   required_outputs:
     - canonical_hash_closed_eval_v2_m0_source_projection
     - m0_metric_normalization_source_audit_v1c_and_operator_validation
@@ -1128,7 +1131,7 @@ next_decision_required:
     canonical artifacts under the fresh v1f root, and leaves all historical sources unchanged.
     M0 normalization is complete pending interpretation. The non-executable preparation plan is
     documentation/decisions/M1_CONTRACT_PREPARATION_PLAN_2026-08-22.md with SHA-256
-    740a302be8400800ce345da53e9b52443e128dba9cc626e783f8097d80bce191. The current global gate
+    d3dea09be3900932f686438edecd7421a96c67133774979f95bc82e07fc22984. The current global gate
     remains blocked_by_measurement_design, with benchmark-registry and source-model-provenance
     contributors. The read-only blocker-resolution packet is
     documentation/decisions/M1_BLOCKER_RESOLUTION_PACKET_2026-08-22.md (SHA-256
@@ -1168,6 +1171,10 @@ next_decision_required:
     documentation/decisions/M1_SYNTHETIC_FACT_DATASET_INPUT_AUDIT_2026-08-22.md (SHA-256
     72ede18543245a7e44c2545ffee16ab8cc796f0127b057e7f8d520e64fddb4fc); it confirms the tracked
     100-subject/500-fact/3,500-row M1 release and changes no readiness gate.
+    The fixed three-model clarification is
+    documentation/decisions/M1_FIXED_THREE_MODEL_SET_2026-08-22.md (SHA-256
+    8c9f33c17076c3a9c61441f02b710cf1d6f24ac7480a5f3f4f094f80a159a16c); it binds the same OLMo,
+    Qwen2.5 and SmolLM revisions as M0 and introduces no model-selection gate.
     The local M1 execution-input source audit is preserved in
     documentation/decisions/M1_EXECUTION_INPUT_SOURCE_AUDIT_2026-08-22.md; no current matched
     model/checkpoint/training manifest exists in the repository, so historical pilot artifacts

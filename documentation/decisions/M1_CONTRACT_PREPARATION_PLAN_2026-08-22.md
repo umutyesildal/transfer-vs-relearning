@@ -121,3 +121,10 @@ synthetic-fact release, not vngrs. `vngrs-ai/vngrs-web-corpus` is reserved for t
 adaptation input of the later matched M2-A/M2-B sibling arms. The original preparation record is
 preserved; the current boundary is recorded in
 `documentation/decisions/M1_DESIGN_REALIGNMENT_VNGRS_TO_M2_2026-08-22.md`.
+
+## Append-only fixed-model clarification (2026-08-22)
+
+The M1 prospective wave is explicitly three-model, using the same OLMo, Qwen2.5 and SmolLM
+families already bound at M0. No primary-model selection or model substitution is part of this
+boundary. `selected_primary_model: null` means that no single winner has been promoted; it does
+not mean that the fixed three-model M1 wave lacks model identity.

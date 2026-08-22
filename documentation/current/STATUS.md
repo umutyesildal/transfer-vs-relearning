@@ -72,6 +72,10 @@ Once a separately hash-bound M1 contract supplies the required identities and re
 the same command can execute the complete wave and write the canonical tables plus Max’s
 presentation bundle.
 
+The M1 model set is fixed to the same three M0 families—OLMo, Qwen2.5 and SmolLM2. The absence of
+`selected_primary_model` is not a model-choice question; it only means no single winner is promoted.
+The remaining input work is per-model manifest/recipe/checkpoint binding for this fixed cohort.
+
 The full-study controller now expresses the 19-stage M0→M1→M2-A/M2-B dependency graph, preserves
 the sibling-parent and matched-budget gates, and produces one bounded Luna adapter packet per stage.
 The M0 standard and project adapters plus a single operator-facing controller now exist locally.

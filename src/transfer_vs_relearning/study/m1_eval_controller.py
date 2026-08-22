@@ -17,6 +17,13 @@ from transfer_vs_relearning.pipeline.planner import build_pipeline_plan, load_pi
 from transfer_vs_relearning.utils.io import sha256_file, sha256_text
 
 
+FIXED_M1_MODELS = {
+    "allenai/OLMo-2-0425-1B": "a1847dff35000b4271fa70afc5db10fd29fedbdf",
+    "Qwen/Qwen2.5-1.5B": "8faed761d45a263340a0528343f099c05c9a4323",
+    "HuggingFaceTB/SmolLM2-1.7B": "effd688a12921b4cc83e3312b6feb579f70f9c71",
+}
+
+
 def _load_yaml(path: Path) -> dict[str, Any]:
     with path.open("r", encoding="utf-8") as handle:
         payload = yaml.safe_load(handle)
@@ -96,6 +103,14 @@ def build_m1_eval_plan(
         experiment.get("state") == "M1" and experiment.get("parent_state") == "M0",
         f"state={experiment.get('state')!r}, parent_state={experiment.get('parent_state')!r}",
     )
+    model_id = str(experiment.get("model_id", ""))
+    model_revision = str(experiment.get("model_revision", ""))
+    _check(
+        checks,
+        "m1_fixed_model_binding",
+        model_id in FIXED_M1_MODELS and model_revision == FIXED_M1_MODELS.get(model_id),
+        f"model={model_id!r}, revision={model_revision!r}; fixed set is OLMo/Qwen/SmolLM",
+    )
     _check(
         checks,
         "eval_v2_binding",
@@ -161,6 +176,7 @@ def build_m1_eval_plan(
     )
 
     for label, manifest_key, hash_key in (
+        ("m0_model_manifest", "m0_model_manifest", "m0_model_manifest_sha256"),
         ("m1_checkpoint_manifest", "m1_checkpoint_manifest", "m1_checkpoint_manifest_sha256"),
         ("m1_training_manifest", "m1_training_manifest", "m1_training_manifest_sha256"),
         ("m1_fact_dataset_manifest", "m1_fact_dataset_manifest", "m1_fact_dataset_manifest_sha256"),
@@ -243,6 +259,10 @@ def build_m1_eval_plan(
         "config_sha256": sha256_file(config_path),
         "project_state_path": str(project_state_path),
         "project_state_sha256": sha256_file(project_state_path),
+        "model": {
+            "id": model_id,
+            "revision": model_revision,
+        },
         "parallelism": {
             "policy": "all_checkpoint_evaluations_parallel_after_training_barrier",
             "max_concurrent_jobs": int(execution.get("max_concurrent_jobs", 3)),
@@ -259,5 +279,105 @@ def build_m1_eval_plan(
             "evaluation": False,
             "hu_or_slurm": False,
             "note": "This controller emits a plan only; a future exact contract must register execution adapters.",
+        },
+    }
+
+
+def build_m1_eval_matrix_plan(
+    config_paths: list[Path],
+    *,
+    repo_root: Path,
+    project_state_path: Path,
+) -> dict[str, Any]:
+    """Compose exactly the fixed OLMo/Qwen/SmolLM M1 plans behind one barrier."""
+
+    if len(config_paths) != len(FIXED_M1_MODELS):
+        raise ValueError("The M1 matrix requires exactly three model configs")
+    plans = [
+        build_m1_eval_plan(path, repo_root=repo_root, project_state_path=project_state_path)
+        for path in config_paths
+    ]
+    model_ids = [str(plan["model"]["id"]) for plan in plans]
+    if set(model_ids) != set(FIXED_M1_MODELS) or len(model_ids) != len(set(model_ids)):
+        raise ValueError("M1 matrix configs must bind exactly OLMo, Qwen2.5 and SmolLM2 once")
+
+    tasks: list[dict[str, Any]] = []
+    checkpoint_task_ids: list[str] = []
+    for plan in plans:
+        label = plan["model"]["id"].split("/")[-1].replace(".", "_").replace("-", "_")
+        for task in plan["tasks"]:
+            if task["kind"] != "checkpoint_evaluation":
+                continue
+            task_id = f"{label}__{task['task_id']}"
+            checkpoint_task_ids.append(task_id)
+            tasks.append(
+                {
+                    **task,
+                    "task_id": task_id,
+                    "depends_on": [f"{label}__m1_training_manifest"],
+                    "model_id": plan["model"]["id"],
+                    "parallel_group": "all_model_checkpoint_evaluations",
+                }
+            )
+    tasks.extend(
+        [
+            {
+                "task_id": "normalize_m1_three_model_results",
+                "kind": "normalization",
+                "checkpoint_id": None,
+                "model_id": None,
+                "bundles": [],
+                "depends_on": checkpoint_task_ids,
+                "parallel_group": "barrier",
+            },
+            {
+                "task_id": "build_m1_three_model_presentation_bundle",
+                "kind": "presentation",
+                "checkpoint_id": None,
+                "model_id": None,
+                "bundles": [],
+                "depends_on": ["normalize_m1_three_model_results"],
+                "parallel_group": "barrier",
+            },
+        ]
+    )
+    identity = {
+        "controller": "m1_eval_three_model_matrix",
+        "models": model_ids,
+        "config_sha256": [plan["config_sha256"] for plan in plans],
+        "subplan_ids": [plan["plan_id"] for plan in plans],
+    }
+    blockers = sorted({blocker for plan in plans for blocker in plan["blockers"]})
+    return {
+        "schema_version": 1,
+        "controller": "m1_eval_three_model_matrix",
+        "plan_id": sha256_text(json.dumps(identity, sort_keys=True))[:16],
+        "status": "ready_to_execute" if not blockers else "blocked",
+        "execution_authorized": False,
+        "scientific_work_started": False,
+        "models": [plan["model"] for plan in plans],
+        "subplans": plans,
+        "parallelism": {
+            "policy": "all_three_models_and_checkpoint_evaluations_parallel_after_training_barriers",
+            "max_concurrent_jobs": 3,
+            "barrier": "normalize_then_presentation",
+        },
+        "checks": [
+            {
+                "id": "fixed_three_model_set",
+                "status": "pass",
+                "detail": "OLMo, Qwen2.5 and SmolLM2 are each present exactly once",
+            }
+        ],
+        "blockers": blockers,
+        "tasks": tasks,
+        "safety": {
+            "planner_only": True,
+            "network": False,
+            "model_load": False,
+            "training": False,
+            "evaluation": False,
+            "hu_or_slurm": False,
+            "note": "The matrix composes fail-closed subplans; it does not authorize execution.",
         },
     }

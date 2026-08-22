@@ -5,7 +5,10 @@ import argparse
 import json
 from pathlib import Path
 
-from transfer_vs_relearning.study.m1_eval_controller import build_m1_eval_plan
+from transfer_vs_relearning.study.m1_eval_controller import (
+    build_m1_eval_matrix_plan,
+    build_m1_eval_plan,
+)
 from transfer_vs_relearning.utils.io import write_json
 
 
@@ -16,7 +19,9 @@ def main() -> None:
     parser.add_argument(
         "--config",
         type=Path,
-        default=Path("configs/pipelines/eval_v1_olmo_epoch_trajectory_template.yaml"),
+        action="append",
+        dest="configs",
+        help="One config for a single model, or exactly three configs for the fixed M1 matrix.",
     )
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     parser.add_argument(
@@ -32,9 +37,14 @@ def main() -> None:
     )
     args = parser.parse_args()
     repo_root = args.repo_root.resolve()
-    config = args.config if args.config.is_absolute() else repo_root / args.config
+    configs = args.configs or [Path("configs/pipelines/eval_v1_olmo_epoch_trajectory_template.yaml")]
+    configs = [path if path.is_absolute() else repo_root / path for path in configs]
     project_state = args.project_state if args.project_state.is_absolute() else repo_root / args.project_state
-    plan = build_m1_eval_plan(config, repo_root=repo_root, project_state_path=project_state)
+    plan = (
+        build_m1_eval_plan(configs[0], repo_root=repo_root, project_state_path=project_state)
+        if len(configs) == 1
+        else build_m1_eval_matrix_plan(configs, repo_root=repo_root, project_state_path=project_state)
+    )
     if args.output:
         output = args.output if args.output.is_absolute() else repo_root / args.output
         write_json(output.resolve(), plan)

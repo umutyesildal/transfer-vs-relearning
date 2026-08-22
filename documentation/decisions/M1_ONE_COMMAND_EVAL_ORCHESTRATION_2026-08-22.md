@@ -13,11 +13,13 @@ exact-prefix supplement in each lane, waits at a normalization barrier, and then
 presentation bundle. The checkpoint lanes are independent after the training manifest is closed and
 can therefore run in parallel, subject to a bounded concurrency limit.
 
-The local entrypoint is:
+The local entrypoint is (repeat `--config` three times for the complete fixed M1 cohort):
 
 ```bash
 PYTHONPATH=src python3 scripts/study/run_m1_eval.py \
-  --config <frozen-m1-eval-config.yaml> \
+  --config <frozen-olmo-m1-eval-config.yaml> \
+  --config <frozen-qwen-m1-eval-config.yaml> \
+  --config <frozen-smollm-m1-eval-config.yaml> \
   --project-state documentation/current/PROJECT_STATE.yaml \
   --execute
 ```
@@ -49,7 +51,7 @@ unfrozen. It does not call LM Eval, load weights, use HU/SSH, submit Slurm, or c
 ## Runtime barriers
 
 1. Hash-closed synthetic-fact dataset, M1 training and M1 checkpoint manifests.
-2. Per-checkpoint eval lanes in parallel, with bounded GPU concurrency.
+2. All three fixed models and their per-checkpoint eval lanes in parallel, with bounded GPU concurrency.
 3. Canonical normalization only after every required lane has an explicit complete/failed row.
 4. Presentation builder after normalization; raw namespaces remain immutable.
 

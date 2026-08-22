@@ -11,17 +11,18 @@ hash-closed M1 model/checkpoint or training manifest: `artifacts/models/` contai
 `.gitkeep`, and the tracked M1 configuration files point to historical or external scratch roots.
 Those paths are evidence references, not automatically usable M1 inputs.
 
-The retained historical Qwen/OLMo/SmolLM artifacts are heterogeneous pilot/screening evidence.
-They do not constitute a matched current M1 cohort with one frozen recipe, exact dataset binding,
-epoch trace and checkpoint registry. The controller therefore must not silently promote them to
-the prospective M1 wave.
+The M1 model set is fixed and inherited from M0: OLMo-2-0425-1B, Qwen2.5-1.5B and SmolLM2-1.7B,
+with their already frozen M0 revisions. There is no model-choice gate here. The retained historical
+Qwen/OLMo/SmolLM artifacts are heterogeneous pilot/screening evidence; they do not constitute the
+new matched M1 cohort until each model has the same synthetic-fact identity binding, its frozen
+recipe, epoch trace and checkpoint registry. The controller therefore must not silently promote
+historical artifacts to the prospective wave.
 
 ## Required closure before execution
 
-1. Select the scientifically authorized model family from the provenance/measurement decision
-   table.
-2. Freeze its model/tokenizer manifest and M1 training recipe against the synthetic-fact manifest.
-3. Produce a fresh M1 training manifest plus model-only epoch checkpoint manifests.
+1. Bind all three fixed M0 model/tokenizer manifests and revisions.
+2. Freeze each model's M1 training recipe against the synthetic-fact manifest.
+3. Produce a fresh M1 training manifest plus model-only epoch checkpoint manifests per model.
 4. Bind the exact-prefix registry and eval-v2 registry hashes.
 5. Create a separately authorized execution contract and register the adapters.
 

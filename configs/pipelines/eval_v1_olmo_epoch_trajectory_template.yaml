@@ -58,6 +58,8 @@ outputs:
 inputs:
   eval_registry: configs/evaluation/eval_v2_registry.yaml
   eval_registry_sha256: __FROZEN_EVAL_V2_REGISTRY_SHA256__
+  m0_model_manifest: __FROZEN_M0_MODEL_MANIFEST__
+  m0_model_manifest_sha256: __FROZEN_M0_MODEL_MANIFEST_SHA256__
   m1_checkpoint_manifest: __FROZEN_M1_CHECKPOINT_MANIFEST__
   m1_checkpoint_manifest_sha256: __FROZEN_M1_CHECKPOINT_MANIFEST_SHA256__
   m1_training_manifest: __FROZEN_M1_TRAINING_MANIFEST__
