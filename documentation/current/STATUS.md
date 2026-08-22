@@ -28,12 +28,14 @@ separate authority.
 The execution-enabled v1b projection completed in its fresh HU root with exactly 24 hash-verified
 source rows and zero metric rows. The reference closure is complete, but metric extraction and
 normalization remain a separate authority boundary. The first authorized v1a source audit stopped
-fail-closed on the historical exact-prefix schema: those complete lane payloads omit `returncode`,
-and their unique primary metric is `primary_mean_logprob_top1_accuracy`, not generic `top1_accuracy`.
-The append-only result is preserved. A narrow v1b adapter correction is now locally fixture-
-validated: it still expects 24 rows and 42 canonical observations, blocks missing/ambiguous aliases,
+fail-closed on the historical exact-prefix schema. The v1b correction handled that legacy completion
+format, then traversed all 24 rows and exposed the next real boundary: canonical metrics live under
+path-specific lm-eval/project JSON structures, Turkish PPL has an explicit cross-domain-control
+summary, factual robust evidence is tabular, and the primary held-out Turkish corpus is absent from
+this M0 lane. Both append-only results are preserved. A path-aware v1c adapter is now locally
+fixture-validated: it binds exact JSON paths, verified CSV aggregates and denominator metadata,
 never rescoring or mutating historical sources, and writes no output while unauthorized. The next
-bounded action is one read-only v1b source audit; only an audit PASS can open a separately
+bounded action is one read-only v1c source audit; only an audit PASS can open a separately
 authorized normalization wave. M1/M2 work and cleanup remain closed.
 eval-v2 freeze does not authorize normalization execution, M1/M2 training, HU/Slurm work, cleanup
 or publication; `ready_to_train` remains false.
@@ -203,11 +205,11 @@ These are constraints and evidence, not reasons to throw away existing implement
 
 ## Active work boundary
 
-The active task is a read-only-to-source eval-v2 M0 metric-schema audit v1b:
+The active task is a read-only-to-source eval-v2 M0 metric-schema audit v1c:
 
 1. read the completed v1b projection registry and its declared lane artifacts;
 2. verify every selected source path and SHA-256 without model load, inference or rescoring;
-3. resolve the corrected exact-prefix and canonical aliases for all 24 lanes and report missing/ambiguous fields;
+3. resolve the corrected exact JSON paths and factual CSV aggregates for all 24 lanes and report missing/ambiguous fields;
 4. normalize only after the real 24-row / 42-observation audit passes and a new exact authorization is supplied;
 5. preserve the historical eval-v1 family, every Pile attempt and all failure evidence unchanged.
 

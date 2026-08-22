@@ -1,0 +1,87 @@
+schema_version: 1
+name: eval-v2-m0-metric-normalization-v1c
+status: prepared_path_aware_adapter_unexecuted
+as_of: "2026-08-22"
+execution_authorized: false
+normalization_authorized: false
+rescore_authorized: false
+historical_sources_read_only: true
+eval_contract: eval-v2
+contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1c.md
+contract_sha256: 23f215696f25a9a3287dd058f3c50ff9e7f4a441cfed578756c4df68f0b21ad1
+
+identities:
+  eval_contract:
+    path: documentation/contracts/evaluation/eval-v2.md
+    sha256: 95eec6fc5a9dd7ce6da3185dfe20e2a183ad3850194c15f88a1299f09a43c6a3
+  eval_registry:
+    path: configs/evaluation/eval_v2_registry.yaml
+    sha256: 0721412c651f5b112f531e69b53c98ccdb3633bee4888571bd7039d3f693229d
+  result_schema:
+    path: documentation/evaluation/RESULT_SCHEMA_V1.md
+    sha256: 239d00c83aaa0a9bc169a22dfcfe9ece6f8a5b3d5be4f55dabbf254d7b2b64c1
+
+input_projection:
+  contract_path: documentation/contracts/evaluation/eval-v2-m0-projection-v1b.md
+  contract_sha256: 4ee1d08f06f789c01f563cccd7ef80772fa403f51a7fe2bb440c577418f42500
+  config_path: configs/evaluation/eval_v2_m0_projection_v1b.yaml
+  config_sha256: debc12012e77b323ac1ad73331a5ab4a7d66a7900e5b16efeaa3c274ad1d3f82
+  root: /vol/tmp2/yesildau/eval_v2_m0_three_model_projection_v1b
+  source_registry: /vol/tmp2/yesildau/eval_v2_m0_three_model_projection_v1b/source_registry.jsonl
+  source_registry_sha256: a0dca252afe7c1d03e458a60a8b48d7e8d8858e0ad95e6e8be696311a0b34265
+  projection_manifest: /vol/tmp2/yesildau/eval_v2_m0_three_model_projection_v1b/projection_manifest.json
+  projection_manifest_sha256: 9081b8eabef1ddfe1139754176cdcb1a26757fa3367d511cf81183536c8a9e0c
+  required_source_rows: 24
+  canonical_non_pile_rows: 21
+  exact_prefix_rows: 3
+
+models: [olmo, qwen, smollm]
+required_lane_ids:
+  - english_retention_wikitext
+  - english_grammar_blimp
+  - english_capability
+  - turkish_capability
+  - turkish_perplexity
+  - factual_access
+  - generation_integrity
+
+metric_mapping_version: eval-v2-m0-normalization-map-v1c
+primary_retention_unit: bits_per_byte
+parent_comparison_at_m0: not_applicable
+missingness_policy: missing_is_not_zero
+bootstrap_policy: copy_verified_source_intervals_without_recomputation
+output_root: /vol/tmp2/yesildau/eval_v2_m0_metric_normalization_v1c
+
+operator:
+  module: src/transfer_vs_relearning/study/m0_metric_normalization.py
+  script: scripts/study/normalize_m0_eval_v2.py
+  module_sha256: b86ecf332264bb9c2947b0fddf653a855e4e73a0f0b1309c68a211d3c528f89c
+  script_sha256: 79772ab237061c29a635fcc5303c330af2387f889681d339cdb18c3ffc984427
+  status: local_path_aware_fixture_audit_pass_source_audit_pending
+
+prior_audits:
+  v1a:
+    contract_sha256: d7e0310dc89f70b742840b0d3680d2c8d9b0ebc4738259ba512065ce6fd2b7a2
+    config_sha256: 0cb92839242f7fa82f7d713ca651d75dba5f047def1f6ba8514a44b3ec728b21
+    result_path: documentation/evaluation/M0_METRIC_SOURCE_AUDIT_2026-08-22.md
+    result_sha256: 692f857ce48bcb765308d560d23f2c6410ff2b8ccf6b1fb7fe99bb2a76e3edd5
+    status: blocked_by_historical_exact_prefix_adapter_schema
+  v1b:
+    contract_sha256: 5f3009709c729cf9af8c37ccfe8f945895539f3b591a4ac7ea10068698a40764
+    config_sha256: 974d10defb5fa2660a92c1a83eefa005294bb702804ef5f374a116c7ff17e700
+    result_path: documentation/evaluation/M0_METRIC_SOURCE_AUDIT_V1B_2026-08-22.md
+    result_sha256: 8553edfb7e831f3d2a0042abb387717584140c279e7ddfbb484a536036af4f72
+    status: blocked_by_path_specific_metric_schema_and_tabular_factual_evidence
+
+prohibitions:
+  - model_load_or_inference
+  - rescore_any_lane
+  - include_pile_10k
+  - mutate_or_delete_historical_sources
+  - overwrite_existing_output_root
+  - infer_missing_metrics
+  - recompute_bootstrap_or_significance
+  - apply_scientific_gates
+  - select_a_primary_model
+  - m1_or_m2_training
+  - cleanup_or_deletion

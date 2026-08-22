@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import csv
-import hashlib
 import json
 import math
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import yaml
 
@@ -29,31 +28,34 @@ ALL_LANES = CANONICAL_LANES + ("exact_prefix",)
 # normalization stops and the source adapter must be revised; it never guesses.
 METRIC_ALIASES: dict[str, dict[str, tuple[str, ...]]] = {
     "english_retention_wikitext": {
-        "bits_per_byte": ("bits_per_byte", "bpb"),
-        "word_perplexity": ("word_perplexity", "word_ppl"),
-        "byte_perplexity": ("byte_perplexity", "byte_ppl"),
+        "bits_per_byte": ("results.wikitext.bits_per_byte,none",),
+        "word_perplexity": ("results.wikitext.word_perplexity,none",),
+        "byte_perplexity": ("results.wikitext.byte_perplexity,none",),
     },
     "english_grammar_blimp": {
-        "accuracy": ("macro_accuracy", "accuracy", "acc"),
+        "accuracy": ("results.blimp.acc,none",),
     },
     "english_capability": {
-        "hellaswag_acc_norm": ("hellaswag_acc_norm", "acc_norm"),
+        "hellaswag_acc_norm": ("results.hellaswag.acc_norm,none",),
     },
     "turkish_capability": {
-        "accuracy": ("macro_accuracy", "accuracy", "acc_norm"),
+        "accuracy": ("results.turblimp_core.acc_norm,none",),
     },
     "turkish_perplexity": {
-        "bits_per_byte": ("bits_per_byte", "bpb"),
-        "word_perplexity": ("word_perplexity", "word_ppl"),
-        "byte_perplexity": ("byte_perplexity", "byte_ppl"),
+        "bits_per_byte": ("summary.primary_cross_tokenizer_metric=bits_per_byte.bits_per_byte",),
+        # The source evaluator calls this token perplexity; the canonical eval-v2
+        # long table retains word_perplexity for compatibility and stores the source
+        # metric identity in raw_artifact_json_path.
+        "word_perplexity": ("summary.primary_cross_tokenizer_metric=bits_per_byte.perplexity",),
+        "byte_perplexity": ("summary.primary_cross_tokenizer_metric=bits_per_byte.byte_perplexity",),
     },
     "factual_access": {
-        "top1_accuracy": ("top1_accuracy", "factual_top1_accuracy"),
-        "robust_fact_intersection": ("robust_fact_intersection",),
+        "top1_accuracy": ("summary.top1/summary.probes",),
+        "robust_fact_intersection": ("all_cell_intersections.csv.all_cell_intersection/n",),
     },
     "generation_integrity": {
-        "empty_generation_rate": ("empty_generation_rate",),
-        "repeated_3gram_fraction": ("repeated_3gram_fraction",),
+        "empty_generation_rate": ("summary.generation.empty_generation_count/summary.generation.prompt_count",),
+        "repeated_3gram_fraction": ("summary.generation.mean_repeated_3gram_fraction",),
     },
     "exact_prefix": {
         # Historical exact-prefix lane_result.json exposes this one unambiguous
@@ -110,6 +112,137 @@ def _candidate_values(documents: list[tuple[Path, dict[str, Any]]], aliases: tup
     return matches
 
 
+def _csv_rows(path: Path) -> list[dict[str, str]]:
+    with path.open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle))
+
+
+def _match(path: Path, location: str, value: Any, *, source_metric: str | None = None,
+           denominator_name: str | None = None, denominator_value: float | None = None) -> dict[str, Any] | None:
+    if not _numeric(value):
+        return None
+    return {
+        "path": str(path),
+        "json_path": location,
+        "value": float(value),
+        "source_metric": source_metric or location,
+        "denominator_name": denominator_name,
+        "denominator_value": denominator_value,
+    }
+
+
+def _path_match(
+    documents: list[tuple[Path, dict[str, Any]]],
+    path_parts: tuple[str, ...],
+    *,
+    marker: tuple[str, Any] | None = None,
+    source_metric: str | None = None,
+) -> list[dict[str, Any]]:
+    matches: list[dict[str, Any]] = []
+    for path, payload in documents:
+        if marker is not None and payload.get(marker[0]) != marker[1]:
+            continue
+        value: Any = payload
+        for part in path_parts:
+            if not isinstance(value, dict) or part not in value:
+                value = None
+                break
+            value = value[part]
+        match = _match(path, ".".join(path_parts), value, source_metric=source_metric)
+        if match is not None:
+            matches.append(match)
+    return matches
+
+
+def _lm_eval_match(
+    documents: list[tuple[Path, dict[str, Any]]], task: str, metric_key: str,
+) -> list[dict[str, Any]]:
+    return _path_match(documents, ("results", task, metric_key), source_metric=metric_key)
+
+
+def _source_summary_matches(
+    documents: list[tuple[Path, dict[str, Any]]], field: str,
+) -> list[dict[str, Any]]:
+    return _path_match(
+        documents,
+        (field,),
+        marker=("primary_cross_tokenizer_metric", "bits_per_byte"),
+        source_metric=field,
+    )
+
+
+def _factual_matches(
+    documents: list[tuple[Path, dict[str, Any]]], tables: list[tuple[Path, list[dict[str, str]]]],
+) -> dict[str, list[dict[str, Any]]]:
+    top1: list[dict[str, Any]] = []
+    for path, payload in documents:
+        if "top1" not in payload or "probes" not in payload:
+            continue
+        denominator = payload.get("probes")
+        if _numeric(payload.get("top1")) and _numeric(denominator) and float(denominator) > 0:
+            top1.append(
+                _match(
+                    path,
+                    "top1/probes",
+                    float(payload["top1"]) / float(denominator),
+                    source_metric="top1",
+                    denominator_name="probes",
+                    denominator_value=float(denominator),
+                )
+            )
+    robust: list[dict[str, Any]] = []
+    for path, rows in tables:
+        if path.name != "all_cell_intersections.csv" or not rows:
+            continue
+        if not all("all_cell_intersection" in row and "n" in row for row in rows):
+            continue
+        numerator = sum(float(row["all_cell_intersection"]) for row in rows)
+        denominator = sum(float(row["n"]) for row in rows)
+        if denominator > 0:
+            robust.append(
+                _match(
+                    path,
+                    "sum(all_cell_intersection)/sum(n)",
+                    numerator / denominator,
+                    source_metric="all_cell_intersection",
+                    denominator_name="sum(n)",
+                    denominator_value=denominator,
+                )
+            )
+    return {"top1_accuracy": top1, "robust_fact_intersection": robust}
+
+
+def _generation_matches(documents: list[tuple[Path, dict[str, Any]]]) -> dict[str, list[dict[str, Any]]]:
+    empty: list[dict[str, Any]] = []
+    repeated: list[dict[str, Any]] = []
+    for path, payload in documents:
+        generation = payload.get("generation")
+        if not isinstance(generation, dict):
+            continue
+        prompt_count = generation.get("prompt_count")
+        empty_count = generation.get("empty_generation_count")
+        if _numeric(prompt_count) and float(prompt_count) > 0:
+            match = _match(
+                path,
+                "generation.empty_generation_count/generation.prompt_count",
+                float(empty_count) / float(prompt_count) if _numeric(empty_count) else None,
+                source_metric="empty_generation_count",
+                denominator_name="prompt_count",
+                denominator_value=float(prompt_count),
+            )
+            if match is not None:
+                empty.append(match)
+        match = _match(
+            path,
+            "generation.mean_repeated_3gram_fraction",
+            generation.get("mean_repeated_3gram_fraction"),
+            source_metric="mean_repeated_3gram_fraction",
+        )
+        if match is not None:
+            repeated.append(match)
+    return {"empty_generation_rate": empty, "repeated_3gram_fraction": repeated}
+
+
 def _load_plan(config_path: Path, *, repo_root: Path) -> dict[str, Any]:
     config_path = config_path.resolve()
     config = _mapping(yaml.safe_load(config_path.read_text(encoding="utf-8")), "normalization config")
@@ -153,7 +286,9 @@ def _load_projection(plan: dict[str, Any]) -> tuple[list[dict[str, Any]], dict[s
     return rows, manifest
 
 
-def _lane_documents(row: dict[str, Any]) -> tuple[list[tuple[Path, dict[str, Any]]], dict[str, Any]]:
+def _lane_documents(
+    row: dict[str, Any],
+) -> tuple[list[tuple[Path, dict[str, Any]]], dict[str, Any], list[tuple[Path, list[dict[str, str]]]]]:
     lane_path = Path(str(row["source_path"]))
     lane_sha = row.get("sha256", row.get("source_sha256"))
     _verify(lane_path, str(lane_sha), "lane result")
@@ -165,6 +300,7 @@ def _lane_documents(row: dict[str, Any]) -> tuple[list[tuple[Path, dict[str, Any
     if row.get("lane_id") != "exact_prefix" and lane.get("returncode") != 0:
         raise ValueError(f"Canonical lane returncode is not zero: {row.get('model_id')}:{row.get('lane_id')}")
     documents: list[tuple[Path, dict[str, Any]]] = [(lane_path, lane)]
+    tables: list[tuple[Path, list[dict[str, str]]]] = []
     for artifact in lane.get("artifacts", []):
         item = _mapping(artifact, "lane artifact")
         artifact_path = Path(str(item.get("path", "")))
@@ -174,7 +310,50 @@ def _lane_documents(row: dict[str, Any]) -> tuple[list[tuple[Path, dict[str, Any
                 documents.append((artifact_path, _json(artifact_path)))
             except (UnicodeDecodeError, json.JSONDecodeError):
                 continue
-    return documents, lane
+        elif artifact_path.suffix.casefold() == ".csv" and artifact_path.stat().st_size <= 10 * 1024 * 1024:
+            try:
+                tables.append((artifact_path, _csv_rows(artifact_path)))
+            except (UnicodeDecodeError, csv.Error):
+                continue
+    return documents, lane, tables
+
+
+def _metric_matches(
+    lane_id: str,
+    documents: list[tuple[Path, dict[str, Any]]],
+    tables: list[tuple[Path, list[dict[str, str]]]],
+) -> dict[str, list[dict[str, Any]]]:
+    if lane_id == "english_retention_wikitext":
+        return {
+            "bits_per_byte": _lm_eval_match(documents, "wikitext", "bits_per_byte,none"),
+            "word_perplexity": _lm_eval_match(documents, "wikitext", "word_perplexity,none"),
+            "byte_perplexity": _lm_eval_match(documents, "wikitext", "byte_perplexity,none"),
+        }
+    if lane_id == "english_grammar_blimp":
+        return {"accuracy": _lm_eval_match(documents, "blimp", "acc,none")}
+    if lane_id == "english_capability":
+        return {"hellaswag_acc_norm": _lm_eval_match(documents, "hellaswag", "acc_norm,none")}
+    if lane_id == "turkish_capability":
+        return {"accuracy": _lm_eval_match(documents, "turblimp_core", "acc_norm,none")}
+    if lane_id == "turkish_perplexity":
+        return {
+            "bits_per_byte": _source_summary_matches(documents, "bits_per_byte"),
+            "word_perplexity": _source_summary_matches(documents, "perplexity"),
+            "byte_perplexity": _source_summary_matches(documents, "byte_perplexity"),
+        }
+    if lane_id == "factual_access":
+        return _factual_matches(documents, tables)
+    if lane_id == "generation_integrity":
+        return _generation_matches(documents)
+    if lane_id == "exact_prefix":
+        return {
+            "exact_prefix_accuracy": _path_match(
+                documents,
+                ("primary_mean_logprob_top1_accuracy",),
+                source_metric="primary_mean_logprob_top1_accuracy",
+            )
+        }
+    raise ValueError(f"Unknown lane: {lane_id}")
 
 
 def audit_normalization(config_path: Path, *, repo_root: Path) -> dict[str, Any]:
@@ -187,9 +366,10 @@ def audit_normalization(config_path: Path, *, repo_root: Path) -> dict[str, Any]
         lane_id = str(row["lane_id"])
         if model_id not in MODEL_IDS or lane_id not in ALL_LANES:
             raise ValueError(f"Unknown source binding: {model_id}:{lane_id}")
-        documents, lane = _lane_documents(row)
+        documents, lane, tables = _lane_documents(row)
+        metric_matches = _metric_matches(lane_id, documents, tables)
         for metric, aliases in METRIC_ALIASES[lane_id].items():
-            matches = _candidate_values(documents, aliases)
+            matches = metric_matches[metric]
             if len(matches) != 1:
                 findings.append(
                     {
@@ -214,6 +394,9 @@ def audit_normalization(config_path: Path, *, repo_root: Path) -> dict[str, Any]
                     "raw_artifact_sha256": sha256_file(Path(match["path"])),
                     "source_lane_sha256": row.get("sha256", row.get("source_sha256")),
                     "source_status": lane.get("status"),
+                    "source_metric": match.get("source_metric"),
+                    "denominator_name": match.get("denominator_name"),
+                    "denominator_value": match.get("denominator_value"),
                 }
             )
     expected_metric_count = sum(
@@ -229,6 +412,7 @@ def audit_normalization(config_path: Path, *, repo_root: Path) -> dict[str, Any]
         "metric_observation_candidate_count": len(metric_rows),
         "expected_metric_observation_count": expected_metric_count,
         "findings": findings,
+        "metric_rows": metric_rows,
         "normalization_performed": False,
         "rescoring_performed": False,
         "historical_sources_mutated": False,
@@ -255,14 +439,10 @@ def normalize(config_path: Path, *, repo_root: Path) -> dict[str, Any]:
         raise FileExistsError(f"Normalization output root already exists: {output_root}")
     output_root.mkdir(parents=True)
     # The actual normalized rows are deliberately assembled only after the complete audit.
-    rows, _ = _load_projection(plan)
     observations: list[dict[str, Any]] = []
-    for row in rows:
-        documents, _ = _lane_documents(row)
-        for metric, aliases in METRIC_ALIASES[str(row["lane_id"])].items():
-            match = _candidate_values(documents, aliases)[0]
-            observations.append(
-                {
+    for match in audit["metric_rows"]:
+        observations.append(
+            {
                     "eval_contract": "eval-v2",
                     "experiment_id": "m0_reference_projection_v1b",
                     "state": "M0",
@@ -270,23 +450,23 @@ def normalize(config_path: Path, *, repo_root: Path) -> dict[str, Any]:
                     "arm": "baseline",
                     "seed": None,
                     "checkpoint_id": "m0_parent",
-                    "lane": row["lane_id"],
-                    "family": row["lane_id"],
-                    "task_id": row["lane_id"],
+                    "lane": match["lane_id"],
+                    "family": match["lane_id"],
+                    "task_id": match["lane_id"],
                     "task_version": "source_declared",
                     "dataset_id": "source_declared",
                     "dataset_revision": "source_declared",
                     "split": "source_declared",
                     "prompt_id": None,
                     "fewshot": None,
-                    "metric": metric,
+                    "metric": match["metric"],
                     "filter": "source_declared",
-                    "role": "secondary" if row["lane_id"] == "exact_prefix" else "primary",
+                    "role": "secondary" if match["lane_id"] == "exact_prefix" else "primary",
                     "value": match["value"],
                     "unit": "native_source_unit",
                     "higher_is_better": None,
-                    "denominator_name": None,
-                    "denominator_value": None,
+                    "denominator_name": match.get("denominator_name"),
+                    "denominator_value": match.get("denominator_value"),
                     "sample_count": None,
                     "stderr": None,
                     "ci_low": None,
@@ -299,8 +479,8 @@ def normalize(config_path: Path, *, repo_root: Path) -> dict[str, Any]:
                     "missing_reason": None,
                     "raw_artifact_path": match["path"],
                     "raw_artifact_sha256": sha256_file(Path(match["path"])),
-                }
-            )
+            }
+        )
     _write_parquet(output_root / "checkpoint_registry.parquet", [], CHECKPOINT_FIELDS)
     _write_parquet(output_root / "metric_observations.parquet", observations, METRIC_FIELDS)
     _write_parquet(output_root / "factual_probe_results.parquet", [], FACTUAL_FIELDS)

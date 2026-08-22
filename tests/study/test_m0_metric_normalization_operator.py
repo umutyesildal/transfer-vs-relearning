@@ -25,12 +25,46 @@ def _fixture(tmp_path: Path, *, authorized: bool = False) -> Path:
         for lane_id in ALL_LANES:
             lane_root = source_root / model_id / lane_id
             lane_root.mkdir(parents=True)
-            metrics = {
-                aliases[0]: float(index + 1)
-                for index, aliases in enumerate(METRIC_ALIASES[lane_id].values())
-            }
             summary = lane_root / "summary.json"
-            summary.write_text(json.dumps({"metrics": metrics}), encoding="utf-8")
+            if lane_id == "english_retention_wikitext":
+                summary_payload = {
+                    "results": {
+                        "wikitext": {
+                            "bits_per_byte,none": 1.0,
+                            "word_perplexity,none": 2.0,
+                            "byte_perplexity,none": 3.0,
+                        }
+                    }
+                }
+            elif lane_id == "english_grammar_blimp":
+                summary_payload = {"results": {"blimp": {"acc,none": 1.0}}}
+            elif lane_id == "english_capability":
+                summary_payload = {"results": {"hellaswag": {"acc_norm,none": 1.0}}}
+            elif lane_id == "turkish_capability":
+                summary_payload = {"results": {"turblimp_core": {"acc_norm,none": 1.0}}}
+            elif lane_id == "turkish_perplexity":
+                summary_payload = {
+                    "status": "completed",
+                    "primary_cross_tokenizer_metric": "bits_per_byte",
+                    "bits_per_byte": 1.0,
+                    "perplexity": 2.0,
+                    "byte_perplexity": 3.0,
+                }
+            elif lane_id == "generation_integrity":
+                summary_payload = {
+                    "generation": {
+                        "empty_generation_count": 1,
+                        "prompt_count": 2,
+                        "mean_repeated_3gram_fraction": 0.5,
+                    }
+                }
+            else:
+                summary_payload = {"placeholder": True}
+            summary.write_text(json.dumps(summary_payload), encoding="utf-8")
+            table = lane_root / "all_cell_intersections.csv"
+            if lane_id == "factual_access":
+                summary.write_text(json.dumps({"top1": 1, "probes": 2}), encoding="utf-8")
+                table.write_text("relation,n,all_cell_intersection\nr1,2,1\n", encoding="utf-8")
             lane_result = lane_root / "lane_result.json"
             lane_payload = {
                 "lane_id": lane_id,
@@ -43,6 +77,16 @@ def _fixture(tmp_path: Path, *, authorized: bool = False) -> Path:
                     }
                 ],
             }
+            if lane_id == "factual_access":
+                lane_payload["artifacts"].append(
+                    {
+                        "path": str(table),
+                        "bytes": table.stat().st_size,
+                        "sha256": sha256_file(table),
+                    }
+                )
+            if lane_id == "exact_prefix":
+                lane_payload["primary_mean_logprob_top1_accuracy"] = 1.0
             if lane_id != "exact_prefix":
                 lane_payload["returncode"] = 0
             lane_result.write_text(json.dumps(lane_payload), encoding="utf-8")
@@ -124,15 +168,18 @@ def test_normalization_refuses_unauthorized_config_without_output(tmp_path: Path
 
 def test_normalization_audit_blocks_ambiguous_metric(tmp_path: Path) -> None:
     config = _fixture(tmp_path)
-    raw = json.loads((tmp_path / "sources/olmo/english_grammar_blimp/summary.json").read_text())
-    raw["metrics"]["accuracy"] = 0.5
-    raw["metrics"]["macro_accuracy"] = 0.5
     summary = tmp_path / "sources/olmo/english_grammar_blimp/summary.json"
-    summary.write_text(json.dumps(raw), encoding="utf-8")
+    duplicate = summary.with_name("summary_duplicate.json")
+    duplicate.write_text(summary.read_text(), encoding="utf-8")
     lane = tmp_path / "sources/olmo/english_grammar_blimp/lane_result.json"
     lane_payload = json.loads(lane.read_text())
-    lane_payload["artifacts"][0]["bytes"] = summary.stat().st_size
-    lane_payload["artifacts"][0]["sha256"] = sha256_file(summary)
+    lane_payload["artifacts"].append(
+        {
+            "path": str(duplicate),
+            "bytes": duplicate.stat().st_size,
+            "sha256": sha256_file(duplicate),
+        }
+    )
     lane.write_text(json.dumps(lane_payload), encoding="utf-8")
     registry = tmp_path / "source_registry.jsonl"
     rows = [json.loads(line) for line in registry.read_text().splitlines()]

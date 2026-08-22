@@ -807,28 +807,37 @@ current_evidence:
     training_authorized: false
     evaluation_authorized: false
   m0_metric_normalization:
-    status: source_audit_blocked_historical_exact_prefix_adapter_schema
+    status: source_audit_blocked_path_specific_metric_schema
     supersedes_contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1.md
     supersedes_config: configs/evaluation/eval_v2_m0_metric_normalization_v1.yaml
     prior_contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1a.md
     prior_config: configs/evaluation/eval_v2_m0_metric_normalization_v1a.yaml
     prior_contract_sha256: d7e0310dc89f70b742840b0d3680d2c8d9b0ebc4738259ba512065ce6fd2b7a2
     prior_config_sha256: 0cb92839242f7fa82f7d713ca651d75dba5f047def1f6ba8514a44b3ec728b21
-    audit_result: documentation/evaluation/M0_METRIC_SOURCE_AUDIT_2026-08-22.md
-    audit_result_sha256: 692f857ce48bcb765308d560d23f2c6410ff2b8ccf6b1fb7fe99bb2a76e3edd5
-    contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1b.md
-    config: configs/evaluation/eval_v2_m0_metric_normalization_v1b.yaml
-    contract_sha256: 5f3009709c729cf9af8c37ccfe8f945895539f3b591a4ac7ea10068698a40764
-    config_sha256: 974d10defb5fa2660a92c1a83eefa005294bb702804ef5f374a116c7ff17e700
+    prior_audit_results:
+      - path: documentation/evaluation/M0_METRIC_SOURCE_AUDIT_2026-08-22.md
+        sha256: 692f857ce48bcb765308d560d23f2c6410ff2b8ccf6b1fb7fe99bb2a76e3edd5
+      - path: documentation/evaluation/M0_METRIC_SOURCE_AUDIT_V1B_2026-08-22.md
+        sha256: 8553edfb7e831f3d2a0042abb387717584140c279e7ddfbb484a536036af4f72
+    audit_result: documentation/evaluation/M0_METRIC_SOURCE_AUDIT_V1B_2026-08-22.md
+    audit_result_sha256: 8553edfb7e831f3d2a0042abb387717584140c279e7ddfbb484a536036af4f72
+    prior_contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1b.md
+    prior_config: configs/evaluation/eval_v2_m0_metric_normalization_v1b.yaml
+    prior_contract_sha256: 5f3009709c729cf9af8c37ccfe8f945895539f3b591a4ac7ea10068698a40764
+    prior_config_sha256: 974d10defb5fa2660a92c1a83eefa005294bb702804ef5f374a116c7ff17e700
+    contract: documentation/contracts/evaluation/eval-v2-m0-metric-normalization-v1c.md
+    config: configs/evaluation/eval_v2_m0_metric_normalization_v1c.yaml
+    contract_sha256: 23f215696f25a9a3287dd058f3c50ff9e7f4a441cfed578756c4df68f0b21ad1
+    config_sha256: 7127a8fd66b494347a1d7c71cee92775e49283493d3be5ebd8e99e0b59f1dffc
     input_projection_root: /vol/tmp2/yesildau/eval_v2_m0_three_model_projection_v1b
     input_projection_registry_sha256: a0dca252afe7c1d03e458a60a8b48d7e8d8858e0ad95e6e8be696311a0b34265
-    output_root: /vol/tmp2/yesildau/eval_v2_m0_metric_normalization_v1b
+    output_root: /vol/tmp2/yesildau/eval_v2_m0_metric_normalization_v1c
     operator_module: src/transfer_vs_relearning/study/m0_metric_normalization.py
     operator_script: scripts/study/normalize_m0_eval_v2.py
-    operator_module_sha256: 3de614b9ffe3b4a8a91a2091c5387c0992a409233dc09d3eb7b5cb9792dbaf0d
+    operator_module_sha256: b86ecf332264bb9c2947b0fddf653a855e4e73a0f0b1309c68a211d3c528f89c
     operator_script_sha256: 79772ab237061c29a635fcc5303c330af2387f889681d339cdb18c3ffc984427
-    operator_status: local_correction_fixture_audit_pass_source_audit_pending
-    source_audit_status: blocked_by_historical_exact_prefix_adapter_schema
+    operator_status: local_path_aware_fixture_audit_pass_source_audit_pending
+    source_audit_status: blocked_by_path_specific_metric_schema_and_tabular_factual_evidence
     execution_authorized: false
     normalization_authorized: false
   vngrs_corpus_route:
@@ -902,14 +911,15 @@ active_priority:
     - m0_metric_normalization_contract_prepared
     - m0_metric_normalization_operator_fixture_validated
     - m0_metric_source_audit_v1a_fail_closed
-    - m0_metric_normalization_exact_prefix_adapter_correction_prepared
+    - m0_metric_source_audit_v1b_fail_closed
+    - m0_metric_normalization_path_aware_adapter_prepared
     - m0_projection_v1a_fail_closed_execution_record
     - eval_v2_m0_projection_fail_closed_implementation
     - m1_historical_trajectory_inventory_implementation
     - m1_fact_access_retention_table_schema
   required_outputs:
     - canonical_hash_closed_eval_v2_m0_source_projection
-    - m0_metric_normalization_source_audit_v1b_and_operator_validation
+    - m0_metric_normalization_source_audit_v1c_and_operator_validation
     - canonical_non_pile_normalization_design
     - explicit_missingness_and_comparison_boundary
     - read_only_m1_historical_checkpoint_inventory
@@ -1047,14 +1057,14 @@ authorization:
       resubmission_authorized: false
 
 next_decision_required:
-  subject: authorize_read_only_m0_metric_source_audit_v1b
+  subject: authorize_read_only_m0_metric_source_audit_v1c
   note: >-
     Pile-10k is retired prospectively and no retry is required. The three-model M0 exact-prefix
     panel is complete and the 21 required non-Pile lanes already exist. The v1b reference
     projection now contains 24 hash-verified source rows and zero metric rows. Freeze a separate
-    The v1a read-only audit synchronized successfully but stopped fail-closed because the historical
-    exact-prefix lane payloads omit returncode and expose a distinct primary ranking field. The
-    append-only audit result is preserved. A narrow v1b adapter correction is locally fixture-
-    validated and remains unexecuted. First authorize one read-only v1b source audit; only after an
-    audit PASS request a new exact authorization for one normalization wave.
+    The v1b read-only audit traversed all 24 bindings and stopped with 3/42 observations because
+    canonical metrics use path-specific lm-eval/project schemas and factual robust evidence is in
+    declared CSVs. The append-only result is preserved. A path-aware v1c adapter is locally
+    fixture-validated and remains unexecuted. First authorize one read-only v1c source audit; only
+    after an audit PASS request a new exact authorization for one normalization wave.
     M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.
