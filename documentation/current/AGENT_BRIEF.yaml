@@ -1,0 +1,71 @@
+schema_version: 1
+brief_id: agent-brief-v1
+as_of: "2026-08-22"
+status: active
+
+source:
+  full_state: documentation/current/PROJECT_STATE.yaml
+  full_state_sha256: 0483d2326361575b8cfc85747f33273b42c43603da2c84627205f7b43575618c
+  role: context_projection_only
+  may_expand_authority: false
+
+project:
+  name: transfer-vs-relearning
+  phase: evaluation_foundation_design
+  states: [M0, M1, M2-A, M2-B]
+  m2_relationship: parallel_sibling_arms_from_same_m1_parent
+
+readiness:
+  evaluation_contract: frozen
+  corpus_contract: not_frozen
+  m1_training_contract: not_frozen
+  m2_training_contract: not_frozen
+  ready_to_measure: true
+  ready_to_train: false
+  selected_primary_model: null
+
+evaluation:
+  active_contract_name: eval-v2
+  active_contract: documentation/contracts/evaluation/eval-v2.md
+  active_contract_sha256: 95eec6fc5a9dd7ce6da3185dfe20e2a183ad3850194c15f88a1299f09a43c6a3
+  registry: configs/evaluation/eval_v2_registry.yaml
+  registry_sha256: 0721412c651f5b112f531e69b53c98ccdb3633bee4888571bd7039d3f693229d
+  pile_10k: retired_not_in_canonical_protocol
+  pile_retry_required: false
+  canonical_m0_non_pile_lanes: 21
+  canonical_m0_non_pile_lanes_required: 21
+  exact_prefix_panel: complete_three_of_three_models
+  normalization: pending_hash_closed_local_projection
+
+next_boundary:
+  subject: validate_hash_closed_eval_v2_m0_projection_and_freeze_normalization_boundary
+  allowed_now:
+    - local_read_only_source_identity_validation
+    - local_projection_design_and_tests
+    - documentation_alignment_explicitly_requested_by_user
+  not_implied:
+    - normalization_execution
+    - hu_or_slurm
+    - evaluation_or_scoring
+    - m1_or_m2_training
+    - cleanup_or_deletion
+
+agent_routing:
+  start_here: documentation/current/START_HERE.md
+  reading_profile: documentation/current/READING_PROFILE.yaml
+  active_task_packets: .agents/task-packets/study-v2/manifest.json
+  chronological_numbered_documents: preserved_default_retired
+  legacy_handoffs: preserved_default_retired
+  recursive_documentation_read: forbidden_by_default
+  full_state_required_for_scientific_or_external_execution: true
+
+authority:
+  local_repository_changes: require_current_user_instruction
+  hu_ssh: false
+  network_retrieval: false
+  slurm_gpu: false
+  training: false
+  evaluation_or_scoring: false
+  corpus_materialization: false
+  cleanup_or_deletion: false
+  old_authorization_reuse: forbidden

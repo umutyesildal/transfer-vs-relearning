@@ -10,14 +10,17 @@ It does not expand project authority. External work stops for user authorization
 Every role starts with the small live set:
 
 1. root `AGENTS.md`;
-2. `documentation/current/PROJECT_STATE.yaml`;
-3. `.agents/POLICY.md`;
-4. `.agents/GOAL.md`;
-5. the single task packet named by `GOAL.md`;
-6. the current decision/report and only its named evidence.
+2. `documentation/current/START_HERE.md`;
+3. `documentation/current/AGENT_BRIEF.yaml`;
+4. `.agents/POLICY.md`;
+5. `.agents/GOAL.md`;
+6. the single task packet named by `GOAL.md`;
+7. the current decision/report and only its named evidence.
 
-The complete numbered record and `LUNA_WORKER_CURRENT_HANDOFF.md` are no longer mandatory per-turn
-reads. A task may name them when they are actually relevant.
+The complete numbered record, full project ledger, stale packet sets and
+`LUNA_WORKER_CURRENT_HANDOFF.md` are not mandatory per-turn reads. A task may name exact entries
+when they are actually relevant. Scientific/external execution must additionally load the full
+project state and exact contract.
 
 ## Roles
 
@@ -97,7 +100,7 @@ execution + interpretation wave.
 
 ## Full-study packet set
 
-The versioned packets under `task-packets/study-v1/` mirror the 15-stage M0→M2 graph. Each packet
+The active packets under `task-packets/study-v2/` mirror the 19-stage eval-v2 M0→M2 graph. Each packet
 is an adapter implementation/validation task, not authorization to run its scientific stage. To
 use one, review it and set `GOAL.md` to one unique Goal ID plus exactly that packet path. Never point
 Luna at the packet directory or ask it to carry context from the previous packet.
@@ -107,7 +110,7 @@ Regenerate the set deterministically after an approved study-config change:
 ```bash
 .venv/bin/python scripts/study/run_study.py packets \
   --config configs/studies/m0_to_m2_eval_v1_template.yaml \
-  --output-dir .agents/task-packets/study-v1 \
+  --output-dir .agents/task-packets/study-v2 \
   --replace
 ```
 
@@ -119,7 +122,8 @@ Regenerate the set deterministically after an approved study-config change:
 - `ACTIVE`: one bounded goal may run;
 - `COMPLETED`: retained only until its evidence is recorded, then reset to the template.
 
-Project truth remains in `documentation/current/PROJECT_STATE.yaml` and immutable evidence.
+The brief is the default projection; project truth remains in the full
+`documentation/current/PROJECT_STATE.yaml` and immutable evidence.
 
 ## Tests
 

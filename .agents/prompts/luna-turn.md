@@ -7,12 +7,13 @@ This is orchestrator round {{ROUND}} for Goal ID `{{GOAL_ID}}`. Execute only the
 Before acting, read:
 
 1. `{{WORKSPACE_ROOT}}/AGENTS.md`
-2. `{{WORKSPACE_ROOT}}/documentation/current/PROJECT_STATE.yaml`
-3. `{{AGENT_DIR}}/POLICY.md`
-4. `{{AGENT_DIR}}/GOAL.md`
-5. the single task packet named by `GOAL.md`
-6. the current decision file
-7. only the authority/evidence files named by the packet and decision
+2. `{{WORKSPACE_ROOT}}/documentation/current/START_HERE.md`
+3. `{{WORKSPACE_ROOT}}/documentation/current/AGENT_BRIEF.yaml`
+4. `{{AGENT_DIR}}/POLICY.md`
+5. `{{AGENT_DIR}}/GOAL.md`
+6. the single task packet named by `GOAL.md`
+7. the current decision file
+8. only the authority/evidence files named by the packet and decision
 
 The workspace is one Git monorepo. Preserve pre-existing dirty/untracked files and do not modify
 paths outside `allowed_paths`. Do not read the full chronological archive unless the decision

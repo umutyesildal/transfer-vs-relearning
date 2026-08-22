@@ -28,5 +28,10 @@ Use [`../templates/DECISION_TEMPLATE.md`](../templates/DECISION_TEMPLATE.md).
 
 ## Current decisions
 
+- [`DEC-2026-08-22-documentation-retirement.md`](DEC-2026-08-22-documentation-retirement.md)
+  keeps every historical document in place while removing legacy gateways from the default agent
+  context.
+- [`PILE_10K_RETIREMENT_AND_EVAL_V2_DECISION_2026-08-22.md`](PILE_10K_RETIREMENT_AND_EVAL_V2_DECISION_2026-08-22.md)
+  retires Pile-10k prospectively and freezes eval-v2 around the retained non-Pile protocol.
 - [`DEC-2026-08-15-hybrid-evaluation-architecture.md`](DEC-2026-08-15-hybrid-evaluation-architecture.md)
   keeps standard harness tasks, project factual estimands and normalization as separate lanes.

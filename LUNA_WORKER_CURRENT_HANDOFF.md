@@ -1,3 +1,10 @@
+# RETIRED DEFAULT READ — preserved legacy Luna handoff
+
+> Stop: this file is historical and must not be loaded for ordinary agent work. Start with
+> `AGENTS.md`, `documentation/current/START_HERE.md`, and
+> `documentation/current/AGENT_BRIEF.yaml`. Read this legacy handoff only when a current task cites
+> a specific section. Its body is preserved below and grants no current authority.
+
 # LUNA Worker — Current Handoff and Living Task Prompt
 
 > **Purpose:** This is the single living operational handoff for LUNA-Worker 2. It is not a

@@ -1,3 +1,9 @@
+# RETIRED DEFAULT HANDOFF — preserved historical overview
+
+> Stop: this July 2026 narrative is not the current onboarding path. Start with
+> `current/START_HERE.md` and `current/AGENT_BRIEF.yaml`; open this file only for a cited historical
+> question. Its prior body is preserved below.
+
 # Project Handoff and Complete Progress Overview
 
 **Date:** 2026-07-19  

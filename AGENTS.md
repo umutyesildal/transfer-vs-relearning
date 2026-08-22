@@ -1,20 +1,22 @@
 # Project Agent Instructions
 
 These instructions apply everywhere in this monorepo. They are deliberately short and stable.
-Live status belongs in `documentation/current/PROJECT_STATE.yaml`; historical facts belong in the
-scientific record.
+Live agent context belongs in `documentation/current/AGENT_BRIEF.yaml`; the full canonical ledger
+is `documentation/current/PROJECT_STATE.yaml`; historical facts belong in the scientific record.
 
 ## Mandatory reading
 
 Before any task, read:
 
 1. this file;
-2. `documentation/current/PROJECT_STATE.yaml`;
-3. the user's current instruction or the current bounded task packet;
-4. only the relevant contract, code, tests, and evidence named by that task.
+2. `documentation/current/START_HERE.md`;
+3. `documentation/current/AGENT_BRIEF.yaml`;
+4. the user's current instruction or the current bounded task packet;
+5. only the relevant contract, code, tests, and evidence named by that task.
 
 For scientific interpretation, also read `documentation/current/STATUS.md`. For authority
-questions, read `documentation/current/AUTHORITY.md`.
+questions or any scientific/external execution, read the full `documentation/current/PROJECT_STATE.yaml`,
+`documentation/current/AUTHORITY.md`, and the exact applicable contract.
 
 `AGENTS.md` alone is not sufficient for scientific execution. It defines durable behavior, not
 the current model, dataset, gate, or authorization.
@@ -111,6 +113,8 @@ Each document has one role:
 - root `README.md`: project and repository map;
 - root `AGENTS.md`: stable operating rules;
 - `documentation/current/PROJECT_STATE.yaml`: machine-readable live state;
+- `documentation/current/AGENT_BRIEF.yaml`: small hash-bound default agent projection;
+- `documentation/current/START_HERE.md`: task-scoped reading router;
 - `documentation/current/STATUS.md`: concise human-readable synthesis;
 - `documentation/current/AUTHORITY.md`: reading and authority routing;
 - `documentation/current/ROADMAP.md`: ordered future work without granting execution;
@@ -125,6 +129,9 @@ canonical evidence.
 
 Numbered Documents 00–180 remain at their current paths until a separately reviewed link-safe
 archive move. New current work uses the directories above.
+
+Numbered documents, legacy handoffs and retired task-packet sets are not default reads. Do not scan
+them recursively; open only the exact record cited by the brief, full state, task, or evidence.
 
 ## Contract discipline
 

@@ -7,7 +7,7 @@ This file answers two questions: “What can I do?” and “What must I read?�
 1. System/developer constraints and the user's current explicit instruction.
 2. Root `AGENTS.md` stable operating rules.
 3. The applicable frozen contract for the exact proposed work.
-4. `PROJECT_STATE.yaml` and the current gate.
+4. `AGENT_BRIEF.yaml`, then `PROJECT_STATE.yaml` when full authority detail is required.
 5. Task-local plan or orchestration decision.
 6. Historical records and old handoffs.
 
@@ -19,8 +19,9 @@ document that once authorized a single wave cannot authorize another execution.
 Every new agent reads exactly these first:
 
 1. `AGENTS.md`;
-2. `documentation/current/PROJECT_STATE.yaml`;
-3. the current user request or bounded task packet.
+2. `documentation/current/START_HERE.md`;
+3. `documentation/current/AGENT_BRIEF.yaml`;
+4. the current user request or bounded task packet.
 
 Then it adds only task-specific material from the table below. This is the default micro-context
 boundary.
@@ -46,7 +47,9 @@ The intended split is:
 
 ```text
 AGENTS.md                    stable rules
-PROJECT_STATE.yaml           live facts and gates
+START_HERE.md                reading router
+AGENT_BRIEF.yaml             small current projection
+PROJECT_STATE.yaml           full canonical ledger when required
 current task packet          one bounded objective
 relevant frozen contract     exact semantics/authority when needed
 evidence named by the task   proof, not background loading
@@ -75,5 +78,5 @@ A handoff should contain only:
 - one next boundary;
 - links to the contract/result/manifest.
 
-Do not make a new agent reconstruct the project by reading all numbered documents or a previous
-chat transcript.
+Do not make a new agent reconstruct the project by reading all numbered documents, a retired
+handoff, a stale packet set, or a previous chat transcript.

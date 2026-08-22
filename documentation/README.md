@@ -7,6 +7,7 @@ so agents do not need to load the complete project history for every task.
 
 | Need | Read |
 |---|---|
+| New agent start | [`current/START_HERE.md`](current/START_HERE.md) then [`current/AGENT_BRIEF.yaml`](current/AGENT_BRIEF.yaml) |
 | Current human summary | [`current/STATUS.md`](current/STATUS.md) |
 | Machine-readable current state | [`current/PROJECT_STATE.yaml`](current/PROJECT_STATE.yaml) |
 | Authority and minimum reading set | [`current/AUTHORITY.md`](current/AUTHORITY.md) |
@@ -21,7 +22,12 @@ so agents do not need to load the complete project history for every task.
 
 Documents 00–178 remain in this directory at their existing paths. They are the chronological
 scientific record and include failures, superseded contracts, results, and corrections. They are
-not the default onboarding set.
+default-retired: preserved, searchable, and read only when a current task cites an exact record.
+
+The large legacy handoffs and old documentation index are also default-retired. See the
+machine-readable [`current/READING_PROFILE.yaml`](current/READING_PROFILE.yaml) and the
+[`retirement decision`](decisions/DEC-2026-08-22-documentation-retirement.md). No file was deleted
+or moved by this retirement.
 
 No new routine progress report should extend the global number sequence. New information belongs
 in the live state, a scoped contract, a decision record, or an immutable result artifact.

@@ -1,3 +1,8 @@
+# RETIRED DEFAULT ROSTER — preserved historical coordination record
+
+> Stop: these July 2026 standing roles are no longer the agent control plane. Read root `AGENTS.md`,
+> `current/START_HERE.md`, and one bounded task packet. The historical roster remains below.
+
 # 02 - Agent Roster
 
 Last updated: 2026-07-05

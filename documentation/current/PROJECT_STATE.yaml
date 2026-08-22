@@ -12,6 +12,17 @@ repository:
   cutover_authorized: false
   original_worktrees_are_rollback_sources: true
   documentation_control_plane: active
+  documentation_retirement:
+    status: active_zero_loss_default_retirement
+    decision: documentation/decisions/DEC-2026-08-22-documentation-retirement.md
+    start_here: documentation/current/START_HERE.md
+    reading_profile: documentation/current/READING_PROFILE.yaml
+    agent_brief: documentation/current/AGENT_BRIEF.yaml
+    numbered_documents_preserved: true
+    legacy_handoffs_preserved: true
+    files_deleted: 0
+    files_moved: 0
+    physical_archive_move_authorized: false
   migration_record: documentation/migration/REPOSITORY_MIGRATION_V1.md
   entrypoint_layout:
     version: entrypoints_v2
@@ -238,7 +249,7 @@ evaluation_target:
     prospective_template: configs/pipelines/eval_v1_olmo_epoch_trajectory_template.yaml
     full_study_template: configs/studies/m0_to_m2_eval_v1_template.yaml
     full_study_entrypoint: scripts/study/run_study.py
-    luna_packet_manifest: .agents/task-packets/study-v1/manifest.json
+    luna_packet_manifest: .agents/task-packets/study-v2/manifest.json
     full_study_stage_count: 19
     execution_adapter_ready: false
     m0_execution_adapter_ready: true
@@ -758,8 +769,8 @@ current_evidence:
     role: excluded_access_blocked
 
 active_priority:
-  name: monitor_submitted_qwen_pile_single_lane_recovery
-  first_boundary: wait_for_controller_allocation_then_verify_terminal_five_job_dag
+  name: validate_hash_closed_eval_v2_m0_projection
+  first_boundary: local_read_only_source_identity_and_hash_closure
   training_before_completion: forbidden
   completed_outputs:
     - evaluator_and_metric_inventory
@@ -805,10 +816,16 @@ active_priority:
     - qwen_pile_single_lane_recovery_implementation
     - qwen_pile_single_lane_frozen_contract
     - exact_sha_bound_qwen_pile_single_lane_authorization
+    - qwen_pile_single_lane_terminal_operational_evidence
+    - three_model_exact_prefix_panel_complete
+    - pile_10k_retired_from_canonical_protocol
+    - eval_v2_contract_and_registry_frozen
+    - twenty_one_of_twenty_one_non_pile_m0_source_lanes_available
   required_outputs:
-    - qwen_pile_single_lane_execution_result
-    - complete_composite_three_model_raw_bundle
-    - frozen_normalization_and_gate_result
+    - hash_closed_eval_v2_m0_source_projection
+    - canonical_non_pile_normalization_design
+    - explicit_missingness_and_comparison_boundary
+    - separate_execution_authorization_if_normalization_will_run
 
 authorization:
   local_repository_changes: require_current_user_instruction

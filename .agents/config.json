@@ -14,7 +14,8 @@
   ],
   "required_read_files": [
     "AGENTS.md",
-    "documentation/current/PROJECT_STATE.yaml"
+    "documentation/current/START_HERE.md",
+    "documentation/current/AGENT_BRIEF.yaml"
   ],
   "root_watch_paths": [],
   "auto_allowed_scope_classes": [

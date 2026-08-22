@@ -1,3 +1,8 @@
+# RETIRED DEFAULT REPORT — preserved initial coordination evidence
+
+> Stop: this is historical evidence, not a current handoff. Read it only when a current task cites
+> the initial coordination pass. Start ordinary work from `current/START_HERE.md`.
+
 # 03 - Initial Agent Reports
 
 Last updated: 2026-07-05

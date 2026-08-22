@@ -5,10 +5,11 @@
 1. System/developer constraints and the user's current explicit instruction.
 2. Workspace-root `AGENTS.md`.
 3. The applicable frozen contract.
-4. `documentation/current/PROJECT_STATE.yaml` and the current gate.
-5. `.agents/GOAL.md` for the current bounded objective.
-6. The single task packet named by `GOAL.md`.
-7. `.agents/state/decision.json` for the current worker turn.
+4. `documentation/current/AGENT_BRIEF.yaml` and the current gate projection.
+5. Full `documentation/current/PROJECT_STATE.yaml` plus exact contract for scientific/external work.
+6. `.agents/GOAL.md` for the current bounded objective.
+7. The single task packet named by `GOAL.md`.
+8. `.agents/state/decision.json` for the current worker turn.
 
 Lower items never expand authority granted by higher items. Old handoffs and numbered records are
 evidence, not reusable authorization.

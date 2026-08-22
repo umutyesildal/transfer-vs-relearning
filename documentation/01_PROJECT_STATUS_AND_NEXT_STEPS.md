@@ -1,3 +1,8 @@
+# RETIRED DEFAULT STATUS — preserved historical snapshot
+
+> Stop: this July 2026 snapshot is not current authority. Read `current/AGENT_BRIEF.yaml` and, when
+> interpretation is needed, `current/STATUS.md`. The historical body remains unchanged below.
+
 # 01 - Project Status And Next Steps
 
 Last updated: 2026-07-11

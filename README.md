@@ -54,12 +54,14 @@ For a human:
 For an agent:
 
 1. Read [`AGENTS.md`](AGENTS.md).
-2. Read [`documentation/current/PROJECT_STATE.yaml`](documentation/current/PROJECT_STATE.yaml).
-3. Read the current task packet or explicit user instruction.
-4. Read only the relevant frozen contract and evidence named by that task.
+2. Read [`documentation/current/START_HERE.md`](documentation/current/START_HERE.md).
+3. Read [`documentation/current/AGENT_BRIEF.yaml`](documentation/current/AGENT_BRIEF.yaml).
+4. Read the current task packet or explicit user instruction.
+5. Read only the relevant frozen contract and evidence named by that task.
 
 `AGENTS.md` alone is intentionally not enough for scientific or operational work: it contains
-stable rules, while `PROJECT_STATE.yaml` contains the changing project state.
+stable rules, while `AGENT_BRIEF.yaml` contains the small current projection. Scientific or
+external execution additionally requires the full `PROJECT_STATE.yaml` and exact contract.
 
 ## Repository map
 

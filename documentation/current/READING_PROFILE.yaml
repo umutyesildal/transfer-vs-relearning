@@ -1,0 +1,51 @@
+schema_version: 1
+profile_id: agent-reading-v2
+as_of: "2026-08-22"
+status: active
+
+default_agent_files:
+  - AGENTS.md
+  - documentation/current/START_HERE.md
+  - documentation/current/AGENT_BRIEF.yaml
+
+dynamic_required_input:
+  rule: exactly_one_current_user_instruction_or_bounded_task_packet
+  max_task_context_files: 8
+
+conditional_reads:
+  scientific_interpretation:
+    - documentation/current/STATUS.md
+  authority_or_external_execution:
+    - documentation/current/PROJECT_STATE.yaml
+    - documentation/current/AUTHORITY.md
+    - __EXACT_APPLICABLE_CONTRACT__
+  evaluation_implementation:
+    - documentation/contracts/evaluation/eval-v2.md
+    - configs/evaluation/eval_v2_registry.yaml
+  historical_investigation:
+    - __ONLY_CURRENTLY_CITED_RECORD_CHAIN__
+
+default_retired:
+  meaning: preserved_but_not_read_without_task_specific_citation
+  explicit_paths:
+    - LUNA_WORKER_CURRENT_HANDOFF.md
+    - documentation/00_DOCUMENTATION_INDEX.md
+    - documentation/01_PROJECT_STATUS_AND_NEXT_STEPS.md
+    - documentation/02_AGENT_ROSTER.md
+    - documentation/03_INITIAL_AGENT_REPORTS.md
+    - documentation/PROJECT_HANDOFF_AND_COMPLETE_PROGRESS_OVERVIEW.md
+    - .agents/task-packets/study-v1
+  path_classes:
+    - documentation_root_numbered_markdown
+    - documentation_records
+    - superseded_or_consumed_contracts
+
+rules:
+  recursive_documentation_read: forbidden_by_default
+  retired_file_deletion: forbidden
+  retired_file_move: requires_link_safe_review
+  old_authorization_reuse: forbidden
+  brief_may_expand_authority: false
+  full_state_required_for_scientific_or_external_execution: true
+
+decision: documentation/decisions/DEC-2026-08-22-documentation-retirement.md

@@ -13,6 +13,8 @@ EVAL_REGISTRY_PATH = ROOT / "configs/evaluation/eval_v1_registry.yaml"
 ACTIVE_EVAL_REGISTRY_PATH = ROOT / "configs/evaluation/eval_v2_registry.yaml"
 M0_QUALIFICATION_PATH = ROOT / "configs/evaluation/m0_olmo_eval_v1_qualification_v1.yaml"
 LEGACY_DIR = ROOT / "documentation/records/workspace-guidance"
+READING_PROFILE_PATH = ROOT / "documentation/current/READING_PROFILE.yaml"
+AGENT_BRIEF_PATH = ROOT / "documentation/current/AGENT_BRIEF.yaml"
 MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 LM_EVAL_REQUIREMENT = (
     "lm-eval @ git+https://github.com/EleutherAI/lm-evaluation-harness.git@"
@@ -71,6 +73,10 @@ def test_project_state_is_fail_closed_and_uses_sibling_m2_arms():
     assert state["authorization"]["cleanup_or_deletion"] is False
 
     referenced_paths = [
+        state["repository"]["documentation_retirement"]["decision"],
+        state["repository"]["documentation_retirement"]["start_here"],
+        state["repository"]["documentation_retirement"]["reading_profile"],
+        state["repository"]["documentation_retirement"]["agent_brief"],
         state["repository"]["migration_record"],
         state["repository"]["history_sanitization"]["record"],
         state["repository"]["entrypoint_layout"]["record"],
@@ -549,3 +555,73 @@ def test_legacy_guidance_hashes_are_preserved():
     for filename, expected in manifest["files"].items():
         payload = (LEGACY_DIR / filename).read_bytes()
         assert hashlib.sha256(payload).hexdigest() == expected
+
+
+def test_default_agent_reading_profile_is_small_and_excludes_retired_gateways():
+    profile = yaml.safe_load(READING_PROFILE_PATH.read_text(encoding="utf-8"))
+    default_files = profile["default_agent_files"]
+
+    assert default_files == [
+        "AGENTS.md",
+        "documentation/current/START_HERE.md",
+        "documentation/current/AGENT_BRIEF.yaml",
+    ]
+    assert len(default_files) <= 3
+    for relative in default_files:
+        assert (ROOT / relative).is_file(), relative
+        assert not re.match(r"documentation/\d", relative)
+        assert "LUNA_WORKER" not in relative
+        assert relative != "documentation/current/PROJECT_STATE.yaml"
+
+    retired = profile["default_retired"]["explicit_paths"]
+    for relative in retired:
+        assert (ROOT / relative).exists(), relative
+    for relative in retired[:-1]:
+        first_line = (ROOT / relative).read_text(encoding="utf-8").splitlines()[0]
+        assert first_line.startswith("# RETIRED DEFAULT")
+    assert (ROOT / ".agents/task-packets/study-v1/RETIRED.md").is_file()
+
+
+def test_agent_brief_is_hash_bound_and_matches_current_state():
+    state_bytes = STATE_PATH.read_bytes()
+    state = yaml.safe_load(state_bytes)
+    brief = yaml.safe_load(AGENT_BRIEF_PATH.read_text(encoding="utf-8"))
+
+    assert brief["source"]["full_state_sha256"] == hashlib.sha256(state_bytes).hexdigest()
+    assert brief["source"]["may_expand_authority"] is False
+    assert brief["readiness"] == state["readiness"]
+    assert brief["evaluation"]["active_contract_name"] == state["evaluation_target"][
+        "contract_name"
+    ]
+    assert brief["evaluation"]["active_contract"] == state["evaluation_target"]["contract"]
+    assert brief["evaluation"]["active_contract_sha256"] == state["evaluation_target"][
+        "contract_sha256"
+    ]
+    assert brief["evaluation"]["registry"] == state["evaluation_target"]["registry"]
+    assert brief["evaluation"]["registry_sha256"] == state["evaluation_target"][
+        "registry_sha256"
+    ]
+    assert brief["evaluation"]["pile_10k"] == state["evaluation_target"][
+        "pile_10k_retirement"
+    ]["status"]
+    assert brief["evaluation"]["canonical_m0_non_pile_lanes"] == state[
+        "evaluation_target"
+    ]["pile_10k_retirement"]["canonical_m0_non_pile_lanes_available"]
+    assert brief["next_boundary"]["subject"] == state["next_decision_required"]["subject"]
+
+
+def test_active_luna_packets_are_eval_v2_and_old_packets_are_retired():
+    packet_dir = ROOT / ".agents/task-packets/study-v2"
+    manifest = json.loads((packet_dir / "manifest.json").read_text(encoding="utf-8"))
+
+    assert manifest["study_id"] == "transfer-vs-relearning-m0-to-m2-eval-v2"
+    assert len(manifest["packets"]) == 19
+    assert manifest["packets"][0] == "00-contract_preflight.md"
+    assert manifest["packets"][-1] == "18-presentation_bundle.md"
+    for filename in manifest["packets"]:
+        text = (packet_dir / filename).read_text(encoding="utf-8")
+        assert "transfer-vs-relearning-m0-to-m2-eval-v2" in text
+        assert "eval-v1.md" not in text
+        assert "pile_10k" not in text
+
+    assert (ROOT / ".agents/task-packets/study-v1/RETIRED.md").is_file()

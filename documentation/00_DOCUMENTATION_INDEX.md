@@ -1,3 +1,9 @@
+# RETIRED DEFAULT INDEX — preserved chronological record
+
+> Stop: this 1,400+ line index is stale and is not an onboarding or current-status document. Start
+> with `current/START_HERE.md` and `current/AGENT_BRIEF.yaml`. The prior index is preserved below for
+> targeted historical lookup only.
+
 # 00 - Documentation Index
 
 Last updated: 2026-08-13
