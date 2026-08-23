@@ -345,10 +345,9 @@ def derive_cheap_factual_from_full(
 
 
 def validate_exact_prefix_output(root: Path) -> dict[str, Any]:
-    summary_path = root / "summary_metrics.json"
-    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    summary_path, summary = _single_json(root, "summary_metrics.json")
     counts = summary.get("counts")
-    rows = read_csv_rows(root / "per_fact_results.csv")
+    rows = read_csv_rows(summary_path.parent / "per_fact_results.csv")
     if (
         summary.get("completion_status") != "completed"
         or not isinstance(counts, dict)

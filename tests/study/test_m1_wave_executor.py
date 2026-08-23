@@ -743,3 +743,79 @@ def test_frozen_master_config_binds_adapter_and_pipeline_hashes():
     adapter = master["adapter"]
     assert sha256_file(repo_root / adapter["module"]) == adapter["module_sha256"]
     assert sha256_file(repo_root / adapter["entrypoint"]) == adapter["entrypoint_sha256"]
+
+
+def test_exact_prefix_validator_accepts_timestamped_layout(tmp_path):
+    from transfer_vs_relearning.study.m1_eval_validation import (
+        validate_exact_prefix_output,
+    )
+
+    run_dir = tmp_path / "raw/20260823T113558Z_deadbeef"
+    run_dir.mkdir(parents=True)
+    summary = {
+        "completion_status": "completed",
+        "counts": {"expected_probe_count": 500, "successful_probe_count": 500, "failed_probe_count": 0},
+    }
+    (run_dir / "summary_metrics.json").write_text(json.dumps(summary), encoding="utf-8")
+    (run_dir / "per_fact_results.csv").write_text(
+        "probe_id\n" + "".join(f"p{i}\n" for i in range(500)), encoding="utf-8"
+    )
+    payload = validate_exact_prefix_output(tmp_path / "raw")
+    assert payload["probe_count"] == 500
+
+    try:
+        validate_exact_prefix_output(tmp_path / "missing")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("missing output must fail")
+
+
+def test_submit_wave_writes_retry_script_and_unique_logs(tmp_path, monkeypatch):
+    import types
+
+    output_root = tmp_path / "output"
+    (output_root / "control").mkdir(parents=True)
+    matrix = {
+        "status": "ready",
+        "matrix_id": "retry",
+        "repo_root": str(tmp_path),
+        "output_root": str(output_root),
+        "tasks": [{"task_index": index} for index in range(108)],
+        "parent_projections": [{}, {}, {}],
+        "total_scientific_states": 111,
+    }
+    matrix_path = output_root / "control/task_matrix.json"
+    matrix_path.write_text(json.dumps(matrix), encoding="utf-8")
+    monkeypatch.setattr(executor, "slurm_environment", lambda root: {})
+    counter = {"n": 0}
+
+    def _fake_run(command, **kwargs):
+        calls = command
+        counter["n"] += 1
+        completed = types.SimpleNamespace()
+        completed.returncode = 0
+        completed.stdout = f"9{counter['n']:02d}\n"
+        completed.stderr = ""
+        del calls
+        return completed
+
+    seen: list[list[str]] = []
+
+    def _run(command, **kwargs):
+        seen.append([str(part) for part in command])
+        return _fake_run(command, **kwargs)
+
+    monkeypatch.setattr(executor.subprocess, "run", _run)
+    result = executor.submit_wave(matrix_path, entrypoint=Path("/repo/scripts/study/execute_m1_eval_v2.py"))
+    assert result["status"] == "submitted"
+    script = output_root / "control/run_task_with_retry.sh"
+    assert script.is_file() and script.stat().st_mode & 0o111
+    array_call = next(
+        call
+        for call in seen
+        if "--parsable" in call and any("gpu:a10080gb:1" in part for part in call)
+    )
+    assert any("%J.out" in part for part in array_call)
+    wrap = next(part for part in array_call if part.startswith("--wrap="))
+    assert "run_task_with_retry.sh" in wrap

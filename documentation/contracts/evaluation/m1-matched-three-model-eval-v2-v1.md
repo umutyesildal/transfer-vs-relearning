@@ -332,3 +332,32 @@ to `control/resume_log.jsonl` with prior/new matrix digests. Any task divergence
 11.5 Authorization binding. The single authorization sentence must name this corrected contract
 SHA-256 and the rebound v3 execution-config SHA-256 recorded in `documentation/current/
 PROJECT_STATE.yaml`. Exactly one wave continues; all earlier prohibitions stand.
+
+## 12. Append-only correction 6 (2026-08-23, output layout, retry loop, sweeps)
+
+12.1 Cause. The exact-prefix evaluator writes each run into a single timestamped
+subdirectory of the configured raw root; the wave validator expected a flat layout, producing
+false failures after otherwise successful evaluations. Separately, one task failed early with
+an unknown transient error whose per-attempt logs were truncated by an array requeue.
+
+12.2 Fixes. The validator now locates `summary_metrics.json` and `per_fact_results.csv` by
+unique recursive match under the raw root (any single layout). Each array element now runs a
+frozen retry script inside its own allocation: at most 24 attempts,
+300 seconds apart, before recording `failed`. Per-attempt Slurm logs use
+unique `%J` suffixes so requeues never truncate history. No metric, denominator, prompt or
+scoring definition changed.
+
+12.3 Bounded sweep convergence. The authorized wave is defined by its matrix identity and
+output root: it may be resumed (`resume` subcommand, logged rebinding) repeatedly to sweep
+terminal-`failed` states until either 111/111 canonical completeness or the user stops it,
+with at most ten resumes for this correction. Complete states are never re-executed; deletions
+remain forbidden.
+
+12.4 Rebound execution adapter module:
+`src/transfer_vs_relearning/study/m1_wave_executor.py` —
+`2f2acc8a296348ade96eb5b6358c52e1aeca5574808b15bdff229e0d07aab97a`
+(entrypoint unchanged: `85c5e8f0488cab89f787266e116262f806c46a5cdfba48842b7d1fadd3594d53`).
+
+12.5 Authorization binding. A sentence naming this corrected contract SHA-256 and the rebound
+v3 execution-config SHA-256 (`8136981802d4e8958c73f6a63fc93dfc35a784e7a4446303b4f1f85665d1f441`) authorizes continuing the running wave under
+these semantics, including sweep resumes without further sentences.
