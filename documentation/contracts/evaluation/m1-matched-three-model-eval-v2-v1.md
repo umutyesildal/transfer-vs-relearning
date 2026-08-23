@@ -214,3 +214,52 @@ root fails closed exactly as before. The re-initialized preflight record sets
 `recovered_stale_root: true`. This recovery never applies to a root from a submitted wave; it
 does not authorize deletion of any path.
 
+## 9. Append-only correction 3 (2026-08-23, single A100 pool)
+
+Recorded after the user explicitly chose the most conservative reliable path when the A6000
+pool proved externally occupied. Where a statement below conflicts with earlier sections, the
+statement below governs.
+
+9.1 Cancelled Correction-2 attempt. The dual-route wave was submitted as preflight `475894`,
+A6000 array `475895`, A100 array `475896` and finalizer `475897`. The per-task 20 GiB gate
+correctly refused states landing on A6000 GPUs occupied by a non-Slurm external process
+(~45 GiB in use); 68 tasks failed fast at the gate, zero scientific results were written, and
+the user cancelled the wave. The root `/vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v2`
+is preserved read-only as this cancelled-attempt evidence with an appended cancellation marker.
+The cancellation consumed no scientific measurement.
+
+9.2 Rebound execution adapter:
+
+- `src/transfer_vs_relearning/study/m1_wave_executor.py` —
+  `acfee0ec5067fcbbac08ee2a8a92fd7f6f8708bebb7546d1048aa838635969a3`
+- `scripts/study/execute_m1_eval_v2.py` — unchanged from Correction 2:
+  `85c5e8f0488cab89f787266e116262f806c46a5cdfba48842b7d1fadd3594d53`
+
+9.3 Single-route topology. The permitted DAG is:
+
+```text
+read-only final preflight
+→ single A10080 array 0-107%6 over all 108 epoch snapshots (gpu:a10080gb:1)
+→ afterany family finalizer that projects the three M0 parent states
+```
+
+The only authorized GPU resource type is `gpu:a10080gb:1` on either gruenau node that offers
+it. V100, RTX6000, RTXA6000, RTX3090 and every other card type are forbidden. All §3 evaluation
+semantics remain unchanged from earlier corrections; closure still requires 111/111.
+
+9.4 Frozen gate probe schedule. Before scoring, every task probes free memory on its allocated
+GPU. On gate failure the task waits exactly 600 seconds and re-probes, for at most 13 probes
+total; only after all 13 fail does the task record `failed`. The schedule is frozen,
+not outcome-aware, and bounded well inside the 1-day task limit. Missing probe values are
+never converted to zero or skipped.
+
+9.5 Frozen execution config. `configs/evaluation/m1_eval_v2_matched_three_model_v3.yaml`
+(SHA-256 `3795bfda6c021d6c1063a6729d80ab13f2e98a5a091f24e437c1336cad25f629`) supersedes
+`configs/evaluation/m1_eval_v2_matched_three_model_v2.yaml`
+(SHA-256 `099d64b6b41250ab14081293e0be4ffce91dcb6efae49929d79cc9861bd5feec`). The fresh output
+root is `/vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v3`.
+
+9.6 Authorization binding. The single authorization sentence must name this corrected contract
+SHA-256 and the v3 execution-config SHA-256. Exactly one wave; no retry beyond the frozen
+in-task gate schedule, no throttle change after submission, no threshold change.
+

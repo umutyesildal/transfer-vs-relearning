@@ -1,0 +1,113 @@
+schema_version: 2
+name: m1-eval-v2-matched-three-model-v3
+status: frozen
+as_of: '2026-08-23'
+classification: scientific_evaluation
+execution_ready: true
+execution_authorized: false
+supersedes_config: configs/evaluation/m1_eval_v2_matched_three_model_v2.yaml
+supersedes_config_sha256: 5f101ded395bed1753f21a7c7d2f4893b6514235d6b50f295cb16b35f07db440
+revision_reason: single_a100_pool_after_a6000_external_occupation_user_choice_solid_path
+contract: documentation/contracts/evaluation/m1-matched-three-model-eval-v2-v1.md
+parent_contract: documentation/contracts/evaluation/eval-v2.md
+parent_contract_sha256: 95eec6fc5a9dd7ce6da3185dfe20e2a183ad3850194c15f88a1299f09a43c6a3
+evaluation_registry: configs/evaluation/eval_v2_registry.yaml
+evaluation_registry_sha256: 0721412c651f5b112f531e69b53c98ccdb3633bee4888571bd7039d3f693229d
+family:
+  source_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1
+  output_root: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v3
+  superseded_output_root: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v2
+  fresh_output_root_required: true
+  model_count: 3
+  states_per_model: 37
+  task_count: 111
+  gpu_task_count: 108
+  parent_projection_count: 3
+  full_state_count: 9
+parent_projection:
+  mode: projected_from_canonical_m0_evidence_without_rescoring
+  normalization_config: configs/evaluation/eval_v2_m0_metric_normalization_v1f.yaml
+  normalization_config_sha256: 3781cd62e6bfa1d3484bd87f54b44000eb9aae35a8b0260ad31b93cc15d56047
+  canonical_output_root: /vol/tmp2/yesildau/eval_v2_m0_metric_normalization_v1f
+  source_registry: /vol/tmp2/yesildau/eval_v2_m0_three_model_projection_v1b/source_registry.jsonl
+  source_registry_sha256: a0dca252afe7c1d03e458a60a8b48d7e8d8858e0ad95e6e8be696311a0b34265
+  registry_source_rows: 24
+  observation_row_count: 42
+  rows_per_model: 14
+pipeline_configs:
+  olmo:
+    path: configs/pipelines/eval_v2_m1_matched_olmo_v3.yaml
+    sha256: e8982fa6560fa7db1d622b24d66a370fadf6e7260ee8c6af2559385f7ad24d0a
+  qwen:
+    path: configs/pipelines/eval_v2_m1_matched_qwen_v3.yaml
+    sha256: 2ebbcef8abf044d9189d35bb7e42f955a55f3fefc062282887e5bbf57d4003a5
+  smollm:
+    path: configs/pipelines/eval_v2_m1_matched_smollm_v3.yaml
+    sha256: b6f608b6a341a52489ff505726ba9855c5c2ddf695ff0233eb5f270e44971cfd
+adapter:
+  id: slurm_m1_matched_wave_v1
+  module: src/transfer_vs_relearning/study/m1_wave_executor.py
+  module_sha256: acfee0ec5067fcbbac08ee2a8a92fd7f6f8708bebb7546d1048aa838635969a3
+  entrypoint: scripts/study/execute_m1_eval_v2.py
+  entrypoint_sha256: 85c5e8f0488cab89f787266e116262f806c46a5cdfba48842b7d1fadd3594d53
+  topology: preflight_then_single_a10080gb_array_108_tasks_throttle_6_then_afterany_finalizer_with_parent_projection
+evaluation_cadence:
+  dense_states: parent_and_every_epoch_end
+  parent_dense_rows_projected_from_canonical_m0_evidence: true
+  full_epochs:
+  - 0
+  - 18
+  - 36
+  full_states_derive_cheap_factual_from_full_without_rescoring: true
+  dense_bundles:
+  - identity_and_training_trace
+  - factual_access_cheap
+  - exact_prefix_500
+  - english_retention_primary
+  - turkish_retention_control
+  - generation_integrity_cheap
+  full_bundles:
+  - factual_access_full
+  - english_capability
+  - turkish_capability
+  - generation_integrity_full
+  pile_10k: retired_not_in_eval_v2
+runtime:
+  python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
+  environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
+  offline_only: true
+  device: cuda:0
+  precision: float16
+  min_free_gpu_memory_bytes: 21474836480
+  gate_probe_attempts: 13
+  gate_retry_wait_seconds: 600
+slurm:
+  account: yesildau
+  control_partition: std
+  evaluation_partition: gpu
+  evaluation_time_limit: 1-00:00:00
+  cpus_per_task: 8
+  memory: 64G
+  job_count: 3
+  evaluation_gres: gpu:a10080gb:1
+  array_task_count: 108
+  array_throttle: 6
+  job_name: m1-eval-v2-a100
+authorization:
+  required: exact_contract_and_config_sha256
+  wave_limit: 1
+  automatic_retry_authorized: false
+  cleanup_authorized: false
+  training_authorized: false
+  m2_authorized: false
+prohibitions:
+- reuse_existing_evaluation_root
+- alter_training_or_checkpoint_artifacts
+- network_retrieval
+- include_pile_10k
+- outcome_aware_checkpoint_or_threshold_change
+- automatic_retry
+- cleanup_or_deletion
+- hu_home_write
+- route_outside_declared_a10080gb_a6000_pools
+- route_outside_a10080gb_pool

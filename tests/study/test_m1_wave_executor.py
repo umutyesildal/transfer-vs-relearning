@@ -455,40 +455,39 @@ def test_gpu_free_memory_gate_fails_closed(tmp_path, monkeypatch):
         completed.stderr = ""
         return completed
 
-    seen: list[list[str]] = []
+    monkeypatch.setattr(executor.subprocess, "run", lambda command, **k: _probe("1024\n"))
+    monkeypatch.setattr(executor.time, "sleep", lambda seconds: None)
+    with pytest.raises(RuntimeError, match="exhausted 13 probes"):
+        executor.gate_with_retries()
 
-    def _fake_run(command, **kwargs):
-        seen.append(list(command))
-        if len(seen) == 1:
-            return _probe("1024\n")
-        return _probe("24000\n")
-
-    monkeypatch.setattr(executor.subprocess, "run", _fake_run)
-    with pytest.raises(ValueError, match="free-memory gate failed"):
-        executor.assert_free_gpu_memory()
-
-    monkeypatch.setattr(executor.subprocess, "run", lambda command, **k: _probe("409600"))
-    payload = executor.assert_free_gpu_memory()
+    outputs = iter(["1024\n", "409600\n"])
+    monkeypatch.setattr(
+        executor.subprocess,
+        "run",
+        lambda command, **k: _probe(next(outputs)),
+    )
+    payload = executor.gate_with_retries()
     assert payload["gpu_index"] == "2"
     assert payload["free_bytes"] == 409600 * 1024 * 1024
+    assert payload["probe_attempts"] == 2
 
     monkeypatch.setattr(executor.subprocess, "run", lambda command, **k: _probe("", returncode=1))
-    with pytest.raises(RuntimeError, match="probe failed"):
-        executor.assert_free_gpu_memory()
+    with pytest.raises(RuntimeError, match="probe failed|exhausted"):
+        executor.gate_with_retries()
 
     monkeypatch.delenv("CUDA_VISIBLE_DEVICES")
     with pytest.raises(RuntimeError, match="CUDA_VISIBLE_DEVICES is missing"):
         executor.assert_free_gpu_memory()
 
 
-def test_submit_wave_dual_route_topology(tmp_path, monkeypatch):
+def test_submit_wave_single_route_topology(tmp_path, monkeypatch):
     import types
 
     output_root = tmp_path / "output"
     (output_root / "control").mkdir(parents=True)
     matrix = {
         "status": "ready",
-        "matrix_id": "dual",
+        "matrix_id": "single",
         "repo_root": str(tmp_path),
         "output_root": str(output_root),
         "tasks": [{"task_index": index} for index in range(108)],
@@ -502,13 +501,10 @@ def test_submit_wave_dual_route_topology(tmp_path, monkeypatch):
     calls: list[list[str]] = []
     counter = {"n": 0}
 
-    class _Completed(types.SimpleNamespace):
-        pass
-
     def _fake_run(command, **kwargs):
         calls.append([str(part) for part in command])
         counter["n"] += 1
-        completed = _Completed()
+        completed = types.SimpleNamespace()
         completed.returncode = 0
         completed.stdout = f"9{counter['n']:02d}\n"
         completed.stderr = ""
@@ -518,38 +514,31 @@ def test_submit_wave_dual_route_topology(tmp_path, monkeypatch):
 
     result = executor.submit_wave(matrix_path, entrypoint=Path("/repo/scripts/study/execute_m1_eval_v2.py"))
     assert result["status"] == "submitted"
-    assert result["evaluation_array_job_ids"] == {
-        "a6000": result["evaluation_array_job_ids"]["a6000"],
-        "a10080gb": result["evaluation_array_job_ids"]["a10080gb"],
-    }
-    assert None not in result["evaluation_array_job_ids"].values()
+    assert result["route"]["gres"] == "gpu:a10080gb:1"
+    assert result["route"]["array_spec"] == "0-107%6"
 
-    array_calls = [call for call in calls if "--parsable" in call]
-    assert len(array_calls) == 4  # preflight + two arrays + finalizer
-    a6000 = next(call for call in array_calls if any("gpu:rtxa6000:1" in part for part in call))
-    a100 = next(call for call in array_calls if any("gpu:a10080gb:1" in part for part in call))
-    finalizer = next(call for call in array_calls if "finalize" in " ".join(call))
+    parsable = [call for call in calls if "--parsable" in call]
+    assert len(parsable) == 3  # preflight + one array + finalizer
+    array_call = next(call for call in parsable if any("gpu:a10080gb:1" in part for part in call))
+    finalizer_call = next(call for call in parsable if any("finalize" in part for part in call))
     preflight_id = result["preflight_job_id"]
-    assert any(f"--array=0-71%8" in part for part in a6000)
-    assert any("--task-offset 36" in part for part in a6000 if isinstance(part, str))
-    assert any(f"--dependency=afterok:{preflight_id}" in part for part in a6000)
-    assert any("--array=0-35%3" in part for part in a100)
-    assert any("--task-offset 0" in part for part in a100 if isinstance(part, str))
+    assert any("--array=0-107%6" in part for part in array_call)
+    assert any(f"--dependency=afterok:{preflight_id}" in part for part in array_call)
+    assert not any("--task-offset" in part for part in array_call)
     assert any(
-        f"--dependency=afterany:{result['evaluation_array_job_ids']['a6000']}:{result['evaluation_array_job_ids']['a10080gb']}"
-        in part
-        for part in finalizer
+        f"--dependency=afterany:{result['evaluation_array_job_id']}" in part
+        for part in finalizer_call
     )
 
     saved = json.loads((output_root / "control/submission_manifest.json").read_text(encoding="utf-8"))
     assert saved["status"] == "submitted"
-    assert saved["evaluation_array_job_ids"]["a10080gb"] == result["evaluation_array_job_ids"]["a10080gb"]
+    assert saved["evaluation_array_job_id"] == result["evaluation_array_job_id"]
 
 
 def test_frozen_master_config_binds_adapter_and_pipeline_hashes():
     repo_root = Path(__file__).resolve().parents[2]
     master = yaml.safe_load(
-        (repo_root / "configs/evaluation/m1_eval_v2_matched_three_model_v2.yaml").read_text(
+        (repo_root / "configs/evaluation/m1_eval_v2_matched_three_model_v3.yaml").read_text(
             encoding="utf-8"
         )
     )
@@ -559,11 +548,18 @@ def test_frozen_master_config_binds_adapter_and_pipeline_hashes():
     assert family["states_per_model"] == 37
     assert family["gpu_task_count"] == 108
     assert family["parent_projection_count"] == 3
-    assert family["output_root"].endswith("m1_eval_v2_matched_three_model_v2")
-    routes = master["slurm"]["routes"]
-    assert (routes["a6000"]["gres"], routes["a6000"]["array_task_count"], routes["a6000"]["array_throttle"], routes["a6000"]["task_offset"]) == ("gpu:rtxa6000:1", 72, 8, 36)
-    assert (routes["a10080gb"]["gres"], routes["a10080gb"]["array_task_count"], routes["a10080gb"]["array_throttle"], routes["a10080gb"]["task_offset"]) == ("gpu:a10080gb:1", 36, 3, 0)
-    assert master["runtime"]["min_free_gpu_memory_bytes"] == executor.MIN_FREE_GPU_MEMORY_BYTES
+    assert family["output_root"].endswith("m1_eval_v2_matched_three_model_v3")
+    slurm = master["slurm"]
+    assert (slurm["evaluation_gres"], slurm["array_task_count"], slurm["array_throttle"]) == (
+        "gpu:a10080gb:1",
+        108,
+        6,
+    )
+    assert slurm["job_count"] == 3
+    runtime = master["runtime"]
+    assert runtime["min_free_gpu_memory_bytes"] == executor.MIN_FREE_GPU_MEMORY_BYTES
+    assert runtime["gate_probe_attempts"] == executor.GATE_PROBE_ATTEMPTS
+    assert runtime["gate_retry_wait_seconds"] == executor.GATE_RETRY_WAIT_SECONDS
     for row in master["pipeline_configs"].values():
         assert sha256_file(repo_root / row["path"]) == row["sha256"]
     adapter = master["adapter"]

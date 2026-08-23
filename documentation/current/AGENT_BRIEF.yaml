@@ -29,7 +29,7 @@ stage_readiness:
   m0: complete
   m1_scientific_inputs: ready
   m1_training: complete_111_checkpoint_states
-  m1_evaluation_adapter_and_contract: frozen_v2_dual_route_awaiting_exact_authorization
+  m1_evaluation_adapter_and_contract: frozen_v3_single_a100_pool_awaiting_exact_authorization
   m1_first_wave_cancelled_by_user_before_any_scientific_result: true
   m1_execution: not_authorized
   m2_corpus_and_sibling_contract: later_not_an_m1_blocker

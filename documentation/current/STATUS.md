@@ -4,9 +4,9 @@
 
 **Current branch:** `agent/m1-pipeline-repair`
 
-**Execution state:** M1 training complete (111 checkpoint states); frozen M1 eval-v2 wave v2
-(dual-route A6000+A100) awaiting the exact SHA-bound user authorization; the first single-array
-submission was user-cancelled before any scientific result
+**Execution state:** M1 training complete (111 checkpoint states); frozen M1 eval-v2 wave v3
+(single A100-80GB pool, throttle 6) awaiting the exact SHA-bound user authorization; the two
+earlier attempts were user-cancelled before any scientific result
 
 ## The short answer
 
@@ -43,6 +43,15 @@ throttle 3), one preflight and one afterany finalizer. Every task passes a fail-
 free-memory gate before scoring. V100, RTX6000 and RTX3090 remain forbidden. The preserved
 v1 output root keeps the cancelled attempt read-only; the fresh v2 root is required by contract.
 Expected wall time drops from roughly 25–35 hours to roughly 8–12 hours.
+
+## Revision 3 — single A100 pool (2026-08-23, final)
+
+The dual-route wave hit an external non-Slurm process occupying most RTX A6000 GPUs (~45 GiB);
+the frozen 20 GiB gate correctly refused 68 tasks before scoring, zero scientific results were
+written, and the user cancelled the wave choosing the solid path. Correction 3 freezes a single
+`gpu:a10080gb:1` array over all 108 tasks (throttle 6 across both A100 nodes), a bounded
+in-task gate schedule (13 probes, 600 s apart), and fresh root `..._v3`. Both preserved roots
+(`_v1`, `_v2`) keep the cancelled attempts read-only.
 
 ## Closed M0 boundary
 

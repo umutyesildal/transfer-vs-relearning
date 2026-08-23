@@ -148,45 +148,44 @@ stage_readiness:
     execution_adapter_frozen: true
     adapter: slurm_m1_matched_wave_v1
     contract: documentation/contracts/evaluation/m1-matched-three-model-eval-v2-v1.md
-    contract_sha256: 147754012688e902331cbdee981a1fce8ebeeb7bb374974dd4549329713a8f6e
-    contract_correction: append_only_correction_2_dual_route
+    contract_sha256: 145bc6690a7c72be09221e56db180760d4f4d3f2d0e89782c1bd60135d71daaf
+    contract_correction: append_only_correction_3_single_a100_pool
     prior_contract_sha256s:
       - 344ccd0b55f237041a4c0c2bc4ad2a9f649778df3e73d2540c8ed9731c64ab70
       - 37ce73bf0b39499a59509be314fa595a903849753393ba9be8408590a5150fc7
-    config: configs/evaluation/m1_eval_v2_matched_three_model_v2.yaml
-    config_sha256: 5f101ded395bed1753f21a7c7d2f4893b6514235d6b50f295cb16b35f07db440
-    supersedes_config_sha256: 65c70265844a7ea94be80498546da2625b41bf2ea83beeafbda156ae70e28db8
-    adapter_module_sha256: 9e73da74be19402817862821f281d05ce9c69816b208fb3c089dbe9c114f7778
+      - 147754012688e902331cbdee981a1fce8ebeeb7bb374974dd4549329713a8f6e
+    config: configs/evaluation/m1_eval_v2_matched_three_model_v3.yaml
+    config_sha256: 3795bfda6c021d6c1063a6729d80ab13f2e98a5a091f24e437c1336cad25f629
+    supersedes_config_sha256: 5f101ded395bed1753f21a7c7d2f4893b6514235d6b50f295cb16b35f07db440
+    adapter_module_sha256: acfee0ec5067fcbbac08ee2a8a92fd7f6f8708bebb7546d1048aa838635969a3
     adapter_entrypoint_sha256: 85c5e8f0488cab89f787266e116262f806c46a5cdfba48842b7d1fadd3594d53
-    proposed_output_root: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v2
-    topology: preflight_then_dual_route_arrays_a6000_72_tasks_throttle_8_plus_a10080gb_36_tasks_throttle_3_then_afterany_finalizer_with_parent_projection
-    routes:
-      a6000:
-        gres: gpu:rtxa6000:1
-        task_offset: 36
-        array_task_count: 72
-        array_throttle: 8
-        allowed_models: [qwen, smollm]
-      a10080gb:
-        gres: gpu:a10080gb:1
-        task_offset: 0
-        array_task_count: 36
-        array_throttle: 3
-        allowed_models: [olmo]
+    proposed_output_root: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v3
+    topology: preflight_then_single_a10080gb_array_108_tasks_throttle_6_then_afterany_finalizer_with_parent_projection
+    evaluation_gres: gpu:a10080gb:1
+    array_task_count: 108
+    array_throttle: 6
     min_free_gpu_memory_bytes: 21474836480
+    gate_probe_attempts: 13
+    gate_retry_wait_seconds: 600
     scientific_state_count: 111
     gpu_task_count: 108
     parent_projection_count: 3
     parent_projection_source: canonical_m0_metric_normalization_v1f_without_rescoring
     full_states_derive_cheap_factual_from_full_without_rescoring: true
     cancelled_attempt:
-      revision: correction_1_single_a100_array
+      revision: correction_2_dual_route
+      jobs: {preflight: "475894", evaluation_array_a6000: "475895", evaluation_array_a100: "475896", finalizer: "475897"}
+      cancellation: explicit_user_choice_of_solid_single_pool_path
+      cause: external_non_slurm_process_occupied_rtxa6000_gpus
+      gate_failures_recorded: 68
+      scientific_results_written: 0
+      preserved_output_root: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v2
+    earlier_cancelled_attempt:
+      revision: correction_1_single_array_throttle_3
       jobs: {preflight: "475878", evaluation_array: "475879", finalizer: "475880"}
-      cancellation: explicit_user_decision_for_dual_route_acceleration
       scientific_results_written: 0
       preserved_output_root: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v1
-      consumed_authorization: no_scientific_measurement_taken
-    max_parallel_tasks: 11
+    max_parallel_tasks: 6
     execution_authorized: false
     ready_to_start: false
     blockers:
