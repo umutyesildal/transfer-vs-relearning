@@ -247,6 +247,11 @@ def test_run_task_gates_complete_on_validators_and_derives_cheap_for_full(
     tmp_path, monkeypatch
 ):
     frozen = _patch_runtime(tmp_path, monkeypatch)
+    monkeypatch.setattr(
+        executor,
+        "assert_free_gpu_memory",
+        lambda: {"gpu_index": "0", "free_bytes": 1, "gate_bytes": 1},
+    )
     output_root = tmp_path / "output"
     model_manifest = tmp_path / "models" / "olmo.json"
     _write(model_manifest, json.dumps({"local_path_absolute": str(tmp_path / "weights")}))
@@ -344,6 +349,11 @@ def test_run_task_gates_complete_on_validators_and_derives_cheap_for_full(
 
 def test_run_task_verifies_snapshot_before_scoring(tmp_path, monkeypatch):
     _patch_runtime(tmp_path, monkeypatch)
+    monkeypatch.setattr(
+        executor,
+        "assert_free_gpu_memory",
+        lambda: {"gpu_index": "0", "free_bytes": 1, "gate_bytes": 1},
+    )
     output_root = tmp_path / "output"
     model_manifest = tmp_path / "models" / "olmo.json"
     _write(model_manifest, json.dumps({"local_path_absolute": str(tmp_path / "weights")}))
@@ -391,10 +401,113 @@ def test_run_task_verifies_snapshot_before_scoring(tmp_path, monkeypatch):
     assert failed["status"] == "failed"
 
 
+def test_gpu_free_memory_gate_fails_closed(tmp_path, monkeypatch):
+    import types
+
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "2,3")
+
+    def _probe(stdout: str, returncode: int = 0):
+        completed = types.SimpleNamespace()
+        completed.returncode = returncode
+        completed.stdout = stdout
+        completed.stderr = ""
+        return completed
+
+    seen: list[list[str]] = []
+
+    def _fake_run(command, **kwargs):
+        seen.append(list(command))
+        if len(seen) == 1:
+            return _probe("1024\n")
+        return _probe("24000\n")
+
+    monkeypatch.setattr(executor.subprocess, "run", _fake_run)
+    with pytest.raises(ValueError, match="free-memory gate failed"):
+        executor.assert_free_gpu_memory()
+
+    monkeypatch.setattr(executor.subprocess, "run", lambda command, **k: _probe("409600"))
+    payload = executor.assert_free_gpu_memory()
+    assert payload["gpu_index"] == "2"
+    assert payload["free_bytes"] == 409600 * 1024 * 1024
+
+    monkeypatch.setattr(executor.subprocess, "run", lambda command, **k: _probe("", returncode=1))
+    with pytest.raises(RuntimeError, match="probe failed"):
+        executor.assert_free_gpu_memory()
+
+    monkeypatch.delenv("CUDA_VISIBLE_DEVICES")
+    with pytest.raises(RuntimeError, match="CUDA_VISIBLE_DEVICES is missing"):
+        executor.assert_free_gpu_memory()
+
+
+def test_submit_wave_dual_route_topology(tmp_path, monkeypatch):
+    import types
+
+    output_root = tmp_path / "output"
+    (output_root / "control").mkdir(parents=True)
+    matrix = {
+        "status": "ready",
+        "matrix_id": "dual",
+        "repo_root": str(tmp_path),
+        "output_root": str(output_root),
+        "tasks": [{"task_index": index} for index in range(108)],
+        "parent_projections": [{}, {}, {}],
+        "total_scientific_states": 111,
+    }
+    matrix_path = output_root / "control/task_matrix.json"
+    matrix_path.write_text(json.dumps(matrix), encoding="utf-8")
+    monkeypatch.setattr(executor, "slurm_environment", lambda root: {})
+
+    calls: list[list[str]] = []
+    counter = {"n": 0}
+
+    class _Completed(types.SimpleNamespace):
+        pass
+
+    def _fake_run(command, **kwargs):
+        calls.append([str(part) for part in command])
+        counter["n"] += 1
+        completed = _Completed()
+        completed.returncode = 0
+        completed.stdout = f"9{counter['n']:02d}\n"
+        completed.stderr = ""
+        return completed
+
+    monkeypatch.setattr(executor.subprocess, "run", _fake_run)
+
+    result = executor.submit_wave(matrix_path, entrypoint=Path("/repo/scripts/study/execute_m1_eval_v2.py"))
+    assert result["status"] == "submitted"
+    assert result["evaluation_array_job_ids"] == {
+        "a6000": result["evaluation_array_job_ids"]["a6000"],
+        "a10080gb": result["evaluation_array_job_ids"]["a10080gb"],
+    }
+    assert None not in result["evaluation_array_job_ids"].values()
+
+    array_calls = [call for call in calls if "--parsable" in call]
+    assert len(array_calls) == 4  # preflight + two arrays + finalizer
+    a6000 = next(call for call in array_calls if any("gpu:a6000:1" in part for part in call))
+    a100 = next(call for call in array_calls if any("gpu:a10080gb:1" in part for part in call))
+    finalizer = next(call for call in array_calls if "finalize" in " ".join(call))
+    preflight_id = result["preflight_job_id"]
+    assert any(f"--array=0-71%8" in part for part in a6000)
+    assert any("--task-offset 36" in part for part in a6000 if isinstance(part, str))
+    assert any(f"--dependency=afterok:{preflight_id}" in part for part in a6000)
+    assert any("--array=0-35%3" in part for part in a100)
+    assert any("--task-offset 0" in part for part in a100 if isinstance(part, str))
+    assert any(
+        f"--dependency=afterany:{result['evaluation_array_job_ids']['a6000']}:{result['evaluation_array_job_ids']['a10080gb']}"
+        in part
+        for part in finalizer
+    )
+
+    saved = json.loads((output_root / "control/submission_manifest.json").read_text(encoding="utf-8"))
+    assert saved["status"] == "submitted"
+    assert saved["evaluation_array_job_ids"]["a10080gb"] == result["evaluation_array_job_ids"]["a10080gb"]
+
+
 def test_frozen_master_config_binds_adapter_and_pipeline_hashes():
     repo_root = Path(__file__).resolve().parents[2]
     master = yaml.safe_load(
-        (repo_root / "configs/evaluation/m1_eval_v2_matched_three_model_v1.yaml").read_text(
+        (repo_root / "configs/evaluation/m1_eval_v2_matched_three_model_v2.yaml").read_text(
             encoding="utf-8"
         )
     )
@@ -404,7 +517,11 @@ def test_frozen_master_config_binds_adapter_and_pipeline_hashes():
     assert family["states_per_model"] == 37
     assert family["gpu_task_count"] == 108
     assert family["parent_projection_count"] == 3
-    assert master["slurm"]["array"] == "0-107%3"
+    assert family["output_root"].endswith("m1_eval_v2_matched_three_model_v2")
+    routes = master["slurm"]["routes"]
+    assert (routes["a6000"]["gres"], routes["a6000"]["array_task_count"], routes["a6000"]["array_throttle"], routes["a6000"]["task_offset"]) == ("gpu:a6000:1", 72, 8, 36)
+    assert (routes["a10080gb"]["gres"], routes["a10080gb"]["array_task_count"], routes["a10080gb"]["array_throttle"], routes["a10080gb"]["task_offset"]) == ("gpu:a10080gb:1", 36, 3, 0)
+    assert master["runtime"]["min_free_gpu_memory_bytes"] == executor.MIN_FREE_GPU_MEMORY_BYTES
     for row in master["pipeline_configs"].values():
         assert sha256_file(repo_root / row["path"]) == row["sha256"]
     adapter = master["adapter"]

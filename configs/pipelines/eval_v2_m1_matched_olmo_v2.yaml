@@ -1,0 +1,72 @@
+schema_version: 2
+pipeline_id: eval-v2-m1-matched-olmo-epoch-trajectory-v2
+status: frozen
+execution_authorized: false
+experiment:
+  experiment_id: m1-matched-epoch-dense-olmo-seed42
+  state: M1
+  parent_state: M0
+  arm: M1
+  parent_checkpoint_id: OLMo-2-0425-1B@a1847dff35000b4271fa70afc5db10fd29fedbdf
+  model_id: allenai/OLMo-2-0425-1B
+  model_revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+  tokenizer_id: allenai/OLMo-2-0425-1B
+  tokenizer_revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+  seed: 42
+training_plan:
+  config: configs/training/eval_v2_m1_matched_olmo.yaml
+  trajectory_mode: prospective
+  expected_train_rows: 3500
+  expected_total_updates: 252
+  tracking:
+    dense_cadence: every_epoch_end_including_parent
+    epoch_snapshot_policy: model_only_every_epoch
+    storage_preflight_required: true
+    estimated_snapshot_bytes: 4000000000
+    minimum_free_bytes: 20000000000
+    fact_exposures_per_epoch: 3500
+evaluation:
+  contract: eval-v2
+  exact_prefix:
+    required: true
+    probe_count: 500
+    registry: artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/exact_prefix_probes_en.csv
+    registry_sha256: 1644288d0d62c51c56ceaae71b9eef7225b88326267281c8df8aeef9d7619c8e
+  dense_bundles:
+  - identity_and_training_trace
+  - factual_access_cheap
+  - exact_prefix_500
+  - english_retention_primary
+  - turkish_retention_control
+  - generation_integrity_cheap
+  full_bundles:
+  - factual_access_full
+  - english_capability
+  - turkish_capability
+  - generation_integrity_full
+  full_epochs:
+  - 0
+  - 18
+  - 36
+outputs:
+  root: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v2
+  raw_namespaces_immutable: true
+  normalized_tables_required: true
+  presentation_bundle_required: true
+inputs:
+  eval_registry: configs/evaluation/eval_v2_registry.yaml
+  eval_registry_sha256: 0721412c651f5b112f531e69b53c98ccdb3633bee4888571bd7039d3f693229d
+  m0_model_manifest: /vol/tmp2/yesildau/m1_provenance_screen_v3/models/allenai__OLMo-2-0425-1B/model_manifest.json
+  m0_model_manifest_sha256: 8702b80d5b7e4c996c8ce2ff5fe771ada08ab0080bde1926c0b1f53c607303dc
+  m1_checkpoint_manifest: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/bindings/olmo/checkpoint_manifest.json
+  m1_checkpoint_manifest_sha256: f1681974fb5aa8da8dece1d0af9786eca1013302a6bf39d3b4920015587c289c
+  m1_training_manifest: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/olmo/20260822T155242Z_m1_matched_epoch_dense_olmo_seed42_30cd6396/training_manifest.json
+  m1_training_manifest_sha256: 68ad5c6b394918bbe5a57189ada0ebe6a14fe9c9213f658ffc1d4177d2935630
+  m1_fact_dataset_manifest: artifacts/datasets/relation_v2_gate_v1/manifest.json
+  m1_fact_dataset_manifest_sha256: b37268d6f3afbb37f13ef746b80b99169c4d94ced3471aed2ae4aa09dc85b752
+execution:
+  adapter_registered: true
+  adapter: slurm_m1_matched_wave_v1
+  max_concurrent_jobs: 3
+supersedes_pipeline_config: configs/pipelines/eval_v2_m1_matched_olmo.yaml
+supersedes_output_root: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v1

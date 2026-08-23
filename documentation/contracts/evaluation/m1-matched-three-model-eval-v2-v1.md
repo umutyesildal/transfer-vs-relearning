@@ -145,3 +145,61 @@ SHA-256 and the corrected execution-config SHA-256 recorded in `documentation/cu
 PROJECT_STATE.yaml` under `m1_evaluation`. Authorization remains one wave; no retry, rerun or
 threshold change is authorized.
 
+## 8. Append-only correction 2 (2026-08-23, dual-route acceleration)
+
+This correction is recorded after the user explicitly chose to cancel the Correction-1 wave
+before any scientific result was produced. Where a statement below conflicts with earlier
+sections, the statement below governs.
+
+8.1 Superseded statements. The §7.2 adapter hashes are superseded by the hashes in 8.2; the
+§7.3 single-array topology is superseded by the dual-route topology in 8.3; and the Correction-1
+execution-config identity `configs/evaluation/m1_eval_v2_matched_three_model_v1.yaml`
+(SHA-256 `65c70265844a7ea94be80498546da2625b41bf2ea83beeafbda156ae70e28db8`) is superseded by
+the frozen `configs/evaluation/m1_eval_v2_matched_three_model_v2.yaml`.
+
+8.2 Rebound execution adapter:
+
+- `src/transfer_vs_relearning/study/m1_wave_executor.py` —
+  `49ed94d37b5000421b23b51dea914b25db8c3fe35c0e5e192ffb36b719c05290`
+- `scripts/study/execute_m1_eval_v2.py` —
+  `85c5e8f0488cab89f787266e116262f806c46a5cdfba48842b7d1fadd3594d53`
+
+8.3 Dual-route topology. The permitted DAG is:
+
+```text
+read-only final preflight
+→ A6000 array 0-71%8 over the qwen+smollm epoch snapshots (gpu:a6000:1)
+→ A10080 array 0-35%3 over the olmo epoch snapshots (gpu:a10080gb:1)
+→ afterany family finalizer that projects the three M0 parent states
+```
+
+Array-local task ids map to global matrix indices through frozen offsets: the A100 array covers
+indices 0–35 (olmo), the A6000 array covers indices 36–107 (qwen, smollm). All other §3
+evaluation semantics — bundles, cadence, full-state cheap derivation, parent projection,
+111/111 closure — are unchanged from Corrections 0 and 1.
+
+8.4 Route policy. Only two GPU resource types are authorized for this wave:
+`gres=gpu:a6000:1` and `gres=gpu:a10080gb:1`. V100, RTX6000, RTX3090 and every other card type
+are forbidden. The A6000 pool is expected to resolve to the currently idle gruenau7/gruenau8
+nodes; the scheduler may place either route on any node offering the declared resource type.
+
+8.5 Per-task GPU free-memory gate. Before scoring, every task probes free memory on its Slurm-
+allocated GPU (`CUDA_VISIBLE_DEVICES`, first entry) via `nvidia-smi`. Fewer than
+21,474,836,480 bytes (20 GiB) free is a fail-closed task failure recorded as `failed`; missing
+values are never converted to zero or skipped. The gate threshold is frozen and not
+outcome-aware.
+
+8.6 Cancelled Correction-1 attempt. The Correction-1 wave was submitted as preflight job
+`475878` (completed), evaluation array `475879` and finalizer `475880`. The user cancelled it
+roughly fifteen minutes after the first three snapshot tasks started; no task had reached a
+scientific result. The root `/vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v1` is preserved
+read-only as the cancelled-attempt evidence with an appended cancellation marker, and the fresh
+output root for this correction is `/vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v2`.
+The cancellation consumed no scientific measurement and does not count as the one authorized
+wave of this correction.
+
+8.7 Authorization binding. The single authorization sentence must name this corrected contract
+SHA-256 and the frozen v2 execution-config SHA-256. Authorization remains exactly one wave
+across both arrays plus preflight and finalizer; no retry, rerun, throttle change after
+submission, or threshold change is authorized.
+

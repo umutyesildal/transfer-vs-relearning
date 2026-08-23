@@ -2,11 +2,13 @@ from __future__ import annotations
 
 """Execution adapter for the hash-bound three-model M1 eval-v2 trajectory wave.
 
-Frozen topology (contract v1, append-only correction 1):
+Frozen topology (contract v1, append-only correction 2):
   read-only final preflight
-    -> A10080 array 0-107%3 over the 108 real M1 epoch snapshots (36 per model)
+    -> A6000 array 0-71%8 over qwen+smollm epoch snapshots (gpu:a6000:1)
+    -> A10080 array 0-35%3 over olmo epoch snapshots (gpu:a10080gb:1)
     -> afterany family finalizer that projects the three M0 parent states from the
        canonical hash-closed M0 evidence and closes the wave only at 111/111.
+Every task passes a fail-closed GPU free-memory gate (20 GiB) before scoring.
 """
 
 import json
@@ -56,6 +58,11 @@ CHEAP_PROBE_COUNT = 1500
 FULL_PROBE_COUNT = 12000
 EXACT_PREFIX_PROBE_COUNT = 500
 TRWIKI_EXPECTED_DOCUMENTS = 10034
+MIN_FREE_GPU_MEMORY_BYTES = 21474836480
+EVALUATION_ROUTES = {
+    "a10080gb": {"gres": "gpu:a10080gb:1", "count": 36, "throttle": 3, "offset": 0, "name": "m1-eval-v2-a100"},
+    "a6000": {"gres": "gpu:a6000:1", "count": 72, "throttle": 8, "offset": 36, "name": "m1-eval-v2-a6000"},
+}
 M0_CANONICAL_EVIDENCE = {
     "normalization_config": "configs/evaluation/eval_v2_m0_metric_normalization_v1f.yaml",
     "normalization_config_sha256": (
@@ -127,6 +134,31 @@ def _verify_file(path: Path, expected: str, label: str) -> None:
         raise FileNotFoundError(f"Missing frozen input ({label}): {path}")
     if sha256_file(path) != expected:
         raise ValueError(f"SHA-256 mismatch ({label}): {path}")
+
+
+def assert_free_gpu_memory() -> dict[str, Any]:
+    """Fail closed unless the allocated GPU has at least the frozen free-memory gate."""
+
+    visible = os.environ.get("CUDA_VISIBLE_DEVICES")
+    if not visible:
+        raise RuntimeError("CUDA_VISIBLE_DEVICES is missing; cannot verify the allocated GPU")
+    index = visible.split(",")[0].strip()
+    probe = subprocess.run(
+        ["nvidia-smi", "-i", index, "--query-gpu=memory.free", "--format=csv,noheader,nounits"],
+        capture_output=True,
+        text=True,
+    )
+    if probe.returncode != 0 or not probe.stdout.strip().isdigit():
+        raise RuntimeError(
+            f"GPU free-memory probe failed (exit={probe.returncode}): {probe.stderr.strip()}"
+        )
+    free_bytes = int(probe.stdout.strip()) * 1024 * 1024
+    if free_bytes < MIN_FREE_GPU_MEMORY_BYTES:
+        raise ValueError(
+            f"GPU free-memory gate failed on index {index}: {free_bytes} bytes free "
+            f"< {MIN_FREE_GPU_MEMORY_BYTES} required"
+        )
+    return {"gpu_index": index, "free_bytes": free_bytes, "gate_bytes": MIN_FREE_GPU_MEMORY_BYTES}
 
 
 def load_m0_canonical_evidence() -> dict[str, Any]:
@@ -587,6 +619,7 @@ def run_task(matrix: dict[str, Any], task_index: int) -> dict[str, Any]:
     )
     result_path = state_root / "task_result.json"
     try:
+        memory_gate = assert_free_gpu_memory()
         if task.get("snapshot_manifest"):
             verify_snapshot(
                 snapshot_manifest_path=Path(task["snapshot_manifest"]),
@@ -628,6 +661,7 @@ def run_task(matrix: dict[str, Any], task_index: int) -> dict[str, Any]:
             "schema_version": 2,
             "status": "complete",
             "command_count": len(commands),
+            "memory_gate": memory_gate,
             "validations": {
                 name: {"status": payload.get("status"), "result_sha256": payload.get("result_sha256")}
                 for name, payload in validations.items()
@@ -746,7 +780,8 @@ def slurm_environment(output_root: Path) -> dict[str, str]:
     }
 
 
-ARRAY_SPEC = f"0-{GPU_TASK_COUNT - 1}%3"
+def _route_array_spec(route: dict[str, Any]) -> str:
+    return f"0-{int(route['count']) - 1}%{int(route['throttle'])}"
 
 
 def submit_wave(matrix_path: Path, *, entrypoint: Path) -> dict[str, Any]:
@@ -758,21 +793,22 @@ def submit_wave(matrix_path: Path, *, entrypoint: Path) -> dict[str, Any]:
     export_value = "ALL," + ",".join(f"{key}={value}" for key, value in env.items())
     submission_path = root / "control/submission_manifest.json"
     preflight: str | None = None
-    array: str | None = None
+    arrays: dict[str, str | None] = {"a10080gb": None, "a6000": None}
     finalizer: str | None = None
     try:
+        for route in EVALUATION_ROUTES.values():
+            subprocess.run(
+                ["sbatch", "--test-only", "--account=yesildau", "--partition=gpu", f"--gres={route['gres']}", f"--array={_route_array_spec(route)}", "--cpus-per-task=8", "--mem=64G", "--time=1-00:00:00", "--wrap=true"],
+                check=True,
+            )
         subprocess.run(
             ["sbatch", "--test-only", "--account=yesildau", "--partition=std", "--cpus-per-task=4", "--mem=16G", "--time=01:00:00", "--wrap=true"],
-            check=True,
-        )
-        subprocess.run(
-            ["sbatch", "--test-only", "--account=yesildau", "--partition=gpu", "--gres=gpu:a10080gb:1", f"--array={ARRAY_SPEC}", "--cpus-per-task=8", "--mem=64G", "--time=1-00:00:00", "--wrap=true"],
             check=True,
         )
     except Exception as exc:
         write_json(
             submission_path,
-            {"schema_version": 2, "status": "not_submitted_test_only_failed", "preflight_job_id": None, "evaluation_array_job_id": None, "finalizer_job_id": None, "error": str(exc)},
+            {"schema_version": 3, "status": "not_submitted_test_only_failed", "preflight_job_id": None, "evaluation_array_job_ids": {}, "finalizer_job_id": None, "error": str(exc)},
         )
         raise
     preflight_cmd = [str(RUNTIME_PYTHON), str(entrypoint), "preflight", "--matrix", str(matrix_path)]
@@ -784,36 +820,59 @@ def submit_wave(matrix_path: Path, *, entrypoint: Path) -> dict[str, Any]:
     except Exception as exc:
         write_json(
             submission_path,
-            {"schema_version": 2, "status": "not_submitted_preflight_sbatch_failed", "preflight_job_id": None, "evaluation_array_job_id": None, "finalizer_job_id": None, "error": str(exc)},
+            {"schema_version": 3, "status": "not_submitted_preflight_sbatch_failed", "preflight_job_id": None, "evaluation_array_job_ids": {}, "finalizer_job_id": None, "error": str(exc)},
         )
         raise
-    task_wrap = (
-        f"exec {shlex.quote(str(RUNTIME_PYTHON))} {shlex.quote(str(entrypoint))} run-task "
-        f"--matrix {shlex.quote(str(matrix_path))} --task-index \"$SLURM_ARRAY_TASK_ID\""
-    )
-    try:
-        array = subprocess.run(
-            [*common, "--partition=gpu", "--gres=gpu:a10080gb:1", "--job-name=m1-eval-v2", f"--dependency=afterok:{preflight}", f"--array={ARRAY_SPEC}", "--cpus-per-task=8", "--mem=64G", "--time=1-00:00:00", f"--output={root / 'logs/%x-%A_%a.out'}", f"--error={root / 'logs/%x-%A_%a.err'}", f"--export={export_value}", f"--wrap={task_wrap}"],
+
+    def _submit_route(key: str, route: dict[str, Any]) -> str:
+        task_wrap = (
+            f"exec {shlex.quote(str(RUNTIME_PYTHON))} {shlex.quote(str(entrypoint))} run-task "
+            f"--matrix {shlex.quote(str(matrix_path))} --task-offset {int(route['offset'])} "
+            f"--task-index \"$SLURM_ARRAY_TASK_ID\""
+        )
+        return subprocess.run(
+            [*common, "--partition=gpu", f"--gres={route['gres']}", f"--job-name={route['name']}", f"--dependency=afterok:{preflight}", f"--array={_route_array_spec(route)}", "--cpus-per-task=8", "--mem=64G", "--time=1-00:00:00", f"--output={root / 'logs/%x-%A_%a.out'}", f"--error={root / 'logs/%x-%A_%a.err'}", f"--export={export_value}", f"--wrap={task_wrap}"],
             check=True, capture_output=True, text=True,
         ).stdout.strip().split(";", 1)[0]
+
+    try:
+        arrays["a6000"] = _submit_route("a6000", EVALUATION_ROUTES["a6000"])
     except Exception as exc:
         write_json(
             submission_path,
-            {"schema_version": 2, "status": "partial_submission_preflight_only", "preflight_job_id": preflight, "evaluation_array_job_id": None, "finalizer_job_id": None, "error": str(exc)},
+            {"schema_version": 3, "status": "partial_submission_a6000_only", "preflight_job_id": preflight, "evaluation_array_job_ids": {"a6000": arrays["a6000"], "a10080gb": None}, "finalizer_job_id": None, "error": str(exc)},
+        )
+        raise
+    try:
+        arrays["a10080gb"] = _submit_route("a10080gb", EVALUATION_ROUTES["a10080gb"])
+    except Exception as exc:
+        write_json(
+            submission_path,
+            {"schema_version": 3, "status": "partial_submission_a6000_active", "preflight_job_id": preflight, "evaluation_array_job_ids": {"a6000": arrays["a6000"], "a10080gb": None}, "finalizer_job_id": None, "error": str(exc)},
         )
         raise
     final_cmd = [str(RUNTIME_PYTHON), str(entrypoint), "finalize", "--matrix", str(matrix_path)]
     try:
         finalizer = subprocess.run(
-            [*common, "--partition=std", "--job-name=m1-eval-v2-finalize", f"--dependency=afterany:{array}", "--cpus-per-task=2", "--mem=8G", "--time=01:00:00", f"--output={root / 'logs/%x-%j.out'}", f"--error={root / 'logs/%x-%j.err'}", "--export=ALL,PYTHONPATH=src", f"--wrap=exec {shlex.join(final_cmd)}"],
+            [*common, "--partition=std", "--job-name=m1-eval-v2-finalize", f"--dependency=afterany:{arrays['a6000']}:{arrays['a10080gb']}", "--cpus-per-task=2", "--mem=8G", "--time=01:00:00", f"--output={root / 'logs/%x-%j.out'}", f"--error={root / 'logs/%x-%j.err'}", "--export=ALL,PYTHONPATH=src", f"--wrap=exec {shlex.join(final_cmd)}"],
             check=True, capture_output=True, text=True,
         ).stdout.strip().split(";", 1)[0]
     except Exception as exc:
         write_json(
             submission_path,
-            {"schema_version": 2, "status": "partial_submission_preflight_and_array_active", "preflight_job_id": preflight, "evaluation_array_job_id": array, "finalizer_job_id": None, "error": str(exc)},
+            {"schema_version": 3, "status": "partial_submission_arrays_active", "preflight_job_id": preflight, "evaluation_array_job_ids": {"a6000": arrays["a6000"], "a10080gb": arrays["a10080gb"]}, "finalizer_job_id": None, "error": str(exc)},
         )
         raise
-    result = {"schema_version": 2, "status": "submitted", "preflight_job_id": preflight, "evaluation_array_job_id": array, "finalizer_job_id": finalizer, "gpu_task_count": GPU_TASK_COUNT, "total_scientific_states": TOTAL_SCIENTIFIC_STATES, "matrix": str(matrix_path)}
+    result = {
+        "schema_version": 3,
+        "status": "submitted",
+        "preflight_job_id": preflight,
+        "evaluation_array_job_ids": {"a6000": arrays["a6000"], "a10080gb": arrays["a10080gb"]},
+        "finalizer_job_id": finalizer,
+        "routes": {key: {**{k: v for k, v in route.items()}, "array_spec": _route_array_spec(route)} for key, route in EVALUATION_ROUTES.items()},
+        "gpu_task_count": GPU_TASK_COUNT,
+        "total_scientific_states": TOTAL_SCIENTIFIC_STATES,
+        "matrix": str(matrix_path),
+    }
     write_json(submission_path, result)
     return result

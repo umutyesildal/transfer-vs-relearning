@@ -32,6 +32,7 @@ def main() -> None:
     task = sub.add_parser("run-task")
     task.add_argument("--matrix", type=Path, required=True)
     task.add_argument("--task-index", type=int, required=True)
+    task.add_argument("--task-offset", type=int, default=0)
     args = parser.parse_args()
     if args.command == "start":
         matrix = build_task_matrix(
@@ -49,7 +50,7 @@ def main() -> None:
         if args.command == "preflight":
             result = preflight_matrix(matrix)
         elif args.command == "run-task":
-            result = run_task(matrix, args.task_index)
+            result = run_task(matrix, args.task_index + args.task_offset)
         else:
             result = finalize_wave(matrix)
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))

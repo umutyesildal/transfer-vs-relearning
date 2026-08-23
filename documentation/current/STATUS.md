@@ -4,8 +4,9 @@
 
 **Current branch:** `agent/m1-pipeline-repair`
 
-**Execution state:** M1 training complete (111 checkpoint states); frozen M1 eval-v2 wave
-awaiting the exact SHA-bound user authorization
+**Execution state:** M1 training complete (111 checkpoint states); frozen M1 eval-v2 wave v2
+(dual-route A6000+A100) awaiting the exact SHA-bound user authorization; the first single-array
+submission was user-cancelled before any scientific result
 
 ## The short answer
 
@@ -30,6 +31,18 @@ post-training evaluation fail-closed unless the real files and hashes exist.
   resolve inside the pinned environment as in M0.
 - Tests: focused executor suite 6/6; combined study + experiment-pipeline suites 82 passed.
 - Remaining blocker: only the exact SHA-bound user authorization sentence.
+
+## Revision 2 — dual-route acceleration (2026-08-23, later the same day)
+
+The Correction-1 single-A100-array wave (preflight 475878 complete; array 475879; finalizer
+475880) was cancelled by explicit user decision roughly fifteen minutes after its first three
+tasks started; zero scientific results were written. Contract Correction 2 and frozen config
+`m1_eval_v2_matched_three_model_v2.yaml` now authorize a dual-route topology: a 72-task
+`gpu:a6000:1` array (qwen+smollm, throttle 8) plus a 36-task `gpu:a10080gb:1` array (olmo,
+throttle 3), one preflight and one afterany finalizer. Every task passes a fail-closed 20 GiB
+free-memory gate before scoring. V100, RTX6000 and RTX3090 remain forbidden. The preserved
+v1 output root keeps the cancelled attempt read-only; the fresh v2 root is required by contract.
+Expected wall time drops from roughly 25–35 hours to roughly 8–12 hours.
 
 ## Closed M0 boundary
 

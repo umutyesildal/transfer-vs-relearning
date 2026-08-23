@@ -1,0 +1,128 @@
+schema_version: 2
+name: m1-eval-v2-matched-three-model-v2
+status: frozen
+as_of: "2026-08-23"
+classification: scientific_evaluation
+execution_ready: true
+execution_authorized: false
+supersedes_config: configs/evaluation/m1_eval_v2_matched_three_model_v1.yaml
+supersedes_config_sha256: 65c70265844a7ea94be80498546da2625b41bf2ea83beeafbda156ae70e28db8
+revision_reason: dual_route_parallel_acceleration_user_cancelled_single_array_wave
+
+contract: documentation/contracts/evaluation/m1-matched-three-model-eval-v2-v1.md
+parent_contract: documentation/contracts/evaluation/eval-v2.md
+parent_contract_sha256: 95eec6fc5a9dd7ce6da3185dfe20e2a183ad3850194c15f88a1299f09a43c6a3
+evaluation_registry: configs/evaluation/eval_v2_registry.yaml
+evaluation_registry_sha256: 0721412c651f5b112f531e69b53c98ccdb3633bee4888571bd7039d3f693229d
+
+family:
+  source_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1
+  output_root: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v2
+  superseded_output_root: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v1
+  fresh_output_root_required: true
+  model_count: 3
+  states_per_model: 37
+  task_count: 111
+  gpu_task_count: 108
+  parent_projection_count: 3
+  full_state_count: 9
+
+parent_projection:
+  mode: projected_from_canonical_m0_evidence_without_rescoring
+  normalization_config: configs/evaluation/eval_v2_m0_metric_normalization_v1f.yaml
+  normalization_config_sha256: 3781cd62e6bfa1d3484bd87f54b44000eb9aae35a8b0260ad31b93cc15d56047
+  canonical_output_root: /vol/tmp2/yesildau/eval_v2_m0_metric_normalization_v1f
+  source_registry: /vol/tmp2/yesildau/eval_v2_m0_three_model_projection_v1b/source_registry.jsonl
+  source_registry_sha256: a0dca252afe7c1d03e458a60a8b48d7e8d8858e0ad95e6e8be696311a0b34265
+  registry_source_rows: 24
+  observation_row_count: 42
+  rows_per_model: 14
+
+pipeline_configs:
+  olmo:
+    path: configs/pipelines/eval_v2_m1_matched_olmo_v2.yaml
+    sha256: dfc6692f63255332052383ea43c9adaba957d00237f1bfdc6b46d4a6c62b3288
+  qwen:
+    path: configs/pipelines/eval_v2_m1_matched_qwen_v2.yaml
+    sha256: da61ae1b9e51f48682ef77a346b9e3482ba72be320fecb41dbce475225b8a7fa
+  smollm:
+    path: configs/pipelines/eval_v2_m1_matched_smollm_v2.yaml
+    sha256: d48f803e66080dc9d5bf72b3ad2c7e85410327019755c8c49336f3058c819989
+
+adapter:
+  id: slurm_m1_matched_wave_v1
+  module: src/transfer_vs_relearning/study/m1_wave_executor.py
+  module_sha256: 49ed94d37b5000421b23b51dea914b25db8c3fe35c0e5e192ffb36b719c05290
+  entrypoint: scripts/study/execute_m1_eval_v2.py
+  entrypoint_sha256: 85c5e8f0488cab89f787266e116262f806c46a5cdfba48842b7d1fadd3594d53
+  topology: preflight_then_dual_route_arrays_a6000_72_tasks_throttle_8_plus_a10080gb_36_tasks_throttle_3_then_afterany_finalizer_with_parent_projection
+
+evaluation_cadence:
+  dense_states: parent_and_every_epoch_end
+  parent_dense_rows_projected_from_canonical_m0_evidence: true
+  full_epochs: [0, 18, 36]
+  full_states_derive_cheap_factual_from_full_without_rescoring: true
+  dense_bundles:
+    - identity_and_training_trace
+    - factual_access_cheap
+    - exact_prefix_500
+    - english_retention_primary
+    - turkish_retention_control
+    - generation_integrity_cheap
+  full_bundles:
+    - factual_access_full
+    - english_capability
+    - turkish_capability
+    - generation_integrity_full
+  pile_10k: retired_not_in_eval_v2
+
+runtime:
+  python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
+  environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
+  offline_only: true
+  device: cuda:0
+  precision: float16
+  min_free_gpu_memory_bytes: 21474836480
+
+slurm:
+  account: yesildau
+  control_partition: std
+  evaluation_partition: gpu
+  routes:
+    a6000:
+      gres: gpu:a6000:1
+      task_offset: 36
+      array_task_count: 72
+      array_throttle: 8
+      job_name: m1-eval-v2-a6000
+      allowed_models: [qwen, smollm]
+    a10080gb:
+      gres: gpu:a10080gb:1
+      task_offset: 0
+      array_task_count: 36
+      array_throttle: 3
+      job_name: m1-eval-v2-a100
+      allowed_models: [olmo]
+  evaluation_time_limit: 1-00:00:00
+  cpus_per_task: 8
+  memory: 64G
+  job_count: 4
+
+authorization:
+  required: exact_contract_and_config_sha256
+  wave_limit: 1
+  automatic_retry_authorized: false
+  cleanup_authorized: false
+  training_authorized: false
+  m2_authorized: false
+
+prohibitions:
+  - reuse_existing_evaluation_root
+  - alter_training_or_checkpoint_artifacts
+  - network_retrieval
+  - include_pile_10k
+  - outcome_aware_checkpoint_or_threshold_change
+  - automatic_retry
+  - cleanup_or_deletion
+  - hu_home_write
+  - route_outside_declared_a10080gb_a6000_pools
