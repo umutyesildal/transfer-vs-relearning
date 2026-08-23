@@ -20,6 +20,17 @@ evaluator required checkpoint and training manifests before training, even thoug
 stage that creates those manifests. The repair makes them dependency outputs and keeps standalone
 post-training evaluation fail-closed unless the real files and hashes exist.
 
+## Local pre-execution audit (2026-08-23)
+
+- Hash chain re-verified after commit `a273f56`: contract, execution config, adapter module and
+  entrypoint hashes on disk match `PROJECT_STATE.yaml` exactly (18/18 checks).
+- Runner-schema parity confirmed: exact-prefix config keys, generation-integrity config keys,
+  Turkish-perplexity CLI flags and harness flags (`--seed 42,42,42,42`, `dtype=float16`,
+  no `--include_path`) match the proven M0 adapter behavior; `winogender_*`/`turblimp_core`
+  resolve inside the pinned environment as in M0.
+- Tests: focused executor suite 6/6; combined study + experiment-pipeline suites 82 passed.
+- Remaining blocker: only the exact SHA-bound user authorization sentence.
+
 ## Closed M0 boundary
 
 - active protocol: frozen `eval-v2`;

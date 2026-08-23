@@ -1,5 +1,5 @@
 schema_version: 1
-as_of: "2026-08-22"
+as_of: "2026-08-23"
 project: transfer-vs-relearning
 
 repository:
@@ -164,6 +164,14 @@ stage_readiness:
     parent_projection_source: canonical_m0_metric_normalization_v1f_without_rescoring
     full_states_derive_cheap_factual_from_full_without_rescoring: true
     max_parallel_tasks: 3
+    implementation_commit: a273f56
+    local_preexecution_audit:
+      date: "2026-08-23"
+      hash_chain_checks: 18_passed_0_failed
+      focused_tests: 6_passed
+      study_and_pipeline_tests: 82_passed
+      runner_schema_parity: exact_prefix_generation_ppl_harness_flags_verified_against_m0_adapter
+      result: ready_pending_exact_sha_bound_user_authorization
     execution_authorized: false
     ready_to_start: false
     blockers:
