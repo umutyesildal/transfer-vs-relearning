@@ -263,3 +263,41 @@ root is `/vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v3`.
 SHA-256 and the v3 execution-config SHA-256. Exactly one wave; no retry beyond the frozen
 in-task gate schedule, no throttle change after submission, no threshold change.
 
+## 10. Append-only correction 4 (2026-08-23, exact-prefix hotfix)
+
+Recorded after the Correction-3 wave began executing and six tasks failed at the third
+evaluation command. Where a statement below conflicts with earlier sections, the statement
+below governs.
+
+10.1 Cause. `src/transfer_vs_relearning/evaluation/evaluator.py` hard-required the manifest key
+`local_path` (and `parameter_count`) when writing its run metadata. M0-era model manifests
+carry those keys; the M1 training-binding manifests carry `local_path_absolute` /
+`tokenizer_source_path_absolute` instead. The failure was environmental-code drift, not a model
+score; all other commands of the affected tasks had already succeeded.
+
+10.2 Hotfix. `evaluator.py` now resolves the snapshot through `_manifest_local_path` (which
+already accepts both key spellings) and records `parameter_count` as optional metadata. No
+metric, denominator, prompt or scoring definition changed.
+
+10.3 Rebound execution adapter module:
+
+- `src/transfer_vs_relearning/study/m1_wave_executor.py` —
+  `b92ca6a14d03f340b2657f6880b5b8f758d824991aa9d2c3d9471a2f62d515f5`
+
+The entrypoint is unchanged from Corrections 2–3:
+`85c5e8f0488cab89f787266e116262f806c46a5cdfba48842b7d1fadd3594d53`.
+
+10.4 In-wave failed-attempt convergence. Within this single authorized wave, `run-task` may now
+re-execute a state whose existing terminal `task_result.json` has `status: "failed"`. Before
+re-execution the entire prior attempt directory is renamed in place to
+`<checkpoint_id>__failed_<n>` and preserved read-only; complete states remain untouchable and
+missing states behave exactly as before. The finalizer counts only canonical paths and still
+closes only at 111/111. This does not authorize any deletion, any second submission after a
+terminal family result, or any change to thresholds or measurement semantics.
+
+10.5 Resubmission binding. The Correction-3 matrix and output root
+(`/vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v3`) remain canonical; resubmission reuses
+the existing initialized matrix without re-initialization. A new authorization sentence naming
+this corrected contract SHA-256 and the rebound v3 execution-config SHA-256 (`12376c0df070df076abc6b7d0cdb46fe56a48db76cdec0fa1c8dd59574e2ae83`)
+is required before the remaining array work continues.
+

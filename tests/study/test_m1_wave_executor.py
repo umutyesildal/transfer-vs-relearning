@@ -535,6 +535,74 @@ def test_submit_wave_single_route_topology(tmp_path, monkeypatch):
     assert saved["evaluation_array_job_id"] == result["evaluation_array_job_id"]
 
 
+def test_run_task_archives_failed_attempt_and_blocks_complete_states(
+    tmp_path, monkeypatch
+):
+    _patch_runtime(tmp_path, monkeypatch)
+    monkeypatch.setattr(
+        executor,
+        "assert_free_gpu_memory",
+        lambda: {"gpu_index": "0", "free_bytes": 1, "gate_bytes": 1},
+    )
+    model_manifest = tmp_path / "models" / "olmo.json"
+    _write(model_manifest, json.dumps({"local_path_absolute": str(tmp_path / "weights")}))
+    training_manifest = tmp_path / "training.json"
+    _write(training_manifest, "{}")
+    task = {
+        "task_index": 0,
+        "model": "olmo",
+        "model_id": "allenai/OLMo-2-0425-1B",
+        "model_revision": "revision",
+        "checkpoint_id": "epoch-002",
+        "epoch": 2,
+        "update": 14,
+        "full": False,
+        "model_manifest": str(model_manifest),
+        "model_manifest_sha256": sha256_file(model_manifest),
+        "snapshot_manifest": None,
+        "snapshot_manifest_sha256": None,
+        "checkpoint_sha256": "5" * 64,
+        "training_manifest": str(training_manifest),
+        "training_manifest_sha256": sha256_file(training_manifest),
+    }
+    matrix = {"repo_root": str(tmp_path), "output_root": str(tmp_path / "output"), "tasks": [task]}
+    monkeypatch.setattr(executor, "_run", lambda command, *, repo_root: None)
+    for name in (
+        "validate_harness_output",
+        "validate_factual_output",
+        "validate_exact_prefix_output",
+        "validate_turkish_perplexity_output",
+        "validate_generation_output",
+    ):
+        monkeypatch.setattr(executor, name, lambda root, *a, **k: {"status": "complete"})
+    monkeypatch.setattr(
+        executor,
+        "derive_cheap_factual_from_full",
+        lambda **kwargs: {"status": "complete"},
+    )
+
+    failed_root = tmp_path / "output/results/olmo/epoch-002"
+    failed_root.mkdir(parents=True)
+    (failed_root / "task_result.json").write_text(
+        json.dumps({"status": "failed", "error": "old"}), encoding="utf-8"
+    )
+    result = executor.run_task(matrix, 0)
+    assert result["status"] == "complete"
+    assert result["archived_failed_attempts"] == ["epoch-002__failed_0"]
+    assert json.loads(
+        (tmp_path / "output/results/olmo/epoch-002__failed_0/task_result.json").read_text(
+            encoding="utf-8"
+        )
+    )["status"] == "failed"
+
+    try:
+        executor.run_task(matrix, 0)
+    except FileExistsError:
+        pass
+    else:
+        raise AssertionError("complete states must never be re-executed")
+
+
 def test_frozen_master_config_binds_adapter_and_pipeline_hashes():
     repo_root = Path(__file__).resolve().parents[2]
     master = yaml.safe_load(

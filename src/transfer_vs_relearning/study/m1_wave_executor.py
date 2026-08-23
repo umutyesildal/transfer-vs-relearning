@@ -616,13 +616,42 @@ def gate_with_retries() -> dict[str, Any]:
     raise RuntimeError(f"GPU free-memory gate exhausted {GATE_PROBE_ATTEMPTS} probes: {last_error}")
 
 
+def _archive_prior_failed_attempt(
+    output_root: Path, model: str, checkpoint_id: str
+) -> list[str]:
+    """Archive a previously failed attempt directory; complete states are untouchable."""
+
+    state_root = output_root / "results" / model / checkpoint_id
+    if not state_root.exists():
+        return []
+    result_path = state_root / "task_result.json"
+    if not result_path.is_file():
+        raise FileExistsError(f"M1 evaluation state has no terminal result: {state_root}")
+    prior = json.loads(result_path.read_text(encoding="utf-8"))
+    if prior.get("status") != "failed":
+        raise FileExistsError(
+            f"Only failed M1 attempts may be re-executed; {state_root} is {prior.get('status')}"
+        )
+    archived: list[str] = []
+    index = 0
+    while True:
+        target = output_root / "results" / model / f"{checkpoint_id}__failed_{index}"
+        if not target.exists():
+            break
+        index += 1
+    os.replace(state_root, target)
+    archived.append(target.name)
+    return archived
+
+
 def run_task(matrix: dict[str, Any], task_index: int) -> dict[str, Any]:
     task = matrix["tasks"][task_index]
     repo_root = Path(matrix["repo_root"])
     output_root = Path(matrix["output_root"])
     state_root = output_root / "results" / task["model"] / task["checkpoint_id"]
-    if state_root.exists():
-        raise FileExistsError(f"M1 evaluation state root already exists: {state_root}")
+    archived_attempts = _archive_prior_failed_attempt(
+        output_root, str(task["model"]), str(task["checkpoint_id"])
+    )
     (state_root / "configs").mkdir(parents=True)
     _verify_file(Path(task["model_manifest"]), task["model_manifest_sha256"], "task_model_manifest")
     exact_config = _write_exact_config(task, repo_root=repo_root, state_root=state_root)
@@ -706,6 +735,7 @@ def run_task(matrix: dict[str, Any], task_index: int) -> dict[str, Any]:
             "status": "complete",
             "command_count": len(commands),
             "memory_gate": memory_gate,
+            "archived_failed_attempts": archived_attempts,
             "validations": {
                 name: {"status": payload.get("status"), "result_sha256": payload.get("result_sha256")}
                 for name, payload in validations.items()
@@ -714,7 +744,7 @@ def run_task(matrix: dict[str, Any], task_index: int) -> dict[str, Any]:
         write_json(result_path, result)
         return result
     except Exception as exc:
-        write_json(result_path, {**task, "schema_version": 2, "status": "failed", "error": str(exc)})
+        write_json(result_path, {**task, "schema_version": 2, "status": "failed", "error": str(exc), "archived_failed_attempts": archived_attempts})
         raise
 
 
