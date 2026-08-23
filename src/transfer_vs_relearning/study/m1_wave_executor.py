@@ -4,7 +4,7 @@ from __future__ import annotations
 
 Frozen topology (contract v1, append-only correction 2):
   read-only final preflight
-    -> A6000 array 0-71%8 over qwen+smollm epoch snapshots (gpu:a6000:1)
+    -> RTXA6000 array 0-71%8 over qwen+smollm epoch snapshots (gpu:rtxa6000:1)
     -> A10080 array 0-35%3 over olmo epoch snapshots (gpu:a10080gb:1)
     -> afterany family finalizer that projects the three M0 parent states from the
        canonical hash-closed M0 evidence and closes the wave only at 111/111.
@@ -61,7 +61,7 @@ TRWIKI_EXPECTED_DOCUMENTS = 10034
 MIN_FREE_GPU_MEMORY_BYTES = 21474836480
 EVALUATION_ROUTES = {
     "a10080gb": {"gres": "gpu:a10080gb:1", "count": 36, "throttle": 3, "offset": 0, "name": "m1-eval-v2-a100"},
-    "a6000": {"gres": "gpu:a6000:1", "count": 72, "throttle": 8, "offset": 36, "name": "m1-eval-v2-a6000"},
+    "a6000": {"gres": "gpu:rtxa6000:1", "count": 72, "throttle": 8, "offset": 36, "name": "m1-eval-v2-a6000"},
 }
 M0_CANONICAL_EVIDENCE = {
     "normalization_config": "configs/evaluation/eval_v2_m0_metric_normalization_v1f.yaml",

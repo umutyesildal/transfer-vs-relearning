@@ -160,7 +160,7 @@ the frozen `configs/evaluation/m1_eval_v2_matched_three_model_v2.yaml`.
 8.2 Rebound execution adapter:
 
 - `src/transfer_vs_relearning/study/m1_wave_executor.py` —
-  `49ed94d37b5000421b23b51dea914b25db8c3fe35c0e5e192ffb36b719c05290`
+  `2baf6630a275d9929baf67d50faeae43a6b25cdc06065dd9b4e5d8d161ba75f6`
 - `scripts/study/execute_m1_eval_v2.py` —
   `85c5e8f0488cab89f787266e116262f806c46a5cdfba48842b7d1fadd3594d53`
 
@@ -168,7 +168,7 @@ the frozen `configs/evaluation/m1_eval_v2_matched_three_model_v2.yaml`.
 
 ```text
 read-only final preflight
-→ A6000 array 0-71%8 over the qwen+smollm epoch snapshots (gpu:a6000:1)
+→ RTXA6000 array 0-71%8 over the qwen+smollm epoch snapshots (gpu:rtxa6000:1)
 → A10080 array 0-35%3 over the olmo epoch snapshots (gpu:a10080gb:1)
 → afterany family finalizer that projects the three M0 parent states
 ```
@@ -179,7 +179,7 @@ evaluation semantics — bundles, cadence, full-state cheap derivation, parent p
 111/111 closure — are unchanged from Corrections 0 and 1.
 
 8.4 Route policy. Only two GPU resource types are authorized for this wave:
-`gres=gpu:a6000:1` and `gres=gpu:a10080gb:1`. V100, RTX6000, RTX3090 and every other card type
+`gres=gpu:rtxa6000:1` and `gres=gpu:a10080gb:1`. V100, RTX6000, RTX3090 and every other card type
 are forbidden. The A6000 pool is expected to resolve to the currently idle gruenau7/gruenau8
 nodes; the scheduler may place either route on any node offering the declared resource type.
 

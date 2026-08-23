@@ -484,7 +484,7 @@ def test_submit_wave_dual_route_topology(tmp_path, monkeypatch):
 
     array_calls = [call for call in calls if "--parsable" in call]
     assert len(array_calls) == 4  # preflight + two arrays + finalizer
-    a6000 = next(call for call in array_calls if any("gpu:a6000:1" in part for part in call))
+    a6000 = next(call for call in array_calls if any("gpu:rtxa6000:1" in part for part in call))
     a100 = next(call for call in array_calls if any("gpu:a10080gb:1" in part for part in call))
     finalizer = next(call for call in array_calls if "finalize" in " ".join(call))
     preflight_id = result["preflight_job_id"]
@@ -519,7 +519,7 @@ def test_frozen_master_config_binds_adapter_and_pipeline_hashes():
     assert family["parent_projection_count"] == 3
     assert family["output_root"].endswith("m1_eval_v2_matched_three_model_v2")
     routes = master["slurm"]["routes"]
-    assert (routes["a6000"]["gres"], routes["a6000"]["array_task_count"], routes["a6000"]["array_throttle"], routes["a6000"]["task_offset"]) == ("gpu:a6000:1", 72, 8, 36)
+    assert (routes["a6000"]["gres"], routes["a6000"]["array_task_count"], routes["a6000"]["array_throttle"], routes["a6000"]["task_offset"]) == ("gpu:rtxa6000:1", 72, 8, 36)
     assert (routes["a10080gb"]["gres"], routes["a10080gb"]["array_task_count"], routes["a10080gb"]["array_throttle"], routes["a10080gb"]["task_offset"]) == ("gpu:a10080gb:1", 36, 3, 0)
     assert master["runtime"]["min_free_gpu_memory_bytes"] == executor.MIN_FREE_GPU_MEMORY_BYTES
     for row in master["pipeline_configs"].values():

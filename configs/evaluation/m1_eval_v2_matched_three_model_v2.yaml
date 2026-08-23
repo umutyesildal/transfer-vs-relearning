@@ -52,7 +52,7 @@ pipeline_configs:
 adapter:
   id: slurm_m1_matched_wave_v1
   module: src/transfer_vs_relearning/study/m1_wave_executor.py
-  module_sha256: 49ed94d37b5000421b23b51dea914b25db8c3fe35c0e5e192ffb36b719c05290
+  module_sha256: 2baf6630a275d9929baf67d50faeae43a6b25cdc06065dd9b4e5d8d161ba75f6
   entrypoint: scripts/study/execute_m1_eval_v2.py
   entrypoint_sha256: 85c5e8f0488cab89f787266e116262f806c46a5cdfba48842b7d1fadd3594d53
   topology: preflight_then_dual_route_arrays_a6000_72_tasks_throttle_8_plus_a10080gb_36_tasks_throttle_3_then_afterany_finalizer_with_parent_projection
@@ -90,7 +90,7 @@ slurm:
   evaluation_partition: gpu
   routes:
     a6000:
-      gres: gpu:a6000:1
+      gres: gpu:rtxa6000:1
       task_offset: 36
       array_task_count: 72
       array_throttle: 8
