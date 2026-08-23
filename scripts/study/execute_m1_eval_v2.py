@@ -11,6 +11,7 @@ from transfer_vs_relearning.study.m1_wave_executor import (
     initialize_wave,
     load_matrix,
     preflight_matrix,
+    resume_wave,
     run_task,
     submit_wave,
 )
@@ -33,6 +34,14 @@ def main() -> None:
     task.add_argument("--matrix", type=Path, required=True)
     task.add_argument("--task-index", type=int, required=True)
     task.add_argument("--task-offset", type=int, default=0)
+    resume = sub.add_parser("resume")
+    resume.add_argument("--config", type=Path, action="append", required=True)
+    resume.add_argument("--repo-root", type=Path, default=Path.cwd())
+    resume.add_argument("--contract", type=Path, required=True)
+    resume.add_argument("--contract-sha256", required=True)
+    resume.add_argument("--execution-config", type=Path, required=True)
+    resume.add_argument("--execution-config-sha256", required=True)
+    resume.add_argument("--matrix", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "start":
         matrix = build_task_matrix(
@@ -45,6 +54,20 @@ def main() -> None:
         )
         matrix_path = initialize_wave(matrix)
         result = submit_wave(matrix_path, entrypoint=Path(__file__).resolve())
+    elif args.command == "resume":
+        rebuilt = build_task_matrix(
+            args.config,
+            repo_root=args.repo_root,
+            contract_path=args.contract,
+            contract_sha256=args.contract_sha256,
+            execution_config_path=args.execution_config,
+            execution_config_sha256=args.execution_config_sha256,
+        )
+        result = resume_wave(
+            args.matrix.resolve(),
+            rebuilt_matrix=rebuilt,
+            entrypoint=Path(__file__).resolve(),
+        )
     else:
         matrix = load_matrix(args.matrix.resolve())
         if args.command == "preflight":

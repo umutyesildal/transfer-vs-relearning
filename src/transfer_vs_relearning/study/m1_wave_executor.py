@@ -539,14 +539,25 @@ def preflight_matrix(matrix: dict[str, Any]) -> dict[str, Any]:
     for label, (value, expected) in FROZEN_INPUTS.items():
         _verify_file(_resolve(Path(matrix["repo_root"]), value), expected, label)
     load_m0_canonical_evidence()
-    existing_results = list((output_root / "results").glob("*/*/task_result.json"))
-    if existing_results:
-        raise FileExistsError("Fresh M1 preflight found pre-existing task results")
+    canonical_results = list((output_root / "results").glob("*/*/task_result.json"))
+    preexisting_failed = 0
+    for path in canonical_results:
+        try:
+            status = json.loads(path.read_text(encoding="utf-8")).get("status")
+        except (OSError, ValueError):
+            status = None
+        if status == "complete":
+            raise FileExistsError(f"Fresh M1 preflight found completed scientific work: {path}")
+        if status == "failed":
+            preexisting_failed += 1
+        else:
+            raise FileExistsError(f"Fresh M1 preflight found an unreadable state result: {path}")
     return {
         "status": "ready",
         "matrix_id": matrix["matrix_id"],
         "gpu_task_count": GPU_TASK_COUNT,
         "total_scientific_states": TOTAL_SCIENTIFIC_STATES,
+        "preexisting_failed_results": preexisting_failed,
     }
 
 
@@ -852,6 +863,48 @@ def slurm_environment(output_root: Path) -> dict[str, str]:
         "PYTHONDONTWRITEBYTECODE": "1",
         "PYTHONPATH": "src",
     }
+
+
+def _task_signature(tasks: list[dict[str, Any]]) -> str:
+    return sha256_text(json.dumps(tasks, sort_keys=True))
+
+
+def resume_wave(
+    matrix_path: Path,
+    *,
+    rebuilt_matrix: dict[str, Any],
+    entrypoint: Path,
+) -> dict[str, Any]:
+    """Rebind an initialized root's matrix to corrected identities and resubmit.
+
+    Allowed only when the rebuilt task signature is byte-identical to the one already on
+    disk (same inputs, same tasks; only authorization hashes may differ).
+    """
+
+    existing = load_matrix(matrix_path)
+    if _task_signature(existing["tasks"]) != _task_signature(rebuilt_matrix["tasks"]):
+        raise ValueError("Resume refused: rebuilt task signature differs from the stored matrix")
+    if existing["output_root"] != rebuilt_matrix["output_root"]:
+        raise ValueError("Resume refused: output root changed")
+    prior_sha256 = sha256_file(matrix_path)
+    write_json(matrix_path, rebuilt_matrix)
+    log_path = matrix_path.parent / "resume_log.jsonl"
+    with log_path.open("a", encoding="utf-8") as handle:
+        handle.write(
+            json.dumps(
+                {
+                    "prior_matrix_sha256": prior_sha256,
+                    "new_matrix_sha256": sha256_file(matrix_path),
+                    "contract_sha256": rebuilt_matrix["authorization"]["contract_sha256"],
+                    "execution_config_sha256": rebuilt_matrix["authorization"][
+                        "execution_config_sha256"
+                    ],
+                },
+                sort_keys=True,
+            )
+            + "\n"
+        )
+    return submit_wave(matrix_path, entrypoint=entrypoint)
 
 
 def submit_wave(matrix_path: Path, *, entrypoint: Path) -> dict[str, Any]:

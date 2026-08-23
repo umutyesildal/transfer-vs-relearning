@@ -301,3 +301,34 @@ the existing initialized matrix without re-initialization. A new authorization s
 this corrected contract SHA-256 and the rebound v3 execution-config SHA-256 (`12376c0df070df076abc6b7d0cdb46fe56a48db76cdec0fa1c8dd59574e2ae83`)
 is required before the remaining array work continues.
 
+
+## 11. Append-only correction 5 (2026-08-23, resume and preflight convergence)
+
+Recorded after the Correction-4 resubmission stalled before execution: the stored matrix still
+carried Correction-3 authorization hashes while the checkout already held Correction-4 files,
+and the preflight freshness check refused terminal-failed results that Correction 4 explicitly
+allows to converge. Both behaviors are now frozen as follows.
+
+11.1 Superseded statements. The §10.3 module hash and §10.5 execution-config SHA-256 are
+superseded by the identities below. No measurement semantics change.
+
+11.2 Rebound execution adapter:
+
+- `src/transfer_vs_relearning/study/m1_wave_executor.py` —
+  `3a473327749746b502a9bb52e32f2608482860b60a1c070f9293b8c1093d62b6`
+- `scripts/study/execute_m1_eval_v2.py` —
+  `e3b8eefe6420f9c1eddf7f13a3548c32355ff203618b9a14c157f8047bebfd1a`
+
+11.3 Preflight convergence rule. The read-only preflight rejects any canonical state whose
+terminal result is `complete` or unreadable; canonical terminal-`failed` states are counted
+(`preexisting_failed_results`) and allowed, because they are exactly what Correction 4's
+in-wave convergence re-executes.
+
+11.4 Resume operation. A new `resume` subcommand rebuilds the task matrix under corrected
+identities and may replace a stored matrix ONLY when the rebuilt 108-task signature is
+byte-identical to the stored one and the output root is unchanged; every rebinding is appended
+to `control/resume_log.jsonl` with prior/new matrix digests. Any task divergence is refused.
+
+11.5 Authorization binding. The single authorization sentence must name this corrected contract
+SHA-256 and the rebound v3 execution-config SHA-256 recorded in `documentation/current/
+PROJECT_STATE.yaml`. Exactly one wave continues; all earlier prohibitions stand.

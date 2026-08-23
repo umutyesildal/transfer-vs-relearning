@@ -603,6 +603,116 @@ def test_run_task_archives_failed_attempt_and_blocks_complete_states(
         raise AssertionError("complete states must never be re-executed")
 
 
+def test_resume_rebinds_matrix_and_preflight_tolerates_failed_states(
+    tmp_path, monkeypatch
+):
+    frozen = _patch_runtime(tmp_path, monkeypatch)
+    _patch_m0_evidence(monkeypatch)
+    configs = _build_configs(tmp_path, frozen)
+    adapter_module = tmp_path / "src/adapter.py"
+    adapter_entrypoint = tmp_path / "scripts/execute.py"
+    _write(adapter_module, "adapter")
+    _write(adapter_entrypoint, "entrypoint")
+    contract_path = tmp_path / "contract.md"
+    _write(contract_path, "contract-v1")
+    execution_config_path = tmp_path / "execution.yaml"
+    pipeline_hashes = {
+        label: {"path": str(path.relative_to(tmp_path)), "sha256": sha256_file(path)}
+        for label, path in zip(("olmo", "qwen", "smollm"), configs)
+    }
+
+    def _execution_config(module_name):
+        return {
+            "status": "frozen",
+            "execution_ready": True,
+            "contract": "contract.md",
+            "adapter": {
+                "id": "slurm_m1_matched_wave_v1",
+                "module": str(adapter_module.relative_to(tmp_path)),
+                "module_sha256": sha256_file(adapter_module),
+                "entrypoint": str(adapter_entrypoint.relative_to(tmp_path)),
+                "entrypoint_sha256": sha256_file(adapter_entrypoint),
+            },
+            "pipeline_configs": pipeline_hashes,
+        }
+
+    first_config = _execution_config("a")
+    _write(execution_config_path, yaml.safe_dump(first_config))
+    matrix = executor.build_task_matrix(
+        configs,
+        repo_root=tmp_path,
+        contract_path=contract_path,
+        contract_sha256=sha256_file(contract_path),
+        execution_config_path=execution_config_path,
+        execution_config_sha256=sha256_file(execution_config_path),
+    )
+    output_root = Path(matrix["output_root"])
+    matrix_path = executor.initialize_wave(matrix)
+
+    # Simulate a prior failed attempt on one canonical state.
+    failed_dir = output_root / "results/olmo/epoch-001"
+    failed_dir.mkdir(parents=True)
+    (failed_dir / "task_result.json").write_text(
+        json.dumps({"status": "failed", "error": "old"}), encoding="utf-8"
+    )
+    payload = executor.preflight_matrix(matrix)
+    assert payload["preexisting_failed_results"] == 1
+
+    (output_root / "results/qwen/epoch-001").mkdir(parents=True)
+    (output_root / "results/qwen/epoch-001/task_result.json").write_text(
+        json.dumps({"status": "complete"}), encoding="utf-8"
+    )
+    try:
+        executor.preflight_matrix(matrix)
+    except FileExistsError:
+        pass
+    else:
+        raise AssertionError("completed states must still block a fresh preflight")
+    import shutil as _shutil
+
+    _shutil.rmtree(output_root / "results/qwen/epoch-001")
+
+    # Corrected identities: same tasks, new contract + config bytes.
+    _write(contract_path, "contract-v2-corrected")
+    rebuilt = executor.build_task_matrix(
+        configs,
+        repo_root=tmp_path,
+        contract_path=contract_path,
+        contract_sha256=sha256_file(contract_path),
+        execution_config_path=execution_config_path,
+        execution_config_sha256=sha256_file(execution_config_path),
+    )
+    submitted = {}
+
+    def _fake_submit(mp, *, entrypoint):
+        submitted["matrix"] = mp
+        return {"status": "submitted"}
+
+    monkeypatch.setattr(executor, "submit_wave", _fake_submit)
+    result = executor.resume_wave(
+        matrix_path,
+        rebuilt_matrix=rebuilt,
+        entrypoint=adapter_entrypoint,
+    )
+    assert result["status"] == "submitted"
+    rebound = json.loads(matrix_path.read_text(encoding="utf-8"))
+    assert (
+        rebound["authorization"]["contract_sha256"] == sha256_file(contract_path) != matrix["authorization"]["contract_sha256"]
+    )
+    log_lines = (output_root / "control/resume_log.jsonl").read_text(encoding="utf-8").strip().splitlines()
+    assert len(log_lines) == 1
+
+    # Diverging tasks are refused.
+    diverged = json.loads(json.dumps(rebuilt))
+    diverged["tasks"][0]["checkpoint_id"] = "epoch-999"
+    try:
+        executor.resume_wave(matrix_path, rebuilt_matrix=diverged, entrypoint=adapter_entrypoint)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("task divergence must be refused")
+
+
 def test_frozen_master_config_binds_adapter_and_pipeline_hashes():
     repo_root = Path(__file__).resolve().parents[2]
     master = yaml.safe_load(
