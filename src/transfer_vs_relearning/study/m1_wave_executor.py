@@ -435,10 +435,30 @@ def build_task_matrix(
     }
 
 
+def _recoverable_stale_root(output_root: Path) -> bool:
+    """True only for a root from a submission attempt that never left the login node."""
+
+    manifest_path = output_root / "control/submission_manifest.json"
+    if not manifest_path.is_file():
+        return False
+    try:
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    if not str(payload.get("status", "")).startswith("not_submitted"):
+        return False
+    if any(True for _ in output_root.glob("results/*/*/task_result.json")):
+        return False
+    return True
+
+
 def initialize_wave(matrix: dict[str, Any]) -> Path:
     output_root = Path(matrix["output_root"])
+    recovered = False
     if output_root.exists():
-        raise FileExistsError(f"Fresh M1 evaluation root already exists: {output_root}")
+        if not _recoverable_stale_root(output_root):
+            raise FileExistsError(f"Fresh M1 evaluation root already exists: {output_root}")
+        recovered = True
     for relative in ("control", "logs", "results", "tmp", "cache"):
         (output_root / relative).mkdir(parents=True, exist_ok=True)
     matrix_path = output_root / "control/task_matrix.json"
@@ -457,6 +477,7 @@ def initialize_wave(matrix: dict[str, Any]) -> Path:
                 len(matrix.get("tasks", [])) + len(matrix.get("parent_projections", [])),
             ),
             "model_count": 3,
+            "recovered_stale_root": recovered,
         },
     )
     return matrix_path

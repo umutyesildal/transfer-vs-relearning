@@ -160,7 +160,7 @@ the frozen `configs/evaluation/m1_eval_v2_matched_three_model_v2.yaml`.
 8.2 Rebound execution adapter:
 
 - `src/transfer_vs_relearning/study/m1_wave_executor.py` —
-  `2baf6630a275d9929baf67d50faeae43a6b25cdc06065dd9b4e5d8d161ba75f6`
+  `9e73da74be19402817862821f281d05ce9c69816b208fb3c089dbe9c114f7778`
 - `scripts/study/execute_m1_eval_v2.py` —
   `85c5e8f0488cab89f787266e116262f806c46a5cdfba48842b7d1fadd3594d53`
 
@@ -202,4 +202,15 @@ wave of this correction.
 SHA-256 and the frozen v2 execution-config SHA-256. Authorization remains exactly one wave
 across both arrays plus preflight and finalizer; no retry, rerun, throttle change after
 submission, or threshold change is authorized.
+
+8.8 Never-submitted root recovery. The first v2 start attempt passed the full hash closure,
+created the fresh output root, and then failed at the `sbatch --test-only` stage because the
+A6000 GRES name is `gpu:rtxa6000:1`; no job was submitted and no scientific artifact exists.
+Re-running under this correction may re-initialize the SAME output root only when all of the
+following hold, verified in code before any write: the root contains
+`control/submission_manifest.json` whose status starts with `not_submitted`, zero
+`results/*/*/task_result.json` files exist, and that manifest parses as JSON. Any other existing
+root fails closed exactly as before. The re-initialized preflight record sets
+`recovered_stale_root: true`. This recovery never applies to a root from a submitted wave; it
+does not authorize deletion of any path.
 

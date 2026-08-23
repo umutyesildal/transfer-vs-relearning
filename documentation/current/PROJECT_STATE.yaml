@@ -148,15 +148,15 @@ stage_readiness:
     execution_adapter_frozen: true
     adapter: slurm_m1_matched_wave_v1
     contract: documentation/contracts/evaluation/m1-matched-three-model-eval-v2-v1.md
-    contract_sha256: 16e52414162dc7b64c5d0e951f085d302ef572673303dc3d594565cbdc3cf803
+    contract_sha256: 147754012688e902331cbdee981a1fce8ebeeb7bb374974dd4549329713a8f6e
     contract_correction: append_only_correction_2_dual_route
     prior_contract_sha256s:
       - 344ccd0b55f237041a4c0c2bc4ad2a9f649778df3e73d2540c8ed9731c64ab70
       - 37ce73bf0b39499a59509be314fa595a903849753393ba9be8408590a5150fc7
     config: configs/evaluation/m1_eval_v2_matched_three_model_v2.yaml
-    config_sha256: 099d64b6b41250ab14081293e0be4ffce91dcb6efae49929d79cc9861bd5feec
+    config_sha256: 5f101ded395bed1753f21a7c7d2f4893b6514235d6b50f295cb16b35f07db440
     supersedes_config_sha256: 65c70265844a7ea94be80498546da2625b41bf2ea83beeafbda156ae70e28db8
-    adapter_module_sha256: 2baf6630a275d9929baf67d50faeae43a6b25cdc06065dd9b4e5d8d161ba75f6
+    adapter_module_sha256: 9e73da74be19402817862821f281d05ce9c69816b208fb3c089dbe9c114f7778
     adapter_entrypoint_sha256: 85c5e8f0488cab89f787266e116262f806c46a5cdfba48842b7d1fadd3594d53
     proposed_output_root: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v2
     topology: preflight_then_dual_route_arrays_a6000_72_tasks_throttle_8_plus_a10080gb_36_tasks_throttle_3_then_afterany_finalizer_with_parent_projection

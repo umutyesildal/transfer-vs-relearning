@@ -180,6 +180,48 @@ def test_initialize_wave_requires_fresh_root(tmp_path):
         raise AssertionError("existing evaluation root must fail closed")
 
 
+def test_initialize_wave_recovers_only_never_submitted_roots(tmp_path):
+    output_root = tmp_path / "output"
+    control = output_root / "control"
+    control.mkdir(parents=True)
+    (output_root / "results").mkdir()
+    matrix = {"output_root": str(output_root), "tasks": [{}] * 111}
+    manifest = control / "submission_manifest.json"
+
+    manifest.write_text(json.dumps({"status": "not_submitted_test_only_failed"}), encoding="utf-8")
+    executor.initialize_wave(matrix)
+    preflight = json.loads((output_root / "control/preflight.json").read_text(encoding="utf-8"))
+    assert preflight["recovered_stale_root"] is True
+
+    (output_root / "results/olmo/epoch-001").mkdir(parents=True)
+    (output_root / "results/olmo/epoch-001/task_result.json").write_text("{}", encoding="utf-8")
+    try:
+        executor.initialize_wave(matrix)
+    except FileExistsError:
+        pass
+    else:
+        raise AssertionError("root containing task results must fail closed")
+
+    for stray in (output_root / "results").rglob("*"):
+        if stray.is_file():
+            stray.unlink()
+    manifest.write_text(json.dumps({"status": "submitted"}), encoding="utf-8")
+    try:
+        executor.initialize_wave(matrix)
+    except FileExistsError:
+        pass
+    else:
+        raise AssertionError("submitted root must fail closed")
+
+    manifest.write_text("{broken", encoding="utf-8")
+    try:
+        executor.initialize_wave(matrix)
+    except FileExistsError:
+        pass
+    else:
+        raise AssertionError("unreadable submission manifest must fail closed")
+
+
 def _gpu_result(matrix, output_root: Path, task_index: int, *, status: str) -> None:
     task = matrix["tasks"][task_index]
     state_root = output_root / "results" / task["model"] / task["checkpoint_id"]
