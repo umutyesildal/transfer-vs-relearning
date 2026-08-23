@@ -60,7 +60,8 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: exact_sha_bound_authorization_then_single_m1_eval_v2_wave_execution
+  subject: monitor_running_correction_6_wave_then_close_at_111_of_111
+  delegation_record: documentation/records/evaluation/M1_EVAL_V2_WAVE_EXECUTION_AND_CORRECTIONS_2026-08-23.md
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user
     - offline_tests_and_dry_runs

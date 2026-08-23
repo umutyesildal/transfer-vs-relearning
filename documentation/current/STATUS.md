@@ -4,9 +4,11 @@
 
 **Current branch:** `agent/m1-pipeline-repair`
 
-**Execution state:** M1 training complete (111 checkpoint states); frozen M1 eval-v2 wave v3
-(single A100-80GB pool, throttle 6) awaiting the exact SHA-bound user authorization; the two
-earlier attempts were user-cancelled before any scientific result
+**Execution state:** M1 eval-v2 wave v3 RUNNING under Correction 6 (single A100-80GB pool,
+throttle 6): 4/111 canonical complete at snapshot 2026-08-23T13:10Z. Full execution history,
+procedures and delegation boundaries:
+`documentation/records/evaluation/M1_EVAL_V2_WAVE_EXECUTION_AND_CORRECTIONS_2026-08-23.md`.
+The two earlier attempts were user-cancelled before any scientific result.
 
 ## The short answer
 

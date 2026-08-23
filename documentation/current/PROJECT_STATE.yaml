@@ -189,6 +189,15 @@ stage_readiness:
       scientific_results_written: 0
       preserved_output_root: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v1
     max_parallel_tasks: 6
+    active_submission:
+      revision: correction_6
+      jobs: {preflight: "476314", evaluation_array: "476315", finalizer: "476316"}
+      submitted_at_utc: "2026-08-23T12:20:00Z"
+      snapshot_utc: "2026-08-23T13:10:39Z"
+      canonical_complete: 4
+      canonical_failed: 0
+      observed_dense_task_seconds: [1815, 2008, 2105]
+      record: documentation/records/evaluation/M1_EVAL_V2_WAVE_EXECUTION_AND_CORRECTIONS_2026-08-23.md
     execution_authorized: false
     ready_to_start: false
     blockers:
