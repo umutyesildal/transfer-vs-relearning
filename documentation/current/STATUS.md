@@ -1,16 +1,19 @@
 # Current project status
 
-**As of:** 2026-08-22
+**As of:** 2026-08-23
 
 **Current branch:** `agent/m1-pipeline-repair`
 
-**Execution state:** local repair only; M1 has not started
+**Execution state:** M1 training complete (111 checkpoint states); frozen M1 eval-v2 wave
+awaiting the exact SHA-bound user authorization
 
 ## The short answer
 
-M0 is finished. The project is now preparing the matched three-model M1 wave, but training and
-evaluation remain disabled until the user reviews and explicitly authorizes the final hash-bound
-M1 contract.
+M0 is finished. The matched three-model M1 training wave is also complete: the successful retry
+family at `/vol/tmp2/yesildau/m1_matched_three_model_retry_v1` produced 37 tracked states per
+model (parent plus 36 epoch snapshots, 111 total). The M1 eval-v2 execution adapter and its
+hash-closed contract are frozen; evaluation starts only after the user provides the exact
+SHA-bound authorization sentence.
 
 The recent stall was a control-plane error, not a scientific-design failure: the prospective M1
 evaluator required checkpoint and training manifests before training, even though training is the
@@ -68,10 +71,10 @@ three identity/storage preflights
 |---|---|
 | M0 | complete |
 | M1 scientific inputs/recipe | ready locally |
-| M1 first training wave | NOT_RUN: import-path failure before model load, jobs 475832–475834 |
-| M1 training correction | frozen locally; awaiting exact user authorization |
-| M1 checkpoint evaluation adapter/contract | next implementation boundary |
-| M1 execution authorization | absent; user must explicitly provide it later |
+| M1 first training wave | preserved NOT_RUN: import-path failure before model load, jobs 475832–475834 |
+| M1 training retry wave | COMPLETE: jobs 475850–475852, 111 checkpoint states under `m1_matched_three_model_retry_v1` |
+| M1 checkpoint evaluation adapter/contract | frozen (append-only correction 1): 108 GPU tasks + 3 parent projections from canonical M0 v1f evidence |
+| M1 execution authorization | absent; user must provide the exact SHA-bound sentence |
 | M2 corpus and sibling contract | not frozen; does not block M1 preparation |
 
 `vngrs-ai/vngrs-web-corpus` is reserved for the later M2-A/M2-B Turkish adaptation arms. It is not

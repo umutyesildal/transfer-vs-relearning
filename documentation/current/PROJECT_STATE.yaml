@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m1-pipeline-repair
-  status: m0_complete_m1_local_pipeline_repair_execution_not_authorized
+  status: m0_complete_m1_training_complete_eval_v2_contract_awaiting_authorization
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -104,7 +104,7 @@ scientific_design:
 readiness:
   evaluation_contract: frozen
   corpus_contract: not_frozen
-  m1_training_contract: frozen_unexecuted
+  m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
   ready_to_train: false
@@ -120,6 +120,7 @@ stage_readiness:
     exact_prefix_models_complete: 3
     normalized_observation_count: 42
   m1_training:
+    status: complete
     scientific_inputs_ready: true
     fixed_model_set_ready: true
     synthetic_fact_dataset_ready: true
@@ -130,22 +131,43 @@ stage_readiness:
     contract_sha256: f2a166eaf357eddda0e3fbbe866873b2b738b46c7d036b2f12ee88db1ca963a4
     config: configs/training/m1_matched_three_model_training_import_repair_v1.yaml
     config_sha256: 7cb8d4d80d9a942c872ca83db7bec9f7b7659527f70bcbd5d474f80e54342e85
-    prior_wave_status: not_run_import_path_failure_before_model_load
+    prior_wave_status: preserved_not_run_import_path_failure_before_model_load
     prior_jobs: [475832, 475833, 475834]
-    execution_authorized: false
+    successful_retry_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1
+    successful_retry_jobs: [475850, 475851, 475852]
+    checkpoint_states_per_model: 37
+    completed_epoch_snapshots_per_model: 36
+    total_trajectory_states: 111
+    execution_authorized: true
     ready_to_start: false
-    blockers:
-      - explicit_user_start_authorization_missing
+    blockers: []
   m1_evaluation:
     protocol_ready: true
     exact_prefix_required: true
     checkpoint_outputs_produced_by_training: true
+    execution_adapter_frozen: true
+    adapter: slurm_m1_matched_wave_v1
+    contract: documentation/contracts/evaluation/m1-matched-three-model-eval-v2-v1.md
+    contract_sha256: 37ce73bf0b39499a59509be314fa595a903849753393ba9be8408590a5150fc7
+    contract_correction: append_only_correction_1_pre_execution
+    supersedes_contract_sha256: 344ccd0b55f237041a4c0c2bc4ad2a9f649778df3e73d2540c8ed9731c64ab70
+    config: configs/evaluation/m1_eval_v2_matched_three_model_v1.yaml
+    config_sha256: 65c70265844a7ea94be80498546da2625b41bf2ea83beeafbda156ae70e28db8
+    supersedes_config_sha256: d08c175c94ee3c70edcb204c4bd1e3ec3929ceeb81e092783f1dddcf6b040d66
+    adapter_module_sha256: d573a0e0aaf342971cbc68068f9004e80f46de988b3de7513381aa01ced098e9
+    adapter_entrypoint_sha256: 0123fe5921b9e4e7c2ce61e74785ad5ead810914155e095d0beb55e3624b004d
+    proposed_output_root: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v1
+    topology: preflight_then_108_task_gpu_array_max_3_then_afterany_finalizer_with_parent_projection
+    scientific_state_count: 111
+    gpu_task_count: 108
+    parent_projection_count: 3
+    parent_projection_source: canonical_m0_metric_normalization_v1f_without_rescoring
+    full_states_derive_cheap_factual_from_full_without_rescoring: true
+    max_parallel_tasks: 3
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - m1_training_outputs_not_yet_produced
-      - execution_adapter_not_frozen
-      - explicit_user_start_authorization_missing
+      - exact_sha_bound_user_authorization_missing
   m2_training:
     corpus_contract_ready: false
     sibling_contract_ready: false

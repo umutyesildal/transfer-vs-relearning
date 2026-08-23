@@ -19,7 +19,7 @@ project:
 readiness:
   evaluation_contract: frozen
   corpus_contract: not_frozen
-  m1_training_contract: frozen_unexecuted
+  m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
   ready_to_train: false
@@ -28,8 +28,8 @@ readiness:
 stage_readiness:
   m0: complete
   m1_scientific_inputs: ready
-  m1_training_adapter_and_contract: frozen_awaiting_exact_authorization
-  m1_evaluation_adapter_and_contract: next_local_boundary
+  m1_training: complete_111_checkpoint_states
+  m1_evaluation_adapter_and_contract: frozen_awaiting_exact_authorization
   m1_execution: not_authorized
   m2_corpus_and_sibling_contract: later_not_an_m1_blocker
 
@@ -53,11 +53,13 @@ m1:
   evaluation: inherit_eval_v2_with_mandatory_exact_prefix
   epoch_states_per_model: 37
   total_checkpoint_states: 111
+  eval_gpu_tasks: 108
+  eval_parent_projections: 3_projected_from_canonical_m0_v1f
   max_feedback_trace: mandatory
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: finish_m1_pipeline_repair_and_prepare_reviewable_execution_contract
+  subject: exact_sha_bound_authorization_then_single_m1_eval_v2_wave_execution
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user
     - offline_tests_and_dry_runs

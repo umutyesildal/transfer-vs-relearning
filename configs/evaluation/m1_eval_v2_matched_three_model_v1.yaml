@@ -1,0 +1,109 @@
+schema_version: 1
+name: m1-eval-v2-matched-three-model-v1
+status: frozen
+as_of: "2026-08-22"
+classification: scientific_evaluation
+execution_ready: true
+execution_authorized: false
+
+contract: documentation/contracts/evaluation/m1-matched-three-model-eval-v2-v1.md
+parent_contract: documentation/contracts/evaluation/eval-v2.md
+parent_contract_sha256: 95eec6fc5a9dd7ce6da3185dfe20e2a183ad3850194c15f88a1299f09a43c6a3
+evaluation_registry: configs/evaluation/eval_v2_registry.yaml
+evaluation_registry_sha256: 0721412c651f5b112f531e69b53c98ccdb3633bee4888571bd7039d3f693229d
+
+family:
+  source_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1
+  output_root: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v1
+  fresh_output_root_required: true
+  model_count: 3
+  states_per_model: 37
+  task_count: 111
+  gpu_task_count: 108
+  parent_projection_count: 3
+  full_state_count: 9
+
+parent_projection:
+  mode: projected_from_canonical_m0_evidence_without_rescoring
+  normalization_config: configs/evaluation/eval_v2_m0_metric_normalization_v1f.yaml
+  normalization_config_sha256: 3781cd62e6bfa1d3484bd87f54b44000eb9aae35a8b0260ad31b93cc15d56047
+  canonical_output_root: /vol/tmp2/yesildau/eval_v2_m0_metric_normalization_v1f
+  source_registry: /vol/tmp2/yesildau/eval_v2_m0_three_model_projection_v1b/source_registry.jsonl
+  source_registry_sha256: a0dca252afe7c1d03e458a60a8b48d7e8d8858e0ad95e6e8be696311a0b34265
+  registry_source_rows: 24
+  observation_row_count: 42
+  rows_per_model: 14
+
+pipeline_configs:
+  olmo:
+    path: configs/pipelines/eval_v2_m1_matched_olmo.yaml
+    sha256: 02be7b33f19c70685540694e65618dac568a526c50240595656ff4228878fdf1
+  qwen:
+    path: configs/pipelines/eval_v2_m1_matched_qwen.yaml
+    sha256: 21fa721a79a0e044e9f8fb9ba77bf2369de5dbf34622796f34f4bf372001b175
+  smollm:
+    path: configs/pipelines/eval_v2_m1_matched_smollm.yaml
+    sha256: 940aba8cf1cf0001ba545f45d38dc25ca02e06eddd51f6e9a317dd191cae6f55
+
+adapter:
+  id: slurm_m1_matched_wave_v1
+  module: src/transfer_vs_relearning/study/m1_wave_executor.py
+  module_sha256: d573a0e0aaf342971cbc68068f9004e80f46de988b3de7513381aa01ced098e9
+  entrypoint: scripts/study/execute_m1_eval_v2.py
+  entrypoint_sha256: 0123fe5921b9e4e7c2ce61e74785ad5ead810914155e095d0beb55e3624b004d
+  topology: preflight_then_single_108_task_gpu_array_max_3_then_afterany_finalizer_with_parent_projection
+
+evaluation_cadence:
+  dense_states: parent_and_every_epoch_end
+  parent_dense_rows_projected_from_canonical_m0_evidence: true
+  full_epochs: [0, 18, 36]
+  full_states_derive_cheap_factual_from_full_without_rescoring: true
+  dense_bundles:
+    - identity_and_training_trace
+    - factual_access_cheap
+    - exact_prefix_500
+    - english_retention_primary
+    - turkish_retention_control
+    - generation_integrity_cheap
+  full_bundles:
+    - factual_access_full
+    - english_capability
+    - turkish_capability
+    - generation_integrity_full
+  pile_10k: retired_not_in_eval_v2
+
+runtime:
+  python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
+  environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
+  offline_only: true
+  device: cuda:0
+  precision: float16
+
+slurm:
+  account: yesildau
+  control_partition: std
+  evaluation_partition: gpu
+  evaluation_gres: gpu:a10080gb:1
+  array: 0-107%3
+  evaluation_time_limit: 1-00:00:00
+  cpus_per_task: 8
+  memory: 64G
+  job_count: 3
+
+authorization:
+  required: exact_contract_and_config_sha256
+  wave_limit: 1
+  automatic_retry_authorized: false
+  cleanup_authorized: false
+  training_authorized: false
+  m2_authorized: false
+
+prohibitions:
+  - reuse_existing_evaluation_root
+  - alter_training_or_checkpoint_artifacts
+  - network_retrieval
+  - include_pile_10k
+  - outcome_aware_checkpoint_or_threshold_change
+  - automatic_retry
+  - cleanup_or_deletion
+  - hu_home_write
