@@ -64,6 +64,7 @@ GATE_PROBE_ATTEMPTS = 13
 GATE_RETRY_WAIT_SECONDS = 600
 TASK_RETRY_ATTEMPTS = 24
 TASK_RETRY_WAIT_SECONDS = 300
+EVALUATION_TIME_LIMIT = "2-12:00:00"
 EVALUATION_ROUTE = {
     "gres": "gpu:a10080gb:1",
     "count": GPU_TASK_COUNT,
@@ -956,7 +957,7 @@ def submit_wave(matrix_path: Path, *, entrypoint: Path) -> dict[str, Any]:
             check=True,
         )
         subprocess.run(
-            ["sbatch", "--test-only", "--account=yesildau", "--partition=gpu", f"--gres={EVALUATION_ROUTE['gres']}", f"--array={array_spec}", "--cpus-per-task=8", "--mem=64G", "--time=1-00:00:00", "--wrap=true"],
+            ["sbatch", "--test-only", "--account=yesildau", "--partition=gpu", f"--gres={EVALUATION_ROUTE['gres']}", f"--array={array_spec}", "--cpus-per-task=8", "--mem=64G", f"--time={EVALUATION_TIME_LIMIT}", "--wrap=true"],
             check=True,
         )
     except Exception as exc:
@@ -984,7 +985,7 @@ def submit_wave(matrix_path: Path, *, entrypoint: Path) -> dict[str, Any]:
     )
     try:
         array = subprocess.run(
-            [*common, "--partition=gpu", f"--gres={EVALUATION_ROUTE['gres']}", f"--job-name={EVALUATION_ROUTE['name']}", f"--dependency=afterok:{preflight}", f"--array={array_spec}", "--cpus-per-task=8", "--mem=64G", "--time=1-00:00:00", f"--output={root / 'logs/%x-%A_%a_%J.out'}", f"--error={root / 'logs/%x-%A_%a_%J.err'}", f"--export={export_value}", f"--wrap={task_wrap}"],
+            [*common, "--partition=gpu", f"--gres={EVALUATION_ROUTE['gres']}", f"--job-name={EVALUATION_ROUTE['name']}", f"--dependency=afterok:{preflight}", f"--array={array_spec}", "--cpus-per-task=8", "--mem=64G", f"--time={EVALUATION_TIME_LIMIT}", f"--output={root / 'logs/%x-%A_%a_%J.out'}", f"--error={root / 'logs/%x-%A_%a_%J.err'}", f"--export={export_value}", f"--wrap={task_wrap}"],
             check=True, capture_output=True, text=True,
         ).stdout.strip().split(";", 1)[0]
     except Exception as exc:

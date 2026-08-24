@@ -523,6 +523,8 @@ def test_submit_wave_single_route_topology(tmp_path, monkeypatch):
     finalizer_call = next(call for call in parsable if any("finalize" in part for part in call))
     preflight_id = result["preflight_job_id"]
     assert any("--array=0-107%6" in part for part in array_call)
+    assert any(f"--time={executor.EVALUATION_TIME_LIMIT}" in part for part in array_call)
+    assert not any("--time=1-00:00:00" in part for part in array_call)
     assert any(f"--dependency=afterok:{preflight_id}" in part for part in array_call)
     assert not any("--task-offset" in part for part in array_call)
     assert any(
@@ -738,6 +740,7 @@ def test_frozen_master_config_binds_adapter_and_pipeline_hashes():
     assert runtime["min_free_gpu_memory_bytes"] == executor.MIN_FREE_GPU_MEMORY_BYTES
     assert runtime["gate_probe_attempts"] == executor.GATE_PROBE_ATTEMPTS
     assert runtime["gate_retry_wait_seconds"] == executor.GATE_RETRY_WAIT_SECONDS
+    assert slurm["evaluation_time_limit"] == executor.EVALUATION_TIME_LIMIT
     for row in master["pipeline_configs"].values():
         assert sha256_file(repo_root / row["path"]) == row["sha256"]
     adapter = master["adapter"]

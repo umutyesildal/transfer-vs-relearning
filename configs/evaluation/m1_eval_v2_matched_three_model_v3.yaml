@@ -47,7 +47,7 @@ pipeline_configs:
 adapter:
   id: slurm_m1_matched_wave_v1
   module: src/transfer_vs_relearning/study/m1_wave_executor.py
-  module_sha256: 2f2acc8a296348ade96eb5b6358c52e1aeca5574808b15bdff229e0d07aab97a
+  module_sha256: 07f1ee77e81ff131af6cc9b9b54e4621911839acf35a988eafde61de9f6229e3
   entrypoint: scripts/study/execute_m1_eval_v2.py
   entrypoint_sha256: e3b8eefe6420f9c1eddf7f13a3548c32355ff203618b9a14c157f8047bebfd1a
   topology: preflight_then_single_a10080gb_array_108_tasks_throttle_6_then_afterany_finalizer_with_parent_projection_with_failed_attempt_convergence
@@ -87,7 +87,7 @@ slurm:
   account: yesildau
   control_partition: std
   evaluation_partition: gpu
-  evaluation_time_limit: 1-00:00:00
+  evaluation_time_limit: 2-12:00:00
   cpus_per_task: 8
   memory: 64G
   job_count: 3

@@ -361,3 +361,40 @@ remain forbidden.
 12.5 Authorization binding. A sentence naming this corrected contract SHA-256 and the rebound
 v3 execution-config SHA-256 (`8136981802d4e8958c73f6a63fc93dfc35a784e7a4446303b4f1f85665d1f441`) authorizes continuing the running wave under
 these semantics, including sweep resumes without further sentences.
+
+## 13. Append-only correction 7 (2026-08-24, evaluation-array wall clock)
+
+13.1 Cause. Full-bundle scientific states exceed the frozen 24-hour array time limit while making
+verified forward progress. Array element 17 (`olmo/epoch-018`, Slurm step job `476783`) was
+cancelled by the scheduler at `2026-08-24T17:12:23` (`DUE TO TIME LIMIT`) after saving harness
+results and reloading weights, without any `task_result.json`. Array element 35
+(`olmo/epoch-036`) reached 23h20m with log writes minutes before hitting the identical wall.
+Dense states complete in roughly 30–35 minutes, so this limit had never been exercised before the
+full states. An in-allocation `scontrol update TimeLimit` extension was attempted and denied by
+cluster policy (`Access/permission denied`); the partition `MaxTime` is `4-00:00:00`.
+
+13.2 Fix. The evaluation-array wall clock is raised from `1-00:00:00` to `2-12:00:00`, applied
+through one frozen module constant (`EVALUATION_TIME_LIMIT`) used identically by the
+`sbatch --test-only` route validation and the real array submission. Control preflight and
+finalizer limits are unchanged. No metric, denominator, prompt, seed, scoring definition, route,
+GRES identity, throttle or topology value changed.
+
+13.3 Continuity. This correction changes no completed result and touches no output directory.
+The bounded sweep semantics of Correction 6 continue unchanged with the same maximum of ten
+resumes for this wave; the next sweep re-executes only terminal-failed or never-completed states
+under the corrected wall clock. All 36 archived `__failed_*` attempts under the wave root
+predate the Correction 6 submission, so no crash-loop recurrence is currently evidenced.
+
+13.4 Rebound identities.
+- Adapter module: `src/transfer_vs_relearning/study/m1_wave_executor.py` —
+  `07f1ee77e81ff131af6cc9b9b54e4621911839acf35a988eafde61de9f6229e3`
+- Entrypoint unchanged from Correction 5:
+  `scripts/study/execute_m1_eval_v2.py` —
+  `e3b8eefe6420f9c1eddf7f13a3548c32355ff203618b9a14c157f8047bebfd1a`
+- Rebound v3 execution config: `configs/evaluation/m1_eval_v2_matched_three_model_v3.yaml` —
+  `faeabb9e72560b27d50ab3416cf3f84561ba6974ed07bc0b2419238b278893cd`
+
+13.5 Authorization binding. A sentence naming this corrected contract SHA-256 and the rebound
+v3 execution-config SHA-256 (`faeabb9e72560b27d50ab3416cf3f84561ba6974ed07bc0b2419238b278893cd`)
+authorizes sweep resumes of the running wave under these semantics. This correction authorizes no
+M1/M2 training, corpus materialization, cleanup, deletion, publication or second-wave submission.

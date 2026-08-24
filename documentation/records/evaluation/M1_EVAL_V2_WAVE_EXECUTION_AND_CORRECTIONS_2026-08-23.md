@@ -30,6 +30,7 @@ the exact procedure a future agent must follow. Read `AGENTS.md`,
 | C4 | §10 `43f52098…` | v3 rebound `12376c0d…` | Hotfix: evaluator required manifest key `local_path`/`parameter_count` that M1 binding manifests lack (`local_path_absolute`); added in-wave failed-attempt archival convergence | — | see C5 stall |
 | C5 | §11 `3baabbaa…` | v3 rebound `b6947d3c…` | Resume subcommand + preflight tolerance for terminal-failed states; first resume stalled (stale matrix hashes + fresh-root check), refixed | pre `476217`, array `476218`, fin `476219` | ran 33 min, then superseded mid-flight by C6 fixes |
 | **C6 active** | **§12 `c5df1a3a…`** | **v3 final `81369818…`** | Exact-prefix output-layout validator fix (timestamped run subdir); per-task retry loop (24 × 300 s) inside each allocation; `%J` unique logs; bounded sweep rule (≤10 resumes) | **pre `476314`, array `476315`, fin `476316`** | **RUNNING** |
+| C7 staged (not authorized) | §13 `e379966f…` | v3 rebound `faeabb9e…` | Full-bundle states exceed the 24 h array wall: `olmo/epoch-018` killed at limit (step `476783`, no result file), `olmo/epoch-036` reached the same wall with live progress; in-allocation `scontrol update TimeLimit` denied by cluster policy; array wall raised to `2-12:00:00` via one frozen module constant; zero scientific changes; Correction 6 sweep budget unchanged | — | prepared 2026-08-24, awaits user authorization |
 
 All hashes above are SHA-256. Full prior-hash chain lives in
 `documentation/current/PROJECT_STATE.yaml → stage_readiness.m1_evaluation`.
@@ -118,3 +119,34 @@ ancestor check, zero overlap).
 `2755751` freeze v2 → `866bd7b` rtxa6000 identity → `0a386fb` recovery semantics →
 `b6bd5bb` correction-3 binding → `71f18a2` evaluator hotfix + convergence → `19757a7`
 layout/retry/sweeps (C6, active) → subsequent commits update docs/state only.
+
+## 9. Addendum (2026-08-24): Correction 7 preparation and live triage
+
+Observed on HU (read-only diagnostics):
+
+- 61/111 canonical results complete, 0 terminal failures under Correction 6 code.
+- Array element 17 (`olmo/epoch-018`, step job `476783`) was killed by the scheduler at
+  `2026-08-24T17:12:23 DUE TO TIME LIMIT` after ~24 h of verified progress; no
+  `task_result.json` was written.
+- Array element 35 (`olmo/epoch-036`, `_35`) was alive with log writes minutes before the same
+  wall; a live `scontrol update JobId=476315_35 TimeLimit=…` extension attempt returned
+  `Access/permission denied`.
+- Triage of all 36 archived `__failed_*` attempts under `results/olmo/`: every archived failure
+  predates the Correction 6 submission (stale layout/manifest/factual-incomplete evidence from
+  Corrections 3–5 era). No crash-loop recurrence is evidenced under current code.
+
+Prepared locally on branch `agent/m1-eval-walltime-correction`, not yet authorized or pushed:
+
+- Contract append-only Correction 7 (§13): array wall clock `1-00:00:00` → `2-12:00:00`, one
+  frozen module constant, control jobs unchanged, sweep budget unchanged.
+- Rebound adapter module SHA `07f1ee77…`; entrypoint unchanged `e3b8eefe…`;
+  rebound v3 config SHA `faeabb9e…` (`slurm.evaluation_time_limit` + rebound module binding).
+- Focused test additions assert the new time limit in the submitted array command and the
+  config↔module hash consistency.
+
+Fastest-completion path proposed to the user on 2026-08-24, pending explicit authorization:
+let the dense backlog drain, cancel the three remaining full-state array elements
+(`476315_71` = `qwen/epoch-036`, `476315_89` = `smollm/epoch-018`, `476315_107` =
+`smollm/epoch-036`) that would otherwise each hold a slot against the old 24 h wall, run the
+afterany finalizer honestly at <111/111, then execute exactly one Correction-7-bound resume
+sweep that re-runs every missing full state in parallel under the corrected wall clock.
