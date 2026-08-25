@@ -219,9 +219,12 @@ stage_readiness:
       execution_config_sha256: 637707391e883874431a271b4df87bc9b761cc8b87891fd915728e507b7f05bf
       first_attempt_jobs: {preflight: "479249", evaluation_array: "479250", finalizer: "479251"}
       first_attempt_cancelled_before_first_element: true
-      active_jobs: {preflight: "479254", evaluation_array: "479255", finalizer: "479256"}
-      submitted_at_utc: "2026-08-25T10:58:00Z"
-      matrix_rebindings_used_of_10: 2
+      second_attempt_jobs: {preflight: "479254", evaluation_array: "479255", finalizer: "479256"}
+      second_attempt_stalled_reason: preflight_fresh_root_incomplete_rejection_fixed_in_correction_7
+      active_jobs: {preflight: "479310", evaluation_array: "479311", finalizer: "479312"}
+      preflight_result: ready_with_105_preexisting_complete_and_54_archived_failed
+      submitted_at_utc: "2026-08-25T15:05:00Z"
+      matrix_rebindings_used_of_10: 3
       archived_killed_dirs: [olmo/epoch-018__killed_1, olmo/epoch-036__killed_1, qwen/epoch-036__killed_1, smollm/epoch-018__killed_1, smollm/epoch-036__killed_1]
     execution_authorized: false
     ready_to_start: false
