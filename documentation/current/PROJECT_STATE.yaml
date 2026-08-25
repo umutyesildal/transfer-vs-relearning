@@ -205,6 +205,22 @@ stage_readiness:
       canonical_failed: 0
       observed_dense_task_seconds: [1815, 2008, 2105]
       record: documentation/records/evaluation/M1_EVAL_V2_WAVE_EXECUTION_AND_CORRECTIONS_2026-08-23.md
+    wave_2026_08_23_outcome:
+      finalizer_job: "476316"
+      family_result_status: incomplete
+      canonical_complete_at_close: 105
+      canonical_total: 111
+      missing_full_states: [olmo/epoch-018, olmo/epoch-036, qwen/epoch-018, qwen/epoch-036, smollm/epoch-018, smollm/epoch-036]
+    resume_sweep_2026_08_25:
+      revision: correction_7
+      contract_sha256: ce69ef372dfe243f686fb30526caf093345cda85689ccd7029cfdd82e5fef665
+      execution_config_sha256: 88d154a4bb00be81a1407668b5f53709a742be12307fdc870c170aee862d2e6e
+      first_attempt_jobs: {preflight: "479249", evaluation_array: "479250", finalizer: "479251"}
+      first_attempt_cancelled_before_first_element: true
+      active_jobs: {preflight: "479254", evaluation_array: "479255", finalizer: "479256"}
+      submitted_at_utc: "2026-08-25T10:58:00Z"
+      matrix_rebindings_used_of_10: 2
+      archived_killed_dirs: [olmo/epoch-018__killed_1, olmo/epoch-036__killed_1, qwen/epoch-036__killed_1, smollm/epoch-018__killed_1, smollm/epoch-036__killed_1]
     execution_authorized: false
     ready_to_start: false
     blockers:
