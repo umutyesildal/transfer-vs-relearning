@@ -30,7 +30,7 @@ the exact procedure a future agent must follow. Read `AGENTS.md`,
 | C4 | §10 `43f52098…` | v3 rebound `12376c0d…` | Hotfix: evaluator required manifest key `local_path`/`parameter_count` that M1 binding manifests lack (`local_path_absolute`); added in-wave failed-attempt archival convergence | — | see C5 stall |
 | C5 | §11 `3baabbaa…` | v3 rebound `b6947d3c…` | Resume subcommand + preflight tolerance for terminal-failed states; first resume stalled (stale matrix hashes + fresh-root check), refixed | pre `476217`, array `476218`, fin `476219` | ran 33 min, then superseded mid-flight by C6 fixes |
 | **C6 active** | **§12 `c5df1a3a…`** | **v3 final `81369818…`** | Exact-prefix output-layout validator fix (timestamped run subdir); per-task retry loop (24 × 300 s) inside each allocation; `%J` unique logs; bounded sweep rule (≤10 resumes) | **pre `476314`, array `476315`, fin `476316`** | **RUNNING** |
-| C7 staged (not authorized) | §13 `e379966f…` | v3 rebound `faeabb9e…` | Full-bundle states exceed the 24 h array wall: `olmo/epoch-018` killed at limit (step `476783`, no result file), `olmo/epoch-036` reached the same wall with live progress; in-allocation `scontrol update TimeLimit` denied by cluster policy; array wall raised to `2-12:00:00` via one frozen module constant; zero scientific changes; Correction 6 sweep budget unchanged | — | prepared 2026-08-24, awaits user authorization |
+| C7 staged (not authorized) | §13 `07edf766…` | v3 rebound `faeabb9e…` | Two operational fixes, zero scientific changes: (a) full states exceed the 24 h array wall (`olmo/epoch-018` killed at limit as step `476783`; in-allocation extension denied by policy), wall raised to `2-12:00:00` via one frozen module constant; (b) full→cheap derivation always failed its final validation (`completed_derived_from_full_without_rescoring` vs exact-match `completed`), first live recurrence `qwen/epoch-018` on 2026-08-25; validator now accepts both frozen statuses. Correction 6 sweep budget unchanged | — | prepared 2026-08-24/25, awaits user authorization |
 
 All hashes above are SHA-256. Full prior-hash chain lives in
 `documentation/current/PROJECT_STATE.yaml → stage_readiness.m1_evaluation`.
@@ -150,3 +150,23 @@ let the dense backlog drain, cancel the three remaining full-state array element
 `smollm/epoch-036`) that would otherwise each hold a slot against the old 24 h wall, run the
 afterany finalizer honestly at <111/111, then execute exactly one Correction-7-bound resume
 sweep that re-runs every missing full state in parallel under the corrected wall clock.
+
+## 10. Addendum (2026-08-25 morning): derived-factual validator defect
+
+Overnight the dense backlog finished (102/111 complete by 07:44 Berlin). Four array elements
+remained alive: `_53`, `_71`, `_89`, `_107` — exactly the four full states. The wave recorded its
+first Correction-6-era terminal failure: `qwen/epoch-018` (`_53`) failed with
+`Factual output is incomplete; expected 1500 probes` after its in-allocation retry loop kept
+re-running. Root cause identified locally: `derive_cheap_factual_from_full` writes summary status
+`completed_derived_from_full_without_rescoring`, but `validate_factual_output` accepted only
+exactly `completed`, so every full state would deterministically fail at final validation after
+completing all expensive scoring stages. Existing tests missed it because they mock the
+derivation function.
+
+Fix staged in Correction 7 alongside the wall-time raise: explicit two-status allowlist constant
+in `validate_factual_output`, plus a new dedicated regression test module
+(`tests/study/test_m1_eval_validation.py`) exercising the real derivation end-to-end and both
+validator acceptance/rejection paths. Validation module SHA
+`66fb5f4c1bdcc5c6f0501420001fd892bd6eea1f29ec8b81ae6dd6c72c412779`; contract rebound to
+`07edf7662889a1eb7bf94d362d7dd6741cea98feeb082837720a561759dc36db`. Executor module, entrypoint
+and execution config are unchanged by this second fix. Local suite: 81 passed.

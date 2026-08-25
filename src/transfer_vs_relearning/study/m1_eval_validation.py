@@ -25,6 +25,12 @@ def verify_file(path: Path, expected_sha256: str, label: str) -> None:
         raise ValueError(f"SHA-256 mismatch ({label}): {observed} != {expected_sha256}")
 
 
+FACTUAL_SUMMARY_COMPLETE_STATUSES = (
+    "completed",
+    "completed_derived_from_full_without_rescoring",
+)
+
+
 def verify_snapshot(
     *,
     snapshot_manifest_path: Path,
@@ -229,7 +235,7 @@ def validate_factual_output(root: Path, expected_probes: int) -> dict[str, Any]:
     rows = read_csv_rows(root / "hard_suite_per_fact.csv")
     probe_ids = [str(row.get("probe_id", "")) for row in rows]
     if (
-        summary.get("status") != "completed"
+        summary.get("status") not in FACTUAL_SUMMARY_COMPLETE_STATUSES
         or int(summary.get("probes", -1)) != expected_probes
         or len(rows) != expected_probes
         or len(set(probe_ids)) != expected_probes

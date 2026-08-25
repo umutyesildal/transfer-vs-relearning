@@ -362,32 +362,56 @@ remain forbidden.
 v3 execution-config SHA-256 (`8136981802d4e8958c73f6a63fc93dfc35a784e7a4446303b4f1f85665d1f441`) authorizes continuing the running wave under
 these semantics, including sweep resumes without further sentences.
 
-## 13. Append-only correction 7 (2026-08-24, evaluation-array wall clock)
+## 13. Append-only correction 7 (2026-08-24/25, evaluation-array wall clock and derived-factual validator)
 
-13.1 Cause. Full-bundle scientific states exceed the frozen 24-hour array time limit while making
-verified forward progress. Array element 17 (`olmo/epoch-018`, Slurm step job `476783`) was
-cancelled by the scheduler at `2026-08-24T17:12:23` (`DUE TO TIME LIMIT`) after saving harness
-results and reloading weights, without any `task_result.json`. Array element 35
-(`olmo/epoch-036`) reached 23h20m with log writes minutes before hitting the identical wall.
-Dense states complete in roughly 30–35 minutes, so this limit had never been exercised before the
-full states. An in-allocation `scontrol update TimeLimit` extension was attempted and denied by
-cluster policy (`Access/permission denied`); the partition `MaxTime` is `4-00:00:00`.
+13.1 Cause. Two operational defects blocked full-bundle scientific states while dense states
+completed normally:
 
-13.2 Fix. The evaluation-array wall clock is raised from `1-00:00:00` to `2-12:00:00`, applied
-through one frozen module constant (`EVALUATION_TIME_LIMIT`) used identically by the
+(a) The frozen 24-hour array time limit is shorter than full-state runtime. Array element 17
+(`olmo/epoch-018`, Slurm step job `476783`) was cancelled by the scheduler at
+`2026-08-24T17:12:23` (`DUE TO TIME LIMIT`) after ~24 h of verified forward progress and wrote
+no `task_result.json`. Array element 35 (`olmo/epoch-036`) reached the same wall with live log
+writes minutes earlier. Dense states complete in roughly 30–35 minutes, so this limit had never
+been exercised before the full states. An in-allocation `scontrol update TimeLimit` extension was
+attempted and denied by cluster policy (`Access/permission denied`); the partition `MaxTime` is
+`4-00:00:00`.
+
+(b) The full→cheap factual derivation always failed its own final validation. On 2026-08-25 the
+running wave recorded the first live terminal failure (`qwen/epoch-018`, element `_53`):
+`Factual output is incomplete; expected 1500 probes`. Root cause: `derive_cheap_factual_from_full`
+writes summary status `completed_derived_from_full_without_rescoring`, while
+`validate_factual_output` accepted only exactly `completed`, so every full state failed at final
+validation after completing all expensive scoring stages. The executor tests did not catch this
+because they mock the derivation function.
+
+13.2 Fixes. Two fail-closed corrections, no scientific semantics changed:
+
+(a) The evaluation-array wall clock is raised from `1-00:00:00` to `2-12:00:00`, applied through
+one frozen module constant (`EVALUATION_TIME_LIMIT`) used identically by the
 `sbatch --test-only` route validation and the real array submission. Control preflight and
-finalizer limits are unchanged. No metric, denominator, prompt, seed, scoring definition, route,
-GRES identity, throttle or topology value changed.
+finalizer limits are unchanged.
 
-13.3 Continuity. This correction changes no completed result and touches no output directory.
-The bounded sweep semantics of Correction 6 continue unchanged with the same maximum of ten
-resumes for this wave; the next sweep re-executes only terminal-failed or never-completed states
-under the corrected wall clock. All 36 archived `__failed_*` attempts under the wave root
-predate the Correction 6 submission, so no crash-loop recurrence is currently evidenced.
+(b) `validate_factual_output` now accepts both frozen complete statuses — native `completed` and
+derived `completed_derived_from_full_without_rescoring` — via an explicit allowlist constant;
+unknown statuses still fail closed. A dedicated regression test exercises the real derivation
+end-to-end (12,000-row synthetic full evidence, 1,500-row frozen cheap registry) plus positive
+and negative validator paths.
+
+No metric, denominator, prompt, seed, scoring definition, route, GRES identity, throttle or
+topology value changed in either fix.
+
+13.3 Continuity. These corrections change no completed result and touch no output directory. The
+bounded sweep semantics of Correction 6 continue unchanged with the same maximum of ten resumes
+for this wave; the next sweep re-executes only terminal-failed or never-completed states under
+the corrected wall clock and the corrected validator. All other archived `__failed_*` attempts
+under the wave root predate the Correction 6 submission; the only C6-era recurrence is defect
+(b) above.
 
 13.4 Rebound identities.
 - Adapter module: `src/transfer_vs_relearning/study/m1_wave_executor.py` —
   `07f1ee77e81ff131af6cc9b9b54e4621911839acf35a988eafde61de9f6229e3`
+- Validation module: `src/transfer_vs_relearning/study/m1_eval_validation.py` —
+  `66fb5f4c1bdcc5c6f0501420001fd892bd6eea1f29ec8b81ae6dd6c72c412779`
 - Entrypoint unchanged from Correction 5:
   `scripts/study/execute_m1_eval_v2.py` —
   `e3b8eefe6420f9c1eddf7f13a3548c32355ff203618b9a14c157f8047bebfd1a`
