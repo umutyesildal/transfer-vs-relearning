@@ -191,3 +191,19 @@ Additionally, the five hard-killed full-state directories without terminal resul
 (olmo epoch-018/epoch-036, qwen epoch-036, smollm epoch-018/epoch-036) were renamed in place to
 `<id>__killed_1` under the same C6-precedented archival rule before re-execution; qwen/epoch-018
 archives automatically via its terminal failed result.
+
+## 12. Addendum (2026-08-25 evening): preflight resume tolerance
+
+The second sweep (`479254`/`479255`/`479256`) also stalled: `squeue` reported
+`DependencyNeverSatisfied` because `preflight_matrix` still enforced the fresh-root invariant and
+raised `FileExistsError` on the first completed result it enumerated
+(`results/smollm/parent/task_result.json`). With 105 completed states on disk, a resume preflight
+could never pass. Correction 7 was extended once more within its staged scope:
+`preflight_matrix` now counts pre-existing complete results
+(`preexisting_complete_results`) instead of rejecting them, keeps counting failed results, and
+still fails closed on unreadable state files; per-task protection remains in `run_task`.
+Rebound identities: adapter module
+`9785fca31f6a2c3183c0db8294ba2253b22ae56fb29f7f3ac8f3870a0c673d6c`, execution config
+`637707391e883874431a271b4df87bc9b761cc8b87891fd915728e507b7f05bf`, contract
+`4d4ed251cbfdc529fcd033e3b52f69daeeda1af153e045dead6ad123b1526e53`. The stalled array/finalizer
+pair was cancelled before any element ran.

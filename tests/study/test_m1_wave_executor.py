@@ -679,12 +679,9 @@ def test_resume_rebinds_matrix_and_preflight_tolerates_failed_states(
     (output_root / "results/qwen/epoch-001/task_result.json").write_text(
         json.dumps({"status": "complete"}), encoding="utf-8"
     )
-    try:
-        executor.preflight_matrix(matrix)
-    except FileExistsError:
-        pass
-    else:
-        raise AssertionError("completed states must still block a fresh preflight")
+    payload = executor.preflight_matrix(matrix)
+    assert payload["preexisting_failed_results"] == 1
+    assert payload["preexisting_complete_results"] == 1
     import shutil as _shutil
 
     _shutil.rmtree(output_root / "results/qwen/epoch-001")

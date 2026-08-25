@@ -544,14 +544,15 @@ def preflight_matrix(matrix: dict[str, Any]) -> dict[str, Any]:
     load_m0_canonical_evidence()
     canonical_results = list((output_root / "results").glob("*/*/task_result.json"))
     preexisting_failed = 0
+    preexisting_complete = 0
     for path in canonical_results:
         try:
             status = json.loads(path.read_text(encoding="utf-8")).get("status")
         except (OSError, ValueError):
             status = None
         if status == "complete":
-            raise FileExistsError(f"Fresh M1 preflight found completed scientific work: {path}")
-        if status == "failed":
+            preexisting_complete += 1
+        elif status == "failed":
             preexisting_failed += 1
         else:
             raise FileExistsError(f"Fresh M1 preflight found an unreadable state result: {path}")
@@ -561,6 +562,7 @@ def preflight_matrix(matrix: dict[str, Any]) -> dict[str, Any]:
         "gpu_task_count": GPU_TASK_COUNT,
         "total_scientific_states": TOTAL_SCIENTIFIC_STATES,
         "preexisting_failed_results": preexisting_failed,
+        "preexisting_complete_results": preexisting_complete,
     }
 
 
