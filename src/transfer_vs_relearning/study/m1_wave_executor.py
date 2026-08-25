@@ -663,6 +663,19 @@ def run_task(matrix: dict[str, Any], task_index: int) -> dict[str, Any]:
     repo_root = Path(matrix["repo_root"])
     output_root = Path(matrix["output_root"])
     state_root = output_root / "results" / task["model"] / task["checkpoint_id"]
+    prior_result_path = state_root / "task_result.json"
+    if prior_result_path.is_file():
+        prior_result = json.loads(prior_result_path.read_text(encoding="utf-8"))
+        if prior_result.get("status") == "complete":
+            return {
+                "schema_version": 2,
+                "status": "already_complete",
+                "task_index": task_index,
+                "model": task["model"],
+                "checkpoint_id": task["checkpoint_id"],
+                "result_path": str(prior_result_path),
+                "result_sha256": sha256_file(prior_result_path),
+            }
     archived_attempts = _archive_prior_failed_attempt(
         output_root, str(task["model"]), str(task["checkpoint_id"])
     )

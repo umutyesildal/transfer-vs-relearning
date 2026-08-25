@@ -167,6 +167,27 @@ Fix staged in Correction 7 alongside the wall-time raise: explicit two-status al
 in `validate_factual_output`, plus a new dedicated regression test module
 (`tests/study/test_m1_eval_validation.py`) exercising the real derivation end-to-end and both
 validator acceptance/rejection paths. Validation module SHA
-`66fb5f4c1bdcc5c6f0501420001fd892bd6eea1f29ec8b81ae6dd6c72c412779`; contract rebound to
-`07edf7662889a1eb7bf94d362d7dd6741cea98feeb082837720a561759dc36db`. Executor module, entrypoint
+`66fb5f4c1bdcc5c6f0501420001fd892bd6eea1f29ec8b81ae6dd6c72c412779`. Executor module, entrypoint
 and execution config are unchanged by this second fix. Local suite: 81 passed.
+
+## 11. Addendum (2026-08-25 midday): first sweep submission stopped pre-churn; skip guard added
+
+The first Correction-7 resume sweep was submitted as jobs `479249` (preflight), `479250`
+(array), `479251` (finalizer) at ~11:50 Berlin. Before any array element started, code review
+showed `run_task` had no fast path for already-complete states: `_archive_prior_failed_attempt`
+raises on any non-failed prior result, so each of the 102 complete elements would have burned
+the full 24 × 300 s retry loop (~2 h per element, roughly 30+ lane-hours of pure churn) before
+the six missing full states could run. The entire sweep triple was cancelled with zero elements
+started (`scancel 479250 479251`); no scientific artifact changed.
+
+Correction 7 was extended (still within the same staged, user-authorized correction):
+`run_task` now returns an `already_complete` skip result for states whose terminal
+`task_result.json` has status `complete`, before touching anything. A dedicated test covers the
+skip; the archival test was renamed to match the new skip semantics. Rebound identities:
+adapter module `a9a92fda65df1482a0f520a91d82d93726e0db7433245501e6b45eb70dfdd9a3`,
+execution config `88d154a4bb00be81a1407668b5f53709a742be12307fdc870c170aee862d2e6e`,
+contract `ce69ef372dfe243f686fb30526caf093345cda85689ccd7029cfdd82e5fef665`.
+Additionally, the five hard-killed full-state directories without terminal results
+(olmo epoch-018/epoch-036, qwen epoch-036, smollm epoch-018/epoch-036) were renamed in place to
+`<id>__killed_1` under the same C6-precedented archival rule before re-execution; qwen/epoch-018
+archives automatically via its terminal failed result.

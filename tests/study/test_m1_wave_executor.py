@@ -285,6 +285,23 @@ def test_finalize_closes_only_at_111_of_111(tmp_path, monkeypatch):
         assert payload["projection"]["projected_row_count"] == 14
 
 
+def test_run_task_skips_already_complete_state_without_execution(tmp_path):
+    output_root = tmp_path / "out"
+    state = output_root / "results/olmo/epoch-001"
+    state.mkdir(parents=True)
+    prior = {"schema_version": 2, "status": "complete", "model": "olmo", "checkpoint_id": "epoch-001"}
+    (state / "task_result.json").write_text(json.dumps(prior), encoding="utf-8")
+    matrix = {
+        "repo_root": str(tmp_path),
+        "output_root": str(output_root),
+        "tasks": [{"model": "olmo", "checkpoint_id": "epoch-001", "full": False}],
+    }
+    result = executor.run_task(matrix, 0)
+    assert result["status"] == "already_complete"
+    assert result["checkpoint_id"] == "epoch-001"
+    assert len(list(state.iterdir())) == 1
+
+
 def test_run_task_gates_complete_on_validators_and_derives_cheap_for_full(
     tmp_path, monkeypatch
 ):
@@ -537,7 +554,7 @@ def test_submit_wave_single_route_topology(tmp_path, monkeypatch):
     assert saved["evaluation_array_job_id"] == result["evaluation_array_job_id"]
 
 
-def test_run_task_archives_failed_attempt_and_blocks_complete_states(
+def test_run_task_archives_failed_attempt_and_skips_complete_states(
     tmp_path, monkeypatch
 ):
     _patch_runtime(tmp_path, monkeypatch)
@@ -597,12 +614,10 @@ def test_run_task_archives_failed_attempt_and_blocks_complete_states(
         )
     )["status"] == "failed"
 
-    try:
-        executor.run_task(matrix, 0)
-    except FileExistsError:
-        pass
-    else:
-        raise AssertionError("complete states must never be re-executed")
+    archives_before = sorted(path.name for path in failed_root.parent.glob("epoch-002__*"))
+    skipped = executor.run_task(matrix, 0)
+    assert skipped["status"] == "already_complete"
+    assert sorted(path.name for path in failed_root.parent.glob("epoch-002__*")) == archives_before
 
 
 def test_resume_rebinds_matrix_and_preflight_tolerates_failed_states(

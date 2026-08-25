@@ -409,16 +409,18 @@ under the wave root predate the Correction 6 submission; the only C6-era recurre
 
 13.4 Rebound identities.
 - Adapter module: `src/transfer_vs_relearning/study/m1_wave_executor.py` —
-  `07f1ee77e81ff131af6cc9b9b54e4621911839acf35a988eafde61de9f6229e3`
+  `a9a92fda65df1482a0f520a91d82d93726e0db7433245501e6b45eb70dfdd9a3` (adds an early
+  `already_complete` skip guard in `run_task` so resume sweeps never churn completed states;
+  complete results remain untouched and unexecuted)
 - Validation module: `src/transfer_vs_relearning/study/m1_eval_validation.py` —
   `66fb5f4c1bdcc5c6f0501420001fd892bd6eea1f29ec8b81ae6dd6c72c412779`
 - Entrypoint unchanged from Correction 5:
   `scripts/study/execute_m1_eval_v2.py` —
   `e3b8eefe6420f9c1eddf7f13a3548c32355ff203618b9a14c157f8047bebfd1a`
 - Rebound v3 execution config: `configs/evaluation/m1_eval_v2_matched_three_model_v3.yaml` —
-  `faeabb9e72560b27d50ab3416cf3f84561ba6974ed07bc0b2419238b278893cd`
+  `88d154a4bb00be81a1407668b5f53709a742be12307fdc870c170aee862d2e6e`
 
 13.5 Authorization binding. A sentence naming this corrected contract SHA-256 and the rebound
-v3 execution-config SHA-256 (`faeabb9e72560b27d50ab3416cf3f84561ba6974ed07bc0b2419238b278893cd`)
+v3 execution-config SHA-256 (`88d154a4bb00be81a1407668b5f53709a742be12307fdc870c170aee862d2e6e`)
 authorizes sweep resumes of the running wave under these semantics. This correction authorizes no
 M1/M2 training, corpus materialization, cleanup, deletion, publication or second-wave submission.
