@@ -620,6 +620,25 @@ def test_run_task_archives_failed_attempt_and_skips_complete_states(
     assert sorted(path.name for path in failed_root.parent.glob("epoch-002__*")) == archives_before
 
 
+def test_run_task_archives_hard_killed_dir_without_result(tmp_path, monkeypatch):
+    killed_root = tmp_path / "output/results/olmo/epoch-003"
+    killed_root.mkdir(parents=True)
+    (killed_root / "partial.txt").write_text("leftover", encoding="utf-8")
+    matrix = {
+        "repo_root": str(tmp_path),
+        "output_root": str(tmp_path / "output"),
+        "tasks": [{"model": "olmo", "checkpoint_id": "epoch-003", "full": False}],
+    }
+    archived = executor._archive_prior_failed_attempt(
+        tmp_path / "output", "olmo", "epoch-003"
+    )
+    assert archived == ["epoch-003__killed_0"]
+    assert (tmp_path / "output/results/olmo/epoch-003__killed_0/partial.txt").read_text(
+        encoding="utf-8"
+    ) == "leftover"
+    assert not killed_root.exists()
+
+
 def test_resume_rebinds_matrix_and_preflight_tolerates_failed_states(
     tmp_path, monkeypatch
 ):

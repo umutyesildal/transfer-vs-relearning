@@ -207,3 +207,18 @@ Rebound identities: adapter module
 `637707391e883874431a271b4df87bc9b761cc8b87891fd915728e507b7f05bf`, contract
 `4d4ed251cbfdc529fcd033e3b52f69daeeda1af153e045dead6ad123b1526e53`. The stalled array/finalizer
 pair was cancelled before any element ran.
+
+## 13. Addendum (2026-08-26 morning): sweep 3 result 110/111 and hard-kill archival fix
+
+Sweep 3 (array `479311`) completed overnight: five of six missing full states finished
+`complete` under the corrected wall clock and validator, closing the family at **110/111
+`incomplete`**. Only `qwen/epoch-018` remained: mid-sweep one attempt died without writing a
+terminal result, and every subsequent in-allocation retry failed instantly because
+`_archive_prior_failed_attempt` raised on a directory lacking `task_result.json`, exhausting all
+24 attempts. Fix: that function now auto-archives a result-less partial directory as
+`<id>__killed_<n>` (rename-only evidence preservation, C6 precedent) and proceeds with a fresh
+execution; unreadable result files still fail closed. Rebound identities: adapter module
+`eacb239142435dd1bfa0ddaea624207a03c34c0bfbf35e4c1752765a723b5315`, execution config
+`3fd83349e7da1986651b5bfceb0942ed491b7671ff97ff33d4a9b89444ece83b`, contract
+`33d48d0a6481c78c88110dd637db68c857d5574f523efbc9754737dc9d80b1a8`. A fourth single-state sweep
+re-executes only this state; all other elements skip via `already_complete`.

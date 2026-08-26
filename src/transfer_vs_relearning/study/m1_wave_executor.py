@@ -642,7 +642,14 @@ def _archive_prior_failed_attempt(
         return []
     result_path = state_root / "task_result.json"
     if not result_path.is_file():
-        raise FileExistsError(f"M1 evaluation state has no terminal result: {state_root}")
+        index = 0
+        while True:
+            target = output_root / "results" / model / f"{checkpoint_id}__killed_{index}"
+            if not target.exists():
+                break
+            index += 1
+        os.replace(state_root, target)
+        return [target.name]
     prior = json.loads(result_path.read_text(encoding="utf-8"))
     if prior.get("status") != "failed":
         raise FileExistsError(

@@ -409,19 +409,20 @@ under the wave root predate the Correction 6 submission; the only C6-era recurre
 
 13.4 Rebound identities.
 - Adapter module: `src/transfer_vs_relearning/study/m1_wave_executor.py` —
-  `9785fca31f6a2c3183c0db8294ba2253b22ae56fb29f7f3ac8f3870a0c673d6c` (adds an early
-  `already_complete` skip guard in `run_task` and makes `preflight_matrix` count pre-existing
-  complete results instead of rejecting them, so a resume sweep over a partially completed wave
-  passes its own dependency; unreadable state results still fail closed)
+  `eacb239142435dd1bfa0ddaea624207a03c34c0bfbf35e4c1752765a723b5315` (adds an early
+  `already_complete` skip guard in `run_task`, makes `preflight_matrix` count pre-existing
+  complete results instead of rejecting them, and auto-archives hard-killed attempt directories
+  without a terminal result as `<id>__killed_<n>` evidence before re-execution; unreadable state
+  result files still fail closed)
 - Validation module: `src/transfer_vs_relearning/study/m1_eval_validation.py` —
   `66fb5f4c1bdcc5c6f0501420001fd892bd6eea1f29ec8b81ae6dd6c72c412779`
 - Entrypoint unchanged from Correction 5:
   `scripts/study/execute_m1_eval_v2.py` —
   `e3b8eefe6420f9c1eddf7f13a3548c32355ff203618b9a14c157f8047bebfd1a`
 - Rebound v3 execution config: `configs/evaluation/m1_eval_v2_matched_three_model_v3.yaml` —
-  `637707391e883874431a271b4df87bc9b761cc8b87891fd915728e507b7f05bf`
+  `3fd83349e7da1986651b5bfceb0942ed491b7671ff97ff33d4a9b89444ece83b`
 
 13.5 Authorization binding. A sentence naming this corrected contract SHA-256 and the rebound
-v3 execution-config SHA-256 (`637707391e883874431a271b4df87bc9b761cc8b87891fd915728e507b7f05bf`)
+v3 execution-config SHA-256 (`3fd83349e7da1986651b5bfceb0942ed491b7671ff97ff33d4a9b89444ece83b`)
 authorizes sweep resumes of the running wave under these semantics. This correction authorizes no
 M1/M2 training, corpus materialization, cleanup, deletion, publication or second-wave submission.

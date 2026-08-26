@@ -47,7 +47,7 @@ pipeline_configs:
 adapter:
   id: slurm_m1_matched_wave_v1
   module: src/transfer_vs_relearning/study/m1_wave_executor.py
-  module_sha256: 9785fca31f6a2c3183c0db8294ba2253b22ae56fb29f7f3ac8f3870a0c673d6c
+  module_sha256: eacb239142435dd1bfa0ddaea624207a03c34c0bfbf35e4c1752765a723b5315
   entrypoint: scripts/study/execute_m1_eval_v2.py
   entrypoint_sha256: e3b8eefe6420f9c1eddf7f13a3548c32355ff203618b9a14c157f8047bebfd1a
   topology: preflight_then_single_a10080gb_array_108_tasks_throttle_6_then_afterany_finalizer_with_parent_projection_with_failed_attempt_convergence
