@@ -84,3 +84,17 @@ def test_d0_materialization_operator_remains_explicit_and_execution_disabled() -
     assert operator["automatic_retry"] is False
     assert operator["automatic_resume"] is False
     assert operator["cleanup_on_failure"] is False
+
+
+def test_d0_epoch036_parent_evidence_is_bound_without_fabricating_tokenizer_assets() -> None:
+    accounting = load_config()["tokenizer_accounting"]
+    evidence = accounting["local_binding_evidence"]
+    assert evidence["sha256"] == "41c2f2c6b722fc25ac48af278f1b318acc5e743b3c48d649fe26259848080462"
+    assert evidence["tokenizer_asset_inventory_closed"] is False
+    for model in accounting["models"].values():
+        assert model["m1_epoch036_path"].endswith("epoch_snapshots/epoch-036")
+        assert len(model["snapshot_manifest_sha256"]) == 64
+        assert len(model["training_manifest_sha256"]) == 64
+        assert len(model["model_manifest_sha256"]) == 64
+        assert model["tokenizer_asset_manifest_sha256"] is None
+        assert model["tokenizer_asset_binding_status"] == "unresolved_requires_read_only_inventory"

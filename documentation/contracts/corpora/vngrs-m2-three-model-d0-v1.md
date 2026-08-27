@@ -273,6 +273,11 @@ split and three model-specific tokenizer-accounting reports. The tokenizer layer
 frozen OLMo/Qwen/SmolLM identities and requires a common raw document-ID hash, but deliberately
 does not impose cross-model token-count equality. No tokenizer asset was loaded by this checkpoint.
 
+The local M1 result dump additionally closes each model's epoch-036 path plus snapshot, training
+and model-manifest SHA-256. It does not contain the per-file tokenizer asset inventory, so those
+parent bindings are recorded without fabricating a tokenizer asset-manifest hash. Closing that
+last layer requires a separately authorized read-only inventory of the preserved M1 roots.
+
 ## Authority boundary
 
 This draft authorizes local code, configuration, documentation, offline fixtures and dry-run

@@ -22,6 +22,9 @@ transport-injected, disabled by default, and cannot create the production root u
 The deterministic lightweight audit, text-free 64-ID human-review selection, exact 10,000-ID
 held-out split and three-tokenizer accounting schemas are also implemented locally. Tokenizer
 assets remain unbound/unloaded, so these are validated operators rather than corpus results.
+The local M1 result dump closes all three epoch-036 parent paths and their snapshot/training/model
+manifest hashes. It does not carry per-file tokenizer asset hashes; that narrower inventory remains
+open and is not guessed from the model manifest.
 
 ## The short answer
 
