@@ -1,0 +1,70 @@
+from pathlib import Path
+
+import yaml
+
+from transfer_vs_relearning.corpora.vngrs.metadata import (
+    FROZEN_SELECTED_SHARD_PATHS,
+    VNGRS_REPOSITORY,
+    VNGRS_REVISION,
+    VNGRS_SCHEMA,
+    build_selection_evidence,
+    canonical_json_sha256,
+)
+
+
+ROOT = Path(__file__).resolve().parents[1]
+CONFIG = ROOT / "configs/corpora/vngrs_m2_three_model_d0_v1.yaml"
+CONTRACT = ROOT / "documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md"
+
+
+def load_config() -> dict:
+    return yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
+
+
+def test_d0_contract_is_execution_disabled_and_present() -> None:
+    config = load_config()
+    assert CONTRACT.is_file()
+    assert config["status"] == "draft_execution_disabled"
+    assert config["contract"] == str(CONTRACT.relative_to(ROOT))
+    assert config["authority"] == {
+        "local_preparation": True,
+        "network_retrieval": False,
+        "hu_ssh": False,
+        "corpus_materialization": False,
+        "model_weight_load": False,
+        "inference_or_scoring": False,
+        "slurm_or_gpu": False,
+        "training": False,
+        "publication": False,
+        "cleanup_or_deletion": False,
+    }
+
+
+def test_d0_source_identity_matches_frozen_vngrs_selection() -> None:
+    config = load_config()
+    source = config["source"]
+    assert source["repository"] == VNGRS_REPOSITORY
+    assert source["revision"] == VNGRS_REVISION
+    assert tuple(source["schema"]) == VNGRS_SCHEMA
+    assert source["selected_shards"] == 32
+    assert tuple(source["selected_paths"]) == FROZEN_SELECTED_SHARD_PATHS
+    assert source["selection_payload_sha256"] == canonical_json_sha256(
+        build_selection_evidence()
+    )
+    assert source["expected_selected_compressed_bytes"] == 9_468_474_036
+
+
+def test_d0_keeps_light_audit_split_and_three_model_scope() -> None:
+    config = load_config()
+    assert config["light_audit"]["human_review_documents"] == 64
+    assert config["light_audit"]["corpus_wide_learned_quality_classifier"] is False
+    assert config["light_audit"]["broad_manual_labeling"] is False
+    assert config["split"]["heldout_documents"] == 10_000
+    assert config["split"]["document_disjoint_required"] is True
+    assert config["split"]["trwiki_training_rows"] == 0
+    assert set(config["tokenizer_accounting"]["models"]) == {"olmo", "qwen", "smollm"}
+    assert config["tokenizer_accounting"]["shared_raw_document_ids"] is True
+    assert (
+        config["tokenizer_accounting"]["model_token_counts_are_cross_model_equality_gate"]
+        is False
+    )

@@ -1,0 +1,118 @@
+schema_version: 1
+contract_id: vngrs-m2-three-model-d0-v1
+status: draft_execution_disabled
+contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
+
+source:
+  repository: vngrs-ai/vngrs-web-corpus
+  revision: ee5c6201ee84457a18182bfc483a7d8a7f3655ba
+  split: train
+  schema: [text, corpus, original_id]
+  total_release_shards: 284
+  selected_shards: 32
+  selection_version: vngrs_systematic_midpoint_32_of_284_v1
+  selection_payload_sha256: dbb9714347970634386ff62366384fcae12cf5f12f1df1df676cb9af3ae25686
+  expected_selected_compressed_bytes: 9468474036
+  selected_paths:
+    - data/train-00004-of-00284.parquet
+    - data/train-00013-of-00284.parquet
+    - data/train-00022-of-00284.parquet
+    - data/train-00031-of-00284.parquet
+    - data/train-00039-of-00284.parquet
+    - data/train-00048-of-00284.parquet
+    - data/train-00057-of-00284.parquet
+    - data/train-00066-of-00284.parquet
+    - data/train-00075-of-00284.parquet
+    - data/train-00084-of-00284.parquet
+    - data/train-00093-of-00284.parquet
+    - data/train-00102-of-00284.parquet
+    - data/train-00110-of-00284.parquet
+    - data/train-00119-of-00284.parquet
+    - data/train-00128-of-00284.parquet
+    - data/train-00137-of-00284.parquet
+    - data/train-00146-of-00284.parquet
+    - data/train-00155-of-00284.parquet
+    - data/train-00164-of-00284.parquet
+    - data/train-00173-of-00284.parquet
+    - data/train-00181-of-00284.parquet
+    - data/train-00190-of-00284.parquet
+    - data/train-00199-of-00284.parquet
+    - data/train-00208-of-00284.parquet
+    - data/train-00217-of-00284.parquet
+    - data/train-00226-of-00284.parquet
+    - data/train-00235-of-00284.parquet
+    - data/train-00244-of-00284.parquet
+    - data/train-00252-of-00284.parquet
+    - data/train-00261-of-00284.parquet
+    - data/train-00270-of-00284.parquet
+    - data/train-00279-of-00284.parquet
+
+accepted_metadata_evidence:
+  root: /vol/tmp2/yesildau/luna_vngrs_metadata_footer_feasibility_v1
+  regular_file_count: 104
+  regular_bytes: 18025945
+  inventory_sha256: 120cdd7b21e161bf981cf8191fa278a11829d3fc5c155b71ed4bc8836e27f1d3
+  shard_metadata_ledger_sha256: 6c6f27651945043ec2dfbf1b26575f416b5d38a8783d0a22320f0ffbf83d3fa3
+  metadata_footer_audit_sha256: 769cda6c1e57170b6a39818b8fdf79dd65f091e3400131a3a964fd215e2015bb
+  read_only: true
+
+output:
+  root: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v1
+  fresh_root_required: true
+  hu_home_writes: false
+  max_http_response_bytes: 10737418240
+  atomic_writes: true
+  overwrite: false
+
+light_audit:
+  human_review_documents: 64
+  human_review_seed: 42
+  human_review_strata: [corpus, shard_quartile]
+  required_regex_groups:
+    - invalid_encoding
+    - empty_or_very_short
+    - boilerplate
+    - seo_or_betting
+    - legal_or_jurisdiction
+  synthetic_contamination:
+    population_subjects: 100
+    population_facts: 500
+    matching: [exact, unicode_normalized]
+    fuzzy_required: false
+  corpus_wide_learned_quality_classifier: false
+  broad_manual_labeling: false
+
+split:
+  namespace: vngrs_primary_in_domain_heldout_v2
+  seed: 42
+  heldout_documents: 10000
+  rule: ascending_sha256_namespace_seed_stable_document_id
+  document_disjoint_required: true
+  trwiki_role: cross_domain_control_only
+  trwiki_training_rows: 0
+
+tokenizer_accounting:
+  shared_raw_document_ids: true
+  model_token_counts_are_cross_model_equality_gate: false
+  models:
+    olmo:
+      model_id: allenai/OLMo-2-0425-1B
+      revision: a1847dff35000b4271fa70afc5db10fd29fedbdf
+    qwen:
+      model_id: Qwen/Qwen2.5-1.5B
+      revision: 8faed761d45a263340a0528343f099c05c9a4323
+    smollm:
+      model_id: HuggingFaceTB/SmolLM2-1.7B
+      revision: effd688a12921b4cc83e3312b6feb579f70f9c71
+
+authority:
+  local_preparation: true
+  network_retrieval: false
+  hu_ssh: false
+  corpus_materialization: false
+  model_weight_load: false
+  inference_or_scoring: false
+  slurm_or_gpu: false
+  training: false
+  publication: false
+  cleanup_or_deletion: false

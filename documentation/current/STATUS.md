@@ -2,7 +2,7 @@
 
 **As of:** 2026-08-27
 
-**Current branch:** `agent/m1-eval-walltime-correction`
+**Current branch:** `agent/m2-three-model-vngrs-d0`
 
 **Execution state:** M1 eval-v2 wave v3 is terminal `complete`: 111/111 canonical scientific
 states, consisting of 108 GPU snapshots and 3 M0 parent projections. Full execution history,
@@ -10,6 +10,12 @@ final result and delegation boundaries:
 `documentation/records/evaluation/M1_EVAL_V2_WAVE_EXECUTION_AND_CORRECTIONS_2026-08-23.md`.
 The detailed M0↔M1 result ledger is
 `documentation/records/evaluation/M1_EVAL_V2_WAVE_RESULT_2026-08-27.md`.
+
+**Current preparation boundary:** the three-model M2 scope is OLMo, Qwen and SmolLM, each with
+full M2-A/M2-B sibling training from its own frozen M1 epoch-036 parent. No single primary model
+is selected. The current local-only artifact is the execution-disabled vngrs D0 draft at
+`documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md`, using the previously verified
+systematic 32-shard subcorpus. No corpus retrieval/materialization or M2 training is authorized.
 
 ## The short answer
 
@@ -119,9 +125,10 @@ an M1 training input. `trwiki-20260601` remains the Turkish cross-domain control
 
 ## Current safety boundary
 
-The completed M1 family is terminal evidence. No duplicate submission, cleanup, deletion, M2-A/M2-B
-execution, or primary-model promotion is implied. The next separate scientific boundary is
-trajectory normalization and presentation review from the preserved result bundles.
+The completed M1 family is terminal evidence. No duplicate submission, cleanup, deletion,
+M2-A/M2-B execution, or primary-model promotion is implied. The active local boundary is to
+qualify the three-model vngrs D0 contract and offline operator. External materialization remains a
+separate exact authorization boundary.
 
 ## Read next
 

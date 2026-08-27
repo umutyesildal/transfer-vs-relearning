@@ -1,11 +1,11 @@
 schema_version: 1
-as_of: "2026-08-23"
+as_of: "2026-08-27"
 project: transfer-vs-relearning
 
 repository:
   layout: monorepo_v1
-  branch: agent/m1-pipeline-repair
-  status: m0_complete_m1_training_complete_eval_v2_contract_awaiting_authorization
+  branch: agent/m2-three-model-vngrs-d0
+  status: m0_m1_complete_m2_d0_corpus_contract_draft
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -66,7 +66,7 @@ repository:
     method: fast_forward_only
     migration_branch_published: true
     eval_harness_branch_published: true
-    current_main_head: 9054392bdc17f1f4b6453f03b83a2d93ace297ac
+    current_main_head: 403c437d3919b80468f7c6722ab3e58218c9b226
     remote_agents_directory_verified: true
     remote_reachable_blob_count_gte_10_mib: 0
   history_sanitization:
@@ -255,13 +255,24 @@ stage_readiness:
       - terminal_family_complete_no_duplicate_submission
   m2_training:
     corpus_contract_ready: false
+    corpus_contract_status: draft_execution_disabled
+    corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
+    corpus_contract_sha256: 4dc3b24b3c9deadeb346e13d21c2ec8bc91c3136f03038c29f74a8fb3fbc4c63
+    corpus_config: configs/corpora/vngrs_m2_three_model_d0_v1.yaml
+    corpus_config_sha256: 4811985f0331bad11f889c37783dd86331aa6eb0a6e9f7841807b1d3fb20e5b8
+    corpus_scope: vngrs_systematic_32_shard_subcorpus
+    required_models: [olmo, qwen, smollm]
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - vngrs_corpus_contract_not_frozen
+      - vngrs_d0_full_object_registry_not_closed
+      - vngrs_d0_materialization_operator_not_implemented
+      - vngrs_d0_tokenizer_asset_bindings_not_closed
+      - vngrs_d0_storage_preflight_not_measured
+      - vngrs_corpus_contract_not_qualified_or_frozen
       - m2_a_m2_b_matched_contract_not_frozen
-      - m1_parent_not_yet_selected
+      - three_m1_epoch036_parent_bindings_not_yet_frozen_in_m2_contract
 
 m1_confirmed_design:
   m1_models: [olmo, qwen, smollm]
@@ -1041,8 +1052,10 @@ current_evidence:
     role: conditional_m2_sibling_materialization_candidate
     materialized: false
     selected_for_training: false
-    latest_contract: documentation/151bh_VNGRS_LICENSE_HTTP307_RESOLVE_CACHE_REPAIR_AND_SINGLE_RETRY_CONTRACT_TR.md
-    latest_contract_status: frozen_unexecuted
+    accepted_metadata_evidence_root: /vol/tmp2/yesildau/luna_vngrs_metadata_footer_feasibility_v1
+    accepted_metadata_inventory_sha256: 120cdd7b21e161bf981cf8191fa278a11829d3fc5c155b71ed4bc8836e27f1d3
+    latest_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
+    latest_contract_status: draft_execution_disabled
     global_gate: blocked_by_measurement_design
   trwiki:
     role: cross_domain_control_only
@@ -1140,16 +1153,17 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: finish_local_m1_pipeline_repair_then_wait_for_user
+  name: prepare_three_model_vngrs_d0_contract_and_offline_operator
   m0_status: complete
-  m1_status: local_preparation_only
-  execution_boundary: explicit_future_user_authorization
+  m1_status: training_and_eval_v2_complete_111_of_111
+  m2_status: local_d0_contract_preparation_only
+  execution_boundary: separate_future_exact_sha_bound_user_authorization
   current_work:
-    - separate_m1_and_m2_readiness
-    - remove_training_output_circular_dependency
-    - finalize_hash_closed_training_output_adapter
-    - align_current_documentation_and_tests
-    - freeze_reviewable_m1_execution_contract_only_after_adapter_validation
+    - qualify_vngrs_32_shard_full_object_registry
+    - implement_fail_closed_materialization_operator_with_offline_fixtures
+    - bind_lightweight_max_aligned_quality_and_contamination_outputs
+    - bind_document_disjoint_split_and_three_tokenizer_accounting
+    - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
     - slurm_submission
@@ -1158,17 +1172,16 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: trajectory_normalization_and_presentation_review_from_preserved_m1_bundles
+  subject: qualify_three_model_vngrs_d0_contract_before_external_materialization
   decision_owner: user
   start_m1_now: false
   note: >-
-    M0 is closed with 21/21 active non-Pile lanes, three-model exact-prefix completion and
-    42 canonical v1f observations. M1 uses the same frozen OLMo/Qwen/SmolLM revisions,
-    Relation V2 synthetic English facts and eval-v2. Training outputs are products of the
-    training stage, not preconditions for it. vngrs and the primary Turkish held-out corpus
-    belong to M2 and do not block M1 preparation. The current local task is limited to making
-    the M1 contract and adapter reviewable; no M1 execution starts until the user explicitly
-    authorizes that final hash-bound contract.
+    M0 and the matched three-model M1 training/eval-v2 family are complete. The user selected
+    OLMo, Qwen and SmolLM as mandatory M2-A/M2-B training models, with no single primary model.
+    The current local boundary is the execution-disabled vngrs systematic 32-shard D0 corpus
+    contract plus offline implementation/tests. Network retrieval, corpus materialization,
+    HU/SSH, tokenizer/model access on HU, Slurm/GPU, training and evaluation require a later
+    qualified/frozen exact contract and separate explicit authorization.
 
 authorization:
   local_repository_changes: require_current_user_instruction
