@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: b2ace61350f4de90c7954abee13b566a9e488cc061b03d78fc8d5fcd17241fa1
+  full_state_sha256: f101ea82d4ffed5aa277f1d33935c23332023b07e1cf8628c4b29108396224d8
   role: context_projection_only
   may_expand_authority: false
 
@@ -35,6 +35,7 @@ stage_readiness:
   m2_corpus_contract: draft_execution_disabled
   m2_materialization_operator: locally_implemented_execution_disabled_offline_fixture_validated
   m2_audit_split_tokenizer_operators: locally_implemented_execution_disabled_offline_fixture_validated
+  m2_tokenizer_asset_inventory: complete_three_of_three_manifest_only_zero_hu_writes
   m2_required_models: [olmo, qwen, smollm]
   m2_sibling_training_contract: not_frozen
 
@@ -64,15 +65,15 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: authorize_exact_six_file_read_only_tokenizer_manifest_inventory
-  contract: documentation/contracts/corpora/vngrs-m2-d0-tokenizer-manifest-inventory-v1.md
-  config: configs/corpora/vngrs_m2_d0_tokenizer_manifest_inventory_v1.yaml
+  subject: close_vngrs_full_object_registry_and_storage_bounds_before_d0_qualification
+  contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
+  config: configs/corpora/vngrs_m2_three_model_d0_v1.yaml
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user
     - offline_tests_and_dry_runs
     - execution_disabled_contract_preparation
   not_implied:
-    - hu_or_ssh_without_new_exact_sha_bound_authorization
+    - hu_or_ssh
     - slurm_or_gpu
     - model_training
     - evaluation_or_scoring

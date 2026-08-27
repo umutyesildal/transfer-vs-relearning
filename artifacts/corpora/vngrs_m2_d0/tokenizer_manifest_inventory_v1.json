@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "executed_on": "2026-08-27",
+  "contract": "documentation/contracts/corpora/vngrs-m2-d0-tokenizer-manifest-inventory-v1.md",
+  "contract_sha256": "4f21ec7201734e1d7a2e950f31bad3246f0620523622e0c305e1f3eea252ab2e",
+  "config": "configs/corpora/vngrs_m2_d0_tokenizer_manifest_inventory_v1.yaml",
+  "config_sha256": "dc55b0b723c13af66ba4d9455688e2fcb1fefd72b2e41adfe6e5415ccccf8ae9",
+  "operator_sha256": "6a8de74f939107c5954081a44af36b57d56ea0c83aaddb8a7e0287982451c2e3",
+  "authorization_sha256": "4f21ec7201734e1d7a2e950f31bad3246f0620523622e0c305e1f3eea252ab2e",
+  "execution": {
+    "remote_pass_count": 1,
+    "local_launcher_failures_before_ssh": 1,
+    "local_launcher_failure_reason": "worktree credential file absent; no SSH connection occurred",
+    "remote_manifest_files_read": 6,
+    "remote_manifest_payload_bytes": 5988,
+    "hu_writes": 0,
+    "model_weight_files_opened": 0,
+    "tokenizer_asset_files_opened": 0,
+    "corpus_files_opened": 0,
+    "network_downloads": 0,
+    "raw_manifest_payloads_persisted": false
+  },
+  "models": {
+    "olmo": {
+      "snapshot_manifest_sha256": "0226c6b0c70415c3f31049e275fa78bfe9b155af60819664bdfe4ae730ae0a57",
+      "model_manifest_sha256": "e005a926daf95a051832438988df4c6416afe1276de2b9ba4c6574d3f92356b9",
+      "asset_count": 2,
+      "asset_bytes": 7138023,
+      "assets": [
+        {"path": "tokenizer.json", "bytes": 7137656, "sha256": "b460dae76d074f5686b2b9cd143bee5cd118be73a7b74196a03d61432b2908b5"},
+        {"path": "tokenizer_config.json", "bytes": 367, "sha256": "58d66e66689696fc96a2ea1e6e1c365a7cda5b1a1361109c564475381e8f6a25"}
+      ],
+      "tokenizer_asset_manifest_sha256": "1bb3f5ee04b6f32aab990e46fb99520b1e4ab04bdc3f1cfa75ea732c8f8dfd17"
+    },
+    "qwen": {
+      "snapshot_manifest_sha256": "f4d839f49672c999dc3c0cf9cbdac0caf139c9a385cbf85366a161d6d998d831",
+      "model_manifest_sha256": "e9d5bd7245ae3c22397fca30edd1489d218983f20998f986dd434efd99810dee",
+      "asset_count": 2,
+      "asset_bytes": 11422685,
+      "assets": [
+        {"path": "tokenizer.json", "bytes": 11421990, "sha256": "1e80893b7e7b1c325029e712eaeaa0758caba4068e3b4f30d030e015bc0ccf81"},
+        {"path": "tokenizer_config.json", "bytes": 695, "sha256": "cbea7bca9904d56693d2226b00fd564e3be053609d1e50f8f1885510f0f6e790"}
+      ],
+      "tokenizer_asset_manifest_sha256": "8e1cbce23938ba773e652fc767002a6687f3ec4f538139d8b760b3fe0b33a2df"
+    },
+    "smollm": {
+      "snapshot_manifest_sha256": "9ba7cdec401f5c5f9e334a3fc75e5ea5c5899f78f78219e24bdf5c6f0712da7c",
+      "model_manifest_sha256": "235bfb12a85d3c1196126349c6b11892ca5d2b4e2aac1cfcac251695bdf9c3ad",
+      "asset_count": 2,
+      "asset_bytes": 3523742,
+      "assets": [
+        {"path": "tokenizer.json", "bytes": 3522969, "sha256": "efa090eb3f5a5805ed9d417b8b0933228167567776a0cb7d852fd1b133153ceb"},
+        {"path": "tokenizer_config.json", "bytes": 773, "sha256": "5ac20e925ea70787367ba2857967d5bf7ae8541645c34634dd4c2d676ac79bba"}
+      ],
+      "tokenizer_asset_manifest_sha256": "1f41566541c514dcebac6168f0f2f83f2b54a969c6b36db4501ae4d0683fd652"
+    }
+  },
+  "gate": {
+    "tokenizer_asset_inventory": "PASS",
+    "vngrs_d0_qualified": false,
+    "ready_to_train": false,
+    "remaining_blockers": [
+      "vngrs_d0_full_object_registry_not_closed",
+      "vngrs_d0_storage_preflight_not_measured",
+      "vngrs_corpus_contract_not_qualified_or_frozen"
+    ]
+  }
+}

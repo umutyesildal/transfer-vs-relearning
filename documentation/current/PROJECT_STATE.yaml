@@ -257,9 +257,9 @@ stage_readiness:
     corpus_contract_ready: false
     corpus_contract_status: draft_execution_disabled
     corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
-    corpus_contract_sha256: b442f432bca4e87eb6ae378948572e44ea3c2d195720f41990743149e9bb21bd
+    corpus_contract_sha256: a1c2f4750ce198bbee6f3b356504d40ad1b6e5a070fcc69e472458aab309d937
     corpus_config: configs/corpora/vngrs_m2_three_model_d0_v1.yaml
-    corpus_config_sha256: 6ba0d6e6adb845ba2e0ccaa35784c44c4cac377feee12a49b0abac914a22f55b
+    corpus_config_sha256: efee55c9c3d4f838406760b84203c09b97f0e3eae04ef92469aa5eac51d1cf2d
     corpus_scope: vngrs_systematic_32_shard_subcorpus
     required_models: [olmo, qwen, smollm]
     materialization_operator: locally_implemented_execution_disabled
@@ -271,22 +271,25 @@ stage_readiness:
     local_audit_operator_sha256: 5d34cbb5dad11afaf5546edeed8ef374da14290127ec2e7e4553c48d1175b65c
     local_audit_operator_validation: offline_fixture_suite_passed
     m1_epoch036_parent_manifest_bindings: locally_closed_for_all_three_models
-    tokenizer_asset_file_inventory: unresolved_not_fabricated
+    tokenizer_asset_file_inventory: closed_three_of_three_from_preserved_manifests
     tokenizer_inventory_operator: locally_implemented_manifest_only_execution_disabled
     tokenizer_inventory_operator_sha256: 6a8de74f939107c5954081a44af36b57d56ea0c83aaddb8a7e0287982451c2e3
-    tokenizer_inventory_contract_status: frozen_unexecuted
+    tokenizer_inventory_contract_status: executed_pass
     tokenizer_inventory_contract: documentation/contracts/corpora/vngrs-m2-d0-tokenizer-manifest-inventory-v1.md
     tokenizer_inventory_contract_sha256: 4f21ec7201734e1d7a2e950f31bad3246f0620523622e0c305e1f3eea252ab2e
     tokenizer_inventory_config: configs/corpora/vngrs_m2_d0_tokenizer_manifest_inventory_v1.yaml
     tokenizer_inventory_config_sha256: dc55b0b723c13af66ba4d9455688e2fcb1fefd72b2e41adfe6e5415ccccf8ae9
-    tokenizer_inventory_execution_authorized: false
+    tokenizer_inventory_execution_authorized: consumed_single_read_only_pass
+    tokenizer_inventory_result: artifacts/corpora/vngrs_m2_d0/tokenizer_manifest_inventory_v1.json
+    tokenizer_inventory_result_sha256: fd3901408e7dfa6f299b3c260229926ba5733bfd3a88f2af80e3ea522b143cb5
+    tokenizer_inventory_remote_files_read: 6
+    tokenizer_inventory_remote_bytes_read: 5988
+    tokenizer_inventory_hu_writes: 0
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
       - vngrs_d0_full_object_registry_not_closed
-      - vngrs_d0_tokenizer_asset_file_inventory_not_closed
-      - vngrs_d0_tokenizer_manifest_inventory_awaits_exact_authorization
       - vngrs_d0_storage_preflight_not_measured
       - vngrs_corpus_contract_not_qualified_or_frozen
       - m2_a_m2_b_matched_contract_not_frozen
@@ -1190,15 +1193,15 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_exact_six_file_read_only_tokenizer_manifest_inventory
+  subject: close_vngrs_full_object_registry_and_storage_bounds_before_d0_qualification
   decision_owner: user
   start_m1_now: false
   note: >-
     M0 and the matched three-model M1 training/eval-v2 family are complete. The user selected
     OLMo, Qwen and SmolLM as mandatory M2-A/M2-B training models, with no single primary model.
-    The next bounded decision is whether to authorize the frozen six-file manifest-only tokenizer
-    inventory contract. It permits no HU writes and no tokenizer/model/corpus file access beyond
-    the exact compact manifests. Network retrieval, corpus materialization, broader HU/SSH,
+    The six-file manifest-only tokenizer inventory completed PASS with zero HU writes, closing all
+    three tokenizer asset registries. The remaining D0 boundary is the exact 32-object SHA/LFS
+    registry plus storage/inode bounds. Network retrieval, corpus materialization, broader HU/SSH,
     Slurm/GPU, training and evaluation remain separately unauthorized.
 
 authorization:

@@ -28,8 +28,10 @@ open and is not guessed from the model manifest.
 A manifest-only extractor for that inventory is now implemented and offline tested; it does not
 open tokenizer files or weights and has not been run against the HU paths.
 The exact six-file read-only inspection is frozen separately in
-`documentation/contracts/corpora/vngrs-m2-d0-tokenizer-manifest-inventory-v1.md`; execution remains
-unauthorized until the user approves its final SHA-256 explicitly.
+`documentation/contracts/corpora/vngrs-m2-d0-tokenizer-manifest-inventory-v1.md`; execution is
+complete and consumed. All six expected hashes matched; 5,988 compact manifest bytes were read,
+HU writes were zero, and the OLMo/Qwen/SmolLM tokenizer asset registries all closed. D0 remains
+unqualified because the 32 full-object SHA/LFS registry and storage/inode bounds are still open.
 
 ## The short answer
 

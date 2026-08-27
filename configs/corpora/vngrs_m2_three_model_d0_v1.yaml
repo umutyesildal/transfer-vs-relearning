@@ -126,7 +126,8 @@ tokenizer_accounting:
     path: artifacts/evaluations/m1_three_model_v1/dump/m1_metrics.json
     sha256: 41c2f2c6b722fc25ac48af278f1b318acc5e743b3c48d649fe26259848080462
     scope: epoch_036_paths_and_manifest_hashes_only
-    tokenizer_asset_inventory_closed: false
+    tokenizer_asset_inventory_closed: true
+    tokenizer_asset_inventory_result: artifacts/corpora/vngrs_m2_d0/tokenizer_manifest_inventory_v1.json
   models:
     olmo:
       model_id: allenai/OLMo-2-0425-1B
@@ -135,8 +136,8 @@ tokenizer_accounting:
       snapshot_manifest_sha256: 0226c6b0c70415c3f31049e275fa78bfe9b155af60819664bdfe4ae730ae0a57
       training_manifest_sha256: 68ad5c6b394918bbe5a57189ada0ebe6a14fe9c9213f658ffc1d4177d2935630
       model_manifest_sha256: e005a926daf95a051832438988df4c6416afe1276de2b9ba4c6574d3f92356b9
-      tokenizer_asset_manifest_sha256: null
-      tokenizer_asset_binding_status: unresolved_requires_read_only_inventory
+      tokenizer_asset_manifest_sha256: 1bb3f5ee04b6f32aab990e46fb99520b1e4ab04bdc3f1cfa75ea732c8f8dfd17
+      tokenizer_asset_binding_status: closed_from_preserved_epoch036_manifests
     qwen:
       model_id: Qwen/Qwen2.5-1.5B
       revision: 8faed761d45a263340a0528343f099c05c9a4323
@@ -144,8 +145,8 @@ tokenizer_accounting:
       snapshot_manifest_sha256: f4d839f49672c999dc3c0cf9cbdac0caf139c9a385cbf85366a161d6d998d831
       training_manifest_sha256: 0323b0088e2804b181cc0ade03a17868f8d37c16fe1ad7f483d73c501cc60b15
       model_manifest_sha256: e9d5bd7245ae3c22397fca30edd1489d218983f20998f986dd434efd99810dee
-      tokenizer_asset_manifest_sha256: null
-      tokenizer_asset_binding_status: unresolved_requires_read_only_inventory
+      tokenizer_asset_manifest_sha256: 8e1cbce23938ba773e652fc767002a6687f3ec4f538139d8b760b3fe0b33a2df
+      tokenizer_asset_binding_status: closed_from_preserved_epoch036_manifests
     smollm:
       model_id: HuggingFaceTB/SmolLM2-1.7B
       revision: effd688a12921b4cc83e3312b6feb579f70f9c71
@@ -153,8 +154,8 @@ tokenizer_accounting:
       snapshot_manifest_sha256: 9ba7cdec401f5c5f9e334a3fc75e5ea5c5899f78f78219e24bdf5c6f0712da7c
       training_manifest_sha256: 638a9066484e8695f9600f7991441b9622a1b63596d3184d55e25606d13a138c
       model_manifest_sha256: 235bfb12a85d3c1196126349c6b11892ca5d2b4e2aac1cfcac251695bdf9c3ad
-      tokenizer_asset_manifest_sha256: null
-      tokenizer_asset_binding_status: unresolved_requires_read_only_inventory
+      tokenizer_asset_manifest_sha256: 1f41566541c514dcebac6168f0f2f83f2b54a969c6b36db4501ae4d0683fd652
+      tokenizer_asset_binding_status: closed_from_preserved_epoch036_manifests
 
 authority:
   local_preparation: true

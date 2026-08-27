@@ -251,7 +251,6 @@ authorization.
 ## Current blockers
 
 - exact per-shard full-object/LFS SHA-256 registry is not locally closed;
-- exact tokenizer asset manifests/paths must be rebound from preserved M1 evidence;
 - scratch free-space/inode and peak-storage requirements are not yet measured;
 - contract, config and implementation hashes are not frozen.
 
@@ -281,8 +280,16 @@ last layer requires a separately authorized read-only inventory of the preserved
 A manifest-only tokenizer inventory extractor is now locally implemented and fixture-tested. It
 verifies the raw snapshot/model-manifest payload hashes, exact epoch-036 root binding and a closed
 tokenizer filename allowlist, then derives a canonical tokenizer asset-manifest hash from declared
-rows. It opens neither tokenizer assets nor model weights. The real three-model outputs remain
-unresolved until the preserved manifest payloads are read under separate authority.
+rows. It opens neither tokenizer assets nor model weights. At preparation time the real
+three-model outputs remained unresolved pending separate authority.
+
+The separately authorized six-file read-only pass subsequently completed with all six expected
+hashes matching and 5,988 remote manifest bytes read. HU writes, tokenizer/model asset reads and
+corpus reads were zero. The resulting tokenizer asset-manifest hashes are OLMo
+`1bb3f5ee04b6f32aab990e46fb99520b1e4ab04bdc3f1cfa75ea732c8f8dfd17`, Qwen
+`8e1cbce23938ba773e652fc767002a6687f3ec4f538139d8b760b3fe0b33a2df` and SmolLM
+`1f41566541c514dcebac6168f0f2f83f2b54a969c6b36db4501ae4d0683fd652`.
+This closes only the tokenizer inventory blocker; D0 remains unqualified and unexecuted.
 
 ## Authority boundary
 

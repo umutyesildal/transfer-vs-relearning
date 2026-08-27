@@ -20,7 +20,8 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - current boundary: local three-model vngrs D0 qualification work only; the fail-closed,
   transport-injected materialization operator and offline fixtures are implemented, but disabled;
 - D0 audit/split/tokenizer-accounting operators: locally implemented and offline validated;
-- next boundary: separately authorize the frozen six-file, manifest-only tokenizer inventory;
+- tokenizer inventory: PASS for all three M1 epoch-036 parents with zero HU writes;
+- next boundary: close the exact 32-object SHA/LFS registry and storage bounds locally first;
 - vngrs: conditional systematic 32-shard M2 input; not materialized or training-ready;
 - M2 execution: not authorized; external materialization requires a later frozen SHA-bound
   contract and separate explicit user authorization.
