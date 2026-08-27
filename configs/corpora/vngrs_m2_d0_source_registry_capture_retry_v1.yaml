@@ -1,0 +1,63 @@
+schema_version: 1
+contract_id: vngrs-m2-d0-source-registry-capture-retry-v1
+status: frozen_unexecuted
+execution_authorized: false
+contract: documentation/contracts/corpora/vngrs-m2-d0-source-registry-capture-retry-v1.md
+preserved_prior_results:
+  - artifacts/corpora/vngrs_m2_d0/source_registry_storage_discovery_v1.json
+  - artifacts/corpora/vngrs_m2_d0/source_registry_storage_discovery_retry_v1.json
+hu_writes: false
+remote_file_count: 1
+max_single_file_bytes: 4194304
+max_total_payload_bytes: 4194304
+automatic_retry: false
+
+sole_correction:
+  layer: local_transport
+  prior_route: bounded_human_visible_command_output
+  replacement_route: direct_stdout_pipe_to_committed_parser
+  remote_command_change: false
+  scientific_change: false
+  raw_payload_persisted: false
+
+metadata_ledger:
+  path: /vol/tmp2/yesildau/luna_vngrs_metadata_footer_feasibility_v1/shard_metadata_ledger.jsonl
+  sha256: 6c6f27651945043ec2dfbf1b26575f416b5d38a8783d0a22320f0ffbf83d3fa3
+  immutable_revision: ee5c6201ee84457a18182bfc483a7d8a7f3655ba
+  selected_objects: 32
+  expected_total_object_bytes: 9468474036
+  object_id_kind: lfs_oid
+
+filesystem_observations:
+  scratch_parent: /vol/tmp2/yesildau
+  proposed_d0_root: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v1
+  proposed_root_must_be_absent: true
+  byte_command: df -B1 --output=source,size,used,avail,pcent,target
+  inode_command: df -Pi
+
+local_transport:
+  parser: scripts/corpora/parse_vngrs_registry_discovery_transport.py
+  parser_sha256: 78f387d544b1d5f959cd7ba0c47fe1120993e2bc7a1b478776546a680ba10b0d
+  parser_module: transfer_vs_relearning.corpora.vngrs.source_registry
+  parser_module_sha256: 4978aa069f3f212fddf871367c868ed64d59956c2b4d633c5bfbc0492e9856ce
+  parser_function: parse_discovery_transport
+  stdin_only: true
+  compact_stdout_only: true
+  transcript_persisted: false
+  raw_ledger_persisted: false
+
+local_output:
+  path: artifacts/corpora/vngrs_m2_d0/source_registry_storage_discovery_capture_retry_v1.json
+
+authority:
+  hu_ssh: false
+  remote_read_only_ledger_inspection: false
+  remote_filesystem_metadata_inspection: false
+  hu_write: false
+  corpus_or_footer_read: false
+  network_download: false
+  model_or_tokenizer_access: false
+  slurm_or_gpu: false
+  training_or_evaluation: false
+  publication: false
+  cleanup_or_deletion: false

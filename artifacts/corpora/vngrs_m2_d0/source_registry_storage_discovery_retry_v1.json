@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "contract_id": "vngrs-m2-d0-source-registry-storage-discovery-retry-v1",
+  "contract_sha256": "b2e6b23a96e36b87c1a7e68b2e5306d3be01bf45293e59c6bc635b08ceff67b5",
+  "config_sha256": "3c93593225b5b819910fd9d4a2dbb06c390191e343e2224ef6eae0682d042dcf",
+  "code_commit": "1ce71c70e62c54a7a9d7cac9c9e959068f7d812c",
+  "executed_at_utc": "2026-08-27T13:22:59Z",
+  "status": "BLOCKED_OPERATIONAL_NOT_RUN",
+  "failure_class": "blocked_by_local_transport_capture_limit",
+  "failure": {
+    "phase": "local_payload_capture",
+    "message": "Remote pass completed and emitted the gzip/base64 ledger, but the Codex command-output transport truncated the middle of the payload",
+    "remote_command_completed": true,
+    "automatic_retry_allowed": false,
+    "retry_executed": false
+  },
+  "execution": {
+    "remote_passes": 1,
+    "hu_writes": 0,
+    "network_downloads": 0,
+    "corpus_rows_read": 0,
+    "full_objects_downloaded": 0,
+    "complete_ledger_payload_available_to_local_extractor": false,
+    "raw_ledger_payload_persisted": false,
+    "model_or_tokenizer_accesses": 0,
+    "slurm_or_gpu_actions": 0
+  },
+  "ledger_prechecks": {
+    "path": "/vol/tmp2/yesildau/luna_vngrs_metadata_footer_feasibility_v1/shard_metadata_ledger.jsonl",
+    "regular_file": true,
+    "bytes": 732929,
+    "max_bytes": 4194304,
+    "sha256": "6c6f27651945043ec2dfbf1b26575f416b5d38a8783d0a22320f0ffbf83d3fa3",
+    "expected_sha256_matched": true
+  },
+  "filesystem_observations": {
+    "resolved_parent": "/vol/tmp2/yesildau",
+    "required_mount_prefix_passed": true,
+    "proposed_root": "/vol/tmp2/yesildau/vngrs_m2_three_model_d0_v1",
+    "proposed_root_absent": true,
+    "byte_capacity": {
+      "filesystem": "storage02:/srv/nfs/data02",
+      "total_bytes": 153002533978112,
+      "used_bytes": 29905731452928,
+      "available_bytes": 122943170412544,
+      "capacity_percent": 20,
+      "mount": "/vol/tmp2"
+    },
+    "inode_capacity": {
+      "filesystem": "storage02:/srv/nfs/data02",
+      "total_inodes": 2343983104,
+      "used_inodes": 59700219,
+      "available_inodes": 2284282885,
+      "capacity_percent": 3,
+      "mount": "/vol/tmp2"
+    },
+    "complete": true
+  },
+  "source_registry": {
+    "status": "NOT_DERIVED_COMPLETE_PAYLOAD_UNAVAILABLE_TO_LOCAL_EXTRACTOR",
+    "object_count": null,
+    "total_bytes": null,
+    "registry_sha256": null
+  },
+  "gate": {
+    "source_registry_closed": false,
+    "storage_observations_complete": true,
+    "storage_bounds_closed": false,
+    "vngrs_d0_qualified": false,
+    "ready_to_materialize": false,
+    "ready_to_train": false
+  }
+}

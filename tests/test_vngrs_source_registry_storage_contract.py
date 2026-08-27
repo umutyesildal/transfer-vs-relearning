@@ -9,6 +9,9 @@ CONTRACT = ROOT / "documentation/contracts/corpora/vngrs-m2-d0-source-registry-s
 RESULT = ROOT / "artifacts/corpora/vngrs_m2_d0/source_registry_storage_discovery_v1.json"
 RETRY_CONFIG = ROOT / "configs/corpora/vngrs_m2_d0_source_registry_storage_discovery_retry_v1.yaml"
 RETRY_CONTRACT = ROOT / "documentation/contracts/corpora/vngrs-m2-d0-source-registry-storage-discovery-retry-v1.md"
+RETRY_RESULT = ROOT / "artifacts/corpora/vngrs_m2_d0/source_registry_storage_discovery_retry_v1.json"
+CAPTURE_CONFIG = ROOT / "configs/corpora/vngrs_m2_d0_source_registry_capture_retry_v1.yaml"
+CAPTURE_CONTRACT = ROOT / "documentation/contracts/corpora/vngrs-m2-d0-source-registry-capture-retry-v1.md"
 
 
 def load_config() -> dict:
@@ -114,4 +117,40 @@ def test_retry_contract_changes_only_inode_command_and_is_not_authorized() -> No
     assert config["filesystem_observations"]["inode_command"] == "df -Pi"
     assert config["filesystem_observations"]["recursive_du"] is False
     assert config["automatic_retry"] is False
+    assert all(config["authority"][key] is False for key in config["authority"])
+
+
+def test_retry_execution_closed_filesystem_observations_but_not_registry() -> None:
+    import json
+
+    result = json.loads(RETRY_RESULT.read_text(encoding="utf-8"))
+    assert result["status"] == "BLOCKED_OPERATIONAL_NOT_RUN"
+    assert result["failure_class"] == "blocked_by_local_transport_capture_limit"
+    assert result["failure"]["remote_command_completed"] is True
+    assert result["execution"]["remote_passes"] == 1
+    assert result["execution"]["hu_writes"] == 0
+    assert result["filesystem_observations"]["complete"] is True
+    assert result["filesystem_observations"]["inode_capacity"]["available_inodes"] == 2_284_282_885
+    assert result["source_registry"]["registry_sha256"] is None
+    assert result["gate"]["source_registry_closed"] is False
+    assert result["gate"]["ready_to_train"] is False
+
+
+def test_capture_retry_is_direct_pipe_only_frozen_and_unexecuted() -> None:
+    import hashlib
+
+    config = yaml.safe_load(CAPTURE_CONFIG.read_text(encoding="utf-8"))
+    assert hashlib.sha256(CAPTURE_CONTRACT.read_bytes()).hexdigest() == (
+        "1d3836a18438a809329c889b5cda24c0e635666cda20f9d3c47fe60a1c92fcc5"
+    )
+    assert config["status"] == "frozen_unexecuted"
+    assert config["execution_authorized"] is False
+    assert config["hu_writes"] is False
+    assert config["remote_file_count"] == 1
+    assert config["sole_correction"]["layer"] == "local_transport"
+    assert config["sole_correction"]["remote_command_change"] is False
+    assert config["sole_correction"]["scientific_change"] is False
+    assert config["local_transport"]["stdin_only"] is True
+    assert config["local_transport"]["transcript_persisted"] is False
+    assert config["local_transport"]["raw_ledger_persisted"] is False
     assert all(config["authority"][key] is False for key in config["authority"])

@@ -30,7 +30,7 @@ from .materialization import (
     materialize_full_objects,
     validate_source_registry,
 )
-from .source_registry import build_source_registry_from_metadata_ledger
+from .source_registry import build_source_registry_from_metadata_ledger, parse_discovery_transport
 from .d0_audit import D0Document, exact_heldout_split, human_review_sample, lightweight_audit, tokenizer_accounting
 from .tokenizer_inventory import extract_tokenizer_inventory
 from .outputs import FINAL_AUDIT, OUTPUT_ARTIFACT_MANIFEST, OUTPUT_ORDER, serialize_output_artifact_manifest
@@ -57,6 +57,7 @@ __all__ = [
     "VngrsPreparationConfig",
     "build_shard_paths",
     "build_source_registry_from_metadata_ledger",
+    "parse_discovery_transport",
     "evaluate_final_contract",
     "exact_heldout_split",
     "extract_tokenizer_inventory",

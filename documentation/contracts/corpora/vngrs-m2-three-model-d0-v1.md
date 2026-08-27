@@ -307,6 +307,13 @@ before inode output and ledger payload return because HU `df` rejects `-i` toget
 remained zero. A narrow unexecuted correction changes only that observation to POSIX `df -Pi`;
 its own exact SHA-bound authorization is required.
 
+The corrected inode pass subsequently completed all HU-side checks and returned complete
+filesystem observations, including 2,284,282,885 available inodes. Its compressed ledger stdout
+was then truncated only at the generic local command-display boundary, so the local extractor did
+not receive a complete payload and no registry was derived. A second narrow unexecuted correction
+changes only local transport to a direct in-memory pipe into the committed fail-closed parser. It
+requires its own exact SHA-bound authorization.
+
 ## Authority boundary
 
 This draft authorizes local code, configuration, documentation, offline fixtures and dry-run

@@ -35,7 +35,13 @@ output or ledger payload return. Ledger size/SHA, proposed-root absence and byte
 HU writes and downloads were zero. The source registry therefore remains open. A narrow frozen,
 unexecuted retry changes only the inode observation to `df -Pi` at
 `documentation/contracts/corpora/vngrs-m2-d0-source-registry-storage-discovery-retry-v1.md` and
-requires new exact SHA-bound user authorization.
+requires new exact SHA-bound user authorization. That corrected pass subsequently completed inode
+and byte observations but the generic Codex output display truncated the compressed ledger before
+local extraction. Its preserved result has zero HU writes/downloads and a still-open registry. A
+final narrow correction pipes stdout directly into the committed fail-closed parser without
+persisting the transcript or raw ledger. It is frozen at
+`documentation/contracts/corpora/vngrs-m2-d0-source-registry-capture-retry-v1.md` and remains
+unexecuted pending new exact SHA-bound authorization.
 
 ## The short answer
 
