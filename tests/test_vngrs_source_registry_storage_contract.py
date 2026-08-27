@@ -12,6 +12,9 @@ RETRY_CONTRACT = ROOT / "documentation/contracts/corpora/vngrs-m2-d0-source-regi
 RETRY_RESULT = ROOT / "artifacts/corpora/vngrs_m2_d0/source_registry_storage_discovery_retry_v1.json"
 CAPTURE_CONFIG = ROOT / "configs/corpora/vngrs_m2_d0_source_registry_capture_retry_v1.yaml"
 CAPTURE_CONTRACT = ROOT / "documentation/contracts/corpora/vngrs-m2-d0-source-registry-capture-retry-v1.md"
+CAPTURE_RESULT = ROOT / "artifacts/corpora/vngrs_m2_d0/source_registry_storage_discovery_capture_retry_v1.json"
+SEMANTICS_CONFIG = ROOT / "configs/corpora/vngrs_m2_d0_source_registry_byte_semantics_repair_v1.yaml"
+SEMANTICS_CONTRACT = ROOT / "documentation/contracts/corpora/vngrs-m2-d0-source-registry-byte-semantics-repair-v1.md"
 
 
 def load_config() -> dict:
@@ -152,5 +155,40 @@ def test_capture_retry_is_direct_pipe_only_frozen_and_unexecuted() -> None:
     assert config["sole_correction"]["scientific_change"] is False
     assert config["local_transport"]["stdin_only"] is True
     assert config["local_transport"]["transcript_persisted"] is False
+    assert config["local_transport"]["raw_ledger_persisted"] is False
+    assert all(config["authority"][key] is False for key in config["authority"])
+
+
+def test_capture_execution_exposes_object_vs_compressed_semantics_and_blocks() -> None:
+    import json
+
+    result = json.loads(CAPTURE_RESULT.read_text(encoding="utf-8"))
+    assert result["status"] == "BLOCKED_EVIDENCE_SEMANTIC_MISMATCH"
+    assert result["failure_class"] == "blocked_by_object_vs_parquet_compressed_byte_semantics"
+    assert result["failure"]["observed_object_size_bytes"] == 9_502_315_428
+    assert result["failure"]["accepted_parquet_compressed_bytes"] == 9_468_474_036
+    assert result["failure"]["difference_bytes"] == 33_841_392
+    assert result["execution"]["complete_ledger_payload_received_in_memory"] is True
+    assert result["execution"]["raw_ledger_payload_persisted"] is False
+    assert result["ledger_prechecks"][
+        "frozen_path_order_revision_lfs_and_positive_size_rows_validated_before_aggregate_gate"
+    ] == 32
+    assert result["gate"]["source_registry_closed"] is False
+
+
+def test_byte_semantics_repair_freezes_both_aggregates_without_source_change() -> None:
+    import hashlib
+
+    config = yaml.safe_load(SEMANTICS_CONFIG.read_text(encoding="utf-8"))
+    assert hashlib.sha256(SEMANTICS_CONTRACT.read_bytes()).hexdigest() == (
+        "3a6591c288c3a2e3c82c7fdc776e1205d6738e57d9042c94bf9b43fff0a09e1e"
+    )
+    assert config["status"] == "frozen_unexecuted"
+    assert config["execution_authorized"] is False
+    assert config["sole_repair"]["expected_total_object_bytes"] == 9_502_315_428
+    assert config["sole_repair"]["expected_total_parquet_compressed_bytes"] == 9_468_474_036
+    assert config["sole_repair"]["difference_bytes"] == 33_841_392
+    assert config["sole_repair"]["source_row_change"] is False
+    assert config["sole_repair"]["scientific_change"] is False
     assert config["local_transport"]["raw_ledger_persisted"] is False
     assert all(config["authority"][key] is False for key in config["authority"])

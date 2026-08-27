@@ -27,7 +27,9 @@ the master synthesis, the long timeline, or a previous chat transcript.
   syntax, with zero HU writes and no ledger payload returned;
 - corrected inode retry: filesystem observations complete, but local command display truncated the
   ledger before extraction; zero HU writes/downloads;
-- next boundary: one frozen direct stdout-to-parser read-only capture retry;
+- direct-pipe capture: complete ledger reached the extractor; it blocked because the historical
+  Parquet compressed-byte total was incorrectly used as the full-object total;
+- next boundary: one frozen byte-semantics repair pass gating both exact aggregates;
 - vngrs: conditional systematic 32-shard M2 input; not materialized or training-ready;
 - M2 execution: not authorized; external materialization requires a later frozen SHA-bound
   contract and separate explicit user authorization.

@@ -64,7 +64,7 @@ Transport = Callable[[SourceObject], FullObjectResponse]
 class MaterializationPolicy:
     selected_paths: tuple[str, ...] = FROZEN_SELECTED_SHARD_PATHS
     revision: str = VNGRS_REVISION
-    expected_total_bytes: int = 9_468_474_036
+    expected_total_bytes: int = 9_502_315_428
     max_response_bytes: int = 10_737_418_240
     chunk_size_upper_bound: int = 8 * 1024 * 1024
     execution_enabled: bool = False

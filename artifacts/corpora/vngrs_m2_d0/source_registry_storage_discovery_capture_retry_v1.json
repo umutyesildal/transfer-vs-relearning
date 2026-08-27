@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "contract_id": "vngrs-m2-d0-source-registry-capture-retry-v1",
+  "contract_sha256": "1d3836a18438a809329c889b5cda24c0e635666cda20f9d3c47fe60a1c92fcc5",
+  "config_sha256": "6f82dd2ffbecd8318974d76cf0b2bcdc8644e083b474f02bda96f0b68dd7610b",
+  "code_commit": "d89b2b93d5cc4eddfa548419ecdd415a361dbd84",
+  "executed_at_utc": "2026-08-27T13:31:27Z",
+  "status": "BLOCKED_EVIDENCE_SEMANTIC_MISMATCH",
+  "failure_class": "blocked_by_object_vs_parquet_compressed_byte_semantics",
+  "failure": {
+    "phase": "source_registry_aggregate_gate",
+    "message": "The accepted ledger object_size_bytes sum is distinct from its Parquet row-group compressed_bytes sum",
+    "observed_object_size_bytes": 9502315428,
+    "incorrectly_frozen_expected_object_bytes": 9468474036,
+    "difference_bytes": 33841392,
+    "accepted_parquet_compressed_bytes": 9468474036,
+    "automatic_retry_allowed": false,
+    "retry_executed": false
+  },
+  "execution": {
+    "remote_passes": 1,
+    "hu_writes": 0,
+    "network_downloads": 0,
+    "corpus_rows_read": 0,
+    "full_objects_downloaded": 0,
+    "complete_ledger_payload_received_in_memory": true,
+    "raw_ledger_payload_persisted": false,
+    "ssh_transcript_persisted": false,
+    "model_or_tokenizer_accesses": 0,
+    "slurm_or_gpu_actions": 0
+  },
+  "ledger_prechecks": {
+    "path": "/vol/tmp2/yesildau/luna_vngrs_metadata_footer_feasibility_v1/shard_metadata_ledger.jsonl",
+    "regular_file": true,
+    "bytes": 732929,
+    "sha256": "6c6f27651945043ec2dfbf1b26575f416b5d38a8783d0a22320f0ffbf83d3fa3",
+    "expected_sha256_matched": true,
+    "frozen_path_order_revision_lfs_and_positive_size_rows_validated_before_aggregate_gate": 32
+  },
+  "filesystem_observations": {
+    "resolved_parent": "/vol/tmp2/yesildau",
+    "proposed_root_absent": true,
+    "available_bytes": 122943170412544,
+    "available_inodes": 2284282885,
+    "complete": true
+  },
+  "source_registry": {
+    "status": "NOT_ACCEPTED_AGGREGATE_SEMANTICS_MISMATCH",
+    "object_count": null,
+    "total_object_bytes": 9502315428,
+    "total_parquet_compressed_bytes": 9468474036,
+    "registry_sha256": null
+  },
+  "gate": {
+    "source_registry_closed": false,
+    "storage_observations_complete": true,
+    "storage_bounds_closed": false,
+    "vngrs_d0_qualified": false,
+    "ready_to_materialize": false,
+    "ready_to_train": false
+  }
+}

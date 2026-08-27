@@ -257,14 +257,14 @@ stage_readiness:
     corpus_contract_ready: false
     corpus_contract_status: draft_execution_disabled
     corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
-    corpus_contract_sha256: 5d07a64993c3fc1f5b545444722eea1a9c331aaee6c1b752f6e012dcc0c84bc7
+    corpus_contract_sha256: 7c59c0207c075288342d8152a2ddf691eff32be445f98a0d293997ef7a8baeef
     corpus_config: configs/corpora/vngrs_m2_three_model_d0_v1.yaml
-    corpus_config_sha256: 08370a120b0e5d805780638b468e9f490d8c01829515933ea2e18c778af02f8a
+    corpus_config_sha256: 3e1766b84f6d8111dc8093855fcb021b2e8e4207d8891ff86a0f5999a909a329
     corpus_scope: vngrs_systematic_32_shard_subcorpus
     required_models: [olmo, qwen, smollm]
     materialization_operator: locally_implemented_execution_disabled
     materialization_operator_module: src/transfer_vs_relearning/corpora/vngrs/materialization.py
-    materialization_operator_sha256: 42ad689f2fca12e4344eb9ec91dcf09f1837d8eb6714a5ad054afbbd8001fc6f
+    materialization_operator_sha256: 6e57e82a39045fb2b3afd3f9af08cff833eacad836dcffe06bfe316be62d82a6
     materialization_operator_validation: offline_fixture_suite_passed
     local_audit_operator: locally_implemented_execution_disabled
     local_audit_operator_module: src/transfer_vs_relearning/corpora/vngrs/d0_audit.py
@@ -287,7 +287,7 @@ stage_readiness:
     tokenizer_inventory_hu_writes: 0
     source_registry_operator: locally_implemented_execution_disabled
     source_registry_operator_module: src/transfer_vs_relearning/corpora/vngrs/source_registry.py
-    source_registry_operator_sha256: 4978aa069f3f212fddf871367c868ed64d59956c2b4d633c5bfbc0492e9856ce
+    source_registry_operator_sha256: 6b74466f1a47391c1dc4e2897e73125a1aa120f8c2d368d35bd919516389e953
     source_registry_operator_validation: offline_fixture_suite_passed
     source_registry_discovery_contract_status: consumed_blocked_operational_not_run
     source_registry_discovery_contract: documentation/contracts/corpora/vngrs-m2-d0-source-registry-storage-discovery-v1.md
@@ -313,12 +313,23 @@ stage_readiness:
     source_registry_discovery_retry_failure: blocked_by_local_transport_capture_limit
     source_registry_discovery_retry_available_inodes: 2284282885
     source_registry_discovery_retry_hu_writes: false
-    source_registry_capture_retry_contract_status: frozen_unexecuted
+    source_registry_capture_retry_contract_status: consumed_blocked_evidence_semantic_mismatch
     source_registry_capture_retry_contract: documentation/contracts/corpora/vngrs-m2-d0-source-registry-capture-retry-v1.md
     source_registry_capture_retry_contract_sha256: 1d3836a18438a809329c889b5cda24c0e635666cda20f9d3c47fe60a1c92fcc5
     source_registry_capture_retry_config: configs/corpora/vngrs_m2_d0_source_registry_capture_retry_v1.yaml
     source_registry_capture_retry_config_sha256: 6f82dd2ffbecd8318974d76cf0b2bcdc8644e083b474f02bda96f0b68dd7610b
-    source_registry_capture_retry_execution_authorized: false
+    source_registry_capture_retry_execution_authorized: consumed_single_pass
+    source_registry_capture_retry_result: artifacts/corpora/vngrs_m2_d0/source_registry_storage_discovery_capture_retry_v1.json
+    source_registry_capture_retry_result_sha256: 2cc1f2f3a9ade12a8ed5bf1891835a63918f18100bfa3ac466d8e5f1489f9dfe
+    source_registry_capture_retry_failure: blocked_by_object_vs_parquet_compressed_byte_semantics
+    source_registry_observed_object_bytes: 9502315428
+    source_registry_parquet_compressed_bytes: 9468474036
+    source_registry_byte_semantics_repair_contract_status: frozen_unexecuted
+    source_registry_byte_semantics_repair_contract: documentation/contracts/corpora/vngrs-m2-d0-source-registry-byte-semantics-repair-v1.md
+    source_registry_byte_semantics_repair_contract_sha256: 3a6591c288c3a2e3c82c7fdc776e1205d6738e57d9042c94bf9b43fff0a09e1e
+    source_registry_byte_semantics_repair_config: configs/corpora/vngrs_m2_d0_source_registry_byte_semantics_repair_v1.yaml
+    source_registry_byte_semantics_repair_config_sha256: daa288787441ced948cdac0202b17c2aad894e24bd228ae96a981899d703973b
+    source_registry_byte_semantics_repair_execution_authorized: false
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
@@ -1236,10 +1247,11 @@ next_decision_required:
     The six-file manifest-only tokenizer inventory completed PASS with zero HU writes, closing all
     three tokenizer asset registries. The first registry/storage discovery pass stopped at
     HU-incompatible inode syntax. Its corrected retry closed filesystem observations but generic
-    command-output capture truncated the emitted ledger before local extraction; both preserved
-    attempts had zero HU writes and no corpus/object downloads. A direct in-memory stdout-to-parser
-    capture retry is frozen but unexecuted and needs new exact SHA-bound authorization. Network
-    retrieval, materialization, broader HU/SSH, Slurm/GPU, training and evaluation remain unauthorized.
+    command-output capture truncated the emitted ledger before local extraction. The direct-pipe
+    pass then identified the frozen aggregate as Parquet compressed bytes rather than full-object
+    bytes (`9,468,474,036` vs `9,502,315,428`) and blocked correctly. All attempts had zero HU
+    writes and no corpus/object downloads. A byte-semantics repair is frozen but unexecuted and
+    needs new exact SHA-bound authorization. Materialization, Slurm/GPU and training remain unauthorized.
 
 authorization:
   local_repository_changes: require_current_user_instruction

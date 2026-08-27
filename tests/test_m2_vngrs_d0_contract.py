@@ -52,6 +52,7 @@ def test_d0_source_identity_matches_frozen_vngrs_selection() -> None:
         build_selection_evidence()
     )
     assert source["expected_selected_compressed_bytes"] == 9_468_474_036
+    assert source["expected_selected_object_bytes"] == 9_502_315_428
 
 
 def test_d0_keeps_light_audit_split_and_three_model_scope() -> None:
@@ -84,6 +85,7 @@ def test_d0_materialization_operator_remains_explicit_and_execution_disabled() -
     assert operator["automatic_retry"] is False
     assert operator["automatic_resume"] is False
     assert operator["cleanup_on_failure"] is False
+    assert operator["expected_total_bytes"] == 9_502_315_428
 
 
 def test_d0_source_registry_operator_is_exact_and_execution_disabled() -> None:
@@ -95,7 +97,8 @@ def test_d0_source_registry_operator_is_exact_and_execution_disabled() -> None:
         "6c6f27651945043ec2dfbf1b26575f416b5d38a8783d0a22320f0ffbf83d3fa3"
     )
     assert operator["expected_objects"] == 32
-    assert operator["expected_total_bytes"] == 9_468_474_036
+    assert operator["expected_total_object_bytes"] == 9_502_315_428
+    assert operator["expected_total_parquet_compressed_bytes"] == 9_468_474_036
     assert operator["lfs_oid_is_full_object_sha256"] is True
     assert operator["corpus_rows_read"] == 0
     assert operator["full_objects_downloaded"] == 0

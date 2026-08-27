@@ -12,7 +12,8 @@ from .materialization import SourceObject, immutable_resolve_url, normalized_lfs
 from .metadata import FROZEN_SELECTED_SHARD_PATHS, VNGRS_REVISION, canonical_json_sha256
 
 
-EXPECTED_SELECTED_BYTES = 9_468_474_036
+EXPECTED_OBJECT_BYTES = 9_502_315_428
+EXPECTED_COMPRESSED_BYTES = 9_468_474_036
 
 
 def _single_marker_block(lines: list[str], start: str, end: str) -> list[str]:
@@ -107,7 +108,8 @@ def build_source_registry_from_metadata_ledger(
     payload: bytes,
     *,
     expected_ledger_sha256: str,
-    expected_total_bytes: int = EXPECTED_SELECTED_BYTES,
+    expected_total_bytes: int = EXPECTED_OBJECT_BYTES,
+    expected_compressed_bytes: int = EXPECTED_COMPRESSED_BYTES,
 ) -> dict[str, Any]:
     """Derive expected full-object SHA-256 from exact Git-LFS OIDs without corpus reads."""
 
@@ -127,6 +129,7 @@ def build_source_registry_from_metadata_ledger(
 
     objects: list[SourceObject] = []
     registry_rows: list[dict[str, Any]] = []
+    compressed_total = 0
     for ordinal, row in enumerate(rows):
         path = str(row["path"])
         if row.get("immutable_revision") != VNGRS_REVISION:
@@ -140,6 +143,14 @@ def build_source_registry_from_metadata_ledger(
         size = row.get("object_size_bytes")
         if not isinstance(size, int) or isinstance(size, bool) or size <= 0:
             raise ValueError(f"{path}: exact object size is absent")
+        compressed_size = row.get("compressed_bytes")
+        if (
+            not isinstance(compressed_size, int)
+            or isinstance(compressed_size, bool)
+            or compressed_size <= 0
+        ):
+            raise ValueError(f"{path}: Parquet compressed byte count is absent")
+        compressed_total += compressed_size
         if row.get("object_sha256") not in (None, object_sha256):
             raise ValueError(f"{path}: recorded object SHA conflicts with the LFS OID")
         source = SourceObject(
@@ -157,6 +168,7 @@ def build_source_registry_from_metadata_ledger(
                 "path": source.path,
                 "revision": source.revision,
                 "size_bytes": source.size_bytes,
+                "parquet_compressed_bytes": compressed_size,
                 "sha256": source.sha256,
                 "lfs_oid": source.lfs_oid,
                 "url": source.url,
@@ -168,12 +180,19 @@ def build_source_registry_from_metadata_ledger(
         raise ValueError(
             f"selected object bytes drift: {observed_total} != {expected_total_bytes}"
         )
+    if compressed_total != expected_compressed_bytes:
+        raise ValueError(
+            "selected Parquet compressed bytes drift: "
+            f"{compressed_total} != {expected_compressed_bytes}"
+        )
     return {
         "schema_version": 1,
         "status": "REGISTRY_CLOSED_FROM_ACCEPTED_LFS_IDENTITIES",
         "revision": VNGRS_REVISION,
         "object_count": len(objects),
         "total_bytes": observed_total,
+        "total_object_bytes": observed_total,
+        "total_parquet_compressed_bytes": compressed_total,
         "metadata_ledger_sha256": expected_ledger_sha256,
         "objects": registry_rows,
         "registry_sha256": canonical_json_sha256(registry_rows),

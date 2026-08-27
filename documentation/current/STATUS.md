@@ -42,6 +42,12 @@ final narrow correction pipes stdout directly into the committed fail-closed par
 persisting the transcript or raw ledger. It is frozen at
 `documentation/contracts/corpora/vngrs-m2-d0-source-registry-capture-retry-v1.md` and remains
 unexecuted pending new exact SHA-bound authorization.
+The authorized direct-pipe pass then delivered the full ledger and exposed a genuine evidence
+semantic mismatch: `9,468,474,036` is the Parquet row-group compressed-byte aggregate, while the
+32 downloadable objects total `9,502,315,428` bytes. The registry rejected the conflation. The
+operator and D0 draft now gate both totals separately; the frozen byte-semantics repair contract
+`documentation/contracts/corpora/vngrs-m2-d0-source-registry-byte-semantics-repair-v1.md` is
+unexecuted and needs new exact SHA-bound authorization.
 
 ## The short answer
 

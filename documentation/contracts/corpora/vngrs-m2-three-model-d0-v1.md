@@ -53,6 +53,7 @@ Preparation of this draft grants none of the future actions above.
 | Selection | systematic midpoint 32 of 284 |
 | Selection payload SHA-256 | `dbb9714347970634386ff62366384fcae12cf5f12f1df1df676cb9af3ae25686` |
 | Selected compressed bytes | `9,468,474,036` |
+| Selected full-object bytes | `9,502,315,428` |
 | Source role | `vngrs systematic 32-shard subcorpus`; not the full release |
 
 The exact selected paths and their order are frozen in
@@ -104,7 +105,8 @@ Before network or output-root creation:
 - Download to `raw/.partial/` and atomically rename only after expected size and SHA-256 pass.
 - Bind every downloaded SHA-256 to the immutable source object/LFS identity obtained from the
   exact revision. An unresolved or mismatched source-object identity is a blocker.
-- Total successful Parquet payload must be exactly `9,468,474,036` bytes.
+- Total successful full-object Parquet payload must be exactly `9,502,315,428` bytes. The distinct
+  Parquet row-group compressed-byte aggregate remains `9,468,474,036` and is reconciled separately.
 - Cumulative HTTP response bytes may not exceed `10,737,418,240` bytes (10 GiB).
 - Redirects, retries, content lengths/ranges and terminal hosts are recorded without secrets.
 - A partial download is retained as typed failed evidence; it is never treated as a valid shard.
@@ -313,6 +315,12 @@ was then truncated only at the generic local command-display boundary, so the lo
 not receive a complete payload and no registry was derived. A second narrow unexecuted correction
 changes only local transport to a direct in-memory pipe into the committed fail-closed parser. It
 requires its own exact SHA-bound authorization.
+
+The direct-pipe pass then exposed an evidence-semantic error rather than a transport failure:
+`9,468,474,036` is the Parquet row-group compressed-byte sum, while exact full-object sizes total
+`9,502,315,428`. The registry correctly failed closed. The local operator and this draft now keep
+both aggregates as separate mandatory gates; a frozen unexecuted repair contract must re-read the
+same compact ledger once before the registry can close.
 
 ## Authority boundary
 

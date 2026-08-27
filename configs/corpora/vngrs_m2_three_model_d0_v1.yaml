@@ -13,6 +13,7 @@ source:
   selection_version: vngrs_systematic_midpoint_32_of_284_v1
   selection_payload_sha256: dbb9714347970634386ff62366384fcae12cf5f12f1df1df676cb9af3ae25686
   expected_selected_compressed_bytes: 9468474036
+  expected_selected_object_bytes: 9502315428
   selected_paths:
     - data/train-00004-of-00284.parquet
     - data/train-00013-of-00284.parquet
@@ -69,6 +70,7 @@ materialization_operator:
   transport_injected: true
   implicit_network_client: false
   execution_enabled: false
+  expected_total_bytes: 9502315428
   exact_registry_required_before_root_creation: true
   full_object_sha256_required: true
   lfs_oid_must_bind_sha256: true
@@ -85,7 +87,8 @@ source_registry_operator:
   execution_enabled: false
   expected_ledger_sha256: 6c6f27651945043ec2dfbf1b26575f416b5d38a8783d0a22320f0ffbf83d3fa3
   expected_objects: 32
-  expected_total_bytes: 9468474036
+  expected_total_object_bytes: 9502315428
+  expected_total_parquet_compressed_bytes: 9468474036
   lfs_oid_is_full_object_sha256: true
   corpus_rows_read: 0
   full_objects_downloaded: 0
