@@ -18,7 +18,9 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - M1: fixed OLMo/Qwen/SmolLM cohort, Relation V2 facts and eval-v2 policy;
 - M1: training and eval-v2 complete at 111/111 states;
 - current boundary: the three-model vngrs D0 two-phase launcher and human-review handoff are
-  frozen and unexecuted; Phase 1 awaits exact SHA-bound authorization;
+  frozen and unexecuted; the pre-correction Phase-1 route was stopped before Slurm submission
+  because it would write preflight/log files outside the sole root; corrected V1A awaits a new
+  exact SHA-bound authorization;
 - D0 audit/split/tokenizer-accounting operators: locally implemented and offline validated;
 - tokenizer inventory: PASS for all three M1 epoch-036 parents with zero HU writes;
 - source-registry extractor: locally implemented and offline validated; exact accepted ledger has
@@ -31,9 +33,10 @@ the master synthesis, the long timeline, or a previous chat transcript.
   Parquet compressed-byte total was incorrectly used as the full-object total;
 - byte-semantics repair: PASS; 32/32 LFS identities and both exact byte aggregates are closed;
 - storage/orchestration qualification: 32 GiB frozen peak, 40 GiB plus 1,024-inode fresh gate,
-  exact Parquet loader, typed failures, reviewed adapters and atomic output chain passed 181
+  exact Parquet loader, typed failures, reviewed adapters and atomic output chain passed 182
   compatible tests;
-- next boundary: authorize only Phase 1, which must stop at `AWAITING_HUMAN_REVIEW`; Phase 2
+- next boundary: authorize only corrected Phase 1 V1A, which must stop at
+  `AWAITING_HUMAN_REVIEW`; Phase 2
   requires the resulting 64-document packet and a separate later authorization;
 - vngrs: conditional systematic 32-shard M2 input; not materialized or training-ready;
 - M2 execution: not authorized; external materialization requires a later frozen SHA-bound

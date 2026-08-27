@@ -11,7 +11,7 @@ import yaml
 
 from transfer_vs_relearning.corpora.vngrs.d0_inputs import load_source_objects, load_synthetic_surfaces
 from transfer_vs_relearning.corpora.vngrs.d0_orchestration import D0OrchestrationPolicy, finalize_d0_phase2, run_d0_phase1
-from transfer_vs_relearning.corpora.vngrs.d0_preflight import validate_d0_preflight
+from transfer_vs_relearning.corpora.vngrs.d0_preflight import collect_d0_preflight_observation, validate_d0_preflight
 from transfer_vs_relearning.corpora.vngrs.d0_runtime import FrozenTokenizerAdapter, ReviewedHttpsTransport
 from transfer_vs_relearning.corpora.vngrs.materialization import MaterializationPolicy
 
@@ -31,6 +31,7 @@ def main() -> int:
     parser.add_argument("--repo-root", type=Path, required=True)
     parser.add_argument("--expected-commit", required=True)
     parser.add_argument("--preflight-json", type=Path)
+    parser.add_argument("--collect-preflight", action="store_true")
     parser.add_argument("--decisions-jsonl", type=Path)
     args = parser.parse_args()
     repo = args.repo_root.resolve()
@@ -45,10 +46,15 @@ def main() -> int:
     )
     policy = D0OrchestrationPolicy(execution_enabled=True)
     if args.phase == "phase1":
-        if args.preflight_json is None or args.decisions_jsonl is not None:
-            raise ValueError("phase1 requires only --preflight-json")
+        if args.decisions_jsonl is not None or (args.preflight_json is None) == (not args.collect_preflight):
+            raise ValueError("phase1 requires exactly one reviewed preflight source")
+        observation = (
+            collect_d0_preflight_observation(repo)
+            if args.collect_preflight
+            else json.loads(args.preflight_json.read_text(encoding="utf-8"))
+        )
         preflight = validate_d0_preflight(
-            json.loads(args.preflight_json.read_text(encoding="utf-8")),
+            observation,
             expected_commit=args.expected_commit,
         )
         result = run_d0_phase1(

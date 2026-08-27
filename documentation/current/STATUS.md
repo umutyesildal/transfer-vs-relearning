@@ -59,8 +59,12 @@ HU writes, corpus reads and downloads remained zero. Storage arithmetic is now c
 post-materialization failures and atomic self-reference-free evidence chain passed the compatible
 then-current 168-test suite. The later two-phase freeze extends that qualified checkpoint. The
 production HU preflight, reviewed HTTPS/tokenizer adapters and explicit two-phase 64-document
-human-review handoff are now frozen and passed 181 compatible tests. Phase 1 is unexecuted and
-unauthorized; it must stop at `AWAITING_HUMAN_REVIEW`. Phase 2 is separately gated by the exact
+human-review handoff are frozen. The pre-correction branch was pushed and HU tests passed 45/45,
+but submission was stopped before any Slurm job when the launcher was found to write preflight/log
+files outside the sole allowed root. No corpus request or output root occurred. Corrected V1A
+keeps preflight in memory, suppresses filesystem Slurm logs and passed 182 compatible tests. It is
+unexecuted and awaits a new exact SHA authorization; it must stop at `AWAITING_HUMAN_REVIEW`.
+Phase 2 is separately gated by the exact
 review-packet hash and a later authorization.
 
 ## The short answer

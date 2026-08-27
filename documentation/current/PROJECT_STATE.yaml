@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_d0_phase1_frozen_unexecuted
+  status: m0_m1_complete_m2_d0_phase1_v1a_frozen_unexecuted
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -257,9 +257,9 @@ stage_readiness:
     corpus_contract_ready: true
     corpus_contract_status: frozen_unexecuted
     corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
-    corpus_contract_sha256: e5cdc5bddc8b80eed315a06aae5cd39e78ded6cfcffd5db062bf62c869be8a76
+    corpus_contract_sha256: ab447c567502e4af900a91eb19626b4c333f212c54ccf6e935795c0ba3f28ba7
     corpus_config: configs/corpora/vngrs_m2_three_model_d0_v1.yaml
-    corpus_config_sha256: 6bd58038a738a2f678d635476d9ff02ef698c4196c118473ce3f4c3b6dde6973
+    corpus_config_sha256: 6819669ba8db04e7d41b0f3619a67477bebb6c7c3e08fd31fce2603b9e04576b
     corpus_scope: vngrs_systematic_32_shard_subcorpus
     required_models: [olmo, qwen, smollm]
     materialization_operator: locally_implemented_execution_disabled
@@ -351,24 +351,30 @@ stage_readiness:
     orchestration_sha256: a5849dad87d71a19e14dc019dc580440618b8bb32859cc9579010e9699ab3e82
     evidence_bundle_module: src/transfer_vs_relearning/corpora/vngrs/d0_bundle.py
     evidence_bundle_sha256: e278a7b6b0d2ab42e84b1e7d1695e8d9c31710240d4eefe5fc0f23b8ff71cfea
-    preflight_operator_sha256: d71b3206a6629af057ae588bec0765b5c9ee4f0c0af9f9116c054343daec8b8b
+    preflight_operator_sha256: 7c958c5e45e3f2507408f3a44af24fe4c09791574cf5190fbda2153b1182be0a
     runtime_adapter_sha256: f78a95e4a3d0567373e4b3b498e24ccd0669a4f0eebc8f61afdb9dce45bd01e7
     review_handoff_sha256: e8b2071e6bba185eede05fe61029c84bd807e8934f98b1c889bf6c2fb75c8ca8
     frozen_input_loader_sha256: d39f494fa5e90548241038c04fddbd8ab66cc0e232eb85d141b5ce400fe71761
-    production_launcher_sha256: c721e78636b643c1bbbd0106fdffbb6317cfd34a2325b610c760ae5506755389
+    production_launcher_sha256: cf8f4f7fe7b0779df2243e1ac387eb229c61e7740b447d75cce7449f42014b11
     preflight_launcher_sha256: 510fe81602a8628bcd665544ccc6f269d442f99c1c21471833283891d660a7da
     phase1_submitter_sha256: 4c01bb4e1b2590c3b3c4fd479b8ce1fea388c6d71d81e51473eee25132cd0c76
     phase2_submitter_sha256: 794f37f5a3a72bd760b1017a1eeb8c48c992e01e872c1dacf678c51a707a4d68
-    local_qualification_validation: 181_tests_passed
-    production_launcher_status: frozen_unexecuted_two_phase
+    phase1_v1a_submitter_sha256: 7cfbcd4dd15beaaf2e50ce593bdf92b2314ed7bb6abea3465c447a5ba6252737
+    phase1_v1a_slurm_sha256: bc65401edf13d3c76b3c06551253107a50dcfca591ea3b150717c088266351f2
+    local_qualification_validation: 182_tests_passed
+    production_launcher_status: frozen_unexecuted_two_phase_phase1_v1a
     human_review_handoff_status: frozen_64_packet_bound_decisions
-    phase1_execution_authorized: false
+    phase1_execution_authorized: pre_correction_authorization_consumed_no_submission
+    phase1_pre_correction_hu_targeted_tests: 45_passed
+    phase1_pre_correction_slurm_jobs_submitted: 0
+    phase1_pre_correction_network_requests: 0
+    phase1_pre_correction_output_root_created: false
     phase2_execution_authorized: false
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - vngrs_d0_phase1_exact_sha_authorization_missing
+      - vngrs_d0_phase1_v1a_exact_sha_authorization_missing
       - phase2_ineligible_until_phase1_review_packet_and_separate_authorization
       - m2_a_m2_b_matched_contract_not_frozen
       - three_m1_epoch036_parent_bindings_not_yet_frozen_in_m2_contract
@@ -1252,7 +1258,7 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: await_exact_sha_authorization_for_vngrs_d0_phase1
+  name: await_exact_sha_authorization_for_vngrs_d0_phase1_v1a
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
   m2_status: d0_frozen_unexecuted
@@ -1269,7 +1275,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_exact_vngrs_d0_phase1_materialization_wave
+  subject: authorize_exact_vngrs_d0_phase1_v1a_materialization_wave
   decision_owner: user
   start_m1_now: false
   note: >-
@@ -1285,8 +1291,10 @@ next_decision_required:
     All passes had zero HU writes and no corpus/object downloads. Storage arithmetic is now closed
     at a 32 GiB frozen peak with 40 GiB/1,024-inode fresh-preflight requirements. The local staged
     operator, exact Parquet loader, reviewed HTTPS/tokenizer adapters, atomic evidence chain and
-    typed-failure behavior passed 181 compatible tests. The two-phase D0 route is frozen and
-    unexecuted: Phase 1 awaits exact SHA-bound authorization and must stop at
+    typed-failure behavior passed 182 compatible tests. The pre-correction Phase-1 route was
+    stopped before Slurm submission because external preflight/log writes contradicted the sole
+    root. Corrected V1A keeps preflight in memory and Slurm logs off filesystem; it is frozen,
+    unexecuted and awaits a new exact SHA-bound authorization. It must stop at
     AWAITING_HUMAN_REVIEW; Phase 2 and training remain separately unauthorized.
 
 authorization:

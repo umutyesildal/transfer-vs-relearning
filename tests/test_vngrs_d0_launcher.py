@@ -25,3 +25,16 @@ def test_d0_launcher_is_exact_two_phase_and_has_no_training_or_cleanup_route() -
     assert 'afterok:${preflight_id}' in phase1_submit
     assert "--test-only" in phase1_submit and "--test-only" in phase2_submit
     assert "DECISIONS_JSONL" in phase2_submit
+
+
+def test_phase1_v1a_keeps_preflight_in_memory_and_all_slurm_logs_off_filesystem() -> None:
+    runner = (ROOT / "scripts/corpora/run_vngrs_m2_d0.py").read_text()
+    submitter = (ROOT / "scripts/corpora/submit_vngrs_m2_d0_phase1_v1a.sh").read_text()
+    slurm = (ROOT / "slurm/m2/materialize_vngrs_m2_d0_phase1_v1a.slurm").read_text()
+    preflight = (ROOT / "src/transfer_vs_relearning/corpora/vngrs/d0_preflight.py").read_text()
+    assert "collect_d0_preflight_observation(repo)" in runner
+    assert "--collect-preflight" in slurm
+    assert "--output=/dev/null --error=/dev/null" in submitter
+    assert "PREFLIGHT_JSON" not in submitter + slurm
+    assert 'job_id != current_job and name == "vngrs-m2-d0"' in preflight
+    assert "write_text" not in preflight and "write_bytes" not in preflight

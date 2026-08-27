@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 import re
+import os
+import subprocess
+from pathlib import Path
 from typing import Any, Mapping
 
 from .d0_storage import validate_storage_observation
+from .metadata import canonical_json_sha256
 
 
 EXPECTED_EVIDENCE = {
@@ -16,6 +20,52 @@ EXPECTED_EVIDENCE = {
 }
 EXPECTED_REGISTRY_SHA256 = "b1c80bf78ff40de5c02e14f08082a51cc17cc90a9853028eaf866cb63326e41f"
 HOME_LIMIT_BYTES = 30 * 1024**3
+OUTPUT_ROOT = Path("/vol/tmp2/yesildau/vngrs_m2_three_model_d0_v1")
+HOME_ROOT = Path("/vol/fob-vol6/mi25/yesildau")
+
+
+def _run(*args: str, cwd: Path | None = None, timeout: int = 120) -> str:
+    return subprocess.run(args, cwd=cwd, text=True, check=True, capture_output=True, timeout=timeout).stdout.strip()
+
+
+def collect_d0_preflight_observation(repo: str | Path, *, user: str = "yesildau") -> dict[str, Any]:
+    """Collect D0.0 evidence in memory; perform no output-root or evidence write."""
+
+    repo_path = Path(repo).resolve()
+    evidence_root = Path(EXPECTED_EVIDENCE["root"])
+    rows = [
+        {"path": str(path.relative_to(evidence_root)), "bytes": path.stat().st_size}
+        for path in sorted(evidence_root.rglob("*"))
+        if path.is_file() and not path.is_symlink()
+    ]
+    home_bytes = int(_run("du", "-x", "-B1", "-s", str(HOME_ROOT)).split()[0])
+    current_job = os.environ.get("SLURM_JOB_ID")
+    queue = _run("squeue", "-h", "-u", user, "-o", "%i|%j")
+    duplicate_jobs = sum(
+        job_id != current_job and name == "vngrs-m2-d0"
+        for job_id, name in (line.split("|", 1) for line in queue.splitlines() if "|" in line)
+    )
+    stat = os.statvfs(OUTPUT_ROOT.parent)
+    return {
+        "git_commit": _run("git", "rev-parse", "HEAD", cwd=repo_path),
+        "clean_task_overlap": not bool(_run("git", "status", "--porcelain", cwd=repo_path)),
+        "accepted_evidence": {
+            "root": str(evidence_root),
+            "regular_file_count": len(rows),
+            "regular_bytes": sum(row["bytes"] for row in rows),
+            "inventory_sha256": canonical_json_sha256(rows),
+        },
+        "source_registry_sha256": EXPECTED_REGISTRY_SHA256,
+        "hu_home_exact_bytes": home_bytes,
+        "hu_home_writes_allowed": False,
+        "duplicate_active_jobs": duplicate_jobs,
+        "storage": {
+            "resolved_parent": str(OUTPUT_ROOT.parent.resolve()),
+            "proposed_root_absent": not OUTPUT_ROOT.exists(),
+            "available_bytes": stat.f_frsize * stat.f_bavail,
+            "available_inodes": stat.f_favail,
+        },
+    }
 
 
 def validate_d0_preflight(observation: Mapping[str, Any], *, expected_commit: str) -> dict[str, Any]:

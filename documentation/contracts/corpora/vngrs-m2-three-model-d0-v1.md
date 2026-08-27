@@ -1,6 +1,6 @@
 # vngrs three-model M2 D0 corpus closure contract v1
 
-**Status:** `FROZEN / UNEXECUTED`
+**Status:** `FROZEN / UNEXECUTED — PHASE-1 OPERATIONAL CORRECTION V1A`
 **Owner:** thesis project  
 **Created:** 2026-08-27  
 **Supersedes:** none; preserves all numbered 151-series evidence
@@ -366,6 +366,36 @@ The exact Relation V2 contamination source is
 SHA-256 `9b1fcae2565fbf0d9c624a2c229c8173a59ca00064db1a017b0f2a5c0c749289`.
 It deterministically yields 100 subject surfaces and 500 fact-object surfaces. No distinct alias
 artifact exists in the frozen release, so alias count `0` is an explicit missingness boundary.
+
+## Phase-1 operational correction V1A (append-only)
+
+The first exact Phase-1 authorization was received for the pre-correction contract SHA-256
+`e5cdc5bddc8b80eed315a06aae5cd39e78ded6cfcffd5db062bf62c869be8a76` and commit
+`0492f6a449c0c730b5a03680bc47e3edaf78dc79`. The branch was ordinary non-force pushed and the HU
+checkout was preservation-checked, ancestry-verified and moved cleanly to that exact commit. HU
+targeted tests passed 45/45. No Slurm test-only or submission command and no corpus request ran.
+
+The frozen pre-correction submitter was then found to place its preflight JSON and default Slurm
+stdout/stderr outside the sole allowed fresh D0 root. Executing it would have contradicted both
+the root-absence preflight and the write-namespace rule. The wave therefore stopped before
+submission and the authorization was not reused on a modified route.
+
+V1A changes only operational evidence transport:
+
+- D0.0 observations are collected and validated in memory inside the single Phase-1 CPU job,
+  before output-root creation or source transport;
+- the running job excludes only its own exact `SLURM_JOB_ID` from the duplicate-job gate;
+- Slurm stdout/stderr are explicitly `/dev/null`; Phase-1 state, request/source ledgers and typed
+  failures remain the sole persisted execution evidence beneath the approved root;
+- the separate preflight job, external preflight JSON and pre-correction Phase-1 submitter are
+  superseded and must not run;
+- source revision/path/object identities, 10 GiB response bound, audit, split, review packet,
+  tokenizers, storage thresholds, Phase-1 stop state and every scientific prohibition are
+  unchanged.
+
+V1A preparation does not authorize publication, HU synchronization, Slurm test-only/submission,
+network retrieval or materialization. It requires a new exact SHA-bound authorization. Phase 2,
+training, cleanup and automatic retry remain forbidden.
 
 ## Authority boundary
 
