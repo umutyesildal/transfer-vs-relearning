@@ -79,6 +79,17 @@ materialization_operator:
   automatic_resume: false
   cleanup_on_failure: false
 
+source_registry_operator:
+  module: transfer_vs_relearning.corpora.vngrs.source_registry
+  function: build_source_registry_from_metadata_ledger
+  execution_enabled: false
+  expected_ledger_sha256: 6c6f27651945043ec2dfbf1b26575f416b5d38a8783d0a22320f0ffbf83d3fa3
+  expected_objects: 32
+  expected_total_bytes: 9468474036
+  lfs_oid_is_full_object_sha256: true
+  corpus_rows_read: 0
+  full_objects_downloaded: 0
+
 local_audit_operators:
   module: transfer_vs_relearning.corpora.vngrs.d0_audit
   tokenizer_inventory_module: transfer_vs_relearning.corpora.vngrs.tokenizer_inventory

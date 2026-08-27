@@ -20,18 +20,17 @@ The local fail-closed full-object operator is now implemented and offline-fixtur
 transport-injected, disabled by default, and cannot create the production root until the exact
 32-object size/SHA-256/LFS registry closes. No real corpus byte was requested or written.
 The deterministic lightweight audit, text-free 64-ID human-review selection, exact 10,000-ID
-held-out split and three-tokenizer accounting schemas are also implemented locally. Tokenizer
-assets remain unbound/unloaded, so these are validated operators rather than corpus results.
-The local M1 result dump closes all three epoch-036 parent paths and their snapshot/training/model
-manifest hashes. It does not carry per-file tokenizer asset hashes; that narrower inventory remains
-open and is not guessed from the model manifest.
-A manifest-only extractor for that inventory is now implemented and offline tested; it does not
-open tokenizer files or weights and has not been run against the HU paths.
+held-out split and three-tokenizer accounting schemas are also implemented locally. These remain
+validated operators rather than corpus results.
 The exact six-file read-only inspection is frozen separately in
 `documentation/contracts/corpora/vngrs-m2-d0-tokenizer-manifest-inventory-v1.md`; execution is
 complete and consumed. All six expected hashes matched; 5,988 compact manifest bytes were read,
 HU writes were zero, and the OLMo/Qwen/SmolLM tokenizer asset registries all closed. D0 remains
 unqualified because the 32 full-object SHA/LFS registry and storage/inode bounds are still open.
+A fail-closed local extractor for those 32 identities is now offline tested. The exact one-ledger
+plus filesystem-metadata read-only discovery contract is frozen at
+`documentation/contracts/corpora/vngrs-m2-d0-source-registry-storage-discovery-v1.md`; it is
+unexecuted and requires new exact SHA-bound user authorization.
 
 ## The short answer
 

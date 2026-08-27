@@ -291,6 +291,15 @@ corpus reads were zero. The resulting tokenizer asset-manifest hashes are OLMo
 `1f41566541c514dcebac6168f0f2f83f2b54a969c6b36db4501ae4d0683fd652`.
 This closes only the tokenizer inventory blocker; D0 remains unqualified and unexecuted.
 
+A fail-closed source-registry extractor is now locally implemented and fixture-tested. It accepts
+only the exact accepted metadata-ledger SHA, frozen 32-path order, immutable revision, positive
+object sizes and Git-LFS identities whose normalized values are exact SHA-256 strings. It derives
+the future full-object registry without reading corpus rows or downloading full objects. The real
+ledger and current scratch byte/inode capacity remain uninspected under this branch. Their exact
+single-pass, HU-read-only discovery is frozen separately in
+`documentation/contracts/corpora/vngrs-m2-d0-source-registry-storage-discovery-v1.md` and requires
+new SHA-bound user authorization.
+
 ## Authority boundary
 
 This draft authorizes local code, configuration, documentation, offline fixtures and dry-run

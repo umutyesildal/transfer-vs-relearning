@@ -86,6 +86,21 @@ def test_d0_materialization_operator_remains_explicit_and_execution_disabled() -
     assert operator["cleanup_on_failure"] is False
 
 
+def test_d0_source_registry_operator_is_exact_and_execution_disabled() -> None:
+    operator = load_config()["source_registry_operator"]
+    assert operator["module"] == "transfer_vs_relearning.corpora.vngrs.source_registry"
+    assert operator["function"] == "build_source_registry_from_metadata_ledger"
+    assert operator["execution_enabled"] is False
+    assert operator["expected_ledger_sha256"] == (
+        "6c6f27651945043ec2dfbf1b26575f416b5d38a8783d0a22320f0ffbf83d3fa3"
+    )
+    assert operator["expected_objects"] == 32
+    assert operator["expected_total_bytes"] == 9_468_474_036
+    assert operator["lfs_oid_is_full_object_sha256"] is True
+    assert operator["corpus_rows_read"] == 0
+    assert operator["full_objects_downloaded"] == 0
+
+
 def test_d0_epoch036_parent_and_tokenizer_asset_evidence_is_closed() -> None:
     accounting = load_config()["tokenizer_accounting"]
     evidence = accounting["local_binding_evidence"]

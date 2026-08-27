@@ -98,7 +98,7 @@ def _atomic_json(path: Path, value: Mapping[str, Any]) -> None:
     os.replace(temporary, path)
 
 
-def _normalized_lfs_sha256(value: str) -> str:
+def normalized_lfs_sha256(value: str) -> str:
     normalized = value.strip().strip('"').lower()
     for prefix in ("sha256:", "sha256-"):
         if normalized.startswith(prefix):
@@ -150,7 +150,7 @@ def validate_source_registry(
             raise MaterializationBlocked(f"{row.path}: missing or invalid exact object size")
         if SHA256_RE.fullmatch(row.sha256) is None:
             raise MaterializationBlocked(f"{row.path}: missing or invalid full-object SHA-256")
-        if _normalized_lfs_sha256(row.lfs_oid) != row.sha256:
+        if normalized_lfs_sha256(row.lfs_oid) != row.sha256:
             raise MaterializationBlocked(f"{row.path}: LFS identity does not bind the object SHA-256")
         total += row.size_bytes
     if total != policy.expected_total_bytes:
@@ -183,7 +183,7 @@ def _validate_response(response: FullObjectResponse, source: SourceObject) -> tu
     if (_header(response.headers, "content-encoding") or "identity").lower() != "identity":
         raise MaterializationBlocked(f"{source.path}: encoded response would break byte identity")
     response_oid = _header(response.headers, "x-linked-etag") or _header(response.headers, "etag")
-    if response_oid is None or _normalized_lfs_sha256(response_oid) != source.sha256:
+    if response_oid is None or normalized_lfs_sha256(response_oid) != source.sha256:
         raise MaterializationBlocked(f"{source.path}: response object identity drift")
     parsed = urlsplit(response.terminal_url)
     if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:

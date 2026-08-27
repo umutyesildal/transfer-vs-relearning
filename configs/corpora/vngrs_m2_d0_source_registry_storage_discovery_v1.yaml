@@ -1,0 +1,59 @@
+schema_version: 1
+contract_id: vngrs-m2-d0-source-registry-storage-discovery-v1
+status: frozen_unexecuted
+execution_authorized: false
+contract: documentation/contracts/corpora/vngrs-m2-d0-source-registry-storage-discovery-v1.md
+hu_writes: false
+remote_file_count: 1
+max_single_file_bytes: 4194304
+max_total_payload_bytes: 4194304
+automatic_retry: false
+
+metadata_ledger:
+  path: /vol/tmp2/yesildau/luna_vngrs_metadata_footer_feasibility_v1/shard_metadata_ledger.jsonl
+  sha256: 6c6f27651945043ec2dfbf1b26575f416b5d38a8783d0a22320f0ffbf83d3fa3
+  immutable_revision: ee5c6201ee84457a18182bfc483a7d8a7f3655ba
+  selected_objects: 32
+  expected_total_object_bytes: 9468474036
+  object_id_kind: lfs_oid
+  lfs_oid_is_full_object_sha256: true
+
+filesystem_observations:
+  scratch_parent: /vol/tmp2/yesildau
+  required_mount_prefix: /vol/tmp2
+  proposed_d0_root: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v1
+  proposed_root_must_be_absent: true
+  commands: [readlink_parent, root_absence_test, df_bytes, df_inodes]
+  recursive_du: false
+  directory_inventory: false
+  fresh_materialization_preflight_still_required: true
+
+home_usage_reference:
+  exact_bytes: 14689423360
+  policy_limit_bytes: 32212254720
+  measured_on: 2026-08-11
+  new_home_du_authorized: false
+  home_write_allowed: false
+
+local_derivation:
+  module: transfer_vs_relearning.corpora.vngrs.source_registry
+  function: build_source_registry_from_metadata_ledger
+  corpus_rows_read: 0
+  full_objects_downloaded: 0
+
+local_output:
+  path: artifacts/corpora/vngrs_m2_d0/source_registry_storage_discovery_v1.json
+  raw_ledger_payload_persisted: false
+
+authority:
+  hu_ssh: false
+  remote_read_only_ledger_inspection: false
+  remote_filesystem_metadata_inspection: false
+  hu_write: false
+  corpus_or_footer_read: false
+  network_download: false
+  model_or_tokenizer_access: false
+  slurm_or_gpu: false
+  training_or_evaluation: false
+  publication: false
+  cleanup_or_deletion: false

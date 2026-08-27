@@ -21,7 +21,9 @@ the master synthesis, the long timeline, or a previous chat transcript.
   transport-injected materialization operator and offline fixtures are implemented, but disabled;
 - D0 audit/split/tokenizer-accounting operators: locally implemented and offline validated;
 - tokenizer inventory: PASS for all three M1 epoch-036 parents with zero HU writes;
-- next boundary: close the exact 32-object SHA/LFS registry and storage bounds locally first;
+- source-registry extractor: locally implemented and offline validated; exact accepted ledger has
+  not been read for this step;
+- next boundary: one frozen, separately authorized read-only ledger + filesystem-metadata pass;
 - vngrs: conditional systematic 32-shard M2 input; not materialized or training-ready;
 - M2 execution: not authorized; external materialization requires a later frozen SHA-bound
   contract and separate explicit user authorization.
