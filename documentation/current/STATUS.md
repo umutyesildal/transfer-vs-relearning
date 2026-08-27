@@ -19,6 +19,9 @@ systematic 32-shard subcorpus. No corpus retrieval/materialization or M2 trainin
 The local fail-closed full-object operator is now implemented and offline-fixture validated. It is
 transport-injected, disabled by default, and cannot create the production root until the exact
 32-object size/SHA-256/LFS registry closes. No real corpus byte was requested or written.
+The deterministic lightweight audit, text-free 64-ID human-review selection, exact 10,000-ID
+held-out split and three-tokenizer accounting schemas are also implemented locally. Tokenizer
+assets remain unbound/unloaded, so these are validated operators rather than corpus results.
 
 ## The short answer
 

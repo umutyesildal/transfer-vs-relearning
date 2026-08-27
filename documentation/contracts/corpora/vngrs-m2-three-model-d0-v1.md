@@ -239,7 +239,8 @@ Before this draft can become `qualified`:
    locally complete in `transfer_vs_relearning.corpora.vngrs.materialization`; the operator has
    no implicit network client, is execution-disabled by default and passed offline fixtures;
 2. bind per-shard expected size plus immutable object/LFS SHA-256 from accepted evidence;
-3. implement deterministic lightweight audit, split and tokenizer accounting outputs;
+3. ~~implement deterministic lightweight audit, split and tokenizer accounting outputs~~ —
+   locally complete as execution-disabled, transport-injected operators and offline fixtures;
 4. validate config against `FROZEN_SELECTED_SHARD_PATHS` and current model revisions;
 5. run the full compatible offline test suite;
 6. freeze code/config/contract hashes and expected storage/inode bounds.
@@ -251,7 +252,6 @@ authorization.
 
 - exact per-shard full-object/LFS SHA-256 registry is not locally closed;
 - exact tokenizer asset manifests/paths must be rebound from preserved M1 evidence;
-- lightweight audit and 64-document review schemas are not implemented;
 - scratch free-space/inode and peak-storage requirements are not yet measured;
 - contract, config and implementation hashes are not frozen.
 
@@ -265,6 +265,13 @@ full verification. A failed object remains typed evidence and is never published
 
 This checkpoint does not provide the missing real 32-object hash registry and does not enable the
 operator, network access or materialization.
+
+The second local checkpoint implements OSCAR/mC4 byte/document composition, the five frozen regex
+groups, exact and Unicode-normalized synthetic scans, normalized-text duplicate summaries, a
+text-free stratified 64-ID human-review sample, the exact hash-ranked 10,000-document held-out
+split and three model-specific tokenizer-accounting reports. The tokenizer layer accepts only the
+frozen OLMo/Qwen/SmolLM identities and requires a common raw document-ID hash, but deliberately
+does not impose cross-model token-count equality. No tokenizer asset was loaded by this checkpoint.
 
 ## Authority boundary
 

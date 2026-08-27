@@ -79,6 +79,17 @@ materialization_operator:
   automatic_resume: false
   cleanup_on_failure: false
 
+local_audit_operators:
+  module: transfer_vs_relearning.corpora.vngrs.d0_audit
+  execution_enabled: false
+  corpus_rows_available: false
+  tokenizer_assets_available: false
+  heldout_selection_exact_count: true
+  heldout_selection_order_independent: true
+  human_review_selection_text_free: true
+  tokenizer_transport_injected: true
+  tokenizer_model_weights_loaded: false
+
 light_audit:
   human_review_documents: 64
   human_review_seed: 42

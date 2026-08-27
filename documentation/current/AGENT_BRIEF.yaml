@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: abc03ced439482d904e55c1f9f60e093fd341c57e9894fd4176195406b725ed9
+  full_state_sha256: ed2d7b51e274daa8874483582eb8c6973c3e717d80280d934c282c3547c9eb52
   role: context_projection_only
   may_expand_authority: false
 
@@ -34,6 +34,7 @@ stage_readiness:
   m1_execution: complete_111_of_111
   m2_corpus_contract: draft_execution_disabled
   m2_materialization_operator: locally_implemented_execution_disabled_offline_fixture_validated
+  m2_audit_split_tokenizer_operators: locally_implemented_execution_disabled_offline_fixture_validated
   m2_required_models: [olmo, qwen, smollm]
   m2_sibling_training_contract: not_frozen
 

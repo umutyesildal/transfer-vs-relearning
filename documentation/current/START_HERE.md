@@ -19,6 +19,7 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - M1: training and eval-v2 complete at 111/111 states;
 - current boundary: local three-model vngrs D0 qualification work only; the fail-closed,
   transport-injected materialization operator and offline fixtures are implemented, but disabled;
+- D0 audit/split/tokenizer-accounting operators: locally implemented and offline validated;
 - vngrs: conditional systematic 32-shard M2 input; not materialized or training-ready;
 - M2 execution: not authorized; external materialization requires a later frozen SHA-bound
   contract and separate explicit user authorization.

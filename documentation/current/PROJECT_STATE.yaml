@@ -257,15 +257,19 @@ stage_readiness:
     corpus_contract_ready: false
     corpus_contract_status: draft_execution_disabled
     corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
-    corpus_contract_sha256: ab41c80b73ba5f3520b52555bb292a1323b402a6618785ea7942caeb3a781350
+    corpus_contract_sha256: b5abceaabc9ff103f279c7796262049365b670f5835e6b4c089d7b8288312390
     corpus_config: configs/corpora/vngrs_m2_three_model_d0_v1.yaml
-    corpus_config_sha256: 41e141144b68d687b5e70be25bef798a1a288ce017208f2ef2ff02f625e619a9
+    corpus_config_sha256: 8814be575dfd73a6c6b4ccb802f2eb64d5b3d25916b6f9d00ca8eb8ee9823899
     corpus_scope: vngrs_systematic_32_shard_subcorpus
     required_models: [olmo, qwen, smollm]
     materialization_operator: locally_implemented_execution_disabled
     materialization_operator_module: src/transfer_vs_relearning/corpora/vngrs/materialization.py
     materialization_operator_sha256: 1998e3268e0c0df0ef69d1abccaa3e1eb84f2eb9618bfeb8d338d4df1d37bb1c
     materialization_operator_validation: offline_fixture_suite_passed
+    local_audit_operator: locally_implemented_execution_disabled
+    local_audit_operator_module: src/transfer_vs_relearning/corpora/vngrs/d0_audit.py
+    local_audit_operator_sha256: 5d34cbb5dad11afaf5546edeed8ef374da14290127ec2e7e4553c48d1175b65c
+    local_audit_operator_validation: offline_fixture_suite_passed
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false

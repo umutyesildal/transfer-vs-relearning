@@ -30,6 +30,7 @@ from .materialization import (
     materialize_full_objects,
     validate_source_registry,
 )
+from .d0_audit import D0Document, exact_heldout_split, human_review_sample, lightweight_audit, tokenizer_accounting
 from .outputs import FINAL_AUDIT, OUTPUT_ARTIFACT_MANIFEST, OUTPUT_ORDER, serialize_output_artifact_manifest
 from .pipeline import FailClosedLidAdapter, VngrsPreparationConfig, evaluate_final_contract, prepare_records
 from .records import source_identity_key
@@ -37,6 +38,7 @@ from .sampling import largest_remainder_allocation, midpoint_systematic_position
 
 __all__ = [
     "FailClosedLidAdapter",
+    "D0Document",
     "FullObjectResponse",
     "FINAL_AUDIT",
     "FROZEN_SELECTED_SHARD_PATHS",
@@ -53,14 +55,18 @@ __all__ = [
     "VngrsPreparationConfig",
     "build_shard_paths",
     "evaluate_final_contract",
+    "exact_heldout_split",
+    "human_review_sample",
     "largest_remainder_allocation",
     "midpoint_systematic_positions",
     "materialize_full_objects",
+    "lightweight_audit",
     "immutable_resolve_url",
     "prepare_records",
     "select_systematic_shards",
     "serialize_output_artifact_manifest",
     "source_identity_key",
+    "tokenizer_accounting",
     "validate_final_evidence_relationships",
     "validate_final_source_evidence",
     "validate_record_manifest",
