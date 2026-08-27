@@ -27,6 +27,9 @@ manifest hashes. It does not carry per-file tokenizer asset hashes; that narrowe
 open and is not guessed from the model manifest.
 A manifest-only extractor for that inventory is now implemented and offline tested; it does not
 open tokenizer files or weights and has not been run against the HU paths.
+The exact six-file read-only inspection is frozen separately in
+`documentation/contracts/corpora/vngrs-m2-d0-tokenizer-manifest-inventory-v1.md`; execution remains
+unauthorized until the user approves its final SHA-256 explicitly.
 
 ## The short answer
 

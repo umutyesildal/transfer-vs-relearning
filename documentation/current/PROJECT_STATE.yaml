@@ -274,12 +274,19 @@ stage_readiness:
     tokenizer_asset_file_inventory: unresolved_not_fabricated
     tokenizer_inventory_operator: locally_implemented_manifest_only_execution_disabled
     tokenizer_inventory_operator_sha256: 6a8de74f939107c5954081a44af36b57d56ea0c83aaddb8a7e0287982451c2e3
+    tokenizer_inventory_contract_status: frozen_unexecuted
+    tokenizer_inventory_contract: documentation/contracts/corpora/vngrs-m2-d0-tokenizer-manifest-inventory-v1.md
+    tokenizer_inventory_contract_sha256: 4f21ec7201734e1d7a2e950f31bad3246f0620523622e0c305e1f3eea252ab2e
+    tokenizer_inventory_config: configs/corpora/vngrs_m2_d0_tokenizer_manifest_inventory_v1.yaml
+    tokenizer_inventory_config_sha256: dc55b0b723c13af66ba4d9455688e2fcb1fefd72b2e41adfe6e5415ccccf8ae9
+    tokenizer_inventory_execution_authorized: false
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
       - vngrs_d0_full_object_registry_not_closed
       - vngrs_d0_tokenizer_asset_file_inventory_not_closed
+      - vngrs_d0_tokenizer_manifest_inventory_awaits_exact_authorization
       - vngrs_d0_storage_preflight_not_measured
       - vngrs_corpus_contract_not_qualified_or_frozen
       - m2_a_m2_b_matched_contract_not_frozen
@@ -1183,16 +1190,16 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: qualify_three_model_vngrs_d0_contract_before_external_materialization
+  subject: authorize_exact_six_file_read_only_tokenizer_manifest_inventory
   decision_owner: user
   start_m1_now: false
   note: >-
     M0 and the matched three-model M1 training/eval-v2 family are complete. The user selected
     OLMo, Qwen and SmolLM as mandatory M2-A/M2-B training models, with no single primary model.
-    The current local boundary is the execution-disabled vngrs systematic 32-shard D0 corpus
-    contract plus offline implementation/tests. Network retrieval, corpus materialization,
-    HU/SSH, tokenizer/model access on HU, Slurm/GPU, training and evaluation require a later
-    qualified/frozen exact contract and separate explicit authorization.
+    The next bounded decision is whether to authorize the frozen six-file manifest-only tokenizer
+    inventory contract. It permits no HU writes and no tokenizer/model/corpus file access beyond
+    the exact compact manifests. Network retrieval, corpus materialization, broader HU/SSH,
+    Slurm/GPU, training and evaluation remain separately unauthorized.
 
 authorization:
   local_repository_changes: require_current_user_instruction

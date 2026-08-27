@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 1f741c5c6921fe7644b5fbc285ddbb59bd7b227ada7ecbc8c5e52d7a031852c2
+  full_state_sha256: b2ace61350f4de90c7954abee13b566a9e488cc061b03d78fc8d5fcd17241fa1
   role: context_projection_only
   may_expand_authority: false
 
@@ -64,15 +64,15 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: qualify_three_model_vngrs_d0_contract_before_external_materialization
-  contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
-  config: configs/corpora/vngrs_m2_three_model_d0_v1.yaml
+  subject: authorize_exact_six_file_read_only_tokenizer_manifest_inventory
+  contract: documentation/contracts/corpora/vngrs-m2-d0-tokenizer-manifest-inventory-v1.md
+  config: configs/corpora/vngrs_m2_d0_tokenizer_manifest_inventory_v1.yaml
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user
     - offline_tests_and_dry_runs
     - execution_disabled_contract_preparation
   not_implied:
-    - hu_or_ssh
+    - hu_or_ssh_without_new_exact_sha_bound_authorization
     - slurm_or_gpu
     - model_training
     - evaluation_or_scoring

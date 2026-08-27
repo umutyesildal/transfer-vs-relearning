@@ -1,0 +1,53 @@
+schema_version: 1
+contract_id: vngrs-m2-d0-tokenizer-manifest-inventory-v1
+status: frozen_unexecuted
+execution_authorized: false
+contract: documentation/contracts/corpora/vngrs-m2-d0-tokenizer-manifest-inventory-v1.md
+hu_writes: false
+remote_file_count: 6
+max_single_file_bytes: 1048576
+max_total_payload_bytes: 6291456
+automatic_retry: false
+
+models:
+  olmo:
+    snapshot_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/olmo/20260822T155242Z_m1_matched_epoch_dense_olmo_seed42_30cd6396/epoch_snapshots/epoch-036
+    snapshot_manifest:
+      path: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/olmo/20260822T155242Z_m1_matched_epoch_dense_olmo_seed42_30cd6396/epoch_snapshots/epoch-036/snapshot_manifest.json
+      sha256: 0226c6b0c70415c3f31049e275fa78bfe9b155af60819664bdfe4ae730ae0a57
+    model_manifest:
+      path: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/bindings/olmo/model_manifests/epoch-036.json
+      sha256: e005a926daf95a051832438988df4c6416afe1276de2b9ba4c6574d3f92356b9
+  qwen:
+    snapshot_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/qwen/20260822T155241Z_m1_matched_epoch_dense_qwen_seed42_7c56e187/epoch_snapshots/epoch-036
+    snapshot_manifest:
+      path: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/qwen/20260822T155241Z_m1_matched_epoch_dense_qwen_seed42_7c56e187/epoch_snapshots/epoch-036/snapshot_manifest.json
+      sha256: f4d839f49672c999dc3c0cf9cbdac0caf139c9a385cbf85366a161d6d998d831
+    model_manifest:
+      path: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/bindings/qwen/model_manifests/epoch-036.json
+      sha256: e9d5bd7245ae3c22397fca30edd1489d218983f20998f986dd434efd99810dee
+  smollm:
+    snapshot_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/smollm/20260822T155242Z_m1_matched_epoch_dense_smollm_seed42_081e6e29/epoch_snapshots/epoch-036
+    snapshot_manifest:
+      path: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/smollm/20260822T155242Z_m1_matched_epoch_dense_smollm_seed42_081e6e29/epoch_snapshots/epoch-036/snapshot_manifest.json
+      sha256: 9ba7cdec401f5c5f9e334a3fc75e5ea5c5899f78f78219e24bdf5c6f0712da7c
+    model_manifest:
+      path: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/bindings/smollm/model_manifests/epoch-036.json
+      sha256: 235bfb12a85d3c1196126349c6b11892ca5d2b4e2aac1cfcac251695bdf9c3ad
+
+local_output:
+  path: artifacts/corpora/vngrs_m2_d0/tokenizer_manifest_inventory_v1.json
+  raw_manifest_payloads_persisted: false
+
+authority:
+  hu_ssh: false
+  remote_read_only_manifest_inspection: false
+  hu_write: false
+  model_or_tokenizer_asset_read: false
+  corpus_access: false
+  network_download: false
+  slurm_or_gpu: false
+  training_or_evaluation: false
+  publication: false
+  cleanup_or_deletion: false
+
