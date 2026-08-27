@@ -278,6 +278,12 @@ and model-manifest SHA-256. It does not contain the per-file tokenizer asset inv
 parent bindings are recorded without fabricating a tokenizer asset-manifest hash. Closing that
 last layer requires a separately authorized read-only inventory of the preserved M1 roots.
 
+A manifest-only tokenizer inventory extractor is now locally implemented and fixture-tested. It
+verifies the raw snapshot/model-manifest payload hashes, exact epoch-036 root binding and a closed
+tokenizer filename allowlist, then derives a canonical tokenizer asset-manifest hash from declared
+rows. It opens neither tokenizer assets nor model weights. The real three-model outputs remain
+unresolved until the preserved manifest payloads are read under separate authority.
+
 ## Authority boundary
 
 This draft authorizes local code, configuration, documentation, offline fixtures and dry-run

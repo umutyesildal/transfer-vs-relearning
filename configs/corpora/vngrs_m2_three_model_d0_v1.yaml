@@ -81,6 +81,7 @@ materialization_operator:
 
 local_audit_operators:
   module: transfer_vs_relearning.corpora.vngrs.d0_audit
+  tokenizer_inventory_module: transfer_vs_relearning.corpora.vngrs.tokenizer_inventory
   execution_enabled: false
   corpus_rows_available: false
   tokenizer_assets_available: false
@@ -89,6 +90,7 @@ local_audit_operators:
   human_review_selection_text_free: true
   tokenizer_transport_injected: true
   tokenizer_model_weights_loaded: false
+  tokenizer_inventory_manifest_only: true
 
 light_audit:
   human_review_documents: 64

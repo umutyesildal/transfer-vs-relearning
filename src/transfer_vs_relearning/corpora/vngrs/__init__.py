@@ -31,6 +31,7 @@ from .materialization import (
     validate_source_registry,
 )
 from .d0_audit import D0Document, exact_heldout_split, human_review_sample, lightweight_audit, tokenizer_accounting
+from .tokenizer_inventory import extract_tokenizer_inventory
 from .outputs import FINAL_AUDIT, OUTPUT_ARTIFACT_MANIFEST, OUTPUT_ORDER, serialize_output_artifact_manifest
 from .pipeline import FailClosedLidAdapter, VngrsPreparationConfig, evaluate_final_contract, prepare_records
 from .records import source_identity_key
@@ -56,6 +57,7 @@ __all__ = [
     "build_shard_paths",
     "evaluate_final_contract",
     "exact_heldout_split",
+    "extract_tokenizer_inventory",
     "human_review_sample",
     "largest_remainder_allocation",
     "midpoint_systematic_positions",

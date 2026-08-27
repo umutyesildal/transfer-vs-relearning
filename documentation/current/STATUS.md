@@ -25,6 +25,8 @@ assets remain unbound/unloaded, so these are validated operators rather than cor
 The local M1 result dump closes all three epoch-036 parent paths and their snapshot/training/model
 manifest hashes. It does not carry per-file tokenizer asset hashes; that narrower inventory remains
 open and is not guessed from the model manifest.
+A manifest-only extractor for that inventory is now implemented and offline tested; it does not
+open tokenizer files or weights and has not been run against the HU paths.
 
 ## The short answer
 
