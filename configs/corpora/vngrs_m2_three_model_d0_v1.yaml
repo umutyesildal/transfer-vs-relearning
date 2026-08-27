@@ -151,6 +151,10 @@ final_orchestration:
   phase1_corrected_submitter: scripts/corpora/submit_vngrs_m2_d0_phase1_v1a.sh
   phase1_corrected_slurm: slurm/m2/materialize_vngrs_m2_d0_phase1_v1a.slurm
   superseded_phase1_submitter_must_not_run: scripts/corpora/submit_vngrs_m2_d0_phase1.sh
+  phase1_v1a_result: operational_not_run_exact_home_du_timeout_before_root_or_network
+  phase1_v1a_job_id: 481608
+  phase1_v1b_correction: exact_home_du_timeout_300_seconds_and_slurm_comment_evidence
+  phase1_v1b_execution_authorized: false
 
 synthetic_surface_registry:
   source: artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/validation.jsonl

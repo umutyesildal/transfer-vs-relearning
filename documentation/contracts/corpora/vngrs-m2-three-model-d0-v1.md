@@ -1,6 +1,6 @@
 # vngrs three-model M2 D0 corpus closure contract v1
 
-**Status:** `FROZEN / UNEXECUTED — PHASE-1 OPERATIONAL CORRECTION V1A`
+**Status:** `FROZEN / UNEXECUTED — PHASE-1 OPERATIONAL CORRECTION V1B`
 **Owner:** thesis project  
 **Created:** 2026-08-27  
 **Supersedes:** none; preserves all numbered 151-series evidence
@@ -396,6 +396,31 @@ V1A changes only operational evidence transport:
 V1A preparation does not authorize publication, HU synchronization, Slurm test-only/submission,
 network retrieval or materialization. It requires a new exact SHA-bound authorization. Phase 2,
 training, cleanup and automatic retry remain forbidden.
+
+### Phase-1 V1A execution result and V1B correction
+
+V1A was subsequently authorized, ordinary non-force pushed and preservation-checked
+fast-forwarded on HU at commit `b42b367c39de556366ddf7bb5b37cb0b1d19deea`. HU targeted tests
+passed 46/46. The single Phase-1 job was `481608`; it ran on `gruenau10` for `00:02:10` and ended
+`FAILED / NonZeroExitCode / 1:0` before output-root creation. The root remained absent, no corpus
+request or object download began, no Phase-1 evidence artifact was written, and no duplicate job
+remained. `sacct` was unavailable because of the preserved Munge/SlurmDBD authentication failure.
+
+The elapsed time and exact preflight command sequence identify the bounded 120-second
+`du -x -B1 -s` HU-home measurement timeout as the operational stop. This is `NOT_RUN` preflight
+evidence, not a corpus-quality result. The V1A authorization is consumed and permits no retry.
+
+V1B changes only two operational observability fields:
+
+- the same exact-byte HU-home command receives a 300-second timeout; its 30 GiB threshold and
+  byte semantics do not change;
+- pre-root failure or successful `AWAITING_HUMAN_REVIEW` status is recorded in the current Slurm
+  job's bounded `Comment` metadata, without creating a filesystem log or alternate evidence root.
+
+No source, HTTP, storage, audit, split, review, tokenizer or scientific field changes. V1B is
+frozen and unexecuted; it requires a new exact SHA-bound authorization plus authorization to push
+and HU fast-forward its new commit. Phase 2, training, cleanup and automatic retry remain
+forbidden.
 
 ## Authority boundary
 

@@ -5,6 +5,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import re
+import subprocess
 from pathlib import Path
 
 import yaml
@@ -23,6 +26,23 @@ SURFACES_SHA256 = "9b1fcae2565fbf0d9c624a2c229c8173a59ca00064db1a017b0f2a5c0c749
 
 def _jsonl(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
+
+
+def _slurm_comment(value: str) -> None:
+    job_id = os.environ.get("SLURM_JOB_ID")
+    if not job_id:
+        return
+    safe = re.sub(r"[^A-Za-z0-9_.:-]+", "_", value)[:240]
+    try:
+        subprocess.run(
+            ["scontrol", "update", f"JobId={job_id}", f"Comment={safe}"],
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=15,
+        )
+    except (OSError, subprocess.SubprocessError):
+        pass
 
 
 def main() -> int:
@@ -48,24 +68,29 @@ def main() -> int:
     if args.phase == "phase1":
         if args.decisions_jsonl is not None or (args.preflight_json is None) == (not args.collect_preflight):
             raise ValueError("phase1 requires exactly one reviewed preflight source")
-        observation = (
-            collect_d0_preflight_observation(repo)
-            if args.collect_preflight
-            else json.loads(args.preflight_json.read_text(encoding="utf-8"))
-        )
-        preflight = validate_d0_preflight(
-            observation,
-            expected_commit=args.expected_commit,
-        )
-        result = run_d0_phase1(
-            OUTPUT_ROOT,
-            objects,
-            transport=ReviewedHttpsTransport(),
-            preflight=preflight,
-            synthetic_surfaces=surfaces,
-            policy=policy,
-            materialization_policy=MaterializationPolicy(execution_enabled=True),
-        )
+        try:
+            observation = (
+                collect_d0_preflight_observation(repo)
+                if args.collect_preflight
+                else json.loads(args.preflight_json.read_text(encoding="utf-8"))
+            )
+            preflight = validate_d0_preflight(
+                observation,
+                expected_commit=args.expected_commit,
+            )
+            result = run_d0_phase1(
+                OUTPUT_ROOT,
+                objects,
+                transport=ReviewedHttpsTransport(),
+                preflight=preflight,
+                synthetic_surfaces=surfaces,
+                policy=policy,
+                materialization_policy=MaterializationPolicy(execution_enabled=True),
+            )
+        except Exception as exc:
+            _slurm_comment(f"D0_PHASE1_BLOCKED:{type(exc).__name__}:{exc}")
+            raise
+        _slurm_comment("D0_PHASE1_AWAITING_HUMAN_REVIEW")
     else:
         if args.decisions_jsonl is None or args.preflight_json is not None:
             raise ValueError("phase2 requires only --decisions-jsonl")

@@ -38,7 +38,7 @@ def collect_d0_preflight_observation(repo: str | Path, *, user: str = "yesildau"
         for path in sorted(evidence_root.rglob("*"))
         if path.is_file() and not path.is_symlink()
     ]
-    home_bytes = int(_run("du", "-x", "-B1", "-s", str(HOME_ROOT)).split()[0])
+    home_bytes = int(_run("du", "-x", "-B1", "-s", str(HOME_ROOT), timeout=300).split()[0])
     current_job = os.environ.get("SLURM_JOB_ID")
     queue = _run("squeue", "-h", "-u", user, "-o", "%i|%j")
     duplicate_jobs = sum(

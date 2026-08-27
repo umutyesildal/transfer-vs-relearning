@@ -62,8 +62,12 @@ production HU preflight, reviewed HTTPS/tokenizer adapters and explicit two-phas
 human-review handoff are frozen. The pre-correction branch was pushed and HU tests passed 45/45,
 but submission was stopped before any Slurm job when the launcher was found to write preflight/log
 files outside the sole allowed root. No corpus request or output root occurred. Corrected V1A
-keeps preflight in memory, suppresses filesystem Slurm logs and passed 182 compatible tests. It is
-unexecuted and awaits a new exact SHA authorization; it must stop at `AWAITING_HUMAN_REVIEW`.
+kept preflight in memory and suppressed filesystem Slurm logs; HU targeted tests passed 46/46.
+Its single job `481608` ran for `00:02:10` and stopped before output-root creation or network access
+when the exact HU-home `du` exceeded its 120-second timeout. This is operational `NOT_RUN`
+evidence, and the V1A authorization is consumed. Frozen V1B changes only that timeout to 300
+seconds and adds bounded best-effort Slurm-comment status evidence; 183 compatible tests pass.
+V1B is unexecuted and awaits a new exact SHA authorization; it must stop at `AWAITING_HUMAN_REVIEW`.
 Phase 2 is separately gated by the exact
 review-packet hash and a later authorization.
 
@@ -177,7 +181,7 @@ an M1 training input. `trwiki-20260601` remains the Turkish cross-domain control
 
 The completed M1 family is terminal evidence. No duplicate submission, cleanup, deletion,
 M2-A/M2-B execution, or primary-model promotion is implied. The active local boundary is to
-authorize only the exact frozen Phase-1 vngrs D0 materialization wave. Phase 2 and every M2
+authorize only the exact frozen Phase-1 V1B vngrs D0 materialization wave. Phase 2 and every M2
 training action remain separate future authorization boundaries.
 
 ## Read next
