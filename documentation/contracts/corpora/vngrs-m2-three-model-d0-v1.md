@@ -1,6 +1,6 @@
 # vngrs three-model M2 D0 corpus closure contract v1
 
-**Status:** `FROZEN / UNEXECUTED — PHASE-1 OPERATIONAL CORRECTION V1B`
+**Status:** `FROZEN / UNEXECUTED — PHASE-1 OPERATIONAL CORRECTION V1C`
 **Owner:** thesis project  
 **Created:** 2026-08-27  
 **Supersedes:** none; preserves all numbered 151-series evidence
@@ -421,6 +421,40 @@ No source, HTTP, storage, audit, split, review, tokenizer or scientific field ch
 frozen and unexecuted; it requires a new exact SHA-bound authorization plus authorization to push
 and HU fast-forward its new commit. Phase 2, training, cleanup and automatic retry remain
 forbidden.
+
+### Phase-1 V1B execution result and V1C correction
+
+V1B was subsequently authorized, ordinary non-force pushed and preservation-checked
+fast-forwarded on HU at commit `98fae2a7629d738dd820f4d234dace6717b0e3a0`. The full compatible HU
+suite passed 183/183 and shell syntax passed. The submitter's test-only plan used transient
+scheduler identifier `481710`; the one real Phase-1 job was `481711`. It was submitted at
+`2026-08-27T21:17:56+02:00`, remained pending for resources, and began on `gruenau4` at
+`2026-08-27T22:54:03+02:00`.
+
+At `2026-08-27T23:11:57+02:00`, `481711` was no longer present in `squeue` or `scontrol`, no
+matching D0 job remained and the output root was absent. Therefore no corpus request, object
+download, materialization output or human-review packet existed. The successful Phase-1 terminal
+state was not reached. `sacct` remained unavailable because of the preserved Munge/SlurmDBD
+authentication failure. The bounded Slurm `Comment` was also unavailable after controller purge,
+so the exact pre-root exception was not durably recoverable. This is operational `NOT_RUN`, not a
+corpus result; the V1B authorization is consumed and permits no retry.
+
+V1C changes only terminal evidence handling for a pre-root exception:
+
+- after a pre-network exception and only while the exact approved output root remains absent, the
+  runner creates that sole root and atomically writes `control/preflight_failure.json`;
+- the compact record binds the implementation commit, Slurm job ID, typed exception and message,
+  `network_requests=0`, `source_objects_written=0`, `ready_to_train=false` and
+  `automatic_retry_authorized=false`;
+- root and artifact creation refuse overwrite/reuse and the approved scratch-parent binding is
+  checked before any write;
+- if materialization has already created the root, the existing materialization/orchestration
+  failure evidence remains authoritative and V1C writes no competing preflight record.
+
+The same 300-second exact-byte HU-home command, every source identity, storage threshold, HTTP
+bound, audit, split, review and tokenizer rule remain unchanged. V1C is frozen and unexecuted; it
+requires a new exact SHA-bound authorization plus authorization to push and HU fast-forward its
+new commit. Phase 2, training, cleanup and automatic retry remain forbidden.
 
 ## Authority boundary
 

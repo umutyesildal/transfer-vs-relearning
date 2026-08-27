@@ -49,3 +49,14 @@ def test_phase1_v1b_extends_only_home_du_timeout_and_persists_scheduler_status()
     assert '["scontrol", "update"' in runner
     assert "timeout=15" in runner
     assert "except (OSError, subprocess.SubprocessError)" in runner
+
+
+def test_phase1_v1c_persists_pre_root_failure_under_the_sole_approved_root() -> None:
+    runner = (ROOT / "scripts/corpora/run_vngrs_m2_d0.py").read_text()
+    preflight = (ROOT / "src/transfer_vs_relearning/corpora/vngrs/d0_preflight.py").read_text()
+    assert "write_preflight_failure(expected_commit=args.expected_commit, error=exc)" in runner
+    assert '"BLOCKED_OPERATIONAL_PREFLIGHT"' in preflight
+    assert '"network_requests": 0' in preflight
+    assert '"source_objects_written": 0' in preflight
+    assert 'control / "preflight_failure.json"' in preflight
+    assert "exist_ok=False" in preflight

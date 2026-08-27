@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-import re
+import json
 import os
+import re
 import subprocess
 from pathlib import Path
 from typing import Any, Mapping
@@ -20,7 +21,8 @@ EXPECTED_EVIDENCE = {
 }
 EXPECTED_REGISTRY_SHA256 = "b1c80bf78ff40de5c02e14f08082a51cc17cc90a9853028eaf866cb63326e41f"
 HOME_LIMIT_BYTES = 30 * 1024**3
-OUTPUT_ROOT = Path("/vol/tmp2/yesildau/vngrs_m2_three_model_d0_v1")
+APPROVED_SCRATCH_PARENT = Path("/vol/tmp2/yesildau")
+OUTPUT_ROOT = APPROVED_SCRATCH_PARENT / "vngrs_m2_three_model_d0_v1"
 HOME_ROOT = Path("/vol/fob-vol6/mi25/yesildau")
 
 
@@ -101,3 +103,42 @@ def validate_d0_preflight(observation: Mapping[str, Any], *, expected_commit: st
         "storage": storage,
         "ready_to_train": False,
     }
+
+
+def write_preflight_failure(*, expected_commit: str, error: Exception) -> dict[str, Any]:
+    """Persist one terminal pre-root failure beneath the sole approved D0 root."""
+
+    if re.fullmatch(r"[0-9a-f]{40}", expected_commit) is None:
+        raise ValueError("expected implementation commit is not an exact Git SHA")
+    if OUTPUT_ROOT.parent.resolve() != APPROVED_SCRATCH_PARENT.resolve():
+        raise ValueError("preflight failure root escaped approved scratch")
+    failure = {
+        "schema_version": 1,
+        "status": "BLOCKED_OPERATIONAL_PREFLIGHT",
+        "phase": "d0_preflight",
+        "error_type": type(error).__name__,
+        "message": str(error),
+        "git_commit": expected_commit,
+        "slurm_job_id": os.environ.get("SLURM_JOB_ID"),
+        "network_requests": 0,
+        "source_objects_written": 0,
+        "ready_to_train": False,
+        "automatic_retry_authorized": False,
+    }
+    payload = json.dumps(
+        failure,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode() + b"\n"
+    OUTPUT_ROOT.mkdir(parents=False, exist_ok=False)
+    control = OUTPUT_ROOT / "control"
+    control.mkdir(exist_ok=False)
+    target = control / "preflight_failure.json"
+    temporary = target.with_name(target.name + ".partial")
+    with temporary.open("xb") as handle:
+        handle.write(payload)
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(temporary, target)
+    return failure

@@ -65,9 +65,13 @@ files outside the sole allowed root. No corpus request or output root occurred. 
 kept preflight in memory and suppressed filesystem Slurm logs; HU targeted tests passed 46/46.
 Its single job `481608` ran for `00:02:10` and stopped before output-root creation or network access
 when the exact HU-home `du` exceeded its 120-second timeout. This is operational `NOT_RUN`
-evidence, and the V1A authorization is consumed. Frozen V1B changes only that timeout to 300
-seconds and adds bounded best-effort Slurm-comment status evidence; 183 compatible tests pass.
-V1B is unexecuted and awaits a new exact SHA authorization; it must stop at `AWAITING_HUMAN_REVIEW`.
+evidence, and the V1A authorization is consumed. V1B changed only that timeout to 300 seconds and
+added bounded best-effort Slurm-comment status evidence. Its single job `481711` started on
+`gruenau4` but stopped before root creation or network access; after controller purge the comment
+was unavailable and broken `sacct` could not recover the exact exception. V1B is operational
+`NOT_RUN` and its authorization is consumed. Frozen V1C adds only atomic typed pre-root failure
+evidence beneath the sole approved root; 185 compatible tests pass. V1C is unexecuted and awaits a
+new exact SHA authorization; it must stop at `AWAITING_HUMAN_REVIEW`.
 Phase 2 is separately gated by the exact
 review-packet hash and a later authorization.
 
@@ -181,7 +185,7 @@ an M1 training input. `trwiki-20260601` remains the Turkish cross-domain control
 
 The completed M1 family is terminal evidence. No duplicate submission, cleanup, deletion,
 M2-A/M2-B execution, or primary-model promotion is implied. The active local boundary is to
-authorize only the exact frozen Phase-1 V1B vngrs D0 materialization wave. Phase 2 and every M2
+authorize only the exact frozen Phase-1 V1C vngrs D0 materialization wave. Phase 2 and every M2
 training action remain separate future authorization boundaries.
 
 ## Read next

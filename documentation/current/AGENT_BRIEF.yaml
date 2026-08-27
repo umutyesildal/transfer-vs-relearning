@@ -5,20 +5,20 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 4e60acef92842248a7d5d24918c1262a18814b7d17034307ac984bf5ee37fa49
+  full_state_sha256: 7df7dc44870484a4007adfa8f7c090dc3c217d798e34ca66849e060642706312
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: m2_d0_phase1_v1a_operational_not_run_v1b_frozen_awaiting_authorization
+  phase: m2_d0_phase1_v1b_operational_not_run_v1c_frozen_awaiting_authorization
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: frozen_unexecuted_phase1_v1b
+  corpus_contract: frozen_unexecuted_phase1_v1c
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -32,7 +32,7 @@ stage_readiness:
   m1_evaluation_adapter_and_contract: frozen_v3_single_a100_pool_terminal_complete_111_of_111
   m1_first_wave_cancelled_by_user_before_any_scientific_result: true
   m1_execution: complete_111_of_111
-  m2_corpus_contract: frozen_unexecuted_phase1_v1b
+  m2_corpus_contract: frozen_unexecuted_phase1_v1c
   m2_materialization_operator: locally_implemented_execution_disabled_offline_fixture_validated
   m2_audit_split_tokenizer_operators: locally_implemented_execution_disabled_offline_fixture_validated
   m2_tokenizer_asset_inventory: complete_three_of_three_manifest_only_zero_hu_writes
@@ -43,8 +43,8 @@ stage_readiness:
   m2_source_registry_byte_semantics_repair: executed_pass_consumed
   m2_source_registry: closed_32_of_32_lfs_identities
   m2_storage_bounds: locally_closed_fresh_preflight_required
-  m2_final_orchestration: v1a_operational_not_run_v1b_183_tests_passed_unexecuted
-  m2_production_launcher: frozen_unexecuted_phase1_v1b
+  m2_final_orchestration: v1b_operational_not_run_v1c_185_tests_passed_unexecuted
+  m2_production_launcher: frozen_unexecuted_phase1_v1c
   m2_human_review_handoff: frozen_packet_bound_64_decisions
   m2_required_models: [olmo, qwen, smollm]
   m2_sibling_training_contract: not_frozen
@@ -75,13 +75,13 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: authorize_exact_vngrs_d0_phase1_v1b_materialization_wave
+  subject: authorize_exact_vngrs_d0_phase1_v1c_materialization_wave
   contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
   config: configs/corpora/vngrs_m2_three_model_d0_v1.yaml
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user
     - offline_tests_and_dry_runs
-    - phase1_v1b_execution_only_after_exact_sha_authorization
+    - phase1_v1c_execution_only_after_exact_sha_authorization
   not_implied:
     - hu_or_ssh
     - slurm_or_gpu

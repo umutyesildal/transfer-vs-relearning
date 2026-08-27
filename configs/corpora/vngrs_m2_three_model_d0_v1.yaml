@@ -154,7 +154,11 @@ final_orchestration:
   phase1_v1a_result: operational_not_run_exact_home_du_timeout_before_root_or_network
   phase1_v1a_job_id: 481608
   phase1_v1b_correction: exact_home_du_timeout_300_seconds_and_slurm_comment_evidence
-  phase1_v1b_execution_authorized: false
+  phase1_v1b_execution_authorized: consumed_single_operational_not_run_wave
+  phase1_v1b_job_id: 481711
+  phase1_v1b_result: operational_not_run_before_root_or_network_exact_error_not_persisted
+  phase1_v1c_correction: atomic_pre_root_failure_evidence_under_sole_approved_root
+  phase1_v1c_execution_authorized: false
 
 synthetic_surface_registry:
   source: artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/validation.jsonl

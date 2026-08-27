@@ -14,7 +14,11 @@ import yaml
 
 from transfer_vs_relearning.corpora.vngrs.d0_inputs import load_source_objects, load_synthetic_surfaces
 from transfer_vs_relearning.corpora.vngrs.d0_orchestration import D0OrchestrationPolicy, finalize_d0_phase2, run_d0_phase1
-from transfer_vs_relearning.corpora.vngrs.d0_preflight import collect_d0_preflight_observation, validate_d0_preflight
+from transfer_vs_relearning.corpora.vngrs.d0_preflight import (
+    collect_d0_preflight_observation,
+    validate_d0_preflight,
+    write_preflight_failure,
+)
 from transfer_vs_relearning.corpora.vngrs.d0_runtime import FrozenTokenizerAdapter, ReviewedHttpsTransport
 from transfer_vs_relearning.corpora.vngrs.materialization import MaterializationPolicy
 
@@ -55,20 +59,19 @@ def main() -> int:
     parser.add_argument("--decisions-jsonl", type=Path)
     args = parser.parse_args()
     repo = args.repo_root.resolve()
-    config = yaml.safe_load((repo / "configs/corpora/vngrs_m2_three_model_d0_v1.yaml").read_text())
-    objects = load_source_objects(
-        repo / "artifacts/corpora/vngrs_m2_d0/source_registry_byte_semantics_repair_v1.json",
-        expected_sha256=REGISTRY_SHA256,
-    )
-    surfaces = load_synthetic_surfaces(
-        repo / "artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/validation.jsonl",
-        expected_sha256=SURFACES_SHA256,
-    )
     policy = D0OrchestrationPolicy(execution_enabled=True)
     if args.phase == "phase1":
         if args.decisions_jsonl is not None or (args.preflight_json is None) == (not args.collect_preflight):
             raise ValueError("phase1 requires exactly one reviewed preflight source")
         try:
+            objects = load_source_objects(
+                repo / "artifacts/corpora/vngrs_m2_d0/source_registry_byte_semantics_repair_v1.json",
+                expected_sha256=REGISTRY_SHA256,
+            )
+            surfaces = load_synthetic_surfaces(
+                repo / "artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/validation.jsonl",
+                expected_sha256=SURFACES_SHA256,
+            )
             observation = (
                 collect_d0_preflight_observation(repo)
                 if args.collect_preflight
@@ -88,12 +91,28 @@ def main() -> int:
                 materialization_policy=MaterializationPolicy(execution_enabled=True),
             )
         except Exception as exc:
+            if not OUTPUT_ROOT.exists():
+                try:
+                    write_preflight_failure(expected_commit=args.expected_commit, error=exc)
+                except Exception as persistence_error:
+                    _slurm_comment(
+                        f"D0_PHASE1_EVIDENCE_WRITE_BLOCKED:{type(persistence_error).__name__}:{persistence_error}"
+                    )
             _slurm_comment(f"D0_PHASE1_BLOCKED:{type(exc).__name__}:{exc}")
             raise
         _slurm_comment("D0_PHASE1_AWAITING_HUMAN_REVIEW")
     else:
         if args.decisions_jsonl is None or args.preflight_json is not None:
             raise ValueError("phase2 requires only --decisions-jsonl")
+        config = yaml.safe_load((repo / "configs/corpora/vngrs_m2_three_model_d0_v1.yaml").read_text())
+        objects = load_source_objects(
+            repo / "artifacts/corpora/vngrs_m2_d0/source_registry_byte_semantics_repair_v1.json",
+            expected_sha256=REGISTRY_SHA256,
+        )
+        surfaces = load_synthetic_surfaces(
+            repo / "artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/validation.jsonl",
+            expected_sha256=SURFACES_SHA256,
+        )
         phase1_state = json.loads((OUTPUT_ROOT / "control/phase1_state.json").read_text())
         if phase1_state.get("preflight", {}).get("git_commit") != args.expected_commit:
             raise ValueError("phase2 implementation commit differs from phase1")
