@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_d0_corpus_contract_draft
+  status: m0_m1_complete_m2_d0_corpus_contract_qualified_execution_disabled
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -103,7 +103,7 @@ scientific_design:
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: not_frozen
+  corpus_contract: qualified_not_frozen
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -255,11 +255,11 @@ stage_readiness:
       - terminal_family_complete_no_duplicate_submission
   m2_training:
     corpus_contract_ready: false
-    corpus_contract_status: draft_execution_disabled
+    corpus_contract_status: qualified_execution_disabled
     corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
-    corpus_contract_sha256: 5c20a5f4e49b66f92ff578a1c6e37a1f31d8d81c12d40755c6bb0a1487b450ef
+    corpus_contract_sha256: 9a3e850756605e57a004836d712530a4b14ebcfae4a0b6c5b477a9a64828be07
     corpus_config: configs/corpora/vngrs_m2_three_model_d0_v1.yaml
-    corpus_config_sha256: 5426a13805a847b509f590a265bda0b2594c0415d5ad3f024758a79bab482b27
+    corpus_config_sha256: 3da8a9b4a53493f878df28526bd0d57ada1c7514c4eefbe2479bb993af4a5d05
     corpus_scope: vngrs_systematic_32_shard_subcorpus
     required_models: [olmo, qwen, smollm]
     materialization_operator: locally_implemented_execution_disabled
@@ -336,12 +336,31 @@ stage_readiness:
     source_registry_sha256: b1c80bf78ff40de5c02e14f08082a51cc17cc90a9853028eaf866cb63326e41f
     source_registry_total_object_bytes: 9502315428
     source_registry_total_parquet_compressed_bytes: 9468474036
+    storage_bounds_status: locally_closed_fresh_execution_preflight_required
+    storage_bounds_result: artifacts/corpora/vngrs_m2_d0/storage_bounds_v1.json
+    storage_bounds_result_sha256: 33dc1f47f0bd22843d6fe918c5b1c0c6ab884abf2b72ae6226740c409e9eba7d
+    storage_operator_module: src/transfer_vs_relearning/corpora/vngrs/d0_storage.py
+    storage_operator_sha256: 5d96f1551f7df80bb18078e95f69436f377ebad654dc90d500d4a82e2fd06886
+    calculated_peak_bytes: 30029406455
+    frozen_peak_bytes: 34359738368
+    required_available_bytes: 42949672960
+    required_available_inodes: 1024
+    parquet_loader_module: src/transfer_vs_relearning/corpora/vngrs/parquet_loader.py
+    parquet_loader_sha256: dced529706ca4ce1346d8557b3f9a478d87e03ef4af0c7b77f195ab1294863c0
+    orchestration_module: src/transfer_vs_relearning/corpora/vngrs/d0_orchestration.py
+    orchestration_sha256: 34bdd44b7218195d40992398ce450c0b7880f150dcee711c1321443c0ec889e4
+    evidence_bundle_module: src/transfer_vs_relearning/corpora/vngrs/d0_bundle.py
+    evidence_bundle_sha256: e278a7b6b0d2ab42e84b1e7d1695e8d9c31710240d4eefe5fc0f23b8ff71cfea
+    local_qualification_validation: 168_tests_passed
+    production_launcher_status: not_frozen
+    human_review_handoff_status: not_frozen
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - vngrs_d0_storage_preflight_not_measured
-      - vngrs_corpus_contract_not_qualified_or_frozen
+      - vngrs_d0_production_launcher_not_frozen
+      - vngrs_d0_human_review_handoff_not_frozen
+      - vngrs_d0_execution_not_authorized
       - m2_a_m2_b_matched_contract_not_frozen
       - three_m1_epoch036_parent_bindings_not_yet_frozen_in_m2_contract
 
@@ -1126,7 +1145,7 @@ current_evidence:
     accepted_metadata_evidence_root: /vol/tmp2/yesildau/luna_vngrs_metadata_footer_feasibility_v1
     accepted_metadata_inventory_sha256: 120cdd7b21e161bf981cf8191fa278a11829d3fc5c155b71ed4bc8836e27f1d3
     latest_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
-    latest_contract_status: draft_execution_disabled
+    latest_contract_status: qualified_execution_disabled
     global_gate: blocked_by_measurement_design
   trwiki:
     role: cross_domain_control_only
@@ -1224,16 +1243,15 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: prepare_three_model_vngrs_d0_contract_and_offline_operator
+  name: freeze_three_model_vngrs_d0_production_launcher_and_human_review_handoff
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: local_d0_contract_preparation_only
+  m2_status: local_d0_qualified_execution_disabled
   execution_boundary: separate_future_exact_sha_bound_user_authorization
   current_work:
-    - qualify_vngrs_32_shard_full_object_registry
-    - implement_fail_closed_materialization_operator_with_offline_fixtures
-    - bind_lightweight_max_aligned_quality_and_contamination_outputs
-    - bind_document_disjoint_split_and_three_tokenizer_accounting
+    - freeze_d0_0_production_preflight_collector
+    - freeze_reviewed_https_transport_and_three_tokenizer_adapters
+    - freeze_two_phase_human_review_handoff
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1243,7 +1261,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: freeze_vngrs_peak_storage_output_inode_bounds_and_final_d0_orchestration
+  subject: freeze_vngrs_production_launcher_and_human_review_handoff
   decision_owner: user
   start_m1_now: false
   note: >-
@@ -1256,8 +1274,11 @@ next_decision_required:
     pass then separated Parquet compressed bytes from full-object bytes, and the authorized repair
     closed 32/32 LFS identities with canonical registry SHA
     `b1c80bf78ff40de5c02e14f08082a51cc17cc90a9853028eaf866cb63326e41f`.
-    All passes had zero HU writes and no corpus/object downloads. Peak-storage/output-inode bounds
-    and final D0 orchestration/freeze remain local blockers. Materialization and training are unauthorized.
+    All passes had zero HU writes and no corpus/object downloads. Storage arithmetic is now closed
+    at a 32 GiB frozen peak with 40 GiB/1,024-inode fresh-preflight requirements. The local staged
+    operator, exact Parquet loader, atomic evidence chain and typed-failure behavior passed 168
+    compatible tests, so the D0 design is qualified but execution-disabled. The production HU
+    launcher and explicit human-review handoff are not frozen. Materialization and training remain unauthorized.
 
 authorization:
   local_repository_changes: require_current_user_instruction

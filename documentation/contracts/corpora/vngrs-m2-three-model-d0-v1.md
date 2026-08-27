@@ -1,6 +1,6 @@
 # vngrs three-model M2 D0 corpus closure contract v1
 
-**Status:** `DRAFT / EXECUTION DISABLED`  
+**Status:** `QUALIFIED / EXECUTION DISABLED`
 **Owner:** thesis project  
 **Created:** 2026-08-27  
 **Supersedes:** none; preserves all numbered 151-series evidence
@@ -38,7 +38,7 @@ It may not:
 - substitute `trwiki-20260601` as the primary in-domain corpus;
 - clean, delete, overwrite, deduplicate in place or mutate historical artifacts.
 
-Preparation of this draft grants none of the future actions above.
+Qualification of this contract grants none of the future actions above.
 
 ## Immutable identities
 
@@ -235,7 +235,7 @@ repair/version; it does not authorize post-hoc filtering.
 
 ## Verification
 
-Before this draft can become `qualified`:
+Qualification checklist:
 
 1. ~~implement a fail-closed full-object materialization operator and offline fixture tests~~ —
    locally complete in `transfer_vs_relearning.corpora.vngrs.materialization`; the operator has
@@ -244,17 +244,22 @@ Before this draft can become `qualified`:
    closed for 32/32 objects by the separately authorized byte-semantics repair pass;
 3. ~~implement deterministic lightweight audit, split and tokenizer accounting outputs~~ —
    locally complete as execution-disabled, transport-injected operators and offline fixtures;
-4. validate config against `FROZEN_SELECTED_SHARD_PATHS` and current model revisions;
-5. run the full compatible offline test suite;
-6. freeze code/config/contract hashes and expected storage/inode bounds.
+4. ~~validate config against `FROZEN_SELECTED_SHARD_PATHS` and current model revisions~~;
+5. ~~run the full compatible offline test suite~~;
+6. ~~freeze the storage/inode arithmetic and record the current code/config/contract hashes in
+   the control plane~~.
 
 Before execution, the contract must become `frozen` and receive separate exact SHA-bound user
 authorization.
 
 ## Current blockers
 
-- scratch free-space/inode and peak-storage requirements are not yet measured;
-- contract, config and implementation hashes are not frozen.
+- the production HU launcher that gathers every D0.0 Git/evidence/home/job preflight observation,
+  supplies the reviewed HTTPS transport and binds the three preserved tokenizer adapters is not
+  frozen;
+- the deterministic 64-document sample still requires the explicit human-review handoff before a
+  terminal D0 PASS can be produced;
+- no exact SHA-bound D0 execution authorization has been given.
 
 ## Local implementation checkpoint (2026-08-27)
 
@@ -328,11 +333,30 @@ full-object SHA-256 identities, full-object bytes `9,502,315,428`, Parquet compr
 `b1c80bf78ff40de5c02e14f08082a51cc17cc90a9853028eaf866cb63326e41f`. It also reconfirmed the
 proposed root absent with 122,943,170,412,544 available bytes and 2,284,282,885 available inodes.
 HU writes, corpus rows and object downloads were zero. This closes the source-registry blocker;
-peak-storage/output-inode bounds and final D0 qualification/freeze remain open.
+the storage arithmetic and local orchestration checkpoint below close local qualification, while
+production-launcher freeze remains open.
+
+The local storage policy now closes the peak arithmetic without claiming that the earlier
+read-only observation is a future execution preflight. Its calculated peak is `30,029,406,455`
+bytes: exact full objects `9,502,315,428`, largest partial object `448,718,347`, one full-size
+processing workspace `9,502,315,428`, a conservative compact-output budget `9,502,315,428` and a
+1 GiB filesystem margin. The frozen peak is rounded upward to 32 GiB; a fresh execution must show
+at least 40 GiB and 1,024 free inodes. The prior observation (`122,943,170,412,544` bytes and
+`2,284,282,885` inodes) demonstrates feasibility only and must be refreshed.
+
+The final local orchestration checkpoint is also fixture-complete. It gates storage before root
+creation, materializes the exact registry through an injected transport, loads exact Parquet
+identity, runs the mandatory audit/split/review/tokenizer stages in order, and emits an atomic
+self-reference-free output manifest followed by a one-way final audit. A post-materialization
+failure writes `control/d0_failure.json`; it cannot produce `ready_to_train=true`. Offline tests
+verify each manifest row against the bytes and SHA-256 actually written. This qualifies the local
+contract and operator design, but does not freeze a production HU launcher or solve the required
+human-review handoff. Therefore corpus materialization remains disabled and separately
+unauthorized.
 
 ## Authority boundary
 
-This draft authorizes local code, configuration, documentation, offline fixtures and dry-run
+This qualified contract authorizes local code, configuration, documentation, offline fixtures and dry-run
 validation requested by the user. It does not authorize network retrieval, corpus
 materialization, HU/SSH, Slurm/GPU, tokenizer/model access on HU, training, evaluation, scoring,
 publication of this M2 branch, cleanup or deletion.

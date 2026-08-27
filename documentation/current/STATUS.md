@@ -13,7 +13,7 @@ The detailed M0↔M1 result ledger is
 
 **Current preparation boundary:** the three-model M2 scope is OLMo, Qwen and SmolLM, each with
 full M2-A/M2-B sibling training from its own frozen M1 epoch-036 parent. No single primary model
-is selected. The current local-only artifact is the execution-disabled vngrs D0 draft at
+is selected. The current local-only artifact is the qualified, execution-disabled vngrs D0 contract at
 `documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md`, using the previously verified
 systematic 32-shard subcorpus. No corpus retrieval/materialization or M2 training is authorized.
 The local fail-closed full-object operator is now implemented and offline-fixture validated. It is
@@ -52,9 +52,13 @@ The authorized byte-semantics repair subsequently completed PASS: 32/32 immutabl
 full-object identities closed, full-object bytes are `9,502,315,428`, Parquet compressed bytes are
 `9,468,474,036`, and canonical registry SHA-256 is
 `b1c80bf78ff40de5c02e14f08082a51cc17cc90a9853028eaf866cb63326e41f`.
-HU writes, corpus reads and downloads remained zero. The remaining local D0 qualification work is
-to freeze peak-storage/output-inode bounds and complete the final execution orchestration; corpus
-materialization remains separately unauthorized.
+HU writes, corpus reads and downloads remained zero. Storage arithmetic is now closed at a
+`30,029,406,455`-byte calculated peak, rounded to a frozen 32 GiB peak with mandatory fresh
+40 GiB/1,024-inode execution gates. The exact Parquet loader, stage orchestration, typed
+post-materialization failures and atomic self-reference-free evidence chain passed the compatible
+168-test suite. This qualifies the local design without freezing or authorizing execution. The
+remaining boundary is a production HU preflight/HTTPS/tokenizer launcher plus an explicit
+two-phase 64-document human-review handoff; corpus materialization remains unauthorized.
 
 ## The short answer
 
@@ -166,8 +170,8 @@ an M1 training input. `trwiki-20260601` remains the Turkish cross-domain control
 
 The completed M1 family is terminal evidence. No duplicate submission, cleanup, deletion,
 M2-A/M2-B execution, or primary-model promotion is implied. The active local boundary is to
-qualify the three-model vngrs D0 contract and offline operator. External materialization remains a
-separate exact authorization boundary.
+freeze the three-model vngrs D0 production launcher and human-review handoff. External
+materialization remains a later, separate exact authorization boundary.
 
 ## Read next
 

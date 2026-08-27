@@ -5,20 +5,20 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 9c0b995bf169995253362dba3eacf72576476e7f342aafc1adcb2e8a8187821b
+  full_state_sha256: 64d7e621282ff3c83454b531c2e17743b15249d8d2ab78f0155c06a91cb69659
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: m2_d0_corpus_contract_preparation
+  phase: m2_d0_production_launcher_freeze_preparation
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: not_frozen
+  corpus_contract: qualified_not_frozen
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -32,7 +32,7 @@ stage_readiness:
   m1_evaluation_adapter_and_contract: frozen_v3_single_a100_pool_terminal_complete_111_of_111
   m1_first_wave_cancelled_by_user_before_any_scientific_result: true
   m1_execution: complete_111_of_111
-  m2_corpus_contract: draft_execution_disabled
+  m2_corpus_contract: qualified_execution_disabled
   m2_materialization_operator: locally_implemented_execution_disabled_offline_fixture_validated
   m2_audit_split_tokenizer_operators: locally_implemented_execution_disabled_offline_fixture_validated
   m2_tokenizer_asset_inventory: complete_three_of_three_manifest_only_zero_hu_writes
@@ -42,6 +42,10 @@ stage_readiness:
   m2_source_registry_capture_retry: consumed_blocked_byte_semantics_mismatch
   m2_source_registry_byte_semantics_repair: executed_pass_consumed
   m2_source_registry: closed_32_of_32_lfs_identities
+  m2_storage_bounds: locally_closed_fresh_preflight_required
+  m2_final_orchestration: locally_qualified_168_tests_passed_execution_disabled
+  m2_production_launcher: not_frozen
+  m2_human_review_handoff: not_frozen
   m2_required_models: [olmo, qwen, smollm]
   m2_sibling_training_contract: not_frozen
 
@@ -71,7 +75,7 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: freeze_vngrs_peak_storage_output_inode_bounds_and_final_d0_orchestration
+  subject: freeze_vngrs_production_launcher_and_human_review_handoff
   contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
   config: configs/corpora/vngrs_m2_three_model_d0_v1.yaml
   allowed_now:

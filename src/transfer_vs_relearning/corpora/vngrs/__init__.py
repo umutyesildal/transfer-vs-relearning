@@ -32,6 +32,10 @@ from .materialization import (
 )
 from .source_registry import build_source_registry_from_metadata_ledger, parse_discovery_transport
 from .d0_audit import D0Document, exact_heldout_split, human_review_sample, lightweight_audit, tokenizer_accounting
+from .d0_storage import D0StoragePolicy, validate_storage_observation
+from .d0_orchestration import D0OrchestrationPolicy, run_d0_orchestration
+from .d0_bundle import write_d0_evidence_bundle, write_d0_failure
+from .parquet_loader import load_verified_parquet_documents
 from .tokenizer_inventory import extract_tokenizer_inventory
 from .outputs import FINAL_AUDIT, OUTPUT_ARTIFACT_MANIFEST, OUTPUT_ORDER, serialize_output_artifact_manifest
 from .pipeline import FailClosedLidAdapter, VngrsPreparationConfig, evaluate_final_contract, prepare_records
@@ -41,6 +45,8 @@ from .sampling import largest_remainder_allocation, midpoint_systematic_position
 __all__ = [
     "FailClosedLidAdapter",
     "D0Document",
+    "D0StoragePolicy",
+    "D0OrchestrationPolicy",
     "FullObjectResponse",
     "FINAL_AUDIT",
     "FROZEN_SELECTED_SHARD_PATHS",
@@ -66,8 +72,10 @@ __all__ = [
     "midpoint_systematic_positions",
     "materialize_full_objects",
     "lightweight_audit",
+    "load_verified_parquet_documents",
     "immutable_resolve_url",
     "prepare_records",
+    "run_d0_orchestration",
     "select_systematic_shards",
     "serialize_output_artifact_manifest",
     "source_identity_key",
@@ -78,4 +86,7 @@ __all__ = [
     "validate_request_ledger",
     "validate_request_ledger_aggregate",
     "validate_source_registry",
+    "validate_storage_observation",
+    "write_d0_evidence_bundle",
+    "write_d0_failure",
 ]

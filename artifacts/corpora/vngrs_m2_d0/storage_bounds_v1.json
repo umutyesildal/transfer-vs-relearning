@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "status": "STORAGE_BOUNDS_PASS",
+  "formula": {
+    "full_object_bytes": 9502315428,
+    "largest_object_partial_bytes": 448718347,
+    "processing_workspace_bytes": 9502315428,
+    "compact_output_budget_bytes": 9502315428,
+    "filesystem_margin_bytes": 1073741824,
+    "calculated_peak_bytes": 30029406455,
+    "frozen_peak_bytes": 34359738368,
+    "required_available_bytes": 42949672960,
+    "required_available_inodes": 1024
+  },
+  "observation": {
+    "source_result": "artifacts/corpora/vngrs_m2_d0/source_registry_byte_semantics_repair_v1.json",
+    "resolved_parent": "/vol/tmp2/yesildau",
+    "proposed_root_absent": true,
+    "available_bytes": 122943170412544,
+    "available_inodes": 2284282885
+  },
+  "fresh_execution_preflight_required": true,
+  "hu_writes": 0,
+  "corpus_downloads": 0
+}

@@ -17,8 +17,8 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - M0: closed with 21/21 active lanes, 3/3 exact-prefix and 42 v1f normalized observations;
 - M1: fixed OLMo/Qwen/SmolLM cohort, Relation V2 facts and eval-v2 policy;
 - M1: training and eval-v2 complete at 111/111 states;
-- current boundary: local three-model vngrs D0 qualification work only; the fail-closed,
-  transport-injected materialization operator and offline fixtures are implemented, but disabled;
+- current boundary: freeze the three-model vngrs D0 production launcher and explicit human-review
+  handoff; the local contract is qualified but execution-disabled;
 - D0 audit/split/tokenizer-accounting operators: locally implemented and offline validated;
 - tokenizer inventory: PASS for all three M1 epoch-036 parents with zero HU writes;
 - source-registry extractor: locally implemented and offline validated; exact accepted ledger has
@@ -30,7 +30,10 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - direct-pipe capture: complete ledger reached the extractor; it blocked because the historical
   Parquet compressed-byte total was incorrectly used as the full-object total;
 - byte-semantics repair: PASS; 32/32 LFS identities and both exact byte aggregates are closed;
-- next boundary: freeze peak-storage/output-inode bounds and final D0 execution orchestration;
+- storage/orchestration qualification: 32 GiB frozen peak, 40 GiB plus 1,024-inode fresh gate,
+  exact Parquet loader, typed failures and atomic output chain passed 168 compatible tests;
+- next boundary: freeze D0.0 preflight collection, reviewed HTTPS/tokenizer adapters and the
+  two-phase 64-document human-review handoff;
 - vngrs: conditional systematic 32-shard M2 input; not materialized or training-ready;
 - M2 execution: not authorized; external materialization requires a later frozen SHA-bound
   contract and separate explicit user authorization.

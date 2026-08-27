@@ -1,6 +1,6 @@
 schema_version: 1
 contract_id: vngrs-m2-three-model-d0-v1
-status: draft_execution_disabled
+status: qualified_execution_disabled
 contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
 
 source:
@@ -64,6 +64,12 @@ output:
   max_http_response_bytes: 10737418240
   atomic_writes: true
   overwrite: false
+  calculated_peak_bytes: 30029406455
+  frozen_peak_bytes: 34359738368
+  required_available_bytes: 42949672960
+  required_available_inodes: 1024
+  storage_bounds_result: artifacts/corpora/vngrs_m2_d0/storage_bounds_v1.json
+  fresh_execution_preflight_required: true
 
 materialization_operator:
   module: transfer_vs_relearning.corpora.vngrs.materialization
@@ -109,6 +115,21 @@ local_audit_operators:
   tokenizer_transport_injected: true
   tokenizer_model_weights_loaded: false
   tokenizer_inventory_manifest_only: true
+
+final_orchestration:
+  module: transfer_vs_relearning.corpora.vngrs.d0_orchestration
+  parquet_loader_module: transfer_vs_relearning.corpora.vngrs.parquet_loader
+  storage_gate_module: transfer_vs_relearning.corpora.vngrs.d0_storage
+  evidence_bundle_module: transfer_vs_relearning.corpora.vngrs.d0_bundle
+  execution_enabled: false
+  transport_injected: true
+  tokenizer_adapters_injected: true
+  reviewed_sample_injected: true
+  typed_post_materialization_failure: control/d0_failure.json
+  terminal_manifest: manifests/output_artifact_manifest.jsonl
+  terminal_audit: control/final_audit.json
+  terminal_ready_to_train: false
+  production_launcher_frozen: false
 
 light_audit:
   human_review_documents: 64

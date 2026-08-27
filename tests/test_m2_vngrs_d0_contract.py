@@ -21,10 +21,10 @@ def load_config() -> dict:
     return yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
 
 
-def test_d0_contract_is_execution_disabled_and_present() -> None:
+def test_d0_contract_is_qualified_but_execution_disabled_and_present() -> None:
     config = load_config()
     assert CONTRACT.is_file()
-    assert config["status"] == "draft_execution_disabled"
+    assert config["status"] == "qualified_execution_disabled"
     assert config["contract"] == str(CONTRACT.relative_to(ROOT))
     assert config["authority"] == {
         "local_preparation": True,
@@ -86,6 +86,27 @@ def test_d0_materialization_operator_remains_explicit_and_execution_disabled() -
     assert operator["automatic_resume"] is False
     assert operator["cleanup_on_failure"] is False
     assert operator["expected_total_bytes"] == 9_502_315_428
+
+
+def test_d0_storage_bounds_are_explicit_but_require_fresh_execution_preflight() -> None:
+    output = load_config()["output"]
+    assert output["calculated_peak_bytes"] == 30_029_406_455
+    assert output["frozen_peak_bytes"] == 32 * 1024**3
+    assert output["required_available_bytes"] == 40 * 1024**3
+    assert output["required_available_inodes"] == 1_024
+    assert output["storage_bounds_result"].endswith("storage_bounds_v1.json")
+    assert output["fresh_execution_preflight_required"] is True
+
+
+def test_d0_final_orchestration_is_local_only_and_not_a_production_launcher() -> None:
+    operator = load_config()["final_orchestration"]
+    assert operator["execution_enabled"] is False
+    assert operator["transport_injected"] is True
+    assert operator["tokenizer_adapters_injected"] is True
+    assert operator["reviewed_sample_injected"] is True
+    assert operator["typed_post_materialization_failure"] == "control/d0_failure.json"
+    assert operator["terminal_ready_to_train"] is False
+    assert operator["production_launcher_frozen"] is False
 
 
 def test_d0_source_registry_operator_is_exact_and_execution_disabled() -> None:
