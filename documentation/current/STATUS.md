@@ -16,6 +16,9 @@ full M2-A/M2-B sibling training from its own frozen M1 epoch-036 parent. No sing
 is selected. The current local-only artifact is the execution-disabled vngrs D0 draft at
 `documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md`, using the previously verified
 systematic 32-shard subcorpus. No corpus retrieval/materialization or M2 training is authorized.
+The local fail-closed full-object operator is now implemented and offline-fixture validated. It is
+transport-injected, disabled by default, and cannot create the production root until the exact
+32-object size/SHA-256/LFS registry closes. No real corpus byte was requested or written.
 
 ## The short answer
 

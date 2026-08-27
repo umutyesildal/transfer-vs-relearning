@@ -17,7 +17,8 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - M0: closed with 21/21 active lanes, 3/3 exact-prefix and 42 v1f normalized observations;
 - M1: fixed OLMo/Qwen/SmolLM cohort, Relation V2 facts and eval-v2 policy;
 - M1: training and eval-v2 complete at 111/111 states;
-- current boundary: local three-model vngrs D0 contract/operator preparation only;
+- current boundary: local three-model vngrs D0 qualification work only; the fail-closed,
+  transport-injected materialization operator and offline fixtures are implemented, but disabled;
 - vngrs: conditional systematic 32-shard M2 input; not materialized or training-ready;
 - M2 execution: not authorized; external materialization requires a later frozen SHA-bound
   contract and separate explicit user authorization.

@@ -235,7 +235,9 @@ repair/version; it does not authorize post-hoc filtering.
 
 Before this draft can become `qualified`:
 
-1. implement a fail-closed full-object materialization operator and offline fixture tests;
+1. ~~implement a fail-closed full-object materialization operator and offline fixture tests~~ —
+   locally complete in `transfer_vs_relearning.corpora.vngrs.materialization`; the operator has
+   no implicit network client, is execution-disabled by default and passed offline fixtures;
 2. bind per-shard expected size plus immutable object/LFS SHA-256 from accepted evidence;
 3. implement deterministic lightweight audit, split and tokenizer accounting outputs;
 4. validate config against `FROZEN_SELECTED_SHARD_PATHS` and current model revisions;
@@ -248,11 +250,21 @@ authorization.
 ## Current blockers
 
 - exact per-shard full-object/LFS SHA-256 registry is not locally closed;
-- D0 full-object materialization operator is not implemented;
 - exact tokenizer asset manifests/paths must be rebound from preserved M1 evidence;
 - lightweight audit and 64-document review schemas are not implemented;
 - scratch free-space/inode and peak-storage requirements are not yet measured;
 - contract, config and implementation hashes are not frozen.
+
+## Local implementation checkpoint (2026-08-27)
+
+The first verification item is locally implemented. Registry closure occurs before root creation
+or transport use; production policy requires the frozen 32-path order; size, SHA-256 and LFS OID
+must agree; unsafe paths, mutable URLs, response-header drift, encoded bodies, byte-budget drift
+and existing roots fail closed. Successful objects move atomically from `raw/.partial/` only after
+full verification. A failed object remains typed evidence and is never published as valid.
+
+This checkpoint does not provide the missing real 32-object hash registry and does not enable the
+operator, network access or materialization.
 
 ## Authority boundary
 

@@ -257,17 +257,20 @@ stage_readiness:
     corpus_contract_ready: false
     corpus_contract_status: draft_execution_disabled
     corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
-    corpus_contract_sha256: 4dc3b24b3c9deadeb346e13d21c2ec8bc91c3136f03038c29f74a8fb3fbc4c63
+    corpus_contract_sha256: ab41c80b73ba5f3520b52555bb292a1323b402a6618785ea7942caeb3a781350
     corpus_config: configs/corpora/vngrs_m2_three_model_d0_v1.yaml
-    corpus_config_sha256: 4811985f0331bad11f889c37783dd86331aa6eb0a6e9f7841807b1d3fb20e5b8
+    corpus_config_sha256: 41e141144b68d687b5e70be25bef798a1a288ce017208f2ef2ff02f625e619a9
     corpus_scope: vngrs_systematic_32_shard_subcorpus
     required_models: [olmo, qwen, smollm]
+    materialization_operator: locally_implemented_execution_disabled
+    materialization_operator_module: src/transfer_vs_relearning/corpora/vngrs/materialization.py
+    materialization_operator_sha256: 1998e3268e0c0df0ef69d1abccaa3e1eb84f2eb9618bfeb8d338d4df1d37bb1c
+    materialization_operator_validation: offline_fixture_suite_passed
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
       - vngrs_d0_full_object_registry_not_closed
-      - vngrs_d0_materialization_operator_not_implemented
       - vngrs_d0_tokenizer_asset_bindings_not_closed
       - vngrs_d0_storage_preflight_not_measured
       - vngrs_corpus_contract_not_qualified_or_frozen

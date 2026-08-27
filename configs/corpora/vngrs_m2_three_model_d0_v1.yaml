@@ -64,6 +64,21 @@ output:
   atomic_writes: true
   overwrite: false
 
+materialization_operator:
+  module: transfer_vs_relearning.corpora.vngrs.materialization
+  transport_injected: true
+  implicit_network_client: false
+  execution_enabled: false
+  exact_registry_required_before_root_creation: true
+  full_object_sha256_required: true
+  lfs_oid_must_bind_sha256: true
+  partial_directory: raw/.partial
+  atomic_publish_after_verification: true
+  chunk_size_upper_bound_bytes: 8388608
+  automatic_retry: false
+  automatic_resume: false
+  cleanup_on_failure: false
+
 light_audit:
   human_review_documents: 64
   human_review_seed: 42

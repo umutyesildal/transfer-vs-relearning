@@ -68,3 +68,19 @@ def test_d0_keeps_light_audit_split_and_three_model_scope() -> None:
         config["tokenizer_accounting"]["model_token_counts_are_cross_model_equality_gate"]
         is False
     )
+
+
+def test_d0_materialization_operator_remains_explicit_and_execution_disabled() -> None:
+    operator = load_config()["materialization_operator"]
+    assert operator["module"] == "transfer_vs_relearning.corpora.vngrs.materialization"
+    assert operator["transport_injected"] is True
+    assert operator["implicit_network_client"] is False
+    assert operator["execution_enabled"] is False
+    assert operator["exact_registry_required_before_root_creation"] is True
+    assert operator["full_object_sha256_required"] is True
+    assert operator["lfs_oid_must_bind_sha256"] is True
+    assert operator["partial_directory"] == "raw/.partial"
+    assert operator["atomic_publish_after_verification"] is True
+    assert operator["automatic_retry"] is False
+    assert operator["automatic_resume"] is False
+    assert operator["cleanup_on_failure"] is False
