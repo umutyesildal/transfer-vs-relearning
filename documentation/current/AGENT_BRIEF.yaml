@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: fe26bc1516166e89a35f4ded6ceccc3f026a52af4e29fce549c3003e8d6cf20f
+  full_state_sha256: e2c5aae40922f59743c1e65ae71355c6769ef4fa5f6a4067f82cc15f9614835b
   role: context_projection_only
   may_expand_authority: false
 
@@ -37,7 +37,8 @@ stage_readiness:
   m2_audit_split_tokenizer_operators: locally_implemented_execution_disabled_offline_fixture_validated
   m2_tokenizer_asset_inventory: complete_three_of_three_manifest_only_zero_hu_writes
   m2_source_registry_operator: locally_implemented_execution_disabled_offline_fixture_validated
-  m2_source_registry_storage_discovery_contract: frozen_unexecuted_not_authorized
+  m2_source_registry_storage_discovery_contract: consumed_blocked_operational_not_run
+  m2_source_registry_storage_discovery_retry: frozen_unexecuted_not_authorized
   m2_required_models: [olmo, qwen, smollm]
   m2_sibling_training_contract: not_frozen
 
@@ -68,8 +69,8 @@ m1:
 
 next_boundary:
   subject: close_vngrs_full_object_registry_and_storage_bounds_before_d0_qualification
-  contract: documentation/contracts/corpora/vngrs-m2-d0-source-registry-storage-discovery-v1.md
-  config: configs/corpora/vngrs_m2_d0_source_registry_storage_discovery_v1.yaml
+  contract: documentation/contracts/corpora/vngrs-m2-d0-source-registry-storage-discovery-retry-v1.md
+  config: configs/corpora/vngrs_m2_d0_source_registry_storage_discovery_retry_v1.yaml
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user
     - offline_tests_and_dry_runs

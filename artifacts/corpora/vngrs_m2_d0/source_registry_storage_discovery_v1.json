@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "contract_id": "vngrs-m2-d0-source-registry-storage-discovery-v1",
+  "contract_sha256": "c17e178a4148a9482b0f37c2d96309897d618a08e65a84fa2bd7edb6c845c644",
+  "config_sha256": "451aabf32fdb06bf659f30aa8c0e657186af9d6d7757c7d66ec2264aa05d97cd",
+  "code_commit": "5183f73a0709ddddf42c97e5a389ba4f7f70b131",
+  "executed_at_utc": "2026-08-27T12:31:56Z",
+  "status": "BLOCKED_OPERATIONAL_NOT_RUN",
+  "failure_class": "blocked_by_filesystem_metadata_command_compatibility",
+  "failure": {
+    "phase": "df_inodes",
+    "command_scope": "read_only_filesystem_metadata",
+    "message": "HU df rejects -i and --output as mutually exclusive",
+    "observed_return_code": 1,
+    "automatic_retry_allowed": false,
+    "retry_executed": false
+  },
+  "execution": {
+    "remote_passes": 1,
+    "hu_writes": 0,
+    "network_downloads": 0,
+    "corpus_rows_read": 0,
+    "full_objects_downloaded": 0,
+    "ledger_payload_returned": false,
+    "ledger_payload_bytes_returned": 0,
+    "raw_ledger_payload_persisted": false,
+    "model_or_tokenizer_accesses": 0,
+    "slurm_or_gpu_actions": 0
+  },
+  "ledger_prechecks": {
+    "path": "/vol/tmp2/yesildau/luna_vngrs_metadata_footer_feasibility_v1/shard_metadata_ledger.jsonl",
+    "regular_file": true,
+    "bytes": 732929,
+    "max_bytes": 4194304,
+    "sha256": "6c6f27651945043ec2dfbf1b26575f416b5d38a8783d0a22320f0ffbf83d3fa3",
+    "expected_sha256_matched": true
+  },
+  "filesystem_observations": {
+    "resolved_parent": "/vol/tmp2/yesildau",
+    "required_mount_prefix_passed": true,
+    "proposed_root": "/vol/tmp2/yesildau/vngrs_m2_three_model_d0_v1",
+    "proposed_root_absent": true,
+    "byte_capacity": {
+      "filesystem": "storage02:/srv/nfs/data02",
+      "total_bytes": 153002533978112,
+      "used_bytes": 29905731452928,
+      "available_bytes": 122943170412544,
+      "capacity_percent": 20,
+      "mount": "/vol/tmp2"
+    },
+    "inode_capacity": null,
+    "complete": false
+  },
+  "source_registry": {
+    "status": "NOT_DERIVED_LEDGER_PAYLOAD_NOT_RETURNED",
+    "object_count": null,
+    "total_bytes": null,
+    "registry_sha256": null
+  },
+  "gate": {
+    "source_registry_closed": false,
+    "storage_bounds_closed": false,
+    "vngrs_d0_qualified": false,
+    "ready_to_materialize": false,
+    "ready_to_train": false
+  }
+}

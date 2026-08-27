@@ -6,6 +6,9 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "configs/corpora/vngrs_m2_d0_source_registry_storage_discovery_v1.yaml"
 CONTRACT = ROOT / "documentation/contracts/corpora/vngrs-m2-d0-source-registry-storage-discovery-v1.md"
+RESULT = ROOT / "artifacts/corpora/vngrs_m2_d0/source_registry_storage_discovery_v1.json"
+RETRY_CONFIG = ROOT / "configs/corpora/vngrs_m2_d0_source_registry_storage_discovery_retry_v1.yaml"
+RETRY_CONTRACT = ROOT / "documentation/contracts/corpora/vngrs-m2-d0-source-registry-storage-discovery-retry-v1.md"
 
 
 def load_config() -> dict:
@@ -70,3 +73,45 @@ def test_contract_forbids_execution_and_qualification_expansion() -> None:
         "no claim that D0 is qualified",
     ):
         assert phrase in text
+
+
+def test_single_execution_failed_closed_before_payload_and_registry_derivation() -> None:
+    import json
+
+    result = json.loads(RESULT.read_text(encoding="utf-8"))
+    assert result["status"] == "BLOCKED_OPERATIONAL_NOT_RUN"
+    assert result["failure_class"] == "blocked_by_filesystem_metadata_command_compatibility"
+    assert result["failure"]["phase"] == "df_inodes"
+    assert result["failure"]["automatic_retry_allowed"] is False
+    assert result["failure"]["retry_executed"] is False
+    assert result["execution"]["remote_passes"] == 1
+    assert result["execution"]["hu_writes"] == 0
+    assert result["execution"]["ledger_payload_returned"] is False
+    assert result["ledger_prechecks"]["expected_sha256_matched"] is True
+    assert result["filesystem_observations"]["proposed_root_absent"] is True
+    assert result["filesystem_observations"]["inode_capacity"] is None
+    assert result["source_registry"]["status"] == "NOT_DERIVED_LEDGER_PAYLOAD_NOT_RETURNED"
+    assert all(result["gate"][key] is False for key in result["gate"])
+
+
+def test_retry_contract_changes_only_inode_command_and_is_not_authorized() -> None:
+    import hashlib
+
+    config = yaml.safe_load(RETRY_CONFIG.read_text(encoding="utf-8"))
+    assert hashlib.sha256(RETRY_CONTRACT.read_bytes()).hexdigest() == (
+        "b2e6b23a96e36b87c1a7e68b2e5306d3be01bf45293e59c6bc635b08ceff67b5"
+    )
+    assert config["status"] == "frozen_unexecuted"
+    assert config["execution_authorized"] is False
+    assert config["hu_writes"] is False
+    assert config["remote_file_count"] == 1
+    assert config["sole_correction"] == {
+        "failed_command": "df -i --output",
+        "replacement_command": "df -Pi",
+        "scientific_change": False,
+    }
+    assert config["metadata_ledger"] == load_config()["metadata_ledger"]
+    assert config["filesystem_observations"]["inode_command"] == "df -Pi"
+    assert config["filesystem_observations"]["recursive_du"] is False
+    assert config["automatic_retry"] is False
+    assert all(config["authority"][key] is False for key in config["authority"])

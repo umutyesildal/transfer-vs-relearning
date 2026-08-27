@@ -257,7 +257,7 @@ stage_readiness:
     corpus_contract_ready: false
     corpus_contract_status: draft_execution_disabled
     corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
-    corpus_contract_sha256: fd36bcb0521ca205557c4574f61810ba4987d65363df706f1f174b2c758a15ef
+    corpus_contract_sha256: 64ef9b220a779e1cdc808aa54fb210487ef6382c1188b5362995d71005ce9b51
     corpus_config: configs/corpora/vngrs_m2_three_model_d0_v1.yaml
     corpus_config_sha256: 08370a120b0e5d805780638b468e9f490d8c01829515933ea2e18c778af02f8a
     corpus_scope: vngrs_systematic_32_shard_subcorpus
@@ -289,13 +289,25 @@ stage_readiness:
     source_registry_operator_module: src/transfer_vs_relearning/corpora/vngrs/source_registry.py
     source_registry_operator_sha256: b1b639a09eaa001e5d6c89ac8f733ab27afdbb8cde65fb69254662274d23b66b
     source_registry_operator_validation: offline_fixture_suite_passed
-    source_registry_discovery_contract_status: frozen_unexecuted
+    source_registry_discovery_contract_status: consumed_blocked_operational_not_run
     source_registry_discovery_contract: documentation/contracts/corpora/vngrs-m2-d0-source-registry-storage-discovery-v1.md
     source_registry_discovery_contract_sha256: c17e178a4148a9482b0f37c2d96309897d618a08e65a84fa2bd7edb6c845c644
     source_registry_discovery_config: configs/corpora/vngrs_m2_d0_source_registry_storage_discovery_v1.yaml
     source_registry_discovery_config_sha256: 451aabf32fdb06bf659f30aa8c0e657186af9d6d7757c7d66ec2264aa05d97cd
-    source_registry_discovery_execution_authorized: false
+    source_registry_discovery_execution_authorized: consumed_single_pass
     source_registry_discovery_hu_writes: false
+    source_registry_discovery_result: artifacts/corpora/vngrs_m2_d0/source_registry_storage_discovery_v1.json
+    source_registry_discovery_result_sha256: e81b32dae708c0942916a4d9a577caacdad77d59843d646a8f1e16a39bc93064
+    source_registry_discovery_failure: blocked_by_filesystem_metadata_command_compatibility
+    source_registry_discovery_verified_ledger_bytes: 732929
+    source_registry_discovery_verified_available_bytes: 122943170412544
+    source_registry_discovery_ledger_payload_returned: false
+    source_registry_discovery_retry_contract_status: frozen_unexecuted
+    source_registry_discovery_retry_contract: documentation/contracts/corpora/vngrs-m2-d0-source-registry-storage-discovery-retry-v1.md
+    source_registry_discovery_retry_contract_sha256: b2e6b23a96e36b87c1a7e68b2e5306d3be01bf45293e59c6bc635b08ceff67b5
+    source_registry_discovery_retry_config: configs/corpora/vngrs_m2_d0_source_registry_storage_discovery_retry_v1.yaml
+    source_registry_discovery_retry_config_sha256: 3c93593225b5b819910fd9d4a2dbb06c390191e343e2224ef6eae0682d042dcf
+    source_registry_discovery_retry_execution_authorized: false
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
@@ -1211,9 +1223,11 @@ next_decision_required:
     M0 and the matched three-model M1 training/eval-v2 family are complete. The user selected
     OLMo, Qwen and SmolLM as mandatory M2-A/M2-B training models, with no single primary model.
     The six-file manifest-only tokenizer inventory completed PASS with zero HU writes, closing all
-    three tokenizer asset registries. The remaining D0 boundary is the exact 32-object SHA/LFS
-    registry plus storage/inode bounds. Network retrieval, corpus materialization, broader HU/SSH,
-    Slurm/GPU, training and evaluation remain separately unauthorized.
+    three tokenizer asset registries. The first registry/storage discovery pass verified ledger
+    identity, root absence and byte capacity but stopped before inode output and ledger payload at
+    HU-incompatible `df` syntax; writes and downloads were zero. The corrected `df -Pi` retry is
+    frozen but unexecuted and needs new exact SHA-bound authorization. Network retrieval, corpus
+    materialization, broader HU/SSH, Slurm/GPU, training and evaluation remain unauthorized.
 
 authorization:
   local_repository_changes: require_current_user_instruction

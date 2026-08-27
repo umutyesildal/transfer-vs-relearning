@@ -23,7 +23,9 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - tokenizer inventory: PASS for all three M1 epoch-036 parents with zero HU writes;
 - source-registry extractor: locally implemented and offline validated; exact accepted ledger has
   not been read for this step;
-- next boundary: one frozen, separately authorized read-only ledger + filesystem-metadata pass;
+- first registry/storage discovery: preserved operational NOT_RUN at incompatible inode `df`
+  syntax, with zero HU writes and no ledger payload returned;
+- next boundary: one corrected frozen, separately authorized read-only retry using `df -Pi`;
 - vngrs: conditional systematic 32-shard M2 input; not materialized or training-ready;
 - M2 execution: not authorized; external materialization requires a later frozen SHA-bound
   contract and separate explicit user authorization.

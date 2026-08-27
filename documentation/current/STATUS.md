@@ -30,7 +30,12 @@ unqualified because the 32 full-object SHA/LFS registry and storage/inode bounds
 A fail-closed local extractor for those 32 identities is now offline tested. The exact one-ledger
 plus filesystem-metadata read-only discovery contract is frozen at
 `documentation/contracts/corpora/vngrs-m2-d0-source-registry-storage-discovery-v1.md`; it is
-unexecuted and requires new exact SHA-bound user authorization.
+consumed and stopped fail-closed at the HU-incompatible `df -i --output` combination before inode
+output or ledger payload return. Ledger size/SHA, proposed-root absence and byte capacity passed;
+HU writes and downloads were zero. The source registry therefore remains open. A narrow frozen,
+unexecuted retry changes only the inode observation to `df -Pi` at
+`documentation/contracts/corpora/vngrs-m2-d0-source-registry-storage-discovery-retry-v1.md` and
+requires new exact SHA-bound user authorization.
 
 ## The short answer
 

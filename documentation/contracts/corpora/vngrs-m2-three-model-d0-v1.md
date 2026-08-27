@@ -300,6 +300,13 @@ single-pass, HU-read-only discovery is frozen separately in
 `documentation/contracts/corpora/vngrs-m2-d0-source-registry-storage-discovery-v1.md` and requires
 new SHA-bound user authorization.
 
+The first separately authorized discovery pass verified the ledger's 732,929-byte size and frozen
+SHA-256, proposed-root absence and 122,943,170,412,544 available scratch bytes, then failed closed
+before inode output and ledger payload return because HU `df` rejects `-i` together with
+`--output`. No registry was derived, no retry was executed and HU writes/corpus reads/downloads
+remained zero. A narrow unexecuted correction changes only that observation to POSIX `df -Pi`;
+its own exact SHA-bound authorization is required.
+
 ## Authority boundary
 
 This draft authorizes local code, configuration, documentation, offline fixtures and dry-run
