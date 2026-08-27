@@ -1,7 +1,7 @@
 """Bounded, model-neutral preparation helpers for the vngrs corpus.
 
-The package contains no implicit network client.  Full-object retrieval is transport-injected,
-explicitly execution-gated and publishes only byte- and identity-verified local Parquet objects.
+The package performs no implicit network access. Full-object retrieval is explicitly injected;
+the reviewed production adapter remains inert until called by an authorized launcher.
 """
 
 from .metadata import (
@@ -33,9 +33,13 @@ from .materialization import (
 from .source_registry import build_source_registry_from_metadata_ledger, parse_discovery_transport
 from .d0_audit import D0Document, exact_heldout_split, human_review_sample, lightweight_audit, tokenizer_accounting
 from .d0_storage import D0StoragePolicy, validate_storage_observation
-from .d0_orchestration import D0OrchestrationPolicy, run_d0_orchestration
+from .d0_orchestration import D0OrchestrationPolicy, finalize_d0_phase2, run_d0_orchestration, run_d0_phase1
 from .d0_bundle import write_d0_evidence_bundle, write_d0_failure
 from .parquet_loader import load_verified_parquet_documents
+from .d0_review import build_review_packet, decision_template, review_packet_sha256, validate_review_decisions
+from .d0_runtime import FrozenTokenizerAdapter, ReviewedHttpsTransport
+from .d0_preflight import validate_d0_preflight
+from .d0_inputs import load_source_objects, load_synthetic_surfaces
 from .tokenizer_inventory import extract_tokenizer_inventory
 from .outputs import FINAL_AUDIT, OUTPUT_ARTIFACT_MANIFEST, OUTPUT_ORDER, serialize_output_artifact_manifest
 from .pipeline import FailClosedLidAdapter, VngrsPreparationConfig, evaluate_final_contract, prepare_records
@@ -48,6 +52,7 @@ __all__ = [
     "D0StoragePolicy",
     "D0OrchestrationPolicy",
     "FullObjectResponse",
+    "FrozenTokenizerAdapter",
     "FINAL_AUDIT",
     "FROZEN_SELECTED_SHARD_PATHS",
     "FROZEN_SELECTION_PAYLOAD_SHA256",
@@ -56,15 +61,18 @@ __all__ = [
     "OUTPUT_ARTIFACT_MANIFEST",
     "OUTPUT_ORDER",
     "RECORD_MANIFEST_FIELDS",
+    "ReviewedHttpsTransport",
     "REQUEST_LEDGER_FIELDS",
     "SourceObject",
     "VNGRS_REVISION",
     "VNGRS_REPOSITORY",
     "VngrsPreparationConfig",
     "build_shard_paths",
+    "build_review_packet",
     "build_source_registry_from_metadata_ledger",
     "parse_discovery_transport",
     "evaluate_final_contract",
+    "decision_template",
     "exact_heldout_split",
     "extract_tokenizer_inventory",
     "human_review_sample",
@@ -73,16 +81,23 @@ __all__ = [
     "materialize_full_objects",
     "lightweight_audit",
     "load_verified_parquet_documents",
+    "load_source_objects",
+    "load_synthetic_surfaces",
     "immutable_resolve_url",
     "prepare_records",
+    "review_packet_sha256",
     "run_d0_orchestration",
+    "run_d0_phase1",
+    "finalize_d0_phase2",
     "select_systematic_shards",
     "serialize_output_artifact_manifest",
     "source_identity_key",
     "tokenizer_accounting",
     "validate_final_evidence_relationships",
     "validate_final_source_evidence",
+    "validate_d0_preflight",
     "validate_record_manifest",
+    "validate_review_decisions",
     "validate_request_ledger",
     "validate_request_ledger_aggregate",
     "validate_source_registry",

@@ -43,6 +43,14 @@ def load_verified_parquet_documents(
         path = root_path / "raw" / source.path
         if not path.is_file() or path.is_symlink():
             raise ValueError(f"{source.path}: verified Parquet object is absent")
+        if path.stat().st_size != source.size_bytes:
+            raise ValueError(f"{source.path}: verified Parquet byte-size drift")
+        digest = hashlib.sha256()
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(8 * 1024 * 1024), b""):
+                digest.update(chunk)
+        if digest.hexdigest() != source.sha256:
+            raise ValueError(f"{source.path}: verified Parquet SHA-256 drift")
         parquet = pq.ParquetFile(path)
         if tuple(parquet.schema_arrow.names) != VNGRS_SCHEMA:
             raise ValueError(f"{source.path}: logical schema drift")

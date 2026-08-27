@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping
+import json
 
 from .d0_audit import (
     D0Document,
@@ -16,6 +17,8 @@ from .d0_audit import (
 )
 from .d0_storage import validate_storage_observation
 from .d0_bundle import write_d0_evidence_bundle, write_d0_failure
+from .d0_review import build_review_packet, review_packet_sha256, validate_review_decisions, write_review_handoff, write_validated_decisions
+from .metadata import canonical_json_sha256
 from .materialization import (
     MaterializationPolicy,
     SourceObject,
@@ -30,6 +33,120 @@ class D0OrchestrationPolicy:
     execution_enabled: bool = False
     heldout_documents: int = 10_000
     human_review_documents: int = 64
+
+
+def run_d0_phase1(
+    root: str | Path,
+    objects: Iterable[SourceObject],
+    *,
+    transport: Transport,
+    preflight: Mapping[str, Any],
+    synthetic_surfaces: Mapping[str, str],
+    policy: D0OrchestrationPolicy,
+    materialization_policy: MaterializationPolicy,
+    document_loader: Callable[..., list[D0Document]] = load_verified_parquet_documents,
+) -> dict[str, Any]:
+    """Materialize and freeze a bounded review packet; deliberately stop before PASS."""
+
+    if not policy.execution_enabled or preflight.get("status") != "D0_PREFLIGHT_PASS":
+        raise ValueError("authorized, passing D0 preflight is required")
+    registry = tuple(objects)
+    materialized = materialize_full_objects(root, registry, transport=transport, policy=materialization_policy)
+    try:
+        documents = document_loader(root, registry, execution_enabled=True)
+        audit = lightweight_audit(documents, synthetic_surfaces=synthetic_surfaces)
+        if audit["status"] != "AUDIT_COMPLETE":
+            raise ValueError("mandatory lightweight audit blocked D0")
+        split = exact_heldout_split(documents, heldout_documents=policy.heldout_documents)
+        selected = human_review_sample(documents, sample_size=policy.human_review_documents)
+        packet = build_review_packet(documents, selected)
+        state = {
+            "schema_version": 1,
+            "status": "AWAITING_HUMAN_REVIEW",
+            "preflight": dict(preflight),
+            "source_rows": materialized.source_rows,
+            "request_rows": materialized.request_rows,
+            "document_count": len(documents),
+            "audit_sha256": canonical_json_sha256(audit),
+            "split_sha256": canonical_json_sha256(split),
+            "sample_sha256": canonical_json_sha256(selected),
+            "review_packet_sha256": review_packet_sha256(packet),
+            "ready_to_train": False,
+        }
+        write_review_handoff(root, state=state, packet=packet)
+        return state
+    except Exception as exc:
+        write_d0_failure(root, phase="phase1_review_handoff", error=exc)
+        raise
+
+
+def finalize_d0_phase2(
+    root: str | Path,
+    objects: Iterable[SourceObject],
+    *,
+    synthetic_surfaces: Mapping[str, str],
+    tokenizers: Iterable[TokenizerAdapter],
+    decisions: Iterable[Mapping[str, Any]],
+    policy: D0OrchestrationPolicy,
+    document_loader: Callable[..., list[D0Document]] = load_verified_parquet_documents,
+) -> dict[str, Any]:
+    """Revalidate immutable phase-1 evidence and finalize only after exact human decisions."""
+
+    if not policy.execution_enabled:
+        raise ValueError("D0 phase-2 execution is disabled")
+    root_path = Path(root)
+    state = json.loads((root_path / "control/phase1_state.json").read_text(encoding="utf-8"))
+    packet = [json.loads(line) for line in (root_path / "reports/human_review_packet.jsonl").read_text(encoding="utf-8").splitlines()]
+    if state.get("status") != "AWAITING_HUMAN_REVIEW" or review_packet_sha256(packet) != state.get("review_packet_sha256"):
+        raise ValueError("phase-1 state or review packet drift")
+    registry = tuple(objects)
+    documents = document_loader(root, registry, execution_enabled=True)
+    audit = lightweight_audit(documents, synthetic_surfaces=synthetic_surfaces)
+    split = exact_heldout_split(documents, heldout_documents=policy.heldout_documents)
+    selected = human_review_sample(documents, sample_size=policy.human_review_documents)
+    if (
+        len(documents) != state["document_count"]
+        or canonical_json_sha256(audit) != state["audit_sha256"]
+        or canonical_json_sha256(split) != state["split_sha256"]
+        or canonical_json_sha256(selected) != state["sample_sha256"]
+    ):
+        raise ValueError("phase-2 corpus/audit/split/sample drift")
+    reviewed = validate_review_decisions(packet, decisions)
+    review = _validate_human_review(selected, reviewed)
+    tokenizer_reports = tokenizer_accounting(documents, tokenizers)
+    if any(row["status"] != "ACCOUNTING_COMPLETE" for row in tokenizer_reports.values()):
+        raise ValueError("one or more tokenizer accounting reports blocked D0")
+    result = {
+        "schema_version": 1,
+        "status": "D0_EVIDENCE_COMPLETE",
+        "storage": state["preflight"]["storage"],
+        "audit": audit,
+        "split": split,
+        "human_review_sample": selected,
+        "reviewed_sample": reviewed,
+        "human_review": review,
+        "tokenizer_accounting": tokenizer_reports,
+        "trwiki_training_rows": 0,
+        "ready_to_train": False,
+    }
+    try:
+        decisions_path = write_validated_decisions(root, reviewed)
+        result["final_audit"] = write_d0_evidence_bundle(
+            root,
+            result,
+            source_rows=state["source_rows"],
+            request_rows=state["request_rows"],
+            existing_artifacts=(
+                "control/phase1_state.json",
+                "reports/human_review_packet.jsonl",
+                "reports/human_review_decision_template.jsonl",
+                decisions_path,
+            ),
+        )
+    except Exception as exc:
+        write_d0_failure(root, phase="phase2_evidence_bundle", error=exc)
+        raise
+    return result
 
 
 def _validate_human_review(

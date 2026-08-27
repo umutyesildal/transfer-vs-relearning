@@ -1,6 +1,6 @@
 schema_version: 1
 contract_id: vngrs-m2-three-model-d0-v1
-status: qualified_execution_disabled
+status: frozen_unexecuted
 contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
 
 source:
@@ -129,7 +129,32 @@ final_orchestration:
   terminal_manifest: manifests/output_artifact_manifest.jsonl
   terminal_audit: control/final_audit.json
   terminal_ready_to_train: false
-  production_launcher_frozen: false
+  production_launcher_frozen: true
+  preflight_module: transfer_vs_relearning.corpora.vngrs.d0_preflight
+  runtime_adapter_module: transfer_vs_relearning.corpora.vngrs.d0_runtime
+  review_handoff_module: transfer_vs_relearning.corpora.vngrs.d0_review
+  frozen_input_module: transfer_vs_relearning.corpora.vngrs.d0_inputs
+  phase1: materialize_audit_split_and_freeze_review_packet
+  phase1_terminal_status: AWAITING_HUMAN_REVIEW
+  phase2: revalidate_then_apply_exact_packet_bound_human_decisions_and_tokenizer_accounting
+  phase2_requires_separate_authorization: true
+  review_excerpt_max_characters: 2000
+  allowed_review_verdicts: [usable, unusable, unsafe]
+  all_64_usable_required_for_pass: true
+  launcher: scripts/corpora/run_vngrs_m2_d0.py
+  preflight_launcher: scripts/corpora/preflight_vngrs_m2_d0.py
+  phase1_submitter: scripts/corpora/submit_vngrs_m2_d0_phase1.sh
+  phase2_submitter: scripts/corpora/submit_vngrs_m2_d0_phase2.sh
+  phase1_slurm: slurm/m2/materialize_vngrs_m2_d0_phase1.slurm
+  phase2_slurm: slurm/m2/finalize_vngrs_m2_d0_phase2.slurm
+
+synthetic_surface_registry:
+  source: artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/validation.jsonl
+  source_sha256: 9b1fcae2565fbf0d9c624a2c229c8173a59ca00064db1a017b0f2a5c0c749289
+  subjects: 100
+  fact_objects: 500
+  aliases: 0
+  note: no_separate_alias_registry_exists_in_the_frozen_relation_v2_release
 
 light_audit:
   human_review_documents: 64

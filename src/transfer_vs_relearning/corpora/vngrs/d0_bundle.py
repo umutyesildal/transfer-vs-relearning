@@ -50,6 +50,7 @@ def write_d0_evidence_bundle(
     *,
     source_rows: Iterable[Mapping[str, Any]],
     request_rows: Iterable[Mapping[str, Any]],
+    existing_artifacts: Iterable[str] = (),
 ) -> dict[str, Any]:
     """Write the exact compact namespaces, then a self-reference-free terminal hash chain."""
 
@@ -100,6 +101,12 @@ def write_d0_evidence_bundle(
     }
     for role, report in sorted(result["tokenizer_accounting"].items()):
         payloads[f"reports/tokenizer_accounting_{role}.json"] = _json(report)
+    existing = set(existing_artifacts)
+    for relative in sorted(existing):
+        path = root_path / relative
+        if not path.is_file() or path.is_symlink() or path.name.endswith(".partial"):
+            raise ValueError(f"required phase artifact is absent or unsafe: {relative}")
+        payloads[relative] = path.read_bytes()
     rows = []
     for index, path in enumerate(sorted(payloads), 1):
         payload = payloads[path]
@@ -112,7 +119,8 @@ def write_d0_evidence_bundle(
                 "sha256": hashlib.sha256(payload).hexdigest(),
             }
         )
-        _atomic(root_path / path, payload)
+        if path not in existing:
+            _atomic(root_path / path, payload)
     manifest_payload = _jsonl(rows)
     manifest_sha256 = hashlib.sha256(manifest_payload).hexdigest()
     _atomic(root_path / "manifests/output_artifact_manifest.jsonl", manifest_payload)

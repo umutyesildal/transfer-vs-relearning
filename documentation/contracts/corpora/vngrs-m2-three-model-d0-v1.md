@@ -1,6 +1,6 @@
 # vngrs three-model M2 D0 corpus closure contract v1
 
-**Status:** `QUALIFIED / EXECUTION DISABLED`
+**Status:** `FROZEN / UNEXECUTED`
 **Owner:** thesis project  
 **Created:** 2026-08-27  
 **Supersedes:** none; preserves all numbered 151-series evidence
@@ -38,7 +38,8 @@ It may not:
 - substitute `trwiki-20260601` as the primary in-domain corpus;
 - clean, delete, overwrite, deduplicate in place or mutate historical artifacts.
 
-Qualification of this contract grants none of the future actions above.
+This freeze grants none of the future actions above without the phase-specific SHA-bound
+authorization described below.
 
 ## Immutable identities
 
@@ -134,8 +135,9 @@ The mandatory audit is intentionally small:
    quartile, with row IDs selected before text review;
 3. deterministic counts/rates for invalid UTF-8/replacement characters, empty/very short text,
    boilerplate, SEO/betting and legal/jurisdiction regex groups;
-4. exact and Unicode-normalized scans for the frozen 100 subjects, 500 objects and all frozen
-   aliases;
+4. exact and Unicode-normalized scans for the frozen Relation V2 100 subjects and 500 fact
+   objects; the frozen release contains no separate alias registry, so alias count is explicitly
+   zero rather than inferred or invented;
 5. exact duplicate stable-ID and normalized-text-hash summary.
 
 The following are not mandatory D0 gates unless a precommitted escalation trigger fires:
@@ -249,17 +251,15 @@ Qualification checklist:
 6. ~~freeze the storage/inode arithmetic and record the current code/config/contract hashes in
    the control plane~~.
 
-Before execution, the contract must become `frozen` and receive separate exact SHA-bound user
-authorization.
+The contract is now frozen. Phase 1 and Phase 2 each require separate exact SHA-bound user
+authorization; authorization of one never implies the other.
 
 ## Current blockers
 
-- the production HU launcher that gathers every D0.0 Git/evidence/home/job preflight observation,
-  supplies the reviewed HTTPS transport and binds the three preserved tokenizer adapters is not
-  frozen;
-- the deterministic 64-document sample still requires the explicit human-review handoff before a
-  terminal D0 PASS can be produced;
-- no exact SHA-bound D0 execution authorization has been given.
+- Phase 1 materialization has no exact SHA-bound execution authorization;
+- Phase 2 remains ineligible until Phase 1 produces the immutable 64-document review packet, all
+  decisions bind its exact SHA-256, and a separate Phase 2 authorization is given;
+- D0 PASS never implies M2-A/M2-B training authorization.
 
 ## Local implementation checkpoint (2026-08-27)
 
@@ -296,7 +296,8 @@ corpus reads were zero. The resulting tokenizer asset-manifest hashes are OLMo
 `1bb3f5ee04b6f32aab990e46fb99520b1e4ab04bdc3f1cfa75ea732c8f8dfd17`, Qwen
 `8e1cbce23938ba773e652fc767002a6687f3ec4f538139d8b760b3fe0b33a2df` and SmolLM
 `1f41566541c514dcebac6168f0f2f83f2b54a969c6b36db4501ae4d0683fd652`.
-This closes only the tokenizer inventory blocker; D0 remains unqualified and unexecuted.
+This closed only the tokenizer inventory blocker at that historical checkpoint; D0 remained
+unqualified and unexecuted then.
 
 A fail-closed source-registry extractor is now locally implemented and fixture-tested. It accepts
 only the exact accepted metadata-ledger SHA, frozen 32-path order, immutable revision, positive
@@ -333,8 +334,7 @@ full-object SHA-256 identities, full-object bytes `9,502,315,428`, Parquet compr
 `b1c80bf78ff40de5c02e14f08082a51cc17cc90a9853028eaf866cb63326e41f`. It also reconfirmed the
 proposed root absent with 122,943,170,412,544 available bytes and 2,284,282,885 available inodes.
 HU writes, corpus rows and object downloads were zero. This closes the source-registry blocker;
-the storage arithmetic and local orchestration checkpoint below close local qualification, while
-production-launcher freeze remains open.
+the storage arithmetic and local orchestration checkpoint below close local qualification.
 
 The local storage policy now closes the peak arithmetic without claiming that the earlier
 read-only observation is a future execution preflight. Its calculated peak is `30,029,406,455`
@@ -349,15 +349,28 @@ creation, materializes the exact registry through an injected transport, loads e
 identity, runs the mandatory audit/split/review/tokenizer stages in order, and emits an atomic
 self-reference-free output manifest followed by a one-way final audit. A post-materialization
 failure writes `control/d0_failure.json`; it cannot produce `ready_to_train=true`. Offline tests
-verify each manifest row against the bytes and SHA-256 actually written. This qualifies the local
-contract and operator design, but does not freeze a production HU launcher or solve the required
-human-review handoff. Therefore corpus materialization remains disabled and separately
-unauthorized.
+verify each manifest row against the bytes and SHA-256 actually written.
+
+The frozen production route is deliberately two-phase. Phase 1 runs D0.0 preflight, the reviewed
+single-redirect HTTPS transport, exact materialization, Parquet/audit/split work and writes bounded
+2,000-character excerpts plus an empty decision template. Its only successful terminal state is
+`AWAITING_HUMAN_REVIEW`; it cannot produce D0 PASS. Phase 2 re-hashes every source object, reruns
+the audit/split/sample derivations, requires exactly 64 unique packet-hash-bound decisions and
+loads only the hash-verified epoch-036 tokenizer assets with `local_files_only=true`. Any
+`unsafe`, `unusable`, missing or unresolved decision blocks PASS. Validated decisions, Phase-1
+state and the review packet are included in the terminal artifact hash chain. Both phases are CPU
+only; no model weights, inference, GPU or training route exists.
+
+The exact Relation V2 contamination source is
+`artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/validation.jsonl` with
+SHA-256 `9b1fcae2565fbf0d9c624a2c229c8173a59ca00064db1a017b0f2a5c0c749289`.
+It deterministically yields 100 subject surfaces and 500 fact-object surfaces. No distinct alias
+artifact exists in the frozen release, so alias count `0` is an explicit missingness boundary.
 
 ## Authority boundary
 
-This qualified contract authorizes local code, configuration, documentation, offline fixtures and dry-run
-validation requested by the user. It does not authorize network retrieval, corpus
+This frozen contract records local code, configuration, documentation, offline fixtures and
+dry-run validation requested by the user. Freeze alone does not authorize network retrieval, corpus
 materialization, HU/SSH, Slurm/GPU, tokenizer/model access on HU, training, evaluation, scoring,
 publication of this M2 branch, cleanup or deletion.
 

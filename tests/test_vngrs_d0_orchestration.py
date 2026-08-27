@@ -16,8 +16,11 @@ from transfer_vs_relearning.corpora.vngrs.d0_audit import (
 )
 from transfer_vs_relearning.corpora.vngrs.d0_orchestration import (
     D0OrchestrationPolicy,
+    finalize_d0_phase2,
     run_d0_orchestration,
+    run_d0_phase1,
 )
+from transfer_vs_relearning.corpora.vngrs.d0_review import review_packet_sha256
 from transfer_vs_relearning.corpora.vngrs.materialization import (
     FullObjectResponse,
     MaterializationPolicy,
@@ -168,6 +171,63 @@ def test_post_materialization_failure_is_typed_and_fail_closed(tmp_path: Path) -
     assert failure["status"] == "BLOCKED"
     assert failure["phase"] == "lightweight_audit"
     assert failure["ready_to_train"] is False
+    assert not (root / "control/final_audit.json").exists()
+
+
+def test_two_phase_review_handoff_revalidates_and_finalizes(tmp_path: Path) -> None:
+    rows, payloads = registry_and_payloads()
+    total = sum(row.size_bytes for row in rows)
+    root = tmp_path / "two-phase"
+    policy = D0OrchestrationPolicy(execution_enabled=True, heldout_documents=2, human_review_documents=2)
+    materialization_policy = MaterializationPolicy(selected_paths=FROZEN_SELECTED_SHARD_PATHS, expected_total_bytes=total, max_response_bytes=total, chunk_size_upper_bound=max(map(len, payloads.values())), execution_enabled=True)
+    state = run_d0_phase1(
+        root,
+        rows,
+        transport=transport(payloads),
+        preflight={"status": "D0_PREFLIGHT_PASS", "storage": {"schema_version": 1, "status": "STORAGE_BOUNDS_PASS"}},
+        synthetic_surfaces={"never": "Bu ifade hiçbir belgede bulunmaz"},
+        policy=policy,
+        materialization_policy=materialization_policy,
+    )
+    assert state["status"] == "AWAITING_HUMAN_REVIEW"
+    assert not (root / "control/final_audit.json").exists()
+    packet = [json.loads(line) for line in (root / "reports/human_review_packet.jsonl").read_text().splitlines()]
+    packet_hash = review_packet_sha256(packet)
+    decisions = [
+        {"schema_version": 1, "stable_document_id": row["stable_document_id"], "review_packet_sha256": packet_hash, "verdict": "usable", "reviewer": "fixture-reviewer"}
+        for row in packet
+    ]
+    result = finalize_d0_phase2(
+        root,
+        rows,
+        synthetic_surfaces={"never": "Bu ifade hiçbir belgede bulunmaz"},
+        tokenizers=[Tokenizer("olmo"), Tokenizer("qwen"), Tokenizer("smollm")],
+        decisions=decisions,
+        policy=policy,
+    )
+    assert result["final_audit"]["status"] == "D0_EVIDENCE_COMPLETE"
+    manifest = (root / "manifests/output_artifact_manifest.jsonl").read_text()
+    assert "control/phase1_state.json" in manifest
+    assert "reports/human_review_packet.jsonl" in manifest
+    assert "reports/human_review_decisions.jsonl" in manifest
+
+
+def test_two_phase_review_rejects_nonusable_content_without_terminal_pass(tmp_path: Path) -> None:
+    rows, payloads = registry_and_payloads()
+    total = sum(row.size_bytes for row in rows)
+    root = tmp_path / "unsafe"
+    policy = D0OrchestrationPolicy(execution_enabled=True, heldout_documents=2, human_review_documents=2)
+    run_d0_phase1(
+        root, rows, transport=transport(payloads),
+        preflight={"status": "D0_PREFLIGHT_PASS", "storage": {"schema_version": 1, "status": "STORAGE_BOUNDS_PASS"}},
+        synthetic_surfaces={"never": "Bu ifade hiçbir belgede bulunmaz"}, policy=policy,
+        materialization_policy=MaterializationPolicy(selected_paths=FROZEN_SELECTED_SHARD_PATHS, expected_total_bytes=total, max_response_bytes=total, chunk_size_upper_bound=max(map(len, payloads.values())), execution_enabled=True),
+    )
+    packet = [json.loads(line) for line in (root / "reports/human_review_packet.jsonl").read_text().splitlines()]
+    packet_hash = review_packet_sha256(packet)
+    decisions = [{"stable_document_id": row["stable_document_id"], "review_packet_sha256": packet_hash, "verdict": "unsafe" if index == 0 else "usable", "reviewer": "fixture-reviewer"} for index, row in enumerate(packet)]
+    with pytest.raises(ValueError, match="unsafe/unusable"):
+        finalize_d0_phase2(root, rows, synthetic_surfaces={"never": "Bu ifade hiçbir belgede bulunmaz"}, tokenizers=[Tokenizer("olmo"), Tokenizer("qwen"), Tokenizer("smollm")], decisions=decisions, policy=policy)
     assert not (root / "control/final_audit.json").exists()
 
 

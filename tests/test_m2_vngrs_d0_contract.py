@@ -21,10 +21,10 @@ def load_config() -> dict:
     return yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
 
 
-def test_d0_contract_is_qualified_but_execution_disabled_and_present() -> None:
+def test_d0_contract_is_frozen_unexecuted_and_present() -> None:
     config = load_config()
     assert CONTRACT.is_file()
-    assert config["status"] == "qualified_execution_disabled"
+    assert config["status"] == "frozen_unexecuted"
     assert config["contract"] == str(CONTRACT.relative_to(ROOT))
     assert config["authority"] == {
         "local_preparation": True,
@@ -106,7 +106,18 @@ def test_d0_final_orchestration_is_local_only_and_not_a_production_launcher() ->
     assert operator["reviewed_sample_injected"] is True
     assert operator["typed_post_materialization_failure"] == "control/d0_failure.json"
     assert operator["terminal_ready_to_train"] is False
-    assert operator["production_launcher_frozen"] is False
+    assert operator["production_launcher_frozen"] is True
+    assert operator["phase1_terminal_status"] == "AWAITING_HUMAN_REVIEW"
+    assert operator["phase2_requires_separate_authorization"] is True
+    assert operator["all_64_usable_required_for_pass"] is True
+
+
+def test_d0_synthetic_surface_source_is_exact_and_does_not_invent_aliases() -> None:
+    source = load_config()["synthetic_surface_registry"]
+    assert source["source_sha256"] == "9b1fcae2565fbf0d9c624a2c229c8173a59ca00064db1a017b0f2a5c0c749289"
+    assert source["subjects"] == 100
+    assert source["fact_objects"] == 500
+    assert source["aliases"] == 0
 
 
 def test_d0_source_registry_operator_is_exact_and_execution_disabled() -> None:

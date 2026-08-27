@@ -13,7 +13,7 @@ The detailed M0↔M1 result ledger is
 
 **Current preparation boundary:** the three-model M2 scope is OLMo, Qwen and SmolLM, each with
 full M2-A/M2-B sibling training from its own frozen M1 epoch-036 parent. No single primary model
-is selected. The current local-only artifact is the qualified, execution-disabled vngrs D0 contract at
+is selected. The current local-only artifact is the frozen, unexecuted vngrs D0 contract at
 `documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md`, using the previously verified
 systematic 32-shard subcorpus. No corpus retrieval/materialization or M2 training is authorized.
 The local fail-closed full-object operator is now implemented and offline-fixture validated. It is
@@ -25,8 +25,9 @@ validated operators rather than corpus results.
 The exact six-file read-only inspection is frozen separately in
 `documentation/contracts/corpora/vngrs-m2-d0-tokenizer-manifest-inventory-v1.md`; execution is
 complete and consumed. All six expected hashes matched; 5,988 compact manifest bytes were read,
-HU writes were zero, and the OLMo/Qwen/SmolLM tokenizer asset registries all closed. D0 remains
-unqualified because the 32 full-object SHA/LFS registry and storage/inode bounds are still open.
+HU writes were zero, and the OLMo/Qwen/SmolLM tokenizer asset registries all closed. D0 remained
+unqualified at that historical checkpoint; the later registry/storage closure supersedes that
+narrow status without rewriting the earlier evidence.
 A fail-closed local extractor for those 32 identities is now offline tested. The exact one-ledger
 plus filesystem-metadata read-only discovery contract is frozen at
 `documentation/contracts/corpora/vngrs-m2-d0-source-registry-storage-discovery-v1.md`; it is
@@ -56,9 +57,11 @@ HU writes, corpus reads and downloads remained zero. Storage arithmetic is now c
 `30,029,406,455`-byte calculated peak, rounded to a frozen 32 GiB peak with mandatory fresh
 40 GiB/1,024-inode execution gates. The exact Parquet loader, stage orchestration, typed
 post-materialization failures and atomic self-reference-free evidence chain passed the compatible
-168-test suite. This qualifies the local design without freezing or authorizing execution. The
-remaining boundary is a production HU preflight/HTTPS/tokenizer launcher plus an explicit
-two-phase 64-document human-review handoff; corpus materialization remains unauthorized.
+then-current 168-test suite. The later two-phase freeze extends that qualified checkpoint. The
+production HU preflight, reviewed HTTPS/tokenizer adapters and explicit two-phase 64-document
+human-review handoff are now frozen and passed 181 compatible tests. Phase 1 is unexecuted and
+unauthorized; it must stop at `AWAITING_HUMAN_REVIEW`. Phase 2 is separately gated by the exact
+review-packet hash and a later authorization.
 
 ## The short answer
 
@@ -170,8 +173,8 @@ an M1 training input. `trwiki-20260601` remains the Turkish cross-domain control
 
 The completed M1 family is terminal evidence. No duplicate submission, cleanup, deletion,
 M2-A/M2-B execution, or primary-model promotion is implied. The active local boundary is to
-freeze the three-model vngrs D0 production launcher and human-review handoff. External
-materialization remains a later, separate exact authorization boundary.
+authorize only the exact frozen Phase-1 vngrs D0 materialization wave. Phase 2 and every M2
+training action remain separate future authorization boundaries.
 
 ## Read next
 
