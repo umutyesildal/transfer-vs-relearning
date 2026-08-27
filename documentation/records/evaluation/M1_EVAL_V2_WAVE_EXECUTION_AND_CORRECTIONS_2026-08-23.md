@@ -222,3 +222,36 @@ execution; unreadable result files still fail closed. Rebound identities: adapte
 `3fd83349e7da1986651b5bfceb0942ed491b7671ff97ff33d4a9b89444ece83b`, contract
 `33d48d0a6481c78c88110dd637db68c857d5574f523efbc9754737dc9d80b1a8`. A fourth single-state sweep
 re-executes only this state; all other elements skip via `already_complete`.
+
+## 14. Addendum (2026-08-27): final sweep terminal result 111/111
+
+The fourth sweep completed the only remaining canonical state. The final submission chain was
+preflight `479444`, evaluation array `479445`, and afterany family finalizer `479446`. A live
+read-only inspection on `2026-08-27T00:17:33+02:00` found no queue entries for these jobs and the
+canonical family result reported `status: complete`, `complete_count: 111`, `gpu_complete_count: 108`,
+and `parent_complete_count: 3` for matrix `2673aacbc8640149`.
+
+The final canonical result root is `/vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v3`. The
+family-result SHA-256 is
+`ccd26de2193ec3d5580346fd01ecadb84f450224eb0aebeb39ec694ff2b1487a`; the preflight is `ready`
+with SHA-256 `dbd40c62f5f3a31f84fd36ee6452d8b02ea2cb8a64ec87496d891d6d36356e4`; the submission
+manifest SHA-256 is `be5da631c304d16d1bcc8662745916a1353e9ada82365d827b5270f1ee72b708`; and the
+task-matrix SHA-256 is `9e0ef04d596ac9c35230a520817da92e03a031d91e7c3e2694b2e8ad0704f120`.
+The finalizer stdout is 27,843 bytes with SHA-256
+`4aab982f6c6f3e07fc4db968ad93eec2e04b9d8b294643cbca320e506bf5a33a`; finalizer stderr is zero
+bytes. `sacct` remained unavailable because of the cluster Munge/SlurmDBD authentication error;
+this is missing scheduler accounting metadata, not a failed scientific result.
+
+Qwen `epoch-018` is now canonical `complete` and records the preserved
+`epoch-018__killed_0` prior attempt. The old attempt is not counted as a second scientific state.
+No canonical result path is non-complete, and no raw result tree was moved, deleted, or overwritten.
+
+The detailed derived result layer and M0 comparison are recorded at:
+
+- `artifacts/evaluations/m1_three_model_v1/dump/M1_RESULT_LEDGER_2026-08-27.md`;
+- `artifacts/evaluations/m1_three_model_v1/dump/m1_metrics.json`;
+- `artifacts/evaluations/m1_three_model_v1/dump/m0_m1_comparison.csv`;
+- `artifacts/evaluations/m1_three_model_v1/dump/m1_trajectory.csv`.
+
+This closes execution bookkeeping only. It does not select a primary model, turn an operational
+completion into a causal claim, authorize M2-A/M2-B, or authorize a duplicate evaluation.

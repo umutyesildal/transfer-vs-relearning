@@ -24,6 +24,15 @@ weights, checkpoints, raw sample JSONL, corpus shards, or long logs.
 - The Qwen Pile-10k lane is the only missing lane in this snapshot (23/24 valid).
 - No canonical cross-model normalization or primary-model selection is claimed here.
 
+## Historical field-label correction
+
+The older compact JSON has a historical `wikitext_bpb` field-label error for the OLMo row: its
+stored value is the byte-perplexity value (`1.5798026045...`), while the canonical M0 projection
+used by the M1 family records the actual WikiText BPB (`0.6597443057...`). The original dump is
+preserved unchanged. New M0↔M1 comparisons bind WikiText BPB to the hash-closed M0 parent
+projection and record this correction in
+`documentation/records/evaluation/M1_EVAL_V2_WAVE_RESULT_2026-08-27.md`.
+
 ## Provenance and retention
 
 The source roots are listed under `contract.source_roots`. HU sources remain read-only on

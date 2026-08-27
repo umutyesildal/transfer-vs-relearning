@@ -1,18 +1,18 @@
 schema_version: 1
 brief_id: agent-brief-v2
-as_of: "2026-08-22"
+as_of: "2026-08-27"
 status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: d5d5dd4bac5e21dc09b9da0018c89457b79bd37bd9f6c4b155fc3d409730e590
+  full_state_sha256: 0a189d5b38eeecec5414fdf8a8906cf877e5aa4474359e30ec73a398e30326a7
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
   phase: m1_pipeline_repair
-  branch: agent/m1-pipeline-repair
+  branch: agent/m1-eval-walltime-correction
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
 
@@ -29,9 +29,9 @@ stage_readiness:
   m0: complete
   m1_scientific_inputs: ready
   m1_training: complete_111_checkpoint_states
-  m1_evaluation_adapter_and_contract: frozen_v3_single_a100_pool_awaiting_exact_authorization
+  m1_evaluation_adapter_and_contract: frozen_v3_single_a100_pool_terminal_complete_111_of_111
   m1_first_wave_cancelled_by_user_before_any_scientific_result: true
-  m1_execution: not_authorized
+  m1_execution: complete_111_of_111
   m2_corpus_and_sibling_contract: later_not_an_m1_blocker
 
 evaluation:
@@ -60,7 +60,7 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: monitor_running_correction_6_wave_then_close_at_111_of_111
+  subject: trajectory_normalization_and_presentation_review_from_preserved_m1_bundles
   delegation_record: documentation/records/evaluation/M1_EVAL_V2_WAVE_EXECUTION_AND_CORRECTIONS_2026-08-23.md
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user

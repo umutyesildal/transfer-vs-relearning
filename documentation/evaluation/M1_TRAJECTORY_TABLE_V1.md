@@ -1,6 +1,11 @@
 # M1 factual-access and retention trajectory table v1
 
-**Status:** prepared schema; no new measurement executed
+**Status:** schema prepared; terminal M1 result view generated 2026-08-27
+
+The completed M1 result view is generated from the 111-state family at
+`artifacts/evaluations/m1_three_model_v1/dump/m1_trajectory.csv`. The source bundle and detailed
+M0↔M1 comparison are linked from
+`documentation/records/evaluation/M1_EVAL_V2_WAVE_RESULT_2026-08-27.md`.
 
 This table implements the supervisor request to show how factual access and language retention
 change from the frozen M0 parent through M1 training.

@@ -1,29 +1,30 @@
 # Current project status
 
-**As of:** 2026-08-23
+**As of:** 2026-08-27
 
-**Current branch:** `agent/m1-pipeline-repair`
+**Current branch:** `agent/m1-eval-walltime-correction`
 
-**Execution state:** M1 eval-v2 wave v3 RUNNING under Correction 6 (single A100-80GB pool,
-throttle 6): 4/111 canonical complete at snapshot 2026-08-23T13:10Z. Full execution history,
-procedures and delegation boundaries:
+**Execution state:** M1 eval-v2 wave v3 is terminal `complete`: 111/111 canonical scientific
+states, consisting of 108 GPU snapshots and 3 M0 parent projections. Full execution history,
+final result and delegation boundaries:
 `documentation/records/evaluation/M1_EVAL_V2_WAVE_EXECUTION_AND_CORRECTIONS_2026-08-23.md`.
-The two earlier attempts were user-cancelled before any scientific result.
+The detailed M0↔M1 result ledger is
+`documentation/records/evaluation/M1_EVAL_V2_WAVE_RESULT_2026-08-27.md`.
 
 ## The short answer
 
-M0 is finished. The matched three-model M1 training wave is also complete: the successful retry
-family at `/vol/tmp2/yesildau/m1_matched_three_model_retry_v1` produced 37 tracked states per
-model (parent plus 36 epoch snapshots, 111 total). The M1 eval-v2 execution adapter and its
-hash-closed contract are frozen; evaluation starts only after the user provides the exact
-SHA-bound authorization sentence.
+M0 is finished. The matched three-model M1 training wave and its eval-v2 checkpoint family are
+complete: `/vol/tmp2/yesildau/m1_matched_three_model_retry_v1` produced 37 tracked states per
+model, and `/vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v3` closed at 111/111. The M1
+eval-v2 contract is hash-closed and the derived result layer is recorded with denominators and
+source hashes.
 
-The recent stall was a control-plane error, not a scientific-design failure: the prospective M1
-evaluator required checkpoint and training manifests before training, even though training is the
-stage that creates those manifests. The repair makes them dependency outputs and keeps standalone
-post-training evaluation fail-closed unless the real files and hashes exist.
+The earlier stalls were control-plane/validator issues, not scientific scores. Their correction
+history remains append-only in the execution record. The final sweep preserved the one hard-killed
+Qwen attempt as `__killed_0`, then produced a complete canonical result without overwriting prior
+evidence.
 
-## Local pre-execution audit (2026-08-23)
+## Historical local pre-execution audit (2026-08-23)
 
 - Hash chain re-verified after commit `a273f56`: contract, execution config, adapter module and
   entrypoint hashes on disk match `PROJECT_STATE.yaml` exactly (18/18 checks).
@@ -32,7 +33,8 @@ post-training evaluation fail-closed unless the real files and hashes exist.
   no `--include_path`) match the proven M0 adapter behavior; `winogender_*`/`turblimp_core`
   resolve inside the pinned environment as in M0.
 - Tests: focused executor suite 6/6; combined study + experiment-pipeline suites 82 passed.
-- Remaining blocker: only the exact SHA-bound user authorization sentence.
+- At that historical point, the remaining blocker was the exact SHA-bound user authorization
+  sentence; the later authorized sweep and its terminal result are recorded above.
 
 ## Revision 2 — dual-route acceleration (2026-08-23, later the same day)
 
@@ -108,8 +110,8 @@ three identity/storage preflights
 | M1 scientific inputs/recipe | ready locally |
 | M1 first training wave | preserved NOT_RUN: import-path failure before model load, jobs 475832–475834 |
 | M1 training retry wave | COMPLETE: jobs 475850–475852, 111 checkpoint states under `m1_matched_three_model_retry_v1` |
-| M1 checkpoint evaluation adapter/contract | frozen (append-only correction 1): 108 GPU tasks + 3 parent projections from canonical M0 v1f evidence |
-| M1 execution authorization | absent; user must provide the exact SHA-bound sentence |
+| M1 checkpoint evaluation adapter/contract | frozen v3; 108 GPU tasks + 3 parent projections from canonical M0 v1f evidence |
+| M1 execution | COMPLETE: final sweep jobs 479444/479445/479446; 111/111 terminal |
 | M2 corpus and sibling contract | not frozen; does not block M1 preparation |
 
 `vngrs-ai/vngrs-web-corpus` is reserved for the later M2-A/M2-B Turkish adaptation arms. It is not
@@ -117,13 +119,9 @@ an M1 training input. `trwiki-20260601` remains the Turkish cross-domain control
 
 ## Current safety boundary
 
-This branch may change local code, configs, documentation and offline tests because the user asked
-for the repair. It may not connect to HU, submit Slurm, load/train models, score evaluations,
-materialize corpora, push, merge, delete artifacts or reuse an old authorization.
-
-The next legitimate handoff is a locally tested M1 adapter plus a reviewable, execution-disabled
-contract/config pair. Only after the user says to start will a separate exact authorization be
-consumed.
+The completed M1 family is terminal evidence. No duplicate submission, cleanup, deletion, M2-A/M2-B
+execution, or primary-model promotion is implied. The next separate scientific boundary is
+trajectory normalization and presentation review from the preserved result bundles.
 
 ## Read next
 

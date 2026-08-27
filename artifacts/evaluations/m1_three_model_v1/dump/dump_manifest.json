@@ -1,0 +1,28 @@
+{
+  "artifacts": [
+    {
+      "bytes": 4372426,
+      "path": "artifacts/evaluations/m1_three_model_v1/dump/m1_metrics.json",
+      "sha256": "41c2f2c6b722fc25ac48af278f1b318acc5e743b3c48d649fe26259848080462"
+    },
+    {
+      "bytes": 898225,
+      "path": "artifacts/evaluations/m1_three_model_v1/dump/m0_m1_comparison.csv",
+      "sha256": "ee0a9f0bc21e8c360c8fc0b9971cd3be3ff76120bc89c55dee60c356a670e68a"
+    },
+    {
+      "bytes": 127891,
+      "path": "artifacts/evaluations/m1_three_model_v1/dump/m1_trajectory.csv",
+      "sha256": "0cf33dca248d35c8c6f49bd8856d2ef801d3cfef522f59bde099a9aef72e269b"
+    },
+    {
+      "bytes": 46477,
+      "path": "artifacts/evaluations/m1_three_model_v1/dump/M1_RESULT_LEDGER_2026-08-27.md",
+      "sha256": "20cbca7e0c46a009dbc678b512f42cc147931c48b896eccb91cfc9c3a1f189c5"
+    }
+  ],
+  "generated_at": "2026-08-27",
+  "schema_version": "m1-eval-v2-compact-dump-manifest-v1",
+  "source_family_result_sha256": "ccd26de2193ec3d5580346fd01ecadb84f450224eb0aebeb39ec694ff2b1487a",
+  "state": "M1"
+}
