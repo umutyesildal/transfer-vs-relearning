@@ -29,7 +29,8 @@ the master synthesis, the long timeline, or a previous chat transcript.
   ledger before extraction; zero HU writes/downloads;
 - direct-pipe capture: complete ledger reached the extractor; it blocked because the historical
   Parquet compressed-byte total was incorrectly used as the full-object total;
-- next boundary: one frozen byte-semantics repair pass gating both exact aggregates;
+- byte-semantics repair: PASS; 32/32 LFS identities and both exact byte aggregates are closed;
+- next boundary: freeze peak-storage/output-inode bounds and final D0 execution orchestration;
 - vngrs: conditional systematic 32-shard M2 input; not materialized or training-ready;
 - M2 execution: not authorized; external materialization requires a later frozen SHA-bound
   contract and separate explicit user authorization.

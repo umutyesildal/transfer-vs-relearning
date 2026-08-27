@@ -48,6 +48,13 @@ semantic mismatch: `9,468,474,036` is the Parquet row-group compressed-byte aggr
 operator and D0 draft now gate both totals separately; the frozen byte-semantics repair contract
 `documentation/contracts/corpora/vngrs-m2-d0-source-registry-byte-semantics-repair-v1.md` is
 unexecuted and needs new exact SHA-bound authorization.
+The authorized byte-semantics repair subsequently completed PASS: 32/32 immutable LFS-derived
+full-object identities closed, full-object bytes are `9,502,315,428`, Parquet compressed bytes are
+`9,468,474,036`, and canonical registry SHA-256 is
+`b1c80bf78ff40de5c02e14f08082a51cc17cc90a9853028eaf866cb63326e41f`.
+HU writes, corpus reads and downloads remained zero. The remaining local D0 qualification work is
+to freeze peak-storage/output-inode bounds and complete the final execution orchestration; corpus
+materialization remains separately unauthorized.
 
 ## The short answer
 

@@ -92,6 +92,10 @@ source_registry_operator:
   lfs_oid_is_full_object_sha256: true
   corpus_rows_read: 0
   full_objects_downloaded: 0
+  registry_closed: true
+  result: artifacts/corpora/vngrs_m2_d0/source_registry_byte_semantics_repair_v1.json
+  result_sha256: 63acadb8955411e0ee42dba0c28f72220568efce6e01db4bfcf90a31c49724a9
+  registry_sha256: b1c80bf78ff40de5c02e14f08082a51cc17cc90a9853028eaf866cb63326e41f
 
 local_audit_operators:
   module: transfer_vs_relearning.corpora.vngrs.d0_audit

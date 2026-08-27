@@ -15,6 +15,7 @@ CAPTURE_CONTRACT = ROOT / "documentation/contracts/corpora/vngrs-m2-d0-source-re
 CAPTURE_RESULT = ROOT / "artifacts/corpora/vngrs_m2_d0/source_registry_storage_discovery_capture_retry_v1.json"
 SEMANTICS_CONFIG = ROOT / "configs/corpora/vngrs_m2_d0_source_registry_byte_semantics_repair_v1.yaml"
 SEMANTICS_CONTRACT = ROOT / "documentation/contracts/corpora/vngrs-m2-d0-source-registry-byte-semantics-repair-v1.md"
+SEMANTICS_RESULT = ROOT / "artifacts/corpora/vngrs_m2_d0/source_registry_byte_semantics_repair_v1.json"
 
 
 def load_config() -> dict:
@@ -192,3 +193,26 @@ def test_byte_semantics_repair_freezes_both_aggregates_without_source_change() -
     assert config["sole_repair"]["scientific_change"] is False
     assert config["local_transport"]["raw_ledger_persisted"] is False
     assert all(config["authority"][key] is False for key in config["authority"])
+
+
+def test_byte_semantics_execution_closes_exact_registry_only() -> None:
+    import json
+
+    from transfer_vs_relearning.corpora.vngrs.metadata import canonical_json_sha256
+
+    result = json.loads(SEMANTICS_RESULT.read_text(encoding="utf-8"))
+    registry = result["source_registry"]
+    assert result["status"] == "PASS"
+    assert result["contract_sha256"] == "3a6591c288c3a2e3c82c7fdc776e1205d6738e57d9042c94bf9b43fff0a09e1e"
+    assert result["execution"]["remote_passes"] == 1
+    assert result["execution"]["hu_writes"] == 0
+    assert result["execution"]["corpus_rows_read"] == 0
+    assert registry["object_count"] == len(registry["objects"]) == 32
+    assert sum(row["size_bytes"] for row in registry["objects"]) == 9_502_315_428
+    assert sum(row["parquet_compressed_bytes"] for row in registry["objects"]) == 9_468_474_036
+    assert canonical_json_sha256(registry["objects"]) == registry["registry_sha256"]
+    assert registry["registry_sha256"] == "b1c80bf78ff40de5c02e14f08082a51cc17cc90a9853028eaf866cb63326e41f"
+    assert result["gate"]["source_registry_closed"] is True
+    assert result["gate"]["storage_bounds_closed"] is False
+    assert result["gate"]["ready_to_materialize"] is False
+    assert result["gate"]["ready_to_train"] is False

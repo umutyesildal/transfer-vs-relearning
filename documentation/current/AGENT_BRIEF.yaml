@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: e576018898a434ce037d9673747a17e8003864877355269b4168c82cc81f2f92
+  full_state_sha256: 9c0b995bf169995253362dba3eacf72576476e7f342aafc1adcb2e8a8187821b
   role: context_projection_only
   may_expand_authority: false
 
@@ -40,7 +40,8 @@ stage_readiness:
   m2_source_registry_storage_discovery_contract: consumed_blocked_operational_not_run
   m2_source_registry_storage_discovery_retry: consumed_blocked_local_capture_limit
   m2_source_registry_capture_retry: consumed_blocked_byte_semantics_mismatch
-  m2_source_registry_byte_semantics_repair: frozen_unexecuted_not_authorized
+  m2_source_registry_byte_semantics_repair: executed_pass_consumed
+  m2_source_registry: closed_32_of_32_lfs_identities
   m2_required_models: [olmo, qwen, smollm]
   m2_sibling_training_contract: not_frozen
 
@@ -70,9 +71,9 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: close_vngrs_full_object_registry_and_storage_bounds_before_d0_qualification
-  contract: documentation/contracts/corpora/vngrs-m2-d0-source-registry-byte-semantics-repair-v1.md
-  config: configs/corpora/vngrs_m2_d0_source_registry_byte_semantics_repair_v1.yaml
+  subject: freeze_vngrs_peak_storage_output_inode_bounds_and_final_d0_orchestration
+  contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
+  config: configs/corpora/vngrs_m2_three_model_d0_v1.yaml
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user
     - offline_tests_and_dry_runs

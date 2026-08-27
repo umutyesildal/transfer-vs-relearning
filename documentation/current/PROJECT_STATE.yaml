@@ -257,9 +257,9 @@ stage_readiness:
     corpus_contract_ready: false
     corpus_contract_status: draft_execution_disabled
     corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
-    corpus_contract_sha256: 7c59c0207c075288342d8152a2ddf691eff32be445f98a0d293997ef7a8baeef
+    corpus_contract_sha256: 5c20a5f4e49b66f92ff578a1c6e37a1f31d8d81c12d40755c6bb0a1487b450ef
     corpus_config: configs/corpora/vngrs_m2_three_model_d0_v1.yaml
-    corpus_config_sha256: 3e1766b84f6d8111dc8093855fcb021b2e8e4207d8891ff86a0f5999a909a329
+    corpus_config_sha256: 5426a13805a847b509f590a265bda0b2594c0415d5ad3f024758a79bab482b27
     corpus_scope: vngrs_systematic_32_shard_subcorpus
     required_models: [olmo, qwen, smollm]
     materialization_operator: locally_implemented_execution_disabled
@@ -324,17 +324,22 @@ stage_readiness:
     source_registry_capture_retry_failure: blocked_by_object_vs_parquet_compressed_byte_semantics
     source_registry_observed_object_bytes: 9502315428
     source_registry_parquet_compressed_bytes: 9468474036
-    source_registry_byte_semantics_repair_contract_status: frozen_unexecuted
+    source_registry_byte_semantics_repair_contract_status: executed_pass
     source_registry_byte_semantics_repair_contract: documentation/contracts/corpora/vngrs-m2-d0-source-registry-byte-semantics-repair-v1.md
     source_registry_byte_semantics_repair_contract_sha256: 3a6591c288c3a2e3c82c7fdc776e1205d6738e57d9042c94bf9b43fff0a09e1e
     source_registry_byte_semantics_repair_config: configs/corpora/vngrs_m2_d0_source_registry_byte_semantics_repair_v1.yaml
     source_registry_byte_semantics_repair_config_sha256: daa288787441ced948cdac0202b17c2aad894e24bd228ae96a981899d703973b
-    source_registry_byte_semantics_repair_execution_authorized: false
+    source_registry_byte_semantics_repair_execution_authorized: consumed_single_pass
+    source_registry_byte_semantics_repair_result: artifacts/corpora/vngrs_m2_d0/source_registry_byte_semantics_repair_v1.json
+    source_registry_byte_semantics_repair_result_sha256: 63acadb8955411e0ee42dba0c28f72220568efce6e01db4bfcf90a31c49724a9
+    source_registry_status: closed_32_of_32_from_accepted_lfs_identities
+    source_registry_sha256: b1c80bf78ff40de5c02e14f08082a51cc17cc90a9853028eaf866cb63326e41f
+    source_registry_total_object_bytes: 9502315428
+    source_registry_total_parquet_compressed_bytes: 9468474036
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - vngrs_d0_full_object_registry_not_closed
       - vngrs_d0_storage_preflight_not_measured
       - vngrs_corpus_contract_not_qualified_or_frozen
       - m2_a_m2_b_matched_contract_not_frozen
@@ -1238,7 +1243,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: close_vngrs_full_object_registry_and_storage_bounds_before_d0_qualification
+  subject: freeze_vngrs_peak_storage_output_inode_bounds_and_final_d0_orchestration
   decision_owner: user
   start_m1_now: false
   note: >-
@@ -1248,10 +1253,11 @@ next_decision_required:
     three tokenizer asset registries. The first registry/storage discovery pass stopped at
     HU-incompatible inode syntax. Its corrected retry closed filesystem observations but generic
     command-output capture truncated the emitted ledger before local extraction. The direct-pipe
-    pass then identified the frozen aggregate as Parquet compressed bytes rather than full-object
-    bytes (`9,468,474,036` vs `9,502,315,428`) and blocked correctly. All attempts had zero HU
-    writes and no corpus/object downloads. A byte-semantics repair is frozen but unexecuted and
-    needs new exact SHA-bound authorization. Materialization, Slurm/GPU and training remain unauthorized.
+    pass then separated Parquet compressed bytes from full-object bytes, and the authorized repair
+    closed 32/32 LFS identities with canonical registry SHA
+    `b1c80bf78ff40de5c02e14f08082a51cc17cc90a9853028eaf866cb63326e41f`.
+    All passes had zero HU writes and no corpus/object downloads. Peak-storage/output-inode bounds
+    and final D0 orchestration/freeze remain local blockers. Materialization and training are unauthorized.
 
 authorization:
   local_repository_changes: require_current_user_instruction

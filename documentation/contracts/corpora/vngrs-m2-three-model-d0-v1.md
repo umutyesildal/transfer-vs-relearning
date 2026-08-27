@@ -240,7 +240,8 @@ Before this draft can become `qualified`:
 1. ~~implement a fail-closed full-object materialization operator and offline fixture tests~~ —
    locally complete in `transfer_vs_relearning.corpora.vngrs.materialization`; the operator has
    no implicit network client, is execution-disabled by default and passed offline fixtures;
-2. bind per-shard expected size plus immutable object/LFS SHA-256 from accepted evidence;
+2. ~~bind per-shard expected size plus immutable object/LFS SHA-256 from accepted evidence~~ —
+   closed for 32/32 objects by the separately authorized byte-semantics repair pass;
 3. ~~implement deterministic lightweight audit, split and tokenizer accounting outputs~~ —
    locally complete as execution-disabled, transport-injected operators and offline fixtures;
 4. validate config against `FROZEN_SELECTED_SHARD_PATHS` and current model revisions;
@@ -252,7 +253,6 @@ authorization.
 
 ## Current blockers
 
-- exact per-shard full-object/LFS SHA-256 registry is not locally closed;
 - scratch free-space/inode and peak-storage requirements are not yet measured;
 - contract, config and implementation hashes are not frozen.
 
@@ -321,6 +321,14 @@ The direct-pipe pass then exposed an evidence-semantic error rather than a trans
 `9,502,315,428`. The registry correctly failed closed. The local operator and this draft now keep
 both aggregates as separate mandatory gates; a frozen unexecuted repair contract must re-read the
 same compact ledger once before the registry can close.
+
+That separately authorized repair pass completed PASS. It closed all 32 exact LFS-derived
+full-object SHA-256 identities, full-object bytes `9,502,315,428`, Parquet compressed bytes
+`9,468,474,036` and canonical registry SHA-256
+`b1c80bf78ff40de5c02e14f08082a51cc17cc90a9853028eaf866cb63326e41f`. It also reconfirmed the
+proposed root absent with 122,943,170,412,544 available bytes and 2,284,282,885 available inodes.
+HU writes, corpus rows and object downloads were zero. This closes the source-registry blocker;
+peak-storage/output-inode bounds and final D0 qualification/freeze remain open.
 
 ## Authority boundary
 

@@ -102,6 +102,10 @@ def test_d0_source_registry_operator_is_exact_and_execution_disabled() -> None:
     assert operator["lfs_oid_is_full_object_sha256"] is True
     assert operator["corpus_rows_read"] == 0
     assert operator["full_objects_downloaded"] == 0
+    assert operator["registry_closed"] is True
+    assert operator["result"].endswith("source_registry_byte_semantics_repair_v1.json")
+    assert operator["result_sha256"] == "63acadb8955411e0ee42dba0c28f72220568efce6e01db4bfcf90a31c49724a9"
+    assert operator["registry_sha256"] == "b1c80bf78ff40de5c02e14f08082a51cc17cc90a9853028eaf866cb63326e41f"
 
 
 def test_d0_epoch036_parent_and_tokenizer_asset_evidence_is_closed() -> None:
