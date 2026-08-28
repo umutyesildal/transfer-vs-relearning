@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_d0_v2_byte_semantics_blocked_v3_frozen_unexecuted
+  status: m0_m1_complete_m2_d0_v3_phase1_running_oscar_only_direction_accepted
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -103,7 +103,7 @@ scientific_design:
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: frozen_unexecuted_d0_v3_phase1
+  corpus_contract: frozen_executing_d0_v3_phase1
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -255,7 +255,7 @@ stage_readiness:
       - terminal_family_complete_no_duplicate_submission
   m2_training:
     corpus_contract_ready: true
-    corpus_contract_status: frozen_unexecuted_d0_v3_phase1
+    corpus_contract_status: frozen_executing_single_d0_v3_phase1_wave
     corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v3.md
     corpus_contract_sha256: c583b434535475692b0682be27434d0d9d4319b4faebe984d3181e8aea9146aa
     corpus_config: configs/corpora/vngrs_m2_three_model_d0_v3.yaml
@@ -265,6 +265,11 @@ stage_readiness:
     prior_v1_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
     prior_v1_contract_sha256: a77855a06c70ccdb52eb3768e7f2be2081da3129b5716eafeb03af2edf56baf3
     corpus_scope: vngrs_systematic_32_shard_subcorpus
+    primary_training_source_decision: cleaned_vngrs_oscar_2201_rows_only_pending_qualification
+    primary_training_source_decision_status: accepted_direction_exact_selection_contract_not_frozen
+    primary_training_source_decision_record: documentation/decisions/M2_OSCAR_ONLY_PRIMARY_TURKISH_CORPUS_DECISION_2026-08-28.md
+    primary_training_source_decision_record_sha256: 883a60f2ee307facc53f043760d3e8b99a4e5b2e5e85e50897e97912f0e88778
+    mc4_training_role: excluded_from_main_m2_training_preserved_no_deletion
     required_models: [olmo, qwen, smollm]
     materialization_operator: locally_implemented_execution_disabled
     materialization_operator_module: src/transfer_vs_relearning/corpora/vngrs/materialization.py
@@ -373,7 +378,7 @@ stage_readiness:
     v3_phase1_submitter_sha256: 8064a0fe4adeb48cc378fce4a5a5aad85960bf0fd6c197e84a5b6e833c2e0e9e
     v3_phase1_slurm_sha256: 6ab21ac5a930360374e0980837a524f3caca94b127547955b27f6b2fc410eda2
     local_qualification_validation: 190_vngrs_focused_tests_passed
-    production_launcher_status: frozen_unexecuted_d0_v3_phase1
+    production_launcher_status: single_authorized_d0_v3_phase1_wave_running
     human_review_handoff_status: frozen_64_packet_bound_decisions
     phase1_execution_authorized: v1a_authorization_consumed_operational_not_run
     phase1_pre_correction_hu_targeted_tests: 45_passed
@@ -419,13 +424,20 @@ stage_readiness:
     d0_v2_expected_transport_object_id: a81097a7346a46825147c84b516be22fe70bdd1fd589d5d57df9da66ec7f91da
     d0_v2_root_read_only: true
     d0_v3_output_root: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v3
-    d0_v3_execution_authorized: false
+    d0_v3_execution_authorized: consumed_single_phase1_wave
+    d0_v3_job_id: "481844"
+    d0_v3_job_state_last_verified: running_materialization_verified_audit_in_progress
+    d0_v3_materialization_manifest_sha256: bb413e9acafd0d891ea9c4461abc77acea1c737489560650db56dacf781dbd10
+    d0_v3_materialized_objects: 32
+    d0_v3_materialized_bytes: 9502315428
+    d0_v3_phase1_terminal_state: pending
     phase2_execution_authorized: false
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - vngrs_d0_v3_phase1_exact_sha_authorization_missing
+      - vngrs_d0_v3_phase1_terminal_state_pending
+      - oscar_only_selection_contract_not_frozen
       - phase2_ineligible_until_phase1_review_packet_and_separate_authorization
       - m2_a_m2_b_matched_contract_not_frozen
       - three_m1_epoch036_parent_bindings_not_yet_frozen_in_m2_contract
@@ -439,7 +451,7 @@ m1_confirmed_design:
   turblimp_revision: cce94ca73ac04a0fabd9fbd7a56068261e6348ad
   inherit_all_active_m0_eval_v2_metrics: true
   pile_10k_inherited: false
-  m2_primary_turkish_corpus: vngrs-ai/vngrs-web-corpus
+  m2_primary_turkish_corpus: cleaned_oscar_2201_subset_within_vngrs_pending_qualification
   m2_primary_corpus_role: in_domain_turkish_adaptation_corpus
   m2_primary_corpus_operational_status: conditional_not_materialized
   trwiki_20260601_role: cross_domain_control_only
@@ -1205,9 +1217,12 @@ current_evidence:
     metric_rows_written: 42
     normalization_status: complete_pending_m0_interpretation
   vngrs_corpus_route:
-    role: conditional_m2_sibling_materialization_candidate
+    role: mixed_source_characterization_reservoir_for_oscar_only_m2_selection
     materialized: false
     selected_for_training: false
+    selected_primary_source: oscar_2201_rows_pending_exact_label_volume_and_quality_qualification
+    mc4_main_training_status: excluded_preserved
+    source_decision: documentation/decisions/M2_OSCAR_ONLY_PRIMARY_TURKISH_CORPUS_DECISION_2026-08-28.md
     accepted_metadata_evidence_root: /vol/tmp2/yesildau/luna_vngrs_metadata_footer_feasibility_v1
     accepted_metadata_inventory_sha256: 120cdd7b21e161bf981cf8191fa278a11829d3fc5c155b71ed4bc8836e27f1d3
     latest_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v3.md
@@ -1309,13 +1324,15 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: await_exact_sha_authorization_for_vngrs_d0_v3_phase1
+  name: await_terminal_d0_v3_phase1_then_freeze_oscar_only_selection
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: d0_v2_byte_semantics_blocked_v3_frozen_unexecuted
-  execution_boundary: separate_future_exact_sha_bound_user_authorization
+  m2_status: d0_v3_phase1_running_oscar_only_direction_accepted
+  execution_boundary: current_single_wave_may_finish_no_retry_or_phase2_authorized
   current_work:
-    - execute_only_d0_v3_phase1_after_exact_sha_authorization
+    - verify_terminal_d0_v3_phase1_artifacts
+    - characterize_oscar_and_mc4_without_mutating_the_running_contract
+    - prepare_new_oscar_only_selection_contract_after_terminal_evidence
     - stop_at_awaiting_human_review
     - keep_phase2_and_m2_training_execution_disabled
   forbidden_until_user_says_start:
@@ -1326,7 +1343,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_exact_vngrs_d0_v3_phase1_materialization_wave
+  subject: review_d0_v3_terminal_evidence_and_freeze_oscar_only_selection_contract
   decision_owner: user
   start_m1_now: false
   note: >-
@@ -1360,9 +1377,14 @@ next_decision_required:
     preserved partial's computed SHA is `d72ae7...`; its Parquet magic and accepted footer/trailer
     all match. Frozen D0 v3 keeps object ID and computed byte SHA separate, re-downloads rather
     than reusing V2, requires first-object cross-wave calibration, atomically records computed
-    byte hashes and revalidates them before Parquet row loading. It awaits a new exact SHA-bound
-    authorization and must stop at AWAITING_HUMAN_REVIEW; Phase 2 and training remain separately
-    unauthorized.
+    byte hashes and revalidates them before Parquet row loading. The exact V3 wave was authorized,
+    commit `b7af152139e4a50c323830474a8e862d91291a2b` was pushed and preservation-checked
+    fast-forwarded on HU, and job `481844` materialized all 32 objects / 9,502,315,428 bytes with
+    manifest SHA `bb413e9a...`; it remains in the audit stage with no terminal Phase-1 state yet.
+    The user has prospectively selected only the cleaned OSCAR-2201-derived rows for the main M2
+    training population. mC4 remains preserved and training-excluded. A new OSCAR-only selection,
+    split, review and tokenizer-accounting contract must be frozen after V3 terminal evidence.
+    Phase 2, a second D0 wave and training remain separately unauthorized.
 
 authorization:
   local_repository_changes: require_current_user_instruction

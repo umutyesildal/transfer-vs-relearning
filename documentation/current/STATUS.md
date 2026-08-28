@@ -13,10 +13,11 @@ The detailed M0↔M1 result ledger is
 
 **Current preparation boundary:** the three-model M2 scope is OLMo, Qwen and SmolLM, each with
 full M2-A/M2-B sibling training from its own frozen M1 epoch-036 parent. No single primary model
-is selected. The current local-only artifact is the frozen, unexecuted vngrs D0 v3 contract at
+is selected. The active corpus artifact is the frozen vngrs D0 v3 contract at
 `documentation/contracts/corpora/vngrs-m2-three-model-d0-v3.md`, using the previously verified
-systematic 32-shard subcorpus. No further corpus retrieval/materialization or M2 training is
-authorized. D0 v2 job `481838` requested one real corpus object and preserved its 448,718,347-byte
+systematic 32-shard subcorpus. Its single authorized job `481844` has materialized all 32 objects /
+9,502,315,428 bytes and remains in the audit stage; Phase 1 is not terminal. No second corpus wave
+or M2 training is authorized. D0 v2 job `481838` requested one real corpus object and preserved its 448,718,347-byte
 partial after a fail-closed identity-semantic mismatch; no object was published. V3 keeps the
 accepted transport object ID distinct from full-byte SHA-256, computes byte SHA only from received
 bytes, atomically freezes those hashes, and revalidates them before Parquet row loading.
@@ -79,10 +80,19 @@ authorized job `481838` downloaded the first object to the v2 partial namespace.
 Parquet magic, accepted footer and accepted trailer all passed, but the old validator incorrectly
 required the byte SHA `d72ae7…` to equal the LFS/Xet object ID `a81097…`. V2 stopped with zero
 published objects and is preserved read-only. Frozen D0 v3 repairs only this semantic on a fresh
-root; 190 vngrs-focused tests pass. It is unexecuted and awaits a new exact SHA authorization; it
-must stop at `AWAITING_HUMAN_REVIEW`.
+root; 190 vngrs-focused tests pass. Its authorized job `481844` has a verified 32-row
+materialization manifest with SHA-256 `bb413e9a…` and continues toward
+`AWAITING_HUMAN_REVIEW`.
 Phase 2 is separately gated by the exact
 review-packet hash and a later authorization.
+
+The prospective primary M2 training source is now the cleaned OSCAR-2201-derived subset within
+the preserved vngrs release. mC4-derived rows are excluded from the main M2 training population
+and remain preserved. This is an accepted direction, not a frozen filtered release: after D0 v3
+terminates, a new contract must bind the exact OSCAR label/predicate, volume, contamination audit,
+10,000-document split, 64-document human-review packet and three-model tokenizer accounting.
+The decision record is
+`documentation/decisions/M2_OSCAR_ONLY_PRIMARY_TURKISH_CORPUS_DECISION_2026-08-28.md`.
 
 ## The short answer
 
@@ -187,15 +197,17 @@ three identity/storage preflights
 | M1 execution | COMPLETE: final sweep jobs 479444/479445/479446; 111/111 terminal |
 | M2 corpus and sibling contract | not frozen; does not block M1 preparation |
 
-`vngrs-ai/vngrs-web-corpus` is reserved for the later M2-A/M2-B Turkish adaptation arms. It is not
-an M1 training input. `trwiki-20260601` remains the Turkish cross-domain control.
+The cleaned OSCAR-2201-derived rows within `vngrs-ai/vngrs-web-corpus` are the prospective primary
+M2-A/M2-B adaptation source. mC4 rows remain preserved but training-excluded. This is not an M1
+input. `trwiki-20260601` remains the Turkish cross-domain control.
 
 ## Current safety boundary
 
 The completed M1 family is terminal evidence. No duplicate submission, cleanup, deletion,
-M2-A/M2-B execution, or primary-model promotion is implied. The active local boundary is to
-authorize only the exact frozen D0 v3 Phase-1 materialization wave. Phase 2 and every M2
-training action remain separate future authorization boundaries.
+M2-A/M2-B execution, or primary-model promotion is implied. The active boundary is to verify the
+single running D0 v3 Phase-1 wave at terminal state and then freeze a separate OSCAR-only selection
+contract. Phase 2, another D0 wave and every M2 training action remain separate future authority
+boundaries.
 
 ## Read next
 

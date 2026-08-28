@@ -5,20 +5,20 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 15e2305ef4bc30f42dcff620945492f7d8f834e3c7f0e28d5ba60698c73a59a3
+  full_state_sha256: 36fa4a6e360e591c5b6aed246a1d75bfe9d13e6098a828d5d6bff7144acc91da
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: m2_d0_v2_byte_semantics_blocked_v3_frozen_awaiting_authorization
+  phase: m2_d0_v3_phase1_running_oscar_only_direction_accepted
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: frozen_unexecuted_d0_v3_phase1
+  corpus_contract: frozen_executing_d0_v3_phase1
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -32,7 +32,7 @@ stage_readiness:
   m1_evaluation_adapter_and_contract: frozen_v3_single_a100_pool_terminal_complete_111_of_111
   m1_first_wave_cancelled_by_user_before_any_scientific_result: true
   m1_execution: complete_111_of_111
-  m2_corpus_contract: frozen_unexecuted_d0_v3_phase1
+  m2_corpus_contract: frozen_executing_single_d0_v3_phase1_wave
   m2_materialization_operator: locally_implemented_execution_disabled_offline_fixture_validated
   m2_audit_split_tokenizer_operators: locally_implemented_execution_disabled_offline_fixture_validated
   m2_tokenizer_asset_inventory: complete_three_of_three_manifest_only_zero_hu_writes
@@ -43,8 +43,10 @@ stage_readiness:
   m2_source_registry_byte_semantics_repair: executed_pass_consumed
   m2_source_registry: closed_32_of_32_transport_object_ids_full_byte_sha_computed_only_on_download
   m2_storage_bounds: locally_closed_fresh_preflight_required
-  m2_final_orchestration: v2_blocked_object_id_byte_sha_conflation_v3_190_vngrs_tests_passed_unexecuted
-  m2_production_launcher: frozen_unexecuted_d0_v3_phase1
+  m2_final_orchestration: v3_job_481844_materialization_verified_audit_in_progress
+  m2_production_launcher: single_authorized_d0_v3_phase1_wave_running
+  m2_primary_training_source: cleaned_vngrs_oscar_2201_rows_only_pending_qualification
+  m2_mc4_training_role: excluded_preserved
   m2_human_review_handoff: frozen_packet_bound_64_decisions
   m2_required_models: [olmo, qwen, smollm]
   m2_sibling_training_contract: not_frozen
@@ -75,13 +77,14 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: authorize_exact_vngrs_d0_v3_phase1_materialization_wave
-  contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v3.md
-  config: configs/corpora/vngrs_m2_three_model_d0_v3.yaml
+  subject: review_d0_v3_terminal_evidence_and_freeze_oscar_only_selection_contract
+  contract: documentation/decisions/M2_OSCAR_ONLY_PRIMARY_TURKISH_CORPUS_DECISION_2026-08-28.md
+  config: null
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user
     - offline_tests_and_dry_runs
-    - d0_v3_phase1_execution_only_after_exact_sha_authorization
+    - read_only_d0_v3_status_and_terminal_artifact_verification
+    - local_oscar_only_contract_preparation_after_terminal_evidence
   not_implied:
     - hu_or_ssh
     - slurm_or_gpu

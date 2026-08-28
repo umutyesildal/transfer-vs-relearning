@@ -20,8 +20,8 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - current boundary: V1A/V1B/V1C remain preserved operational NOT-RUN evidence; authorized D0 v2
   job `481838` downloaded the first 448,718,347-byte Parquet object and stopped fail-closed before
   publication because an LFS/Xet object ID had been misclassified as full-byte SHA-256; the exact
-  partial is preserved with SHA-256 `d72ae7…`; D0 v3 is frozen locally on a fresh root and awaits
-  exact SHA-bound authorization;
+  partial is preserved with SHA-256 `d72ae7…`; the authorized D0 v3 job `481844` has materialized
+  all 32 objects and remains in the audit stage with no terminal Phase-1 state yet;
 - D0 audit/split/tokenizer-accounting operators: locally implemented and offline validated;
 - tokenizer inventory: PASS for all three M1 epoch-036 parents with zero HU writes;
 - source-registry extractor: locally implemented and offline validated; exact accepted ledger has
@@ -36,11 +36,12 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - storage/orchestration qualification: 32 GiB frozen peak, 40 GiB plus 1,024-inode fresh gate,
   exact Parquet loader, typed failures, reviewed adapters and atomic output chain passed 191
   compatible tests;
-- next boundary: authorize only D0 v3 Phase 1, which preserves and does not reuse V2, keeps source
-  object IDs separate from computed full-byte SHA-256, requires the first fresh object to reproduce
-  V2's `d72ae7…` byte hash, and must stop at `AWAITING_HUMAN_REVIEW`; Phase 2
-  requires the resulting 64-document packet and a separate later authorization;
-- vngrs: conditional systematic 32-shard M2 input; not materialized or training-ready;
+- next boundary: verify D0 v3 terminal evidence, then freeze a new OSCAR-only source-selection,
+  split, human-review and tokenizer-accounting contract; Phase 2 requires a separate later
+  authorization;
+- M2 primary source direction: cleaned OSCAR-2201-derived rows within vngrs, pending exact label,
+  volume and quality qualification; mC4 is excluded from main training and preserved;
+- vngrs: the selected mixed 32-shard reservoir is materialized but not training-ready;
 - M2 execution: not authorized; external materialization requires a later frozen SHA-bound
   contract and separate explicit user authorization.
 
