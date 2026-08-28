@@ -44,6 +44,71 @@ def write_d0_failure(root: str | Path, *, phase: str, error: Exception) -> dict[
     return failure
 
 
+def bounded_audit_evidence(audit: Mapping[str, Any], *, example_limit: int = 256) -> dict[str, Any]:
+    """Keep exact audit counts while bounding potentially large hit examples."""
+
+    if not 1 <= example_limit <= 1_000:
+        raise ValueError("audit example limit must be between 1 and 1,000")
+    contamination = dict(audit.get("synthetic_contamination") or {})
+    exact_hits = list(contamination.get("exact_hits") or [])
+    normalized_hits = list(contamination.get("unicode_normalized_hits") or [])
+    return {
+        "schema_version": 1,
+        "status": audit.get("status"),
+        "document_count": audit.get("document_count"),
+        "utf8_bytes": audit.get("utf8_bytes"),
+        "composition": audit.get("composition"),
+        "regex_document_counts": audit.get("regex_document_counts"),
+        "normalized_text_duplicate_groups": audit.get("normalized_text_duplicate_groups"),
+        "normalized_text_duplicate_documents": audit.get("normalized_text_duplicate_documents"),
+        "synthetic_contamination": {
+            "pattern_count": contamination.get("pattern_count"),
+            "exact_hit_count": len(exact_hits),
+            "unicode_normalized_hit_count": len(normalized_hits),
+            "exact_hit_examples": exact_hits[:example_limit],
+            "unicode_normalized_hit_examples": normalized_hits[:example_limit],
+            "example_limit_per_kind": example_limit,
+            "examples_truncated": len(exact_hits) > example_limit or len(normalized_hits) > example_limit,
+        },
+        "ready_to_train": False,
+    }
+
+
+def write_d0_phase1_audit_evidence(
+    root: str | Path,
+    *,
+    audit: Mapping[str, Any],
+    corpus_label_inventory: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Persist audit evidence before applying its fail-closed decision gate."""
+
+    root_path = Path(root)
+    bounded = bounded_audit_evidence(audit)
+    _atomic(root_path / "reports/lightweight_audit.json", _json(bounded))
+    if corpus_label_inventory is not None:
+        write_d0_corpus_label_inventory(root_path, corpus_label_inventory)
+    return bounded
+
+
+def write_d0_corpus_label_inventory(
+    root: str | Path, inventory: Mapping[str, Any]
+) -> None:
+    """Persist exact observed corpus labels before any candidate-label gate."""
+
+    _atomic(
+        Path(root) / "reports/corpus_label_inventory.json",
+        _json(dict(inventory)),
+    )
+
+
+def write_d0_recovery_state(root: str | Path, state: Mapping[str, Any]) -> None:
+    """Atomically close a diagnostic recovery pass without implying training readiness."""
+
+    if state.get("ready_to_train") is not False:
+        raise ValueError("D0 recovery state must remain training-ineligible")
+    _atomic(Path(root) / "control/recovery_state.json", _json(dict(state)))
+
+
 def write_d0_evidence_bundle(
     root: str | Path,
     result: Mapping[str, Any],

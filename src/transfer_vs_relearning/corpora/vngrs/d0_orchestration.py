@@ -16,7 +16,7 @@ from .d0_audit import (
     tokenizer_accounting,
 )
 from .d0_storage import validate_storage_observation
-from .d0_bundle import write_d0_evidence_bundle, write_d0_failure
+from .d0_bundle import write_d0_evidence_bundle, write_d0_failure, write_d0_phase1_audit_evidence
 from .d0_review import build_review_packet, review_packet_sha256, validate_review_decisions, write_review_handoff, write_validated_decisions
 from .metadata import canonical_json_sha256
 from .materialization import (
@@ -56,6 +56,7 @@ def run_d0_phase1(
     try:
         documents = document_loader(root, registry, execution_enabled=True)
         audit = lightweight_audit(documents, synthetic_surfaces=synthetic_surfaces)
+        write_d0_phase1_audit_evidence(root, audit=audit)
         if audit["status"] != "AUDIT_COMPLETE":
             raise ValueError("mandatory lightweight audit blocked D0")
         split = exact_heldout_split(documents, heldout_documents=policy.heldout_documents)
@@ -141,6 +142,7 @@ def finalize_d0_phase2(
                 "control/phase1_state.json",
                 "reports/human_review_packet.jsonl",
                 "reports/human_review_decision_template.jsonl",
+                "reports/lightweight_audit.json",
                 decisions_path,
             ),
         )
@@ -194,6 +196,7 @@ def run_d0_orchestration(
         documents = document_loader(root, registry, execution_enabled=True)
         phase = "lightweight_audit"
         audit = lightweight_audit(documents, synthetic_surfaces=synthetic_surfaces)
+        write_d0_phase1_audit_evidence(root, audit=audit)
         if audit["status"] != "AUDIT_COMPLETE":
             raise ValueError("mandatory lightweight audit blocked D0")
         phase = "document_disjoint_split"
@@ -242,6 +245,7 @@ def run_d0_orchestration(
             result,
             source_rows=materialized.source_rows,
             request_rows=materialized.request_rows,
+            existing_artifacts=("reports/lightweight_audit.json",),
         )
     except Exception as exc:
         write_d0_failure(root, phase="evidence_bundle", error=exc)

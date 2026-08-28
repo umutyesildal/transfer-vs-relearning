@@ -17,11 +17,11 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - M0: closed with 21/21 active lanes, 3/3 exact-prefix and 42 v1f normalized observations;
 - M1: fixed OLMo/Qwen/SmolLM cohort, Relation V2 facts and eval-v2 policy;
 - M1: training and eval-v2 complete at 111/111 states;
-- current boundary: V1A/V1B/V1C remain preserved operational NOT-RUN evidence; authorized D0 v2
-  job `481838` downloaded the first 448,718,347-byte Parquet object and stopped fail-closed before
-  publication because an LFS/Xet object ID had been misclassified as full-byte SHA-256; the exact
-  partial is preserved with SHA-256 `d72ae7…`; the authorized D0 v3 job `481844` has materialized
-  all 32 objects and remains in the audit stage with no terminal Phase-1 state yet;
+- current boundary: V1A/V1B/V1C remain preserved operational NOT-RUN evidence; D0 v2 job `481838`
+  preserved its exact first-object partial; D0 v3 job `481844` then materialized and byte-verified
+  all 32 objects / 9,502,315,428 bytes, but stopped fail-closed at the mandatory lightweight audit;
+  its generic failure did not preserve the exact contamination/encoding trigger, no split or
+  64-document review packet was created, and the V3 root is now immutable/read-only evidence;
 - D0 audit/split/tokenizer-accounting operators: locally implemented and offline validated;
 - tokenizer inventory: PASS for all three M1 epoch-036 parents with zero HU writes;
 - source-registry extractor: locally implemented and offline validated; exact accepted ledger has
@@ -36,14 +36,15 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - storage/orchestration qualification: 32 GiB frozen peak, 40 GiB plus 1,024-inode fresh gate,
   exact Parquet loader, typed failures, reviewed adapters and atomic output chain passed 191
   compatible tests;
-- next boundary: verify D0 v3 terminal evidence, then freeze a new OSCAR-only source-selection,
-  split, human-review and tokenizer-accounting contract; Phase 2 requires a separate later
-  authorization;
+- next boundary: the frozen, unexecuted OSCAR-only audit-recovery contract may be separately
+  authorized once; it reuses V3 bytes read-only, records exact labels and bounded audit reasons in
+  a fresh compact root, and stops before split/review/tokenizer accounting;
 - M2 primary source direction: cleaned OSCAR-2201-derived rows within vngrs, pending exact label,
   volume and quality qualification; mC4 is excluded from main training and preserved;
-- vngrs: the selected mixed 32-shard reservoir is materialized but not training-ready;
-- M2 execution: not authorized; external materialization requires a later frozen SHA-bound
-  contract and separate explicit user authorization.
+- vngrs: the selected mixed 32-shard reservoir is materialized but audit-blocked and not
+  training-ready;
+- M2 execution: not authorized; the diagnostic recovery, later selection and all training stages
+  each require their own exact contract boundary and explicit user authorization.
 
 ## When to open larger files
 

@@ -171,6 +171,10 @@ def test_post_materialization_failure_is_typed_and_fail_closed(tmp_path: Path) -
     assert failure["status"] == "BLOCKED"
     assert failure["phase"] == "lightweight_audit"
     assert failure["ready_to_train"] is False
+    audit = json.loads((root / "reports/lightweight_audit.json").read_text(encoding="utf-8"))
+    assert audit["status"] == "BLOCKED"
+    assert audit["synthetic_contamination"]["exact_hit_count"] == 1
+    assert audit["synthetic_contamination"]["exact_hit_examples"][0]["pattern_id"] == "hit"
     assert not (root / "control/final_audit.json").exists()
 
 

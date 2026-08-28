@@ -69,9 +69,12 @@ contract must bind all of the following before any source filtering or later exe
 If OSCAR-only volume, provenance, contamination or human quality fails a frozen gate, the stage
 must stop for an explicit new decision. mC4 must not be substituted automatically.
 
-## Relationship to the running D0 v3 wave
+## Relationship to the terminal D0 v3 wave
 
-Job `481844` remains the single authorized execution of the mixed-source D0 v3 Phase-1 contract.
-It is preserved as source-characterization and materialization evidence. This prospective decision
-does not cancel, mutate, reinterpret or broaden that contract, and does not authorize a second D0
-wave, Phase 2, filtering/materialization, training, evaluation, cleanup or deletion.
+Job `481844` remains the single consumed execution of the mixed-source D0 v3 Phase-1 contract. It
+materialized all 32 objects, then stopped at the mandatory audit gate without persisting the exact
+blocking reason; Document 181 records the terminal result. The V3 root remains preserved
+read-only. A separate frozen OSCAR audit-recovery contract may read those bytes in place and write
+only compact diagnostic evidence to a fresh root, but it is currently unexecuted and unauthorized.
+This decision does not authorize that pass, a D0 retry, Phase 2, filtering/materialization,
+training, evaluation, cleanup or deletion.

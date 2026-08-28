@@ -16,8 +16,10 @@ full M2-A/M2-B sibling training from its own frozen M1 epoch-036 parent. No sing
 is selected. The active corpus artifact is the frozen vngrs D0 v3 contract at
 `documentation/contracts/corpora/vngrs-m2-three-model-d0-v3.md`, using the previously verified
 systematic 32-shard subcorpus. Its single authorized job `481844` has materialized all 32 objects /
-9,502,315,428 bytes and remains in the audit stage; Phase 1 is not terminal. No second corpus wave
-or M2 training is authorized. D0 v2 job `481838` requested one real corpus object and preserved its 448,718,347-byte
+9,502,315,428 bytes, then stopped fail-closed because the mandatory lightweight audit returned
+`BLOCKED`. The V3 implementation persisted only the generic exception, not the exact
+contamination/encoding reason. It created no split or review packet. No retry or M2 training is
+authorized. D0 v2 job `481838` requested one real corpus object and preserved its 448,718,347-byte
 partial after a fail-closed identity-semantic mismatch; no object was published. V3 keeps the
 accepted transport object ID distinct from full-byte SHA-256, computes byte SHA only from received
 bytes, atomically freezes those hashes, and revalidates them before Parquet row loading.
@@ -79,17 +81,19 @@ JSON produced `268ebe81...`. The V1C root is preserved. D0 v2 corrected that ser
 authorized job `481838` downloaded the first object to the v2 partial namespace. Its exact size,
 Parquet magic, accepted footer and accepted trailer all passed, but the old validator incorrectly
 required the byte SHA `d72ae7…` to equal the LFS/Xet object ID `a81097…`. V2 stopped with zero
-published objects and is preserved read-only. Frozen D0 v3 repairs only this semantic on a fresh
-root; 190 vngrs-focused tests pass. Its authorized job `481844` has a verified 32-row
-materialization manifest with SHA-256 `bb413e9a…` and continues toward
-`AWAITING_HUMAN_REVIEW`.
-Phase 2 is separately gated by the exact
-review-packet hash and a later authorization.
+published objects and is preserved read-only. Frozen D0 v3 repaired only this semantic on a fresh
+root. Its authorized job `481844` produced a verified 32-row materialization manifest with
+SHA-256 `bb413e9a…`, then terminated at the audit gate with failure SHA-256 `a341e478…`.
+Document 181 is the append-only result record. The frozen, unexecuted
+`vngrs-m2-oscar-audit-recovery-v1` contract reads those bytes in place, tests exact
+`corpus == "OSCAR"`, and persists exact label counts plus bounded audit reasons before stopping.
+It creates no split/review packet and requires separate exact SHA authorization.
 
 The prospective primary M2 training source is now the cleaned OSCAR-2201-derived subset within
 the preserved vngrs release. mC4-derived rows are excluded from the main M2 training population
-and remain preserved. This is an accepted direction, not a frozen filtered release: after D0 v3
-terminates, a new contract must bind the exact OSCAR label/predicate, volume, contamination audit,
+and remain preserved. This is an accepted direction, not a frozen filtered release: after the
+recovery evidence closes, a new contract must bind the verified OSCAR label/predicate, volume,
+contamination disposition,
 10,000-document split, 64-document human-review packet and three-model tokenizer accounting.
 The decision record is
 `documentation/decisions/M2_OSCAR_ONLY_PRIMARY_TURKISH_CORPUS_DECISION_2026-08-28.md`.

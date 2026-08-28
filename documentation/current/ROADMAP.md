@@ -38,14 +38,17 @@ Status: not authorized.
 
 ## R3 — Freeze the M2 corpus and sibling contract
 
-Status: active corpus qualification; training execution disabled.
+Status: V3 materialization complete, audit blocked; diagnostic recovery frozen but unexecuted;
+training execution disabled.
 
-- preserve the running mixed-source D0 v3 wave as characterization evidence and verify its
-  terminal artifacts;
+- preserve terminal D0 v3 materialization and generic audit failure as immutable evidence;
+- separately authorize at most one OSCAR audit-recovery pass if desired; reuse V3 bytes read-only,
+  persist exact source labels and bounded audit reasons, and stop before split/review;
 - use only cleaned OSCAR-2201-derived vngrs rows as the prospective main M2 training source;
 - keep mC4-derived rows training-excluded and preserved; do not substitute them automatically;
-- freeze the exact OSCAR source label/predicate, quality/provenance, held-out split, 64-document
-  review packet and per-model token budget in a new contract;
+- only after recovery evidence, freeze the verified OSCAR source label/predicate,
+  contamination/encoding disposition, quality/provenance, held-out split, 64-document review
+  packet and per-model token budget in a new contract;
 - preserve `trwiki-20260601` as cross-domain control;
 - bind M2-A and M2-B to the same selected M1 parent and matched budgets;
 - define controlled Turkish factual re-exposure only for M2-B.

@@ -1,0 +1,46 @@
+schema_version: 1
+contract_id: vngrs-m2-oscar-audit-recovery-v1
+status: frozen_unexecuted
+contract: documentation/contracts/corpora/vngrs-m2-oscar-audit-recovery-v1.md
+
+source:
+  root: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v3
+  access: read_only
+  materialization_manifest_sha256: bb413e9acafd0d891ea9c4461abc77acea1c737489560650db56dacf781dbd10
+  terminal_failure_sha256: a341e4787e38720f27beeaf5815331ef0163084cb2974d91799ee5ffe426c52f
+  object_count: 32
+  object_bytes: 9502315428
+
+selection:
+  field: corpus
+  operator: exact_string_equality
+  candidate_value: OSCAR
+  minimum_documents: 10001
+  fail_if_absent_or_too_small: true
+
+output:
+  root: /vol/tmp2/yesildau/vngrs_m2_oscar_audit_recovery_v1
+  fresh_and_absent_required: true
+  exact_label_inventory: reports/corpus_label_inventory.json
+  bounded_audit: reports/lightweight_audit.json
+  terminal_state: control/recovery_state.json
+
+execution:
+  runner: scripts/corpora/run_vngrs_m2_oscar_audit_recovery_v1.py
+  submitter: scripts/corpora/submit_vngrs_m2_oscar_audit_recovery_v1.sh
+  slurm: slurm/m2/audit_vngrs_m2_oscar_d0_v1.slurm
+  job_name: vngrs-m2-oscar-audit-v1
+  automatic_retry: false
+
+authority:
+  local_preparation: true
+  publication: false
+  hu_ssh: false
+  slurm_cpu: false
+  network_retrieval: false
+  corpus_download_or_copy: false
+  split_or_review_packet: false
+  tokenizer_or_model_access: false
+  phase2: false
+  training: false
+  cleanup_or_deletion: false

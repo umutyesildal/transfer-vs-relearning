@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_d0_v3_phase1_running_oscar_only_direction_accepted
+  status: m0_m1_complete_m2_d0_v3_audit_blocked_oscar_recovery_frozen
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -103,7 +103,7 @@ scientific_design:
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: frozen_executing_d0_v3_phase1
+  corpus_contract: frozen_oscar_audit_recovery_unexecuted
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -254,8 +254,8 @@ stage_readiness:
     blockers:
       - terminal_family_complete_no_duplicate_submission
   m2_training:
-    corpus_contract_ready: true
-    corpus_contract_status: frozen_executing_single_d0_v3_phase1_wave
+    corpus_contract_ready: false
+    corpus_contract_status: d0_v3_terminal_blocked_audit_detail_missing_oscar_recovery_frozen_unexecuted
     corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v3.md
     corpus_contract_sha256: c583b434535475692b0682be27434d0d9d4319b4faebe984d3181e8aea9146aa
     corpus_config: configs/corpora/vngrs_m2_three_model_d0_v3.yaml
@@ -268,7 +268,7 @@ stage_readiness:
     primary_training_source_decision: cleaned_vngrs_oscar_2201_rows_only_pending_qualification
     primary_training_source_decision_status: accepted_direction_exact_selection_contract_not_frozen
     primary_training_source_decision_record: documentation/decisions/M2_OSCAR_ONLY_PRIMARY_TURKISH_CORPUS_DECISION_2026-08-28.md
-    primary_training_source_decision_record_sha256: 883a60f2ee307facc53f043760d3e8b99a4e5b2e5e85e50897e97912f0e88778
+    primary_training_source_decision_record_sha256: 336d429a0968aabb3efe678405967270517b04f2ccc267ee916ec44954d0350a
     mc4_training_role: excluded_from_main_m2_training_preserved_no_deletion
     required_models: [olmo, qwen, smollm]
     materialization_operator: locally_implemented_execution_disabled
@@ -357,9 +357,9 @@ stage_readiness:
     parquet_loader_module: src/transfer_vs_relearning/corpora/vngrs/parquet_loader_v3.py
     parquet_loader_sha256: 4226586b781471153dafa90f3a3f82516ebb70db88d7f217bec52566cb9119d5
     orchestration_module: src/transfer_vs_relearning/corpora/vngrs/d0_orchestration.py
-    orchestration_sha256: a923651dda0ce233fd6993094c2cccb7394f2945581c043326819cb27d37f8d5
+    orchestration_sha256: b60e84f3917c00b91031ede4e4380ebe565e7f53998c8b2a4d332955261a859b
     evidence_bundle_module: src/transfer_vs_relearning/corpora/vngrs/d0_bundle.py
-    evidence_bundle_sha256: e278a7b6b0d2ab42e84b1e7d1695e8d9c31710240d4eefe5fc0f23b8ff71cfea
+    evidence_bundle_sha256: de72f170627015cb536dab11072eaf12e317884f91520d45268433b544c2d968
     preflight_operator_sha256: ae1da3b1c886ac8143197609ff5aa89915a15064212a8356b4d8e2bc7ce43acb
     runtime_adapter_sha256: f78a95e4a3d0567373e4b3b498e24ccd0669a4f0eebc8f61afdb9dce45bd01e7
     review_handoff_sha256: e8b2071e6bba185eede05fe61029c84bd807e8934f98b1c889bf6c2fb75c8ca8
@@ -377,8 +377,8 @@ stage_readiness:
     v3_runner_sha256: c1e802e4be0624c1556f0071402449ec76c9ea56a06019659948acafd7dfb9fc
     v3_phase1_submitter_sha256: 8064a0fe4adeb48cc378fce4a5a5aad85960bf0fd6c197e84a5b6e833c2e0e9e
     v3_phase1_slurm_sha256: 6ab21ac5a930360374e0980837a524f3caca94b127547955b27f6b2fc410eda2
-    local_qualification_validation: 190_vngrs_focused_tests_passed
-    production_launcher_status: single_authorized_d0_v3_phase1_wave_running
+    local_qualification_validation: 206_vngrs_and_documentation_control_tests_passed
+    production_launcher_status: d0_v3_terminal_blocked_no_retry_authorized
     human_review_handoff_status: frozen_64_packet_bound_decisions
     phase1_execution_authorized: v1a_authorization_consumed_operational_not_run
     phase1_pre_correction_hu_targeted_tests: 45_passed
@@ -426,17 +426,39 @@ stage_readiness:
     d0_v3_output_root: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v3
     d0_v3_execution_authorized: consumed_single_phase1_wave
     d0_v3_job_id: "481844"
-    d0_v3_job_state_last_verified: running_materialization_verified_audit_in_progress
+    d0_v3_job_state_last_verified: terminal_disappeared_from_squeue_failure_evidence_persisted
     d0_v3_materialization_manifest_sha256: bb413e9acafd0d891ea9c4461abc77acea1c737489560650db56dacf781dbd10
     d0_v3_materialized_objects: 32
     d0_v3_materialized_bytes: 9502315428
-    d0_v3_phase1_terminal_state: pending
+    d0_v3_phase1_terminal_state: blocked_mandatory_lightweight_audit
+    d0_v3_failure_path: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v3/control/d0_failure.json
+    d0_v3_failure_sha256: a341e4787e38720f27beeaf5815331ef0163084cb2974d91799ee5ffe426c52f
+    d0_v3_failure_phase: phase1_review_handoff
+    d0_v3_failure_message: mandatory_lightweight_audit_blocked_d0
+    d0_v3_audit_detail_persisted: false
+    d0_v3_split_created: false
+    d0_v3_human_review_packet_created: false
+    d0_v3_result_record: documentation/181_VNGRS_D0_V3_PHASE1_AUDIT_GATE_EXECUTION_RESULT_TR.md
+    d0_v3_result_record_sha256: 04ca5b34586eb1bc8625e7f0fd6f4a17295ca95600917b1ba176efb838a0eb24
+    oscar_audit_recovery_contract: documentation/contracts/corpora/vngrs-m2-oscar-audit-recovery-v1.md
+    oscar_audit_recovery_contract_sha256: ab3ad95cc6126682d8206715a0d3e01d80784f81e01944a655750e839d06b442
+    oscar_audit_recovery_config: configs/corpora/vngrs_m2_oscar_audit_recovery_v1.yaml
+    oscar_audit_recovery_config_sha256: 5b55988616c718d8eea305aede87887150f8b62c00ae0bcef94739dd11668c78
+    oscar_audit_recovery_operator: src/transfer_vs_relearning/corpora/vngrs/d0_oscar_recovery.py
+    oscar_audit_recovery_operator_sha256: 50501aaccab677388b1b5d27e485e4182590539344a5f06f2bdf84d60c850fc1
+    oscar_audit_recovery_runner_sha256: 44f40fb0f95b18625bb8705d23b1392c1414bb08d726c74ba6ce301964f175c3
+    oscar_audit_recovery_submitter_sha256: 8139cdbfa6160d25ed6601b6239feee40c3c1f7ebf8909857fba71b0ccb87787
+    oscar_audit_recovery_slurm_sha256: f01872b37b552c2b4ddcc8da922edd4cf9d9dba8ee73bebbd159b9931e03d8b8
+    oscar_audit_recovery_output_root: /vol/tmp2/yesildau/vngrs_m2_oscar_audit_recovery_v1
+    oscar_audit_recovery_status: frozen_unexecuted_requires_exact_sha_authorization
+    oscar_audit_recovery_execution_authorized: false
     phase2_execution_authorized: false
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - vngrs_d0_v3_phase1_terminal_state_pending
+      - d0_v3_audit_blocked_without_persisted_reason_detail
+      - oscar_audit_recovery_unexecuted
       - oscar_only_selection_contract_not_frozen
       - phase2_ineligible_until_phase1_review_packet_and_separate_authorization
       - m2_a_m2_b_matched_contract_not_frozen
@@ -1324,16 +1346,15 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: await_terminal_d0_v3_phase1_then_freeze_oscar_only_selection
+  name: execute_separately_authorized_oscar_audit_recovery_then_freeze_selection
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: d0_v3_phase1_running_oscar_only_direction_accepted
-  execution_boundary: current_single_wave_may_finish_no_retry_or_phase2_authorized
+  m2_status: d0_v3_terminal_audit_blocked_oscar_recovery_frozen_unexecuted
+  execution_boundary: no_external_execution_until_exact_recovery_contract_authorization
   current_work:
-    - verify_terminal_d0_v3_phase1_artifacts
-    - characterize_oscar_and_mc4_without_mutating_the_running_contract
-    - prepare_new_oscar_only_selection_contract_after_terminal_evidence
-    - stop_at_awaiting_human_review
+    - preserve_d0_v3_root_as_read_only_terminal_evidence
+    - run_no_action_until_exact_oscar_audit_recovery_authorization
+    - after_recovery_freeze_oscar_only_selection_split_and_review_contract
     - keep_phase2_and_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1343,7 +1364,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: review_d0_v3_terminal_evidence_and_freeze_oscar_only_selection_contract
+  subject: authorize_single_oscar_audit_evidence_recovery_pass_if_desired
   decision_owner: user
   start_m1_now: false
   note: >-
@@ -1380,11 +1401,15 @@ next_decision_required:
     byte hashes and revalidates them before Parquet row loading. The exact V3 wave was authorized,
     commit `b7af152139e4a50c323830474a8e862d91291a2b` was pushed and preservation-checked
     fast-forwarded on HU, and job `481844` materialized all 32 objects / 9,502,315,428 bytes with
-    manifest SHA `bb413e9a...`; it remains in the audit stage with no terminal Phase-1 state yet.
-    The user has prospectively selected only the cleaned OSCAR-2201-derived rows for the main M2
-    training population. mC4 remains preserved and training-excluded. A new OSCAR-only selection,
-    split, review and tokenizer-accounting contract must be frozen after V3 terminal evidence.
-    Phase 2, a second D0 wave and training remain separately unauthorized.
+    manifest SHA `bb413e9a...`. It then stopped fail-closed at the mandatory lightweight audit.
+    Terminal failure SHA is `a341e478...`; no split or review packet was created. The V3 code did
+    not persist the audit detail before raising, so the exact contamination/encoding trigger is
+    unresolved. Document 181 records the result. The user has prospectively selected only cleaned
+    OSCAR-2201-derived rows for the main M2 training population; mC4 remains preserved and
+    training-excluded. The frozen, unexecuted OSCAR audit-recovery contract reads V3 in place,
+    records exact labels and bounded audit reasons under a fresh compact root, and stops before
+    split/review. It requires separate exact SHA authorization. Phase 2, a second attempt and
+    training remain unauthorized.
 
 authorization:
   local_repository_changes: require_current_user_instruction
