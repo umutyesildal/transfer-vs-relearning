@@ -13,12 +13,13 @@ The detailed M0↔M1 result ledger is
 
 **Current preparation boundary:** the three-model M2 scope is OLMo, Qwen and SmolLM, each with
 full M2-A/M2-B sibling training from its own frozen M1 epoch-036 parent. No single primary model
-is selected. The current local-only artifact is the frozen, unexecuted vngrs D0 v2 contract at
-`documentation/contracts/corpora/vngrs-m2-three-model-d0-v2.md`, using the previously verified
-systematic 32-shard subcorpus. No corpus retrieval/materialization or M2 training is authorized.
-The local fail-closed full-object operator is now implemented and offline-fixture validated. It is
-transport-injected, disabled by default, and cannot create the production root until the exact
-32-object size/SHA-256/LFS registry closes. No real corpus byte was requested or written.
+is selected. The current local-only artifact is the frozen, unexecuted vngrs D0 v3 contract at
+`documentation/contracts/corpora/vngrs-m2-three-model-d0-v3.md`, using the previously verified
+systematic 32-shard subcorpus. No further corpus retrieval/materialization or M2 training is
+authorized. D0 v2 job `481838` requested one real corpus object and preserved its 448,718,347-byte
+partial after a fail-closed identity-semantic mismatch; no object was published. V3 keeps the
+accepted transport object ID distinct from full-byte SHA-256, computes byte SHA only from received
+bytes, atomically freezes those hashes, and revalidates them before Parquet row loading.
 The deterministic lightweight audit, text-free 64-ID human-review selection, exact 10,000-ID
 held-out split and three-tokenizer accounting schemas are also implemented locally. These remain
 validated operators rather than corpus results.
@@ -73,9 +74,13 @@ was unavailable and broken `sacct` could not recover the exact exception. V1B is
 `accepted read-only evidence closure drift` with zero network/object writes. Read-only diagnosis
 proved the root itself unchanged at 104 files / 18,025,945 bytes: exact historical
 `relative_path size\n` serialization reproduces `120cdd7b...`, while the V1 validator's canonical
-JSON produced `268ebe81...`. The V1C root is preserved. Frozen D0 v2 uses a fresh root and correct
-line serialization; 191 compatible tests pass. It is unexecuted and awaits a new exact SHA
-authorization; it must stop at `AWAITING_HUMAN_REVIEW`.
+JSON produced `268ebe81...`. The V1C root is preserved. D0 v2 corrected that serialization and its
+authorized job `481838` downloaded the first object to the v2 partial namespace. Its exact size,
+Parquet magic, accepted footer and accepted trailer all passed, but the old validator incorrectly
+required the byte SHA `d72ae7…` to equal the LFS/Xet object ID `a81097…`. V2 stopped with zero
+published objects and is preserved read-only. Frozen D0 v3 repairs only this semantic on a fresh
+root; 190 vngrs-focused tests pass. It is unexecuted and awaits a new exact SHA authorization; it
+must stop at `AWAITING_HUMAN_REVIEW`.
 Phase 2 is separately gated by the exact
 review-packet hash and a later authorization.
 
@@ -189,7 +194,7 @@ an M1 training input. `trwiki-20260601` remains the Turkish cross-domain control
 
 The completed M1 family is terminal evidence. No duplicate submission, cleanup, deletion,
 M2-A/M2-B execution, or primary-model promotion is implied. The active local boundary is to
-authorize only the exact frozen D0 v2 Phase-1 materialization wave. Phase 2 and every M2
+authorize only the exact frozen D0 v3 Phase-1 materialization wave. Phase 2 and every M2
 training action remain separate future authorization boundaries.
 
 ## Read next

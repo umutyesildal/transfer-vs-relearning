@@ -45,13 +45,14 @@ def run_d0_phase1(
     policy: D0OrchestrationPolicy,
     materialization_policy: MaterializationPolicy,
     document_loader: Callable[..., list[D0Document]] = load_verified_parquet_documents,
+    materializer: Callable[..., Any] = materialize_full_objects,
 ) -> dict[str, Any]:
     """Materialize and freeze a bounded review packet; deliberately stop before PASS."""
 
     if not policy.execution_enabled or preflight.get("status") != "D0_PREFLIGHT_PASS":
         raise ValueError("authorized, passing D0 preflight is required")
     registry = tuple(objects)
-    materialized = materialize_full_objects(root, registry, transport=transport, policy=materialization_policy)
+    materialized = materializer(root, registry, transport=transport, policy=materialization_policy)
     try:
         documents = document_loader(root, registry, execution_enabled=True)
         audit = lightweight_audit(documents, synthetic_surfaces=synthetic_surfaces)

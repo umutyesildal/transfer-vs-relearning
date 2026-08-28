@@ -17,12 +17,11 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - M0: closed with 21/21 active lanes, 3/3 exact-prefix and 42 v1f normalized observations;
 - M1: fixed OLMo/Qwen/SmolLM cohort, Relation V2 facts and eval-v2 policy;
 - M1: training and eval-v2 complete at 111/111 states;
-- current boundary: the three-model vngrs D0 two-phase launcher and human-review handoff remain
-  frozen; corrected V1A ran once as job `481608` and stopped before output-root creation or network
-  access at the exact HU-home `du` timeout; V1B job `481711` later started but stopped before root
-  creation and its Slurm comment was lost after controller purge; V1C job `481836` then persisted
-  the exact canonicalization mismatch with zero network/object writes; D0 v2 is frozen on a fresh
-  root with the historical line-inventory semantics and awaits exact SHA-bound authorization;
+- current boundary: V1A/V1B/V1C remain preserved operational NOT-RUN evidence; authorized D0 v2
+  job `481838` downloaded the first 448,718,347-byte Parquet object and stopped fail-closed before
+  publication because an LFS/Xet object ID had been misclassified as full-byte SHA-256; the exact
+  partial is preserved with SHA-256 `d72ae7…`; D0 v3 is frozen locally on a fresh root and awaits
+  exact SHA-bound authorization;
 - D0 audit/split/tokenizer-accounting operators: locally implemented and offline validated;
 - tokenizer inventory: PASS for all three M1 epoch-036 parents with zero HU writes;
 - source-registry extractor: locally implemented and offline validated; exact accepted ledger has
@@ -37,10 +36,9 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - storage/orchestration qualification: 32 GiB frozen peak, 40 GiB plus 1,024-inode fresh gate,
   exact Parquet loader, typed failures, reviewed adapters and atomic output chain passed 191
   compatible tests;
-- next boundary: authorize only D0 v2 Phase 1, which preserves V1C evidence, uses the fresh v2
-  root and reproduces the accepted evidence SHA with exact `relative_path size\n` serialization,
-  and must stop at
-  `AWAITING_HUMAN_REVIEW`; Phase 2
+- next boundary: authorize only D0 v3 Phase 1, which preserves and does not reuse V2, keeps source
+  object IDs separate from computed full-byte SHA-256, requires the first fresh object to reproduce
+  V2's `d72ae7…` byte hash, and must stop at `AWAITING_HUMAN_REVIEW`; Phase 2
   requires the resulting 64-document packet and a separate later authorization;
 - vngrs: conditional systematic 32-shard M2 input; not materialized or training-ready;
 - M2 execution: not authorized; external materialization requires a later frozen SHA-bound

@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_d0_v1c_operational_not_run_v2_frozen_unexecuted
+  status: m0_m1_complete_m2_d0_v2_byte_semantics_blocked_v3_frozen_unexecuted
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -103,7 +103,7 @@ scientific_design:
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: frozen_unexecuted_d0_v2_phase1
+  corpus_contract: frozen_unexecuted_d0_v3_phase1
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -255,18 +255,20 @@ stage_readiness:
       - terminal_family_complete_no_duplicate_submission
   m2_training:
     corpus_contract_ready: true
-    corpus_contract_status: frozen_unexecuted_d0_v2_phase1
-    corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v2.md
-    corpus_contract_sha256: a8d84224476d3b307dc73f5144ebb7ebf21b8330b8c0e84020c285ce1ba23e20
-    corpus_config: configs/corpora/vngrs_m2_three_model_d0_v2.yaml
-    corpus_config_sha256: 13f2bd4c6502762e83fa140cc544a5f02bf35b941abea1c732161a1ab9dfbe94
+    corpus_contract_status: frozen_unexecuted_d0_v3_phase1
+    corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v3.md
+    corpus_contract_sha256: c583b434535475692b0682be27434d0d9d4319b4faebe984d3181e8aea9146aa
+    corpus_config: configs/corpora/vngrs_m2_three_model_d0_v3.yaml
+    corpus_config_sha256: 0dc2812f40b2a3dcc16aada64eda7a11a2e15caea1dfb2d0a5f81e1b9da22a2b
+    prior_v2_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v2.md
+    prior_v2_contract_sha256: a8d84224476d3b307dc73f5144ebb7ebf21b8330b8c0e84020c285ce1ba23e20
     prior_v1_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
     prior_v1_contract_sha256: a77855a06c70ccdb52eb3768e7f2be2081da3129b5716eafeb03af2edf56baf3
     corpus_scope: vngrs_systematic_32_shard_subcorpus
     required_models: [olmo, qwen, smollm]
     materialization_operator: locally_implemented_execution_disabled
     materialization_operator_module: src/transfer_vs_relearning/corpora/vngrs/materialization.py
-    materialization_operator_sha256: 6e57e82a39045fb2b3afd3f9af08cff833eacad836dcffe06bfe316be62d82a6
+    materialization_operator_sha256: aa93684fd2e17826cea1b7e412ad3de9237e1550c6c7b9d90ec27a45b437086c
     materialization_operator_validation: offline_fixture_suite_passed
     local_audit_operator: locally_implemented_execution_disabled
     local_audit_operator_module: src/transfer_vs_relearning/corpora/vngrs/d0_audit.py
@@ -334,7 +336,7 @@ stage_readiness:
     source_registry_byte_semantics_repair_execution_authorized: consumed_single_pass
     source_registry_byte_semantics_repair_result: artifacts/corpora/vngrs_m2_d0/source_registry_byte_semantics_repair_v1.json
     source_registry_byte_semantics_repair_result_sha256: 63acadb8955411e0ee42dba0c28f72220568efce6e01db4bfcf90a31c49724a9
-    source_registry_status: closed_32_of_32_from_accepted_lfs_identities
+    source_registry_status: closed_32_of_32_transport_object_ids_full_byte_sha_unverified_until_download
     source_registry_sha256: b1c80bf78ff40de5c02e14f08082a51cc17cc90a9853028eaf866cb63326e41f
     source_registry_total_object_bytes: 9502315428
     source_registry_total_parquet_compressed_bytes: 9468474036
@@ -347,10 +349,10 @@ stage_readiness:
     frozen_peak_bytes: 34359738368
     required_available_bytes: 42949672960
     required_available_inodes: 1024
-    parquet_loader_module: src/transfer_vs_relearning/corpora/vngrs/parquet_loader.py
-    parquet_loader_sha256: bbec0a210ab1a412f70c70212e6a8bea33544e30f5723667c9396da202038750
+    parquet_loader_module: src/transfer_vs_relearning/corpora/vngrs/parquet_loader_v3.py
+    parquet_loader_sha256: 4226586b781471153dafa90f3a3f82516ebb70db88d7f217bec52566cb9119d5
     orchestration_module: src/transfer_vs_relearning/corpora/vngrs/d0_orchestration.py
-    orchestration_sha256: a5849dad87d71a19e14dc019dc580440618b8bb32859cc9579010e9699ab3e82
+    orchestration_sha256: a923651dda0ce233fd6993094c2cccb7394f2945581c043326819cb27d37f8d5
     evidence_bundle_module: src/transfer_vs_relearning/corpora/vngrs/d0_bundle.py
     evidence_bundle_sha256: e278a7b6b0d2ab42e84b1e7d1695e8d9c31710240d4eefe5fc0f23b8ff71cfea
     preflight_operator_sha256: ae1da3b1c886ac8143197609ff5aa89915a15064212a8356b4d8e2bc7ce43acb
@@ -365,8 +367,13 @@ stage_readiness:
     phase1_v1a_slurm_sha256: bc65401edf13d3c76b3c06551253107a50dcfca591ea3b150717c088266351f2
     v2_phase1_submitter_sha256: 6da31bf587a57e38af22a5ffd44e368fc7fd4ce82890d67e7a6bc2c077ef4038
     v2_phase1_slurm_sha256: 2a35f0d82a96965231886e7ffcba72a94f929f836e1119f2645b386e39df7657
-    local_qualification_validation: 191_tests_passed
-    production_launcher_status: frozen_unexecuted_d0_v2_phase1
+    v3_input_loader_sha256: 619b4021779f034fa62268e3da76d671b99acbb2eb08fcfb4e54a7d71c643001
+    v3_preflight_sha256: 4ab4f9e1227d0df3b1f46df0c1470da9ce74575498305eb821aaf273e8cfd991
+    v3_runner_sha256: c1e802e4be0624c1556f0071402449ec76c9ea56a06019659948acafd7dfb9fc
+    v3_phase1_submitter_sha256: 8064a0fe4adeb48cc378fce4a5a5aad85960bf0fd6c197e84a5b6e833c2e0e9e
+    v3_phase1_slurm_sha256: 6ab21ac5a930360374e0980837a524f3caca94b127547955b27f6b2fc410eda2
+    local_qualification_validation: 190_vngrs_focused_tests_passed
+    production_launcher_status: frozen_unexecuted_d0_v3_phase1
     human_review_handoff_status: frozen_64_packet_bound_decisions
     phase1_execution_authorized: v1a_authorization_consumed_operational_not_run
     phase1_pre_correction_hu_targeted_tests: 45_passed
@@ -402,13 +409,23 @@ stage_readiness:
     accepted_evidence_historical_line_inventory_sha256: 120cdd7b21e161bf981cf8191fa278a11829d3fc5c155b71ed4bc8836e27f1d3
     accepted_evidence_rejected_canonical_json_sha256: 268ebe818021efcbd7a96658e4371fc28a4594a8c6259d473369166bdda550dc
     d0_v2_output_root: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v2
-    d0_v2_execution_authorized: false
+    d0_v2_execution_authorized: consumed_single_phase1_wave
+    d0_v2_job_id: "481838"
+    d0_v2_result: blocked_object_id_misclassified_as_full_byte_sha256
+    d0_v2_verified_objects: 0
+    d0_v2_response_transferred_bytes: 448718347
+    d0_v2_partial_path: raw/.partial/data/train-00004-of-00284.parquet
+    d0_v2_partial_byte_sha256: d72ae76652c1a3880288ebbea9d0004e17c03730971f62666ed09c6c87de0943
+    d0_v2_expected_transport_object_id: a81097a7346a46825147c84b516be22fe70bdd1fd589d5d57df9da66ec7f91da
+    d0_v2_root_read_only: true
+    d0_v3_output_root: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v3
+    d0_v3_execution_authorized: false
     phase2_execution_authorized: false
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - vngrs_d0_v2_phase1_exact_sha_authorization_missing
+      - vngrs_d0_v3_phase1_exact_sha_authorization_missing
       - phase2_ineligible_until_phase1_review_packet_and_separate_authorization
       - m2_a_m2_b_matched_contract_not_frozen
       - three_m1_epoch036_parent_bindings_not_yet_frozen_in_m2_contract
@@ -1193,7 +1210,7 @@ current_evidence:
     selected_for_training: false
     accepted_metadata_evidence_root: /vol/tmp2/yesildau/luna_vngrs_metadata_footer_feasibility_v1
     accepted_metadata_inventory_sha256: 120cdd7b21e161bf981cf8191fa278a11829d3fc5c155b71ed4bc8836e27f1d3
-    latest_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v2.md
+    latest_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v3.md
     latest_contract_status: frozen_unexecuted_phase1
     global_gate: blocked_by_measurement_design
   trwiki:
@@ -1292,13 +1309,13 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: await_exact_sha_authorization_for_vngrs_d0_v2_phase1
+  name: await_exact_sha_authorization_for_vngrs_d0_v3_phase1
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: d0_v1c_operational_not_run_v2_frozen_unexecuted
+  m2_status: d0_v2_byte_semantics_blocked_v3_frozen_unexecuted
   execution_boundary: separate_future_exact_sha_bound_user_authorization
   current_work:
-    - execute_only_d0_v2_phase1_after_exact_sha_authorization
+    - execute_only_d0_v3_phase1_after_exact_sha_authorization
     - stop_at_awaiting_human_review
     - keep_phase2_and_m2_training_execution_disabled
   forbidden_until_user_says_start:
@@ -1309,7 +1326,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_exact_vngrs_d0_v2_phase1_materialization_wave
+  subject: authorize_exact_vngrs_d0_v3_phase1_materialization_wave
   decision_owner: user
   start_m1_now: false
   note: >-
@@ -1337,9 +1354,15 @@ next_decision_required:
     accepted root still has 104 files / 18,025,945 bytes; historical line serialization still
     reproduces `120cdd7b...`, while the V1 canonical-JSON validator produced `268ebe81...`.
     V1C is operational `NOT_RUN` with zero network/object writes and its root is preserved.
-    Frozen D0 v2 changes only the inventory serialization and fresh output namespace; it is
-    unexecuted and awaits a new exact SHA-bound authorization. It must stop at
-    AWAITING_HUMAN_REVIEW; Phase 2 and training remain separately unauthorized.
+    D0 v2 corrected the inventory serialization and its authorized job `481838` downloaded the
+    first exact 448,718,347-byte Parquet object, but stopped before publication because the prior
+    registry repair misclassified transport object ID `a81097...` as the full-byte SHA. The
+    preserved partial's computed SHA is `d72ae7...`; its Parquet magic and accepted footer/trailer
+    all match. Frozen D0 v3 keeps object ID and computed byte SHA separate, re-downloads rather
+    than reusing V2, requires first-object cross-wave calibration, atomically records computed
+    byte hashes and revalidates them before Parquet row loading. It awaits a new exact SHA-bound
+    authorization and must stop at AWAITING_HUMAN_REVIEW; Phase 2 and training remain separately
+    unauthorized.
 
 authorization:
   local_repository_changes: require_current_user_instruction

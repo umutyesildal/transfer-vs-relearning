@@ -61,12 +61,46 @@ Transport = Callable[[SourceObject], FullObjectResponse]
 
 
 @dataclass(frozen=True)
+class SourceObjectV3:
+    """Immutable route identity plus independently verified Parquet byte evidence.
+
+    ``object_id`` is deliberately *not* called a SHA-256. The accepted HU ledger classifies
+    it as an LFS/Xet identifier while explicitly leaving ``object_sha256`` unverified. Full-file
+    SHA-256 is therefore an observed output of materialization, never an input copied from ETag.
+    """
+
+    path: str
+    revision: str
+    size_bytes: int
+    object_id: str
+    object_id_kind: str
+    url: str
+    footer_bytes: int
+    footer_sha256: str
+    trailer_sha256: str
+
+
+@dataclass(frozen=True)
 class MaterializationPolicy:
     selected_paths: tuple[str, ...] = FROZEN_SELECTED_SHARD_PATHS
     revision: str = VNGRS_REVISION
     expected_total_bytes: int = 9_502_315_428
     max_response_bytes: int = 10_737_418_240
     chunk_size_upper_bound: int = 8 * 1024 * 1024
+    execution_enabled: bool = False
+
+
+@dataclass(frozen=True)
+class MaterializationV3Policy:
+    selected_paths: tuple[str, ...] = FROZEN_SELECTED_SHARD_PATHS
+    revision: str = VNGRS_REVISION
+    expected_total_bytes: int = 9_502_315_428
+    max_response_bytes: int = 10_737_418_240
+    chunk_size_upper_bound: int = 8 * 1024 * 1024
+    calibration_path: str = "data/train-00004-of-00284.parquet"
+    calibration_byte_sha256: str = (
+        "d72ae76652c1a3880288ebbea9d0004e17c03730971f62666ed09c6c87de0943"
+    )
     execution_enabled: bool = False
 
 
@@ -191,6 +225,83 @@ def _validate_response(response: FullObjectResponse, source: SourceObject) -> tu
     return content_type, parsed.hostname.lower()
 
 
+def normalized_object_id(value: str) -> str:
+    """Normalize a transport object identifier without assigning byte-digest semantics."""
+
+    normalized = value.strip().strip('"').lower()
+    for prefix in ("sha256:", "sha256-"):
+        if normalized.startswith(prefix):
+            normalized = normalized[len(prefix) :]
+            break
+    if SHA256_RE.fullmatch(normalized) is None:
+        raise MaterializationBlocked("transport object identifier is not a 64-hex value")
+    return normalized
+
+
+def validate_source_registry_v3(
+    objects: Iterable[SourceObjectV3], policy: MaterializationV3Policy
+) -> tuple[SourceObjectV3, ...]:
+    rows = tuple(objects)
+    if policy.selected_paths != FROZEN_SELECTED_SHARD_PATHS:
+        raise MaterializationBlocked("V3 policy must use the frozen 32-shard selection")
+    if tuple(row.path for row in rows) != policy.selected_paths:
+        raise MaterializationBlocked("V3 registry does not exactly match selected-path order")
+    if len({row.path for row in rows}) != len(rows):
+        raise MaterializationBlocked("V3 registry contains duplicate paths")
+    total = 0
+    for row in rows:
+        _safe_relative_path(row.path)
+        if row.revision != policy.revision:
+            raise MaterializationBlocked(f"{row.path}: immutable revision drift")
+        if row.url != immutable_resolve_url(row.path, row.revision):
+            raise MaterializationBlocked(f"{row.path}: immutable resolve URL drift")
+        if not isinstance(row.size_bytes, int) or isinstance(row.size_bytes, bool) or row.size_bytes <= 0:
+            raise MaterializationBlocked(f"{row.path}: invalid exact object size")
+        normalized_object_id(row.object_id)
+        if row.object_id_kind != "lfs_oid":
+            raise MaterializationBlocked(f"{row.path}: accepted object-id kind drift")
+        if (
+            not isinstance(row.footer_bytes, int)
+            or isinstance(row.footer_bytes, bool)
+            or not 8 < row.footer_bytes <= 4 * 1024 * 1024
+            or row.footer_bytes > row.size_bytes
+        ):
+            raise MaterializationBlocked(f"{row.path}: invalid accepted footer length")
+        if SHA256_RE.fullmatch(row.footer_sha256) is None or SHA256_RE.fullmatch(row.trailer_sha256) is None:
+            raise MaterializationBlocked(f"{row.path}: invalid accepted footer/trailer digest")
+        total += row.size_bytes
+    if total != policy.expected_total_bytes or total > policy.max_response_bytes:
+        raise MaterializationBlocked(
+            "V3 registry byte total drift",
+            context={"observed_bytes": total, "expected_bytes": policy.expected_total_bytes},
+        )
+    if policy.calibration_path != rows[0].path or SHA256_RE.fullmatch(policy.calibration_byte_sha256) is None:
+        raise MaterializationBlocked("V3 first-object byte calibration drift")
+    return rows
+
+
+def _validate_response_v3(
+    response: FullObjectResponse, source: SourceObjectV3
+) -> tuple[str, str, str]:
+    if response.status != 200:
+        raise MaterializationBlocked(f"{source.path}: full-object response status was not 200")
+    content_length = _header(response.headers, "content-length")
+    if content_length is None or not content_length.isdigit() or int(content_length) != source.size_bytes:
+        raise MaterializationBlocked(f"{source.path}: Content-Length does not match exact object size")
+    content_type = (_header(response.headers, "content-type") or "").split(";", 1)[0].strip().lower()
+    if content_type not in ALLOWED_CONTENT_TYPES:
+        raise MaterializationBlocked(f"{source.path}: response Content-Type is not allowed")
+    if (_header(response.headers, "content-encoding") or "identity").lower() != "identity":
+        raise MaterializationBlocked(f"{source.path}: encoded response would break byte identity")
+    response_id = _header(response.headers, "x-linked-etag") or _header(response.headers, "etag")
+    if response_id is None or normalized_object_id(response_id) != normalized_object_id(source.object_id):
+        raise MaterializationBlocked(f"{source.path}: response object identity drift")
+    parsed = urlsplit(response.terminal_url)
+    if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
+        raise MaterializationBlocked(f"{source.path}: invalid terminal HTTPS route")
+    return content_type, parsed.hostname.lower(), normalized_object_id(response_id)
+
+
 def materialize_full_objects(
     root: str | Path,
     objects: Iterable[SourceObject],
@@ -306,6 +417,147 @@ def materialize_full_objects(
             "verified_objects": len(result.source_rows),
             "response_transferred_bytes": result.total_response_bytes,
             "context": context,
+        }
+        _atomic_json(control_root / "failure.json", failure)
+        if isinstance(exc, MaterializationBlocked):
+            raise
+        raise MaterializationBlocked(str(exc), context=failure) from exc
+
+
+def materialize_full_objects_v3(
+    root: str | Path,
+    objects: Iterable[SourceObjectV3],
+    *,
+    transport: Callable[[SourceObjectV3], FullObjectResponse],
+    policy: MaterializationV3Policy = MaterializationV3Policy(),
+) -> MaterializationResult:
+    """Materialize V3 while keeping object IDs separate from computed byte SHA-256."""
+
+    if not policy.execution_enabled:
+        raise MaterializationBlocked("V3 materialization execution is disabled by policy")
+    registry = validate_source_registry_v3(objects, policy)
+    root_path = Path(root)
+    if not root_path.is_absolute():
+        raise MaterializationBlocked("output root must be absolute")
+    if root_path.exists() or root_path.is_symlink():
+        raise MaterializationBlocked("fresh V3 output root is required")
+    root_path.mkdir(parents=True, exist_ok=False)
+    raw_root = root_path / "raw"
+    partial_root = raw_root / ".partial"
+    control_root = root_path / "control"
+    partial_root.mkdir(parents=True)
+    control_root.mkdir(parents=True)
+
+    result = MaterializationResult(status="IN_PROGRESS", root=str(root_path), total_response_bytes=0)
+    active_source: SourceObjectV3 | None = None
+    active_partial: Path | None = None
+    observed_sha256: str | None = None
+    try:
+        for ordinal, source in enumerate(registry):
+            active_source = source
+            observed_sha256 = None
+            relative = _safe_relative_path(source.path)
+            target = raw_root.joinpath(*relative.parts)
+            partial = partial_root.joinpath(*relative.parts)
+            active_partial = partial
+            if target.exists() or partial.exists() or target.is_symlink() or partial.is_symlink():
+                raise MaterializationBlocked(f"{source.path}: target or partial already exists")
+            target.parent.mkdir(parents=True, exist_ok=True)
+            partial.parent.mkdir(parents=True, exist_ok=True)
+
+            response = transport(source)  # type: ignore[arg-type]
+            content_type, terminal_host, response_object_id = _validate_response_v3(response, source)
+            digest = hashlib.sha256()
+            object_bytes = 0
+            with partial.open("xb") as handle:
+                for chunk in response.chunks:
+                    if not isinstance(chunk, bytes) or not chunk:
+                        raise MaterializationBlocked(f"{source.path}: transport yielded a non-byte/empty chunk")
+                    if len(chunk) > policy.chunk_size_upper_bound:
+                        raise MaterializationBlocked(f"{source.path}: transport chunk exceeds memory bound")
+                    object_bytes += len(chunk)
+                    result.total_response_bytes += len(chunk)
+                    if object_bytes > source.size_bytes:
+                        raise MaterializationBlocked(f"{source.path}: response exceeded exact object size")
+                    if result.total_response_bytes > policy.max_response_bytes:
+                        raise MaterializationBlocked("cumulative response-byte budget exceeded")
+                    handle.write(chunk)
+                    digest.update(chunk)
+                handle.flush()
+                os.fsync(handle.fileno())
+            observed_sha256 = digest.hexdigest()
+            if object_bytes != source.size_bytes:
+                raise MaterializationBlocked(f"{source.path}: response ended before exact object size")
+            with partial.open("rb") as handle:
+                if handle.read(4) != b"PAR1":
+                    raise MaterializationBlocked(f"{source.path}: Parquet leading magic mismatch")
+                handle.seek(-source.footer_bytes, os.SEEK_END)
+                footer = handle.read(source.footer_bytes)
+            if hashlib.sha256(footer).hexdigest() != source.footer_sha256:
+                raise MaterializationBlocked(
+                    f"{source.path}: accepted footer SHA-256 mismatch",
+                    context={"observed_byte_sha256": observed_sha256},
+                )
+            if footer[-4:] != b"PAR1" or hashlib.sha256(footer[-8:]).hexdigest() != source.trailer_sha256:
+                raise MaterializationBlocked(
+                    f"{source.path}: accepted Parquet trailer mismatch",
+                    context={"observed_byte_sha256": observed_sha256},
+                )
+            if source.path == policy.calibration_path and observed_sha256 != policy.calibration_byte_sha256:
+                raise MaterializationBlocked(
+                    f"{source.path}: V2-observed full-byte calibration mismatch",
+                    context={
+                        "observed_byte_sha256": observed_sha256,
+                        "expected_calibration_sha256": policy.calibration_byte_sha256,
+                    },
+                )
+            os.replace(partial, target)
+            active_partial = None
+            result.request_rows.append({
+                "schema_version": 3, "request_ordinal": ordinal, "path": source.path,
+                "http_status": response.status, "response_transferred_bytes": object_bytes,
+                "terminal_host": terminal_host, "redirect_hops": len(response.redirect_chain),
+                "content_type": content_type, "content_encoding": "identity",
+                "response_object_id": response_object_id, "status": "verified",
+            })
+            result.source_rows.append({
+                "schema_version": 3, "ordinal": ordinal, "path": source.path,
+                "revision": source.revision, "bytes": object_bytes,
+                "byte_sha256": observed_sha256,
+                "byte_sha256_source": "computed_from_downloaded_bytes",
+                "source_object_id": normalized_object_id(source.object_id),
+                "source_object_id_kind": source.object_id_kind,
+                "source_object_id_is_byte_sha256": False,
+                "footer_bytes": source.footer_bytes, "footer_sha256": source.footer_sha256,
+                "trailer_sha256": source.trailer_sha256,
+                "local_path": str(target.relative_to(root_path)), "status": "verified",
+            })
+        if result.total_response_bytes != policy.expected_total_bytes:
+            raise MaterializationBlocked("terminal transferred-byte total drift")
+        result.status = "MATERIALIZED_VERIFIED"
+        _atomic_json(
+            control_root / "materialization_v3.json",
+            {
+                "schema_version": 3,
+                "status": result.status,
+                "total_response_bytes": result.total_response_bytes,
+                "source_rows": result.source_rows,
+                "request_rows": result.request_rows,
+                "ready_to_train": False,
+            },
+        )
+        return result
+    except Exception as exc:
+        context = dict(getattr(exc, "context", {}))
+        if observed_sha256 is not None:
+            context.setdefault("observed_byte_sha256", observed_sha256)
+        failure = {
+            "schema_version": 3, "status": "BLOCKED", "error_type": type(exc).__name__,
+            "message": str(exc), "source_path": active_source.path if active_source else None,
+            "partial_path": str(active_partial.relative_to(root_path)) if active_partial is not None and active_partial.exists() else None,
+            "verified_objects": len(result.source_rows),
+            "response_transferred_bytes": result.total_response_bytes,
+            "context": context, "automatic_retry_authorized": False,
         }
         _atomic_json(control_root / "failure.json", failure)
         if isinstance(exc, MaterializationBlocked):
