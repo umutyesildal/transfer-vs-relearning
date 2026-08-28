@@ -1,11 +1,11 @@
 schema_version: 1
-as_of: "2026-08-27"
+as_of: "2026-08-28"
 project: transfer-vs-relearning
 
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_d0_phase1_v1b_operational_not_run_v1c_frozen_unexecuted
+  status: m0_m1_complete_m2_d0_v1c_operational_not_run_v2_frozen_unexecuted
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -103,7 +103,7 @@ scientific_design:
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: frozen_unexecuted_phase1_v1c
+  corpus_contract: frozen_unexecuted_d0_v2_phase1
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -255,11 +255,13 @@ stage_readiness:
       - terminal_family_complete_no_duplicate_submission
   m2_training:
     corpus_contract_ready: true
-    corpus_contract_status: frozen_unexecuted_phase1_v1c
-    corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
-    corpus_contract_sha256: a77855a06c70ccdb52eb3768e7f2be2081da3129b5716eafeb03af2edf56baf3
-    corpus_config: configs/corpora/vngrs_m2_three_model_d0_v1.yaml
-    corpus_config_sha256: 646d587731b4be0b9987194342300296e25d27ab998e178c6b43fe717ab5eb46
+    corpus_contract_status: frozen_unexecuted_d0_v2_phase1
+    corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v2.md
+    corpus_contract_sha256: a8d84224476d3b307dc73f5144ebb7ebf21b8330b8c0e84020c285ce1ba23e20
+    corpus_config: configs/corpora/vngrs_m2_three_model_d0_v2.yaml
+    corpus_config_sha256: 13f2bd4c6502762e83fa140cc544a5f02bf35b941abea1c732161a1ab9dfbe94
+    prior_v1_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
+    prior_v1_contract_sha256: a77855a06c70ccdb52eb3768e7f2be2081da3129b5716eafeb03af2edf56baf3
     corpus_scope: vngrs_systematic_32_shard_subcorpus
     required_models: [olmo, qwen, smollm]
     materialization_operator: locally_implemented_execution_disabled
@@ -351,18 +353,20 @@ stage_readiness:
     orchestration_sha256: a5849dad87d71a19e14dc019dc580440618b8bb32859cc9579010e9699ab3e82
     evidence_bundle_module: src/transfer_vs_relearning/corpora/vngrs/d0_bundle.py
     evidence_bundle_sha256: e278a7b6b0d2ab42e84b1e7d1695e8d9c31710240d4eefe5fc0f23b8ff71cfea
-    preflight_operator_sha256: 58403cc58ef5c78ace1328c60afa950fc432cb3c6c9ae0216dedddd5098588c3
+    preflight_operator_sha256: ae1da3b1c886ac8143197609ff5aa89915a15064212a8356b4d8e2bc7ce43acb
     runtime_adapter_sha256: f78a95e4a3d0567373e4b3b498e24ccd0669a4f0eebc8f61afdb9dce45bd01e7
     review_handoff_sha256: e8b2071e6bba185eede05fe61029c84bd807e8934f98b1c889bf6c2fb75c8ca8
     frozen_input_loader_sha256: d39f494fa5e90548241038c04fddbd8ab66cc0e232eb85d141b5ce400fe71761
-    production_launcher_sha256: c93d94ce569d4edf20a1b8a967f9b7765b4c809c3cc2bd3054ea242aa9404e58
+    production_launcher_sha256: e314724880217715e09c05bed11563cd8d43844903f6c278ec7fe30216282bea
     preflight_launcher_sha256: 510fe81602a8628bcd665544ccc6f269d442f99c1c21471833283891d660a7da
     phase1_submitter_sha256: 4c01bb4e1b2590c3b3c4fd479b8ce1fea388c6d71d81e51473eee25132cd0c76
     phase2_submitter_sha256: 794f37f5a3a72bd760b1017a1eeb8c48c992e01e872c1dacf678c51a707a4d68
     phase1_v1a_submitter_sha256: 7cfbcd4dd15beaaf2e50ce593bdf92b2314ed7bb6abea3465c447a5ba6252737
     phase1_v1a_slurm_sha256: bc65401edf13d3c76b3c06551253107a50dcfca591ea3b150717c088266351f2
-    local_qualification_validation: 185_tests_passed
-    production_launcher_status: frozen_unexecuted_two_phase_phase1_v1c
+    v2_phase1_submitter_sha256: 6da31bf587a57e38af22a5ffd44e368fc7fd4ce82890d67e7a6bc2c077ef4038
+    v2_phase1_slurm_sha256: 2a35f0d82a96965231886e7ffcba72a94f929f836e1119f2645b386e39df7657
+    local_qualification_validation: 191_tests_passed
+    production_launcher_status: frozen_unexecuted_d0_v2_phase1
     human_review_handoff_status: frozen_64_packet_bound_decisions
     phase1_execution_authorized: v1a_authorization_consumed_operational_not_run
     phase1_pre_correction_hu_targeted_tests: 45_passed
@@ -385,14 +389,26 @@ stage_readiness:
     phase1_v1b_result: operational_not_run_before_root_or_network_exact_error_not_persisted
     phase1_v1b_output_root_created: false
     phase1_v1b_network_requests: 0
-    phase1_v1c_failure_evidence: control/preflight_failure.json
-    phase1_v1c_execution_authorized: false
+    phase1_v1c_failure_evidence: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v1/control/preflight_failure.json
+    phase1_v1c_execution_authorized: consumed_single_operational_not_run_wave
+    phase1_v1c_commit: aad286d479a237096053b95ad5d91ea10d077bd3
+    phase1_v1c_job_id: "481836"
+    phase1_v1c_result: operational_not_run_inventory_serialization_mismatch
+    phase1_v1c_error: accepted_read_only_evidence_closure_drift
+    phase1_v1c_network_requests: 0
+    phase1_v1c_source_objects_written: 0
+    accepted_evidence_current_files: 104
+    accepted_evidence_current_bytes: 18025945
+    accepted_evidence_historical_line_inventory_sha256: 120cdd7b21e161bf981cf8191fa278a11829d3fc5c155b71ed4bc8836e27f1d3
+    accepted_evidence_rejected_canonical_json_sha256: 268ebe818021efcbd7a96658e4371fc28a4594a8c6259d473369166bdda550dc
+    d0_v2_output_root: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v2
+    d0_v2_execution_authorized: false
     phase2_execution_authorized: false
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - vngrs_d0_phase1_v1c_exact_sha_authorization_missing
+      - vngrs_d0_v2_phase1_exact_sha_authorization_missing
       - phase2_ineligible_until_phase1_review_packet_and_separate_authorization
       - m2_a_m2_b_matched_contract_not_frozen
       - three_m1_epoch036_parent_bindings_not_yet_frozen_in_m2_contract
@@ -1177,8 +1193,8 @@ current_evidence:
     selected_for_training: false
     accepted_metadata_evidence_root: /vol/tmp2/yesildau/luna_vngrs_metadata_footer_feasibility_v1
     accepted_metadata_inventory_sha256: 120cdd7b21e161bf981cf8191fa278a11829d3fc5c155b71ed4bc8836e27f1d3
-    latest_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
-    latest_contract_status: frozen_unexecuted
+    latest_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v2.md
+    latest_contract_status: frozen_unexecuted_phase1
     global_gate: blocked_by_measurement_design
   trwiki:
     role: cross_domain_control_only
@@ -1276,13 +1292,13 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: await_exact_sha_authorization_for_vngrs_d0_phase1_v1c
+  name: await_exact_sha_authorization_for_vngrs_d0_v2_phase1
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: d0_phase1_v1b_operational_not_run_v1c_frozen_unexecuted
+  m2_status: d0_v1c_operational_not_run_v2_frozen_unexecuted
   execution_boundary: separate_future_exact_sha_bound_user_authorization
   current_work:
-    - execute_only_phase1_v1c_after_exact_sha_authorization
+    - execute_only_d0_v2_phase1_after_exact_sha_authorization
     - stop_at_awaiting_human_review
     - keep_phase2_and_m2_training_execution_disabled
   forbidden_until_user_says_start:
@@ -1293,7 +1309,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_exact_vngrs_d0_phase1_v1c_materialization_wave
+  subject: authorize_exact_vngrs_d0_v2_phase1_materialization_wave
   decision_owner: user
   start_m1_now: false
   note: >-
@@ -1309,7 +1325,7 @@ next_decision_required:
     All passes had zero HU writes and no corpus/object downloads. Storage arithmetic is now closed
     at a 32 GiB frozen peak with 40 GiB/1,024-inode fresh-preflight requirements. The local staged
     operator, exact Parquet loader, reviewed HTTPS/tokenizer adapters, atomic evidence chain and
-    typed-failure behavior passed 185 compatible tests. The pre-correction Phase-1 route was
+    typed-failure behavior passed 191 compatible tests. The pre-correction Phase-1 route was
     stopped before Slurm submission because external preflight/log writes contradicted the sole
     root. Corrected V1A kept preflight in memory and Slurm logs off filesystem, but its single job
     `481608` stopped before root creation or network access when the exact HU-home `du` exceeded
@@ -1317,9 +1333,12 @@ next_decision_required:
     timeout to 300 seconds and added bounded best-effort Slurm-comment status evidence. Its one
     job `481711` started on `gruenau4` but disappeared before root creation; the comment was lost
     after controller purge and `sacct` remained unavailable. V1B is operational `NOT_RUN` and its
-    authorization is consumed. Frozen V1C adds only atomic typed pre-root failure evidence beneath
-    the sole approved root; it is unexecuted and awaits a new exact SHA-bound authorization. It
-    must stop at
+    authorization is consumed. V1C then persisted the exact `481836` exception and proved the
+    accepted root still has 104 files / 18,025,945 bytes; historical line serialization still
+    reproduces `120cdd7b...`, while the V1 canonical-JSON validator produced `268ebe81...`.
+    V1C is operational `NOT_RUN` with zero network/object writes and its root is preserved.
+    Frozen D0 v2 changes only the inventory serialization and fresh output namespace; it is
+    unexecuted and awaits a new exact SHA-bound authorization. It must stop at
     AWAITING_HUMAN_REVIEW; Phase 2 and training remain separately unauthorized.
 
 authorization:

@@ -20,8 +20,9 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - current boundary: the three-model vngrs D0 two-phase launcher and human-review handoff remain
   frozen; corrected V1A ran once as job `481608` and stopped before output-root creation or network
   access at the exact HU-home `du` timeout; V1B job `481711` later started but stopped before root
-  creation and its Slurm comment was lost after controller purge; V1C is frozen and awaits a new
-  exact SHA-bound authorization;
+  creation and its Slurm comment was lost after controller purge; V1C job `481836` then persisted
+  the exact canonicalization mismatch with zero network/object writes; D0 v2 is frozen on a fresh
+  root with the historical line-inventory semantics and awaits exact SHA-bound authorization;
 - D0 audit/split/tokenizer-accounting operators: locally implemented and offline validated;
 - tokenizer inventory: PASS for all three M1 epoch-036 parents with zero HU writes;
 - source-registry extractor: locally implemented and offline validated; exact accepted ledger has
@@ -34,10 +35,10 @@ the master synthesis, the long timeline, or a previous chat transcript.
   Parquet compressed-byte total was incorrectly used as the full-object total;
 - byte-semantics repair: PASS; 32/32 LFS identities and both exact byte aggregates are closed;
 - storage/orchestration qualification: 32 GiB frozen peak, 40 GiB plus 1,024-inode fresh gate,
-  exact Parquet loader, typed failures, reviewed adapters and atomic output chain passed 185
+  exact Parquet loader, typed failures, reviewed adapters and atomic output chain passed 191
   compatible tests;
-- next boundary: authorize only corrected Phase 1 V1C, which preserves the 300-second exact
-  HU-home `du` command and atomically persists any pre-root failure beneath the sole approved root,
+- next boundary: authorize only D0 v2 Phase 1, which preserves V1C evidence, uses the fresh v2
+  root and reproduces the accepted evidence SHA with exact `relative_path size\n` serialization,
   and must stop at
   `AWAITING_HUMAN_REVIEW`; Phase 2
   requires the resulting 64-document packet and a separate later authorization;

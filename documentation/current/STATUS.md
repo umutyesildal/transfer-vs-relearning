@@ -1,6 +1,6 @@
 # Current project status
 
-**As of:** 2026-08-27
+**As of:** 2026-08-28
 
 **Current branch:** `agent/m2-three-model-vngrs-d0`
 
@@ -13,8 +13,8 @@ The detailed M0↔M1 result ledger is
 
 **Current preparation boundary:** the three-model M2 scope is OLMo, Qwen and SmolLM, each with
 full M2-A/M2-B sibling training from its own frozen M1 epoch-036 parent. No single primary model
-is selected. The current local-only artifact is the frozen, unexecuted vngrs D0 contract at
-`documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md`, using the previously verified
+is selected. The current local-only artifact is the frozen, unexecuted vngrs D0 v2 contract at
+`documentation/contracts/corpora/vngrs-m2-three-model-d0-v2.md`, using the previously verified
 systematic 32-shard subcorpus. No corpus retrieval/materialization or M2 training is authorized.
 The local fail-closed full-object operator is now implemented and offline-fixture validated. It is
 transport-injected, disabled by default, and cannot create the production root until the exact
@@ -69,9 +69,13 @@ evidence, and the V1A authorization is consumed. V1B changed only that timeout t
 added bounded best-effort Slurm-comment status evidence. Its single job `481711` started on
 `gruenau4` but stopped before root creation or network access; after controller purge the comment
 was unavailable and broken `sacct` could not recover the exact exception. V1B is operational
-`NOT_RUN` and its authorization is consumed. Frozen V1C adds only atomic typed pre-root failure
-evidence beneath the sole approved root; 185 compatible tests pass. V1C is unexecuted and awaits a
-new exact SHA authorization; it must stop at `AWAITING_HUMAN_REVIEW`.
+`NOT_RUN` and its authorization is consumed. V1C job `481836` then durably recorded
+`accepted read-only evidence closure drift` with zero network/object writes. Read-only diagnosis
+proved the root itself unchanged at 104 files / 18,025,945 bytes: exact historical
+`relative_path size\n` serialization reproduces `120cdd7b...`, while the V1 validator's canonical
+JSON produced `268ebe81...`. The V1C root is preserved. Frozen D0 v2 uses a fresh root and correct
+line serialization; 191 compatible tests pass. It is unexecuted and awaits a new exact SHA
+authorization; it must stop at `AWAITING_HUMAN_REVIEW`.
 Phase 2 is separately gated by the exact
 review-packet hash and a later authorization.
 
@@ -185,7 +189,7 @@ an M1 training input. `trwiki-20260601` remains the Turkish cross-domain control
 
 The completed M1 family is terminal evidence. No duplicate submission, cleanup, deletion,
 M2-A/M2-B execution, or primary-model promotion is implied. The active local boundary is to
-authorize only the exact frozen Phase-1 V1C vngrs D0 materialization wave. Phase 2 and every M2
+authorize only the exact frozen D0 v2 Phase-1 materialization wave. Phase 2 and every M2
 training action remain separate future authorization boundaries.
 
 ## Read next

@@ -1,0 +1,67 @@
+schema_version: 2
+contract_id: vngrs-m2-three-model-d0-v2
+status: frozen_unexecuted
+contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v2.md
+
+inheritance:
+  base_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
+  base_config: configs/corpora/vngrs_m2_three_model_d0_v1.yaml
+  inherited_scientific_fields_unchanged: true
+  source_revision_paths_and_object_identities_unchanged: true
+  audit_split_review_and_tokenizer_rules_unchanged: true
+  storage_and_http_bounds_unchanged: true
+
+v1_terminal_evidence:
+  root: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v1
+  artifact: control/preflight_failure.json
+  artifact_bytes: 351
+  artifact_sha256: 54e3f59abd2df14cc00acb260dbe13c0f90dd5a18a22e8d0eb9089f31382a1ce
+  job_id: 481836
+  status: BLOCKED_OPERATIONAL_PREFLIGHT
+  error_type: ValueError
+  message: accepted read-only evidence closure drift
+  network_requests: 0
+  source_objects_written: 0
+  cleanup_authorized: false
+  reuse_authorized: false
+
+accepted_evidence:
+  root: /vol/tmp2/yesildau/luna_vngrs_metadata_footer_feasibility_v1
+  regular_file_count: 104
+  regular_bytes: 18025945
+  inventory_serialization: relative_path_space_size_lf_utf8
+  inventory_sha256: 120cdd7b21e161bf981cf8191fa278a11829d3fc5c155b71ed4bc8836e27f1d3
+  canonical_json_inventory_sha256_rejected: 268ebe818021efcbd7a96658e4371fc28a4594a8c6259d473369166bdda550dc
+  top_level_sha256_inherited_from_v1: true
+
+output:
+  root: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v2
+  fresh_and_absent_required: true
+  calculated_peak_bytes: 30029406455
+  frozen_peak_bytes: 34359738368
+  required_available_bytes: 42949672960
+  required_available_inodes: 1024
+  hu_home_limit_bytes: 32212254720
+
+execution:
+  phase1_runner: scripts/corpora/run_vngrs_m2_d0_v2.py
+  phase1_submitter: scripts/corpora/submit_vngrs_m2_d0_v2_phase1.sh
+  phase1_slurm: slurm/m2/materialize_vngrs_m2_d0_v2_phase1.slurm
+  phase1_job_name: vngrs-m2-d0-v2
+  phase1_terminal_status: AWAITING_HUMAN_REVIEW
+  preflight_failure_artifact: control/preflight_failure.json
+  automatic_retry: false
+  phase2_requires_separate_contract_and_authorization: true
+
+authority:
+  local_preparation: true
+  publication: false
+  hu_ssh: false
+  slurm_cpu: false
+  network_retrieval: false
+  corpus_materialization: false
+  phase2: false
+  model_weight_load: false
+  inference_or_scoring: false
+  training: false
+  cleanup_or_deletion: false
