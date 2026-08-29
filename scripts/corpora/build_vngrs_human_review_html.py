@@ -50,6 +50,9 @@ textarea{{width:100%;min-height:80px;margin-top:14px;padding:10px;border:1px sol
 <body><main>
 <header><h1>OSCAR doküman incelemesi</h1>
 <div>Her kaydı yalnız görünen Türkçe metnin eğitim için kullanılabilirliğine göre işaretle.</div>
+<div class="hint"><b>Kullanılabilir:</b> anlaşılır/doğal Türkçe içerik. <b>Kullanılamaz:</b> bozuk,
+spam, yoğun şablon/menü veya anlamsız içerik. <b>Güvensiz:</b> kişisel veri ya da açıkça zararlı,
+istismar edici veya eğitime alınmaması gereken hassas içerik.</div>
 <div class="meta">Packet SHA-256: <span id="packetHash">{html.escape(packet_hash)}</span></div>
 <div><span id="progressText"></span><div class="progress"><div id="progressBar"></div></div></div></header>
 <div class="toolbar"><input id="reviewer" type="text" placeholder="İnceleyen kişi (zorunlu)"><button id="pending">İlk boş kayda git</button><button class="primary" id="export">Kararları JSONL indir</button></div>
