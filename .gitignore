@@ -53,6 +53,8 @@ checkpoints/
 errors.jsonl
 progress.json
 artifacts/pre_m2_followup_v1/
+# Local-only corpus excerpts and browser review state; never publish through Git.
+artifacts/corpora/vngrs_m2_d0/human_review_coverage_v1/
 
 # Existing local dataset releases copied for a functional migration worktree.
 # Their source trees remain preserved and review is required before any

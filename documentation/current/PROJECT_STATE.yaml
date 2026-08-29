@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_oscar_split_frozen_review_coverage_repair_frozen
+  status: m0_m1_complete_m2_oscar_coverage_validated_awaiting_human_review
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -103,7 +103,7 @@ scientific_design:
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: frozen_oscar_review_coverage_repair_unexecuted
+  corpus_contract: executed_oscar_coverage_validated_awaiting_human_review
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -255,7 +255,7 @@ stage_readiness:
       - terminal_family_complete_no_duplicate_submission
   m2_training:
     corpus_contract_ready: false
-    corpus_contract_status: split_frozen_review_packet_provisional_coverage_repair_frozen_unexecuted
+    corpus_contract_status: split_frozen_review_coverage_validated_awaiting_human_review
     corpus_contract: documentation/contracts/corpora/vngrs-m2-oscar-review-coverage-repair-v1.md
     corpus_contract_sha256: f05b43faaee6f2561af85a693cfff35194c7b7aaa467911de68684d4b5163f06
     corpus_config: configs/corpora/vngrs_m2_oscar_review_coverage_v1.yaml
@@ -540,15 +540,28 @@ stage_readiness:
     oscar_review_coverage_submitter_sha256: 6ba7b1c6ff85644d0897bbb8085d51d9bc2bb9c2086439e570720175784b4b4d
     oscar_review_coverage_slurm_sha256: c268f7b8bb9664c10451800eb94c296a6b08756fc69e79920320e2a01318b607
     oscar_review_coverage_output_root: /vol/tmp2/yesildau/vngrs_m2_oscar_review_coverage_repair_v1
-    oscar_review_coverage_status: frozen_unexecuted_requires_exact_sha_authorization
-    oscar_review_coverage_execution_authorized: false
+    oscar_review_coverage_status: executed_coverage_validated_awaiting_human_review
+    oscar_review_coverage_execution_authorized: consumed_single_cpu_pass
+    oscar_review_coverage_job_id: "481908"
+    oscar_review_coverage_test_only_estimate_id: "481907"
+    oscar_review_coverage_commit: 09e1627afde68879d06567731ddd301793c3b4ff
+    oscar_review_coverage_nonempty_strata: 1
+    oscar_review_coverage_q0_documents: 354482
+    oscar_review_coverage_q1_documents: 0
+    oscar_review_coverage_q2_documents: 0
+    oscar_review_coverage_q3_documents: 0
+    oscar_review_coverage_packet_sha256: 73329e45fd8ff2c6b24c36fa6f9b5bac767b9d25726b691d527c71f9fdf90af8
+    oscar_review_coverage_packet_file_sha256: 621d8416f120803cc37f75453f0068a5fecaa60562698f11936b22caa3b75c61
+    oscar_review_coverage_final_audit_sha256: 6ce5f1f7b13fa61ae3f9c021b237b0464e4989ae179dc73fe32030049772c177
+    oscar_review_coverage_result_record: documentation/186_VNGRS_OSCAR_REVIEW_COVERAGE_REPAIR_EXECUTION_RESULT_TR.md
+    oscar_review_coverage_result_record_sha256: 4c0be5d15dc9c44178332d8ba3a9fc465b72e7c47f874a44dd1075c22c92d018
+    oscar_review_coverage_human_review_status: awaiting_64_manual_verdicts
     oscar_review_coverage_human_verdict_entry: false
     phase2_execution_authorized: false
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - oscar_review_quartile_coverage_not_validated
       - human_review_decisions_not_completed
       - phase2_ineligible_until_phase1_review_packet_and_separate_authorization
       - m2_a_m2_b_matched_contract_not_frozen
@@ -1436,17 +1449,17 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: execute_separately_authorized_oscar_review_coverage_repair
+  name: complete_authoritative_oscar_64_document_human_review
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: split_frozen_review_packet_provisional_coverage_repair_frozen_unexecuted
-  execution_boundary: no_external_execution_until_exact_review_coverage_contract_authorization
+  m2_status: split_frozen_review_coverage_validated_awaiting_human_review
+  execution_boundary: no_phase2_or_training_until_64_human_verdicts_and_later_contract
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
     - preserve_lowercase_v1a_atom_audit_as_read_only_terminal_evidence
     - preserve_fact_pair_audit_pass_as_read_only_terminal_evidence
     - preserve_job_481906_split_and_packet_evidence_read_only
-    - run_no_action_until_exact_review_coverage_repair_authorization
+    - collect_exactly_64_packet_bound_human_verdicts_locally
     - keep_phase2_and_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1456,7 +1469,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_single_oscar_review_coverage_repair_if_desired
+  subject: complete_64_authoritative_oscar_human_verdicts
   decision_owner: user
   start_m1_now: false
   note: >-

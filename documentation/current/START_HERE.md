@@ -51,9 +51,12 @@ the master synthesis, the long timeline, or a previous chat transcript.
   not persisted, the packet is provisional for verdict entry. One excerpt also contains literal
   U+0085, exposing a `splitlines()` reader bug; the JSONL remains valid and the LF-only reader fix
   is regression-tested;
-- next boundary: the frozen review-coverage repair measures q0--q3 and produces the authoritative
-  pre-verdict 64-packet with a one-per-nonempty-stratum floor. It does not rewrite the split, enter
-  verdicts, access tokenizers/models, open Phase 2 or train, and needs new exact SHA-bound authority;
+- the review-coverage repair was limited to measuring q0--q3 and producing the authoritative
+  pre-verdict 64-packet with a one-per-nonempty-stratum floor; it did not rewrite the split, enter
+  verdicts, access tokenizers/models, open Phase 2 or train;
+- review-coverage job `481908` completed PASS: all 354,482 OSCAR documents genuinely belong to q0
+  and q1--q3 are empty, so q0-only sampling is valid. The new authoritative 64-packet is bound to
+  semantic SHA `73329e45...` and awaits exactly 64 manual verdicts in the local HTML interface;
 - M2 primary source direction: cleaned OSCAR-2201-derived rows within vngrs, pending exact label,
   volume and quality qualification; mC4 is excluded from main training and preserved;
 - vngrs: the reservoir is materialized, the OSCAR fact-pair gate passed and the split is frozen;
