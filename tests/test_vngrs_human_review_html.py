@@ -34,6 +34,7 @@ def test_builds_self_contained_packet_bound_review_ui(tmp_path: Path) -> None:
     assert "review_packet_sha256" in page
     assert "\\u003c/script\\u003e" in page
     assert "localStorage" in page
+    assert "lines.join('\\n')+'\\n'" in page
 
 
 def test_rejects_non_64_packet(tmp_path: Path) -> None:
