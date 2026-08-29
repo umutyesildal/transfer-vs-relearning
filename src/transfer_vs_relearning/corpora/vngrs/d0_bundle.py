@@ -109,6 +109,14 @@ def write_d0_recovery_state(root: str | Path, state: Mapping[str, Any]) -> None:
     _atomic(Path(root) / "control/recovery_state.json", _json(dict(state)))
 
 
+def write_d0_fact_pair_audit(root: str | Path, audit: Mapping[str, Any]) -> None:
+    """Persist the bounded fact-pair correction report without opening later stages."""
+
+    if audit.get("ready_to_train") is not False:
+        raise ValueError("fact-pair audit must remain training-ineligible")
+    _atomic(Path(root) / "reports/fact_pair_contamination_audit.json", _json(dict(audit)))
+
+
 def write_d0_evidence_bundle(
     root: str | Path,
     result: Mapping[str, Any],

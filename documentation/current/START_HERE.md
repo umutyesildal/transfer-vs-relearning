@@ -39,9 +39,14 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - first OSCAR audit-recovery job `481863`: exact label inventory PASS; observed lowercase `oscar`
   has 354,482 documents / 1,553,923,133 UTF-8 bytes, while `mc4` has 5,317,204 documents; V1
   stopped before audit because its candidate was uppercase `OSCAR`;
-- next boundary: frozen V1a changes only the exact predicate to lowercase `oscar`, verifies V3 and
-  V1 evidence read-only, writes a fresh retry root, and stops before split/review/tokenizer
-  accounting; it requires a new exact SHA-bound authorization;
+- lowercase V1a job `481886` completed the 354,482-document OSCAR audit, but its flattened
+  600-surface gate blocked on 439,906 exact / 935,276 normalized document-pattern pairs; bounded
+  examples are object-only, so isolated ordinary cities/professions/industries cannot support a
+  factual-contamination verdict by themselves;
+- next boundary: the frozen fact-pair repair preserves V1a read-only and blocks only when the same
+  document contains a synthetic subject plus that subject's answer under the frozen `fact_id`
+  binding (or `U+FFFD`); it writes a fresh root and stops before split/review/tokenizer accounting,
+  and requires a new exact SHA-bound authorization;
 - M2 primary source direction: cleaned OSCAR-2201-derived rows within vngrs, pending exact label,
   volume and quality qualification; mC4 is excluded from main training and preserved;
 - vngrs: the selected mixed 32-shard reservoir is materialized but audit-blocked and not

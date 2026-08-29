@@ -31,7 +31,7 @@ from .materialization import (
     validate_source_registry,
 )
 from .source_registry import build_source_registry_from_metadata_ledger, parse_discovery_transport
-from .d0_audit import D0Document, exact_heldout_split, human_review_sample, lightweight_audit, tokenizer_accounting
+from .d0_audit import D0Document, SyntheticFactSurface, exact_heldout_split, fact_pair_contamination_audit, human_review_sample, lightweight_audit, tokenizer_accounting
 from .d0_storage import D0StoragePolicy, validate_storage_observation
 from .d0_orchestration import D0OrchestrationPolicy, finalize_d0_phase2, run_d0_orchestration, run_d0_phase1
 from .d0_bundle import write_d0_evidence_bundle, write_d0_failure
@@ -39,7 +39,7 @@ from .parquet_loader import load_verified_parquet_documents
 from .d0_review import build_review_packet, decision_template, review_packet_sha256, validate_review_decisions
 from .d0_runtime import FrozenTokenizerAdapter, ReviewedHttpsTransport
 from .d0_preflight import validate_d0_preflight
-from .d0_inputs import load_source_objects, load_synthetic_surfaces
+from .d0_inputs import load_source_objects, load_synthetic_fact_registry, load_synthetic_surfaces
 from .tokenizer_inventory import extract_tokenizer_inventory
 from .outputs import FINAL_AUDIT, OUTPUT_ARTIFACT_MANIFEST, OUTPUT_ORDER, serialize_output_artifact_manifest
 from .pipeline import FailClosedLidAdapter, VngrsPreparationConfig, evaluate_final_contract, prepare_records
@@ -49,6 +49,7 @@ from .sampling import largest_remainder_allocation, midpoint_systematic_position
 __all__ = [
     "FailClosedLidAdapter",
     "D0Document",
+    "SyntheticFactSurface",
     "D0StoragePolicy",
     "D0OrchestrationPolicy",
     "FullObjectResponse",
@@ -74,6 +75,7 @@ __all__ = [
     "evaluate_final_contract",
     "decision_template",
     "exact_heldout_split",
+    "fact_pair_contamination_audit",
     "extract_tokenizer_inventory",
     "human_review_sample",
     "largest_remainder_allocation",
@@ -82,6 +84,7 @@ __all__ = [
     "lightweight_audit",
     "load_verified_parquet_documents",
     "load_source_objects",
+    "load_synthetic_fact_registry",
     "load_synthetic_surfaces",
     "immutable_resolve_url",
     "prepare_records",

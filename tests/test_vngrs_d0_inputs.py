@@ -1,7 +1,11 @@
 import hashlib
 from pathlib import Path
 
-from transfer_vs_relearning.corpora.vngrs.d0_inputs import load_source_objects, load_synthetic_surfaces
+from transfer_vs_relearning.corpora.vngrs.d0_inputs import (
+    load_source_objects,
+    load_synthetic_fact_registry,
+    load_synthetic_surfaces,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,3 +21,11 @@ def test_frozen_real_source_registry_and_relation_v2_surfaces_load_exactly() -> 
     assert len(surfaces) == 600
     assert sum(key.startswith("subject:") for key in surfaces) == 100
     assert sum(key.startswith("object:") for key in surfaces) == 500
+    facts = load_synthetic_fact_registry(
+        validation, expected_sha256=hashlib.sha256(validation.read_bytes()).hexdigest()
+    )
+    assert len(facts) == 500
+    assert len({fact.subject_id for fact in facts}) == 100
+    assert {fact.relation for fact in facts} == {
+        "born_in", "field_of_study", "lives_in", "profession", "works_in_industry"
+    }

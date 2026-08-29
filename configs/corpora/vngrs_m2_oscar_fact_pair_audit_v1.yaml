@@ -1,0 +1,73 @@
+schema_version: 1
+contract_id: vngrs-m2-oscar-fact-pair-contamination-audit-v1
+status: frozen_unexecuted
+contract: documentation/contracts/corpora/vngrs-m2-oscar-fact-pair-contamination-audit-v1.md
+
+source:
+  root: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v3
+  access: read_only
+  materialization_manifest_sha256: bb413e9acafd0d891ea9c4461abc77acea1c737489560650db56dacf781dbd10
+  object_count: 32
+  object_bytes: 9502315428
+
+predecessor_atom_audit:
+  root: /vol/tmp2/yesildau/vngrs_m2_oscar_audit_recovery_retry_v1
+  access: read_only
+  label_inventory_sha256: 178991f311336a4acead1bb00fe8043d60a18c590e809b11629ca64f4920ee2b
+  lightweight_audit_sha256: 2cac1f53dd924bfcf9866297ab4e2c447d26e67ef232cae589e1ade27668e939
+  recovery_state_sha256: 49120b615a4516826c92fbc1693ca198ddd5cabbaabf5fb3242683de01f93f95
+  exact_atom_hit_count: 439906
+  unicode_normalized_atom_hit_count: 935276
+  role: diagnostic_non_blocking_under_fact_pair_gate
+
+selection:
+  field: corpus
+  operator: exact_string_equality
+  candidate_value: oscar
+  observed_documents: 354482
+  observed_utf8_bytes: 1553923133
+
+fact_registry:
+  path: artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/validation.jsonl
+  sha256: 9b1fcae2565fbf0d9c624a2c229c8173a59ca00064db1a017b0f2a5c0c749289
+  facts: 500
+  subjects: 100
+  relations: [born_in, field_of_study, lives_in, profession, works_in_industry]
+
+gate:
+  blocking:
+    - exact_paired_subject_answer_cooccurrence
+    - nfc_casefold_paired_subject_answer_cooccurrence
+    - invalid_encoding_u_fffd
+  diagnostic_non_blocking:
+    - subject_only_hits
+    - object_only_atom_hits
+  relation_phrase_required: false
+  reason: Turkish relation wording is variable; paired subject-answer cooccurrence is the conservative fact-level signal.
+
+output:
+  root: /vol/tmp2/yesildau/vngrs_m2_oscar_fact_pair_audit_v1
+  fresh_and_absent_required: true
+  exact_label_inventory: reports/corpus_label_inventory.json
+  fact_pair_audit: reports/fact_pair_contamination_audit.json
+  terminal_state: control/recovery_state.json
+
+execution:
+  runner: scripts/corpora/run_vngrs_m2_oscar_fact_pair_audit_v1.py
+  submitter: scripts/corpora/submit_vngrs_m2_oscar_fact_pair_audit_v1.sh
+  slurm: slurm/m2/audit_vngrs_m2_oscar_fact_pair_v1.slurm
+  job_name: vngrs-m2-oscar-pair-v1
+  automatic_retry: false
+
+authority:
+  local_preparation: true
+  publication: false
+  hu_ssh: false
+  slurm_cpu: false
+  network_retrieval: false
+  corpus_download_or_copy: false
+  split_or_review_packet: false
+  tokenizer_or_model_access: false
+  phase2: false
+  training: false
+  cleanup_or_deletion: false

@@ -51,6 +51,15 @@ class D0Document:
     text: str
 
 
+@dataclass(frozen=True)
+class SyntheticFactSurface:
+    subject_id: str
+    subject: str
+    fact_id: str
+    relation: str
+    answer: str
+
+
 def _documents(rows: Iterable[D0Document]) -> list[D0Document]:
     documents = list(rows)
     ids = [row.stable_document_id for row in documents]
@@ -187,6 +196,177 @@ def lightweight_audit(
         },
         "normalized_text_duplicate_groups": duplicate_groups,
         "normalized_text_duplicate_documents": duplicate_documents,
+    }
+
+
+def fact_pair_contamination_audit(
+    rows: Iterable[D0Document],
+    *,
+    synthetic_facts: Iterable[SyntheticFactSurface],
+    predecessor_atom_audit: Mapping[str, Any],
+    predecessor_atom_audit_sha256: str,
+    example_limit: int = 256,
+) -> dict[str, Any]:
+    """Gate only paired subject+answer co-occurrence; keep atom hits diagnostic.
+
+    Relation V2 answers include ordinary cities, professions and industries. Their appearance
+    without the corresponding synthetic subject is therefore not evidence of factual leakage.
+    This audit retains each frozen fact's relation binding and blocks only when a document
+    contains both that fact's subject and answer (exactly or after NFC+casefold normalization).
+    """
+
+    documents = _documents(rows)
+    facts = tuple(synthetic_facts)
+    if not facts or not 1 <= example_limit <= 1_000:
+        raise ValueError("synthetic fact registry and bounded example limit are required")
+    if not re.fullmatch(r"[0-9a-f]{64}", predecessor_atom_audit_sha256):
+        raise ValueError("predecessor atom-audit SHA-256 is invalid")
+    predecessor_contamination = predecessor_atom_audit.get("synthetic_contamination") or {}
+    for key in ("pattern_count", "exact_hit_count", "unicode_normalized_hit_count"):
+        if not isinstance(predecessor_contamination.get(key), int):
+            raise ValueError("predecessor atom audit is incomplete")
+
+    seen_fact_ids: set[str] = set()
+    subject_identity: dict[str, str] = {}
+    by_subject: dict[str, list[SyntheticFactSurface]] = defaultdict(list)
+    relations: set[str] = set()
+    for fact in facts:
+        values = (fact.subject_id, fact.subject, fact.fact_id, fact.relation, fact.answer)
+        if not all(isinstance(value, str) and value for value in values):
+            raise ValueError("synthetic fact identity is incomplete")
+        if fact.fact_id in seen_fact_ids:
+            raise ValueError("synthetic fact identity is duplicated")
+        if fact.subject_id in subject_identity and subject_identity[fact.subject_id] != fact.subject:
+            raise ValueError("synthetic subject identity is ambiguous")
+        seen_fact_ids.add(fact.fact_id)
+        subject_identity[fact.subject_id] = fact.subject
+        by_subject[fact.subject_id].append(fact)
+        relations.add(fact.relation)
+
+    normalized_subjects = {
+        subject_id: unicodedata.normalize("NFC", subject).casefold()
+        for subject_id, subject in subject_identity.items()
+    }
+    normalized_answers = {
+        fact.fact_id: unicodedata.normalize("NFC", fact.answer).casefold() for fact in facts
+    }
+    subject_exact_pairs = 0
+    subject_normalized_pairs = 0
+    subject_exact_documents: set[str] = set()
+    subject_normalized_documents: set[str] = set()
+    exact_pair_count = 0
+    normalized_pair_count = 0
+    exact_pair_documents: set[str] = set()
+    normalized_pair_documents: set[str] = set()
+    exact_fact_ids: set[str] = set()
+    normalized_fact_ids: set[str] = set()
+    exact_examples: list[dict[str, str]] = []
+    normalized_examples: list[dict[str, str]] = []
+    exact_by_relation: Counter[str] = Counter()
+    normalized_by_relation: Counter[str] = Counter()
+    invalid_encoding_documents = 0
+
+    for row in documents:
+        normalized_text = unicodedata.normalize("NFC", row.text).casefold()
+        if "\ufffd" in row.text:
+            invalid_encoding_documents += 1
+        for subject_id in sorted(by_subject):
+            subject = subject_identity[subject_id]
+            exact_subject = subject in row.text
+            normalized_subject = normalized_subjects[subject_id] in normalized_text
+            if exact_subject:
+                subject_exact_pairs += 1
+                subject_exact_documents.add(row.stable_document_id)
+            if normalized_subject:
+                subject_normalized_pairs += 1
+                subject_normalized_documents.add(row.stable_document_id)
+            if not normalized_subject:
+                continue
+            for fact in by_subject[subject_id]:
+                if exact_subject and fact.answer in row.text:
+                    exact_pair_count += 1
+                    exact_pair_documents.add(row.stable_document_id)
+                    exact_fact_ids.add(fact.fact_id)
+                    exact_by_relation[fact.relation] += 1
+                    if len(exact_examples) < example_limit:
+                        exact_examples.append(
+                            {
+                                "stable_document_id": row.stable_document_id,
+                                "subject_id": fact.subject_id,
+                                "fact_id": fact.fact_id,
+                                "relation": fact.relation,
+                            }
+                        )
+                if normalized_answers[fact.fact_id] in normalized_text:
+                    normalized_pair_count += 1
+                    normalized_pair_documents.add(row.stable_document_id)
+                    normalized_fact_ids.add(fact.fact_id)
+                    normalized_by_relation[fact.relation] += 1
+                    if len(normalized_examples) < example_limit:
+                        normalized_examples.append(
+                            {
+                                "stable_document_id": row.stable_document_id,
+                                "subject_id": fact.subject_id,
+                                "fact_id": fact.fact_id,
+                                "relation": fact.relation,
+                            }
+                        )
+
+    blocked = bool(exact_pair_count or normalized_pair_count or invalid_encoding_documents)
+    return {
+        "schema_version": 1,
+        "status": "BLOCKED" if blocked else "AUDIT_COMPLETE",
+        "document_count": len(documents),
+        "gate_semantics": {
+            "blocking": [
+                "exact_paired_subject_answer_cooccurrence",
+                "nfc_casefold_paired_subject_answer_cooccurrence",
+                "invalid_encoding_u_fffd",
+            ],
+            "diagnostic_non_blocking": ["subject_only_hits", "object_only_atom_hits"],
+            "relation_phrase_required": False,
+        },
+        "registry": {
+            "fact_count": len(facts),
+            "subject_count": len(subject_identity),
+            "relations": sorted(relations),
+        },
+        "predecessor_atom_audit": {
+            "sha256": predecessor_atom_audit_sha256,
+            "status": predecessor_atom_audit.get("status"),
+            "pattern_count": predecessor_contamination["pattern_count"],
+            "exact_hit_count": predecessor_contamination["exact_hit_count"],
+            "unicode_normalized_hit_count": predecessor_contamination[
+                "unicode_normalized_hit_count"
+            ],
+            "role": "diagnostic_non_blocking_under_fact_pair_gate",
+        },
+        "subject_only_diagnostic": {
+            "exact_document_surface_pairs": subject_exact_pairs,
+            "exact_unique_documents": len(subject_exact_documents),
+            "unicode_normalized_document_surface_pairs": subject_normalized_pairs,
+            "unicode_normalized_unique_documents": len(subject_normalized_documents),
+        },
+        "paired_contamination": {
+            "exact_document_fact_pairs": exact_pair_count,
+            "exact_unique_documents": len(exact_pair_documents),
+            "exact_unique_facts": len(exact_fact_ids),
+            "unicode_normalized_document_fact_pairs": normalized_pair_count,
+            "unicode_normalized_unique_documents": len(normalized_pair_documents),
+            "unicode_normalized_unique_facts": len(normalized_fact_ids),
+            "exact_by_relation": {key: exact_by_relation[key] for key in sorted(relations)},
+            "unicode_normalized_by_relation": {
+                key: normalized_by_relation[key] for key in sorted(relations)
+            },
+            "exact_examples": exact_examples,
+            "unicode_normalized_examples": normalized_examples,
+            "example_limit_per_kind": example_limit,
+            "examples_truncated": (
+                exact_pair_count > example_limit or normalized_pair_count > example_limit
+            ),
+        },
+        "invalid_encoding_documents": invalid_encoding_documents,
+        "ready_to_train": False,
     }
 
 

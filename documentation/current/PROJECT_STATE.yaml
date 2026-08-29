@@ -1,11 +1,11 @@
 schema_version: 1
-as_of: "2026-08-28"
+as_of: "2026-08-29"
 project: transfer-vs-relearning
 
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_oscar_label_discovered_lowercase_retry_frozen
+  status: m0_m1_complete_m2_oscar_atom_gate_blocked_fact_pair_repair_frozen
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -103,7 +103,7 @@ scientific_design:
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: frozen_lowercase_oscar_audit_recovery_retry_unexecuted
+  corpus_contract: frozen_oscar_fact_pair_contamination_audit_unexecuted
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -474,15 +474,38 @@ stage_readiness:
     oscar_audit_recovery_retry_submitter_sha256: 1af23dbfabf47b1b74051f60f47bcfc5f253a9efd7b528d502a57e11e547e940
     oscar_audit_recovery_retry_slurm_sha256: f5885a2ddad0978990323406ae78f7a335f35d3e1b420b4f3c88a0590b5eb8e0
     oscar_audit_recovery_retry_output_root: /vol/tmp2/yesildau/vngrs_m2_oscar_audit_recovery_retry_v1
-    oscar_audit_recovery_retry_status: frozen_unexecuted_requires_exact_sha_authorization
-    oscar_audit_recovery_retry_execution_authorized: false
+    oscar_audit_recovery_retry_status: consumed_blocked_atom_level_surface_gate
+    oscar_audit_recovery_retry_execution_authorized: consumed_single_diagnostic_pass
+    oscar_audit_recovery_retry_job_id: "481886"
+    oscar_audit_recovery_retry_selected_documents: 354482
+    oscar_audit_recovery_retry_selected_utf8_bytes: 1553923133
+    oscar_audit_recovery_retry_selected_ids_sha256: c252d6b54d488e898f534564ef6c16196e22ae78f4fe0e61f83d4ad0bf83a056
+    oscar_audit_recovery_retry_atom_exact_hits: 439906
+    oscar_audit_recovery_retry_atom_unicode_normalized_hits: 935276
+    oscar_audit_recovery_retry_invalid_encoding_documents: 0
+    oscar_audit_recovery_retry_lightweight_audit_sha256: 2cac1f53dd924bfcf9866297ab4e2c447d26e67ef232cae589e1ade27668e939
+    oscar_audit_recovery_retry_recovery_state_sha256: 49120b615a4516826c92fbc1693ca198ddd5cabbaabf5fb3242683de01f93f95
+    oscar_audit_recovery_retry_result_record: documentation/183_VNGRS_OSCAR_AUDIT_RECOVERY_V1A_EXECUTION_RESULT_AND_GATE_TR.md
+    oscar_audit_recovery_retry_result_record_sha256: 566d0775671f0ac5a02cf76b8464176f0b22c32beafa3f918ba6d6c0939c8e9e
+    oscar_fact_pair_audit_contract: documentation/contracts/corpora/vngrs-m2-oscar-fact-pair-contamination-audit-v1.md
+    oscar_fact_pair_audit_contract_sha256: eee2da1d2ea166f05443e8ebba591d4b1c519475e6b029f9e73293cee870075d
+    oscar_fact_pair_audit_config: configs/corpora/vngrs_m2_oscar_fact_pair_audit_v1.yaml
+    oscar_fact_pair_audit_config_sha256: 01f063058041196f97717886442c8ec332de437ec65b54090dbc43c7f872a73b
+    oscar_fact_pair_audit_operator: src/transfer_vs_relearning/corpora/vngrs/d0_fact_pair_recovery.py
+    oscar_fact_pair_audit_operator_sha256: 1bfe260f8f27174cc12179c06f95284b7866eb1df4a6818e0d350957bb5dd524
+    oscar_fact_pair_audit_runner_sha256: 4b72d2eafeb107065199aa8877861cc710c1b2cf2b0c595774bd0a1403814594
+    oscar_fact_pair_audit_submitter_sha256: fef658bdddc81c72567141ddd0be45483412f1e4f39b06a272b123294c3bf44d
+    oscar_fact_pair_audit_slurm_sha256: 1ee246e63bcab3896782b3bbb3bce32765ff644fb62b13382ec378899ca6c8b1
+    oscar_fact_pair_audit_output_root: /vol/tmp2/yesildau/vngrs_m2_oscar_fact_pair_audit_v1
+    oscar_fact_pair_audit_status: frozen_unexecuted_requires_exact_sha_authorization
+    oscar_fact_pair_audit_execution_authorized: false
     phase2_execution_authorized: false
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - lowercase_oscar_audit_recovery_retry_unexecuted
-      - oscar_only_selection_contract_not_frozen
+      - oscar_fact_pair_contamination_audit_unexecuted
+      - oscar_quality_gate_not_closed
       - phase2_ineligible_until_phase1_review_packet_and_separate_authorization
       - m2_a_m2_b_matched_contract_not_frozen
       - three_m1_epoch036_parent_bindings_not_yet_frozen_in_m2_contract
@@ -1376,8 +1399,9 @@ active_priority:
   execution_boundary: no_external_execution_until_exact_v1a_contract_authorization
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
-    - run_no_action_until_exact_lowercase_oscar_retry_authorization
-    - after_recovery_freeze_oscar_only_selection_split_and_review_contract
+    - preserve_lowercase_v1a_atom_audit_as_read_only_terminal_evidence
+    - run_no_action_until_exact_fact_pair_audit_authorization
+    - after_fact_pair_gate_freeze_oscar_only_split_and_review_contract
     - keep_phase2_and_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1387,7 +1411,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_single_lowercase_oscar_audit_recovery_retry_if_desired
+  subject: authorize_single_oscar_fact_pair_contamination_audit_if_desired
   decision_owner: user
   start_m1_now: false
   note: >-
@@ -1432,10 +1456,15 @@ next_decision_required:
     training-excluded. The first audit-recovery job `481863` read V3 in place and preserved the
     exact labels: `oscar` has 354,482 documents / 1,553,923,133 UTF-8 bytes and `mc4` has
     5,317,204 documents / 14,195,860,459 bytes. It stopped before audit because V1 had frozen
-    uppercase `OSCAR`. Document 182 records this case-only mismatch. Frozen V1a changes only the
-    exact predicate to lowercase `oscar`, verifies both earlier roots read-only, writes a fresh
-    retry root and stops before split/review. It requires separate exact SHA authorization.
-    Phase 2, any further attempt and training remain unauthorized.
+    uppercase `OSCAR`. Document 182 records this case-only mismatch. V1a then completed exact
+    lowercase `oscar` selection in job `481886`: 354,482 documents, 439,906 exact atom pairs,
+    935,276 normalized atom pairs and zero invalid-encoding documents. Its historical flattened
+    gate blocked because ordinary answer/object surfaces were independently blocking; the 256+256
+    bounded examples are all `object:*`. Document 183 preserves the result and limits that claim.
+    The new frozen fact-pair contract retains all 500 `subject_id -> fact_id -> relation -> answer`
+    bindings and blocks only on paired subject-answer co-occurrence or `U+FFFD`. It requires a new
+    exact SHA authorization and fresh root. Phase 2, split/review, any retry and training remain
+    unauthorized.
 
 authorization:
   local_repository_changes: require_current_user_instruction
