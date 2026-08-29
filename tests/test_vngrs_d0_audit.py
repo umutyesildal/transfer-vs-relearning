@@ -9,6 +9,8 @@ from transfer_vs_relearning.corpora.vngrs.d0_audit import (
     EXPECTED_MODELS,
     exact_heldout_split,
     human_review_sample,
+    human_review_sample_with_stratum_floor,
+    human_review_stratum_inventory,
     lightweight_audit,
     tokenizer_accounting,
 )
@@ -46,6 +48,18 @@ def test_human_review_sample_is_stratified_text_free_and_deterministic() -> None
     assert len({row["stable_document_id"] for row in sample}) == 64
     assert {row["shard_quartile"] for row in sample} == {0, 1, 2, 3}
     assert all("text" not in row and row["review_status"] == "pending_human_review" for row in sample)
+
+
+def test_review_coverage_floor_includes_every_nonempty_quartile() -> None:
+    rows = documents(640)
+    sample = human_review_sample_with_stratum_floor(rows)
+    assert len(sample) == 64
+    assert {row["shard_quartile"] for row in sample} == {0, 1, 2, 3}
+    assert all(row["allocation_rule"] == "one_per_nonempty_stratum_then_largest_remainder" for row in sample)
+    inventory = human_review_stratum_inventory(rows)
+    assert inventory["document_count"] == 640
+    assert inventory["nonempty_strata"] == 4
+    assert sum(row["documents"] for row in inventory["strata"]) == 640
 
 
 def test_lightweight_audit_reports_composition_regex_contamination_and_duplicates() -> None:

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import io
+import json
 import urllib.error
 from email.message import Message
 from pathlib import Path
@@ -12,6 +13,7 @@ from transfer_vs_relearning.corpora.vngrs.d0_audit import D0Document, human_revi
 from transfer_vs_relearning.corpora.vngrs.d0_review import (
     build_review_packet,
     decision_template,
+    read_jsonl_rows,
     review_packet_sha256,
     validate_review_decisions,
 )
@@ -44,6 +46,17 @@ def test_review_handoff_is_bounded_exact_and_packet_bound() -> None:
     decisions[0]["review_packet_sha256"] = "0" * 64
     with pytest.raises(ValueError, match="exact review packet"):
         validate_review_decisions(packet, decisions)
+
+
+def test_jsonl_reader_preserves_literal_unicode_next_line_inside_excerpt(tmp_path: Path) -> None:
+    path = tmp_path / "packet.jsonl"
+    rows = [{"stable_document_id": "one", "excerpt": "önce\u0085sonra"}]
+    path.write_text(
+        "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows),
+        encoding="utf-8",
+    )
+    assert len(path.read_text(encoding="utf-8").splitlines()) == 2
+    assert read_jsonl_rows(path) == rows
 
 
 class Response:

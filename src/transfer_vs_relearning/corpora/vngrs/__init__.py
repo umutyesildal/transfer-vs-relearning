@@ -31,16 +31,17 @@ from .materialization import (
     validate_source_registry,
 )
 from .source_registry import build_source_registry_from_metadata_ledger, parse_discovery_transport
-from .d0_audit import D0Document, SyntheticFactSurface, exact_heldout_split, fact_pair_contamination_audit, human_review_sample, lightweight_audit, tokenizer_accounting
+from .d0_audit import D0Document, SyntheticFactSurface, exact_heldout_split, fact_pair_contamination_audit, human_review_sample, human_review_sample_with_stratum_floor, human_review_stratum_inventory, lightweight_audit, tokenizer_accounting
 from .d0_storage import D0StoragePolicy, validate_storage_observation
 from .d0_orchestration import D0OrchestrationPolicy, finalize_d0_phase2, run_d0_orchestration, run_d0_phase1
 from .d0_bundle import write_d0_evidence_bundle, write_d0_failure
 from .parquet_loader import load_verified_parquet_documents
-from .d0_review import build_review_packet, decision_template, review_packet_sha256, validate_review_decisions
+from .d0_review import build_review_packet, decision_template, read_jsonl_rows, review_packet_sha256, validate_review_decisions
 from .d0_runtime import FrozenTokenizerAdapter, ReviewedHttpsTransport
 from .d0_preflight import validate_d0_preflight
 from .d0_inputs import load_source_objects, load_synthetic_fact_registry, load_synthetic_surfaces
 from .d0_oscar_split_review import run_oscar_split_review_handoff
+from .d0_oscar_review_coverage import run_oscar_review_coverage_repair
 from .tokenizer_inventory import extract_tokenizer_inventory
 from .outputs import FINAL_AUDIT, OUTPUT_ARTIFACT_MANIFEST, OUTPUT_ORDER, serialize_output_artifact_manifest
 from .pipeline import FailClosedLidAdapter, VngrsPreparationConfig, evaluate_final_contract, prepare_records
@@ -79,6 +80,8 @@ __all__ = [
     "fact_pair_contamination_audit",
     "extract_tokenizer_inventory",
     "human_review_sample",
+    "human_review_sample_with_stratum_floor",
+    "human_review_stratum_inventory",
     "largest_remainder_allocation",
     "midpoint_systematic_positions",
     "materialize_full_objects",
@@ -90,9 +93,11 @@ __all__ = [
     "immutable_resolve_url",
     "prepare_records",
     "review_packet_sha256",
+    "read_jsonl_rows",
     "run_d0_orchestration",
     "run_d0_phase1",
     "run_oscar_split_review_handoff",
+    "run_oscar_review_coverage_repair",
     "finalize_d0_phase2",
     "select_systematic_shards",
     "serialize_output_artifact_manifest",

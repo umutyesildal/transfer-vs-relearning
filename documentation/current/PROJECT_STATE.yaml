@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_oscar_fact_pair_pass_split_review_handoff_frozen
+  status: m0_m1_complete_m2_oscar_split_frozen_review_coverage_repair_frozen
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -103,7 +103,7 @@ scientific_design:
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: frozen_oscar_split_review_handoff_unexecuted
+  corpus_contract: frozen_oscar_review_coverage_repair_unexecuted
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -255,18 +255,18 @@ stage_readiness:
       - terminal_family_complete_no_duplicate_submission
   m2_training:
     corpus_contract_ready: false
-    corpus_contract_status: fact_pair_audit_pass_split_review_handoff_frozen_unexecuted
-    corpus_contract: documentation/contracts/corpora/vngrs-m2-oscar-split-review-handoff-v1.md
-    corpus_contract_sha256: 8d5784518afd5291a0e0302f17d5fba8dc38acd910e8414961f2336aa42a632e
-    corpus_config: configs/corpora/vngrs_m2_oscar_split_review_v1.yaml
-    corpus_config_sha256: 66b8a70dfc0c51ad04670130c5e47f8a6330ee52908078fcbf3324f1ed07d453
+    corpus_contract_status: split_frozen_review_packet_provisional_coverage_repair_frozen_unexecuted
+    corpus_contract: documentation/contracts/corpora/vngrs-m2-oscar-review-coverage-repair-v1.md
+    corpus_contract_sha256: f05b43faaee6f2561af85a693cfff35194c7b7aaa467911de68684d4b5163f06
+    corpus_config: configs/corpora/vngrs_m2_oscar_review_coverage_v1.yaml
+    corpus_config_sha256: dc7ff601da950fa65830bfb4dda1195b6fd6db9316fd3868f53d7e8344272c50
     prior_v2_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v2.md
     prior_v2_contract_sha256: a8d84224476d3b307dc73f5144ebb7ebf21b8330b8c0e84020c285ce1ba23e20
     prior_v1_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
     prior_v1_contract_sha256: a77855a06c70ccdb52eb3768e7f2be2081da3129b5716eafeb03af2edf56baf3
     corpus_scope: vngrs_systematic_32_shard_subcorpus
     primary_training_source_decision: cleaned_vngrs_oscar_2201_rows_only_pending_qualification
-    primary_training_source_decision_status: accepted_direction_split_review_contract_frozen_unexecuted
+    primary_training_source_decision_status: accepted_direction_split_frozen_review_coverage_pending
     primary_training_source_decision_record: documentation/decisions/M2_OSCAR_ONLY_PRIMARY_TURKISH_CORPUS_DECISION_2026-08-28.md
     primary_training_source_decision_record_sha256: 89286cb83dba2e49452781fa4f5350f250f2fc8f709614df569b7a066b7aeaa8
     mc4_training_role: excluded_from_main_m2_training_preserved_no_deletion
@@ -277,7 +277,7 @@ stage_readiness:
     materialization_operator_validation: offline_fixture_suite_passed
     local_audit_operator: locally_implemented_execution_disabled
     local_audit_operator_module: src/transfer_vs_relearning/corpora/vngrs/d0_audit.py
-    local_audit_operator_sha256: 5d34cbb5dad11afaf5546edeed8ef374da14290127ec2e7e4553c48d1175b65c
+    local_audit_operator_sha256: 0db0ed765e87baeeec47bbcb089629f885c2dc7b6f864629a2ecf2c3396168ea
     local_audit_operator_validation: offline_fixture_suite_passed
     m1_epoch036_parent_manifest_bindings: locally_closed_for_all_three_models
     tokenizer_asset_file_inventory: closed_three_of_three_from_preserved_manifests
@@ -357,12 +357,12 @@ stage_readiness:
     parquet_loader_module: src/transfer_vs_relearning/corpora/vngrs/parquet_loader_v3.py
     parquet_loader_sha256: 4226586b781471153dafa90f3a3f82516ebb70db88d7f217bec52566cb9119d5
     orchestration_module: src/transfer_vs_relearning/corpora/vngrs/d0_orchestration.py
-    orchestration_sha256: b60e84f3917c00b91031ede4e4380ebe565e7f53998c8b2a4d332955261a859b
+    orchestration_sha256: c31f49a47a74f8a5b671971417f7fb19a208a33f98057a06a03684fd7733912d
     evidence_bundle_module: src/transfer_vs_relearning/corpora/vngrs/d0_bundle.py
-    evidence_bundle_sha256: de72f170627015cb536dab11072eaf12e317884f91520d45268433b544c2d968
+    evidence_bundle_sha256: f06aa760f94ae2be1f3c99c30d2ca65e73bd3a5ab3346bc317170201fb3c4863
     preflight_operator_sha256: ae1da3b1c886ac8143197609ff5aa89915a15064212a8356b4d8e2bc7ce43acb
     runtime_adapter_sha256: f78a95e4a3d0567373e4b3b498e24ccd0669a4f0eebc8f61afdb9dce45bd01e7
-    review_handoff_sha256: e8b2071e6bba185eede05fe61029c84bd807e8934f98b1c889bf6c2fb75c8ca8
+    review_handoff_sha256: d91c414d52233b84d2d25fafcce92bb9c7f468a5d680edf284131d6f58894d3a
     frozen_input_loader_sha256: d39f494fa5e90548241038c04fddbd8ab66cc0e232eb85d141b5ce400fe71761
     production_launcher_sha256: e314724880217715e09c05bed11563cd8d43844903f6c278ec7fe30216282bea
     preflight_launcher_sha256: 510fe81602a8628bcd665544ccc6f269d442f99c1c21471833283891d660a7da
@@ -519,14 +519,36 @@ stage_readiness:
     oscar_split_review_submitter_sha256: 9d31e8831ef12d946b35858163fc17153974b700b2e96d70a618ddee79697c2f
     oscar_split_review_slurm_sha256: 6518112ee0e1f3aa824562e863de9378e5ab5479ca5582ba56befd2e8a532c1c
     oscar_split_review_output_root: /vol/tmp2/yesildau/vngrs_m2_oscar_split_review_v1
-    oscar_split_review_status: frozen_unexecuted_requires_exact_sha_authorization
-    oscar_split_review_execution_authorized: false
+    oscar_split_review_status: executed_split_valid_review_packet_provisional
+    oscar_split_review_execution_authorized: consumed_single_cpu_pass
+    oscar_split_review_job_id: "481906"
+    oscar_split_review_commit: fd0ca0b207ae2b9dc91ef7b77ae6957f3fff297b
+    oscar_split_review_document_count: 354482
+    oscar_split_review_train_count: 344482
+    oscar_split_review_heldout_count: 10000
+    oscar_split_review_split_sha256: 21f43359570ea66a73e969c1d0e8b4f08408f8ebbb71f50fc40dbd0d7e16f38f
+    oscar_split_review_old_sample_strata: {oscar|q0: 64}
+    oscar_split_review_result_record: documentation/185_VNGRS_OSCAR_SPLIT_REVIEW_HANDOFF_EXECUTION_RESULT_TR.md
+    oscar_split_review_result_record_sha256: d83e171122de83540e34b6c3f739d3decb0e415b636a77066c2c1105b350c519
+    oscar_review_coverage_contract: documentation/contracts/corpora/vngrs-m2-oscar-review-coverage-repair-v1.md
+    oscar_review_coverage_contract_sha256: f05b43faaee6f2561af85a693cfff35194c7b7aaa467911de68684d4b5163f06
+    oscar_review_coverage_config: configs/corpora/vngrs_m2_oscar_review_coverage_v1.yaml
+    oscar_review_coverage_config_sha256: dc7ff601da950fa65830bfb4dda1195b6fd6db9316fd3868f53d7e8344272c50
+    oscar_review_coverage_operator: src/transfer_vs_relearning/corpora/vngrs/d0_oscar_review_coverage.py
+    oscar_review_coverage_operator_sha256: 4c581f3a6a95a050145419aa14d68ac7d3394374b04d8b883f5f2b1316c0d2e8
+    oscar_review_coverage_runner_sha256: e303b79f42b8487aee4925b5b54120a8b732b1caa0bc4a4a72d2d0cddd70f500
+    oscar_review_coverage_submitter_sha256: 6ba7b1c6ff85644d0897bbb8085d51d9bc2bb9c2086439e570720175784b4b4d
+    oscar_review_coverage_slurm_sha256: c268f7b8bb9664c10451800eb94c296a6b08756fc69e79920320e2a01318b607
+    oscar_review_coverage_output_root: /vol/tmp2/yesildau/vngrs_m2_oscar_review_coverage_repair_v1
+    oscar_review_coverage_status: frozen_unexecuted_requires_exact_sha_authorization
+    oscar_review_coverage_execution_authorized: false
+    oscar_review_coverage_human_verdict_entry: false
     phase2_execution_authorized: false
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - oscar_split_review_handoff_unexecuted
+      - oscar_review_quartile_coverage_not_validated
       - human_review_decisions_not_completed
       - phase2_ineligible_until_phase1_review_packet_and_separate_authorization
       - m2_a_m2_b_matched_contract_not_frozen
@@ -1414,16 +1436,17 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: execute_separately_authorized_oscar_split_review_handoff
+  name: execute_separately_authorized_oscar_review_coverage_repair
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: fact_pair_audit_pass_split_review_handoff_frozen_unexecuted
-  execution_boundary: no_external_execution_until_exact_split_review_contract_authorization
+  m2_status: split_frozen_review_packet_provisional_coverage_repair_frozen_unexecuted
+  execution_boundary: no_external_execution_until_exact_review_coverage_contract_authorization
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
     - preserve_lowercase_v1a_atom_audit_as_read_only_terminal_evidence
     - preserve_fact_pair_audit_pass_as_read_only_terminal_evidence
-    - run_no_action_until_exact_split_review_handoff_authorization
+    - preserve_job_481906_split_and_packet_evidence_read_only
+    - run_no_action_until_exact_review_coverage_repair_authorization
     - keep_phase2_and_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1433,7 +1456,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_single_oscar_split_review_handoff_if_desired
+  subject: authorize_single_oscar_review_coverage_repair_if_desired
   decision_owner: user
   start_m1_now: false
   note: >-

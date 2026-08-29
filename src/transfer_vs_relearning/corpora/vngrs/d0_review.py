@@ -15,6 +15,23 @@ from .metadata import canonical_json_sha256
 REVIEW_VERDICTS = frozenset({"usable", "unusable", "unsafe"})
 
 
+def read_jsonl_rows(path: str | Path) -> list[dict[str, Any]]:
+    """Read LF-delimited JSONL without treating Unicode separators inside strings as records."""
+
+    rows: list[dict[str, Any]] = []
+    with Path(path).open("r", encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, 1):
+            if not line.strip():
+                raise ValueError(f"blank JSONL record at line {line_number}")
+            value = json.loads(line)
+            if not isinstance(value, dict):
+                raise ValueError(f"JSONL record {line_number} is not an object")
+            rows.append(value)
+    if not rows:
+        raise ValueError("JSONL input is empty")
+    return rows
+
+
 def build_review_packet(
     documents: Iterable[D0Document],
     selected: Iterable[Mapping[str, Any]],

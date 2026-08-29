@@ -144,6 +144,80 @@ def human_review_sample(
     return selected
 
 
+def human_review_stratum_inventory(rows: Iterable[D0Document]) -> dict[str, Any]:
+    """Describe the exact corpus-by-selected-shard-quartile review population."""
+
+    documents = _documents(rows)
+    counts: dict[str, dict[str, int]] = {
+        f"q{quartile}": {"documents": 0, "utf8_bytes": 0} for quartile in range(4)
+    }
+    for row in documents:
+        key = f"q{_quartile(row.shard_path)}"
+        counts[key]["documents"] += 1
+        counts[key]["utf8_bytes"] += len(row.text.encode("utf-8"))
+    return {
+        "schema_version": 1,
+        "status": "STRATUM_INVENTORY_COMPLETE",
+        "document_count": len(documents),
+        "strata": [{"stratum": key, **counts[key]} for key in sorted(counts)],
+        "nonempty_strata": sum(counts[key]["documents"] > 0 for key in counts),
+        "ready_to_train": False,
+    }
+
+
+def human_review_sample_with_stratum_floor(
+    rows: Iterable[D0Document], *, sample_size: int = HUMAN_REVIEW_DOCUMENTS
+) -> list[dict[str, Any]]:
+    """Guarantee one row per non-empty quartile, then allocate remaining slots proportionally."""
+
+    documents = _documents(rows)
+    strata: dict[str, list[D0Document]] = defaultdict(list)
+    for row in documents:
+        strata[f"{row.corpus}|q{_quartile(row.shard_path)}"].append(row)
+    if sample_size < len(strata):
+        raise ValueError("review sample is smaller than the non-empty stratum floor")
+    allocation = {key: 1 for key in strata}
+    remaining = sample_size - len(strata)
+    residual = {key: len(value) - 1 for key, value in strata.items() if len(value) > 1}
+    if remaining:
+        if not residual or remaining > sum(residual.values()):
+            raise ValueError("review sample exceeds the population after stratum floors")
+        extra = largest_remainder_allocation(residual, remaining)
+        for key, value in extra.items():
+            allocation[key] += value
+    selected: list[dict[str, Any]] = []
+    for key in sorted(strata):
+        candidates = sorted(
+            strata[key],
+            key=lambda row: (
+                hashlib.sha256(
+                    f"vngrs_d0_human_review_coverage_floor_v1|42|{row.stable_document_id}".encode()
+                ).hexdigest(),
+                row.stable_document_id,
+            ),
+        )
+        for row in candidates[: allocation[key]]:
+            selected.append(
+                {
+                    "schema_version": 1,
+                    "stable_document_id": row.stable_document_id,
+                    "corpus": row.corpus,
+                    "shard_quartile": _quartile(row.shard_path),
+                    "selection_stratum": key,
+                    "stratum_population_documents": len(strata[key]),
+                    "stratum_allocated_documents": allocation[key],
+                    "allocation_rule": "one_per_nonempty_stratum_then_largest_remainder",
+                    "review_status": "pending_human_review",
+                }
+            )
+    selected.sort(key=lambda row: row["stable_document_id"])
+    if len(selected) != sample_size or len({row["stable_document_id"] for row in selected}) != sample_size:
+        raise AssertionError("coverage-floor review sample cardinality drift")
+    if {row["selection_stratum"] for row in selected} != set(strata):
+        raise AssertionError("coverage-floor review sample omitted a non-empty stratum")
+    return selected
+
+
 def lightweight_audit(
     rows: Iterable[D0Document], *, synthetic_surfaces: Mapping[str, str]
 ) -> dict[str, Any]:

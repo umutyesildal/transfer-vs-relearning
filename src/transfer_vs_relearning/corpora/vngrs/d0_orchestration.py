@@ -17,7 +17,7 @@ from .d0_audit import (
 )
 from .d0_storage import validate_storage_observation
 from .d0_bundle import write_d0_evidence_bundle, write_d0_failure, write_d0_phase1_audit_evidence
-from .d0_review import build_review_packet, review_packet_sha256, validate_review_decisions, write_review_handoff, write_validated_decisions
+from .d0_review import build_review_packet, read_jsonl_rows, review_packet_sha256, validate_review_decisions, write_review_handoff, write_validated_decisions
 from .metadata import canonical_json_sha256
 from .materialization import (
     MaterializationPolicy,
@@ -98,7 +98,7 @@ def finalize_d0_phase2(
         raise ValueError("D0 phase-2 execution is disabled")
     root_path = Path(root)
     state = json.loads((root_path / "control/phase1_state.json").read_text(encoding="utf-8"))
-    packet = [json.loads(line) for line in (root_path / "reports/human_review_packet.jsonl").read_text(encoding="utf-8").splitlines()]
+    packet = read_jsonl_rows(root_path / "reports/human_review_packet.jsonl")
     if state.get("status") != "AWAITING_HUMAN_REVIEW" or review_packet_sha256(packet) != state.get("review_packet_sha256"):
         raise ValueError("phase-1 state or review packet drift")
     registry = tuple(objects)

@@ -46,14 +46,18 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - fact-pair job `481904` completed PASS over all 354,482 exact OSCAR documents: subject-only,
   exact/normalized paired-fact and invalid-encoding counts are all zero; the prior atom hits are
   therefore object/answer-only diagnostics, and all three terminal artifacts are hash-closed;
-- next boundary: the frozen seed-42 split/review handoff writes exact 344,482 train and 10,000
-  held-out ID lists plus a quartile-stratified 64-document review packet to a fresh root; it enters
-  no human verdict and stops before tokenizer accounting, Phase 2 and training, requiring a new
-  exact SHA-bound authorization;
+- split/review job `481906` completed: the exact 344,482 train / 10,000 held-out split is valid and
+  frozen, but all 64 review rows were labelled `oscar|q0`; because q1--q3 population counts were
+  not persisted, the packet is provisional for verdict entry. One excerpt also contains literal
+  U+0085, exposing a `splitlines()` reader bug; the JSONL remains valid and the LF-only reader fix
+  is regression-tested;
+- next boundary: the frozen review-coverage repair measures q0--q3 and produces the authoritative
+  pre-verdict 64-packet with a one-per-nonempty-stratum floor. It does not rewrite the split, enter
+  verdicts, access tokenizers/models, open Phase 2 or train, and needs new exact SHA-bound authority;
 - M2 primary source direction: cleaned OSCAR-2201-derived rows within vngrs, pending exact label,
   volume and quality qualification; mC4 is excluded from main training and preserved;
-- vngrs: the 32-shard reservoir is materialized and the exact OSCAR fact-pair gate passed, but
-  split/review and later gates remain incomplete, so it is not training-ready;
+- vngrs: the reservoir is materialized, the OSCAR fact-pair gate passed and the split is frozen;
+  review coverage, human verdicts and later gates remain incomplete, so it is not training-ready;
 - M2 execution: not authorized; the diagnostic recovery, later selection and all training stages
   each require their own exact contract boundary and explicit user authorization.
 
