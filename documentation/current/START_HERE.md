@@ -59,14 +59,16 @@ the master synthesis, the long timeline, or a previous chat transcript.
   semantic SHA `73329e45...`;
 - human review is complete and packet-bound: 64/64 unique documents were marked `usable`, with
   zero `unusable` or `unsafe`; the exact decision ledger is tracked and hash-closed;
-- Phase 2 has a local unexecuted plan in Document 187: revalidate population/split/decisions, load
-  only the exact OLMo/Qwen/SmolLM tokenizer assets, and produce train/held-out token accounting.
-  Operator/config/launcher/contract are not implemented or frozen yet; no tokenizer/model/HU job,
-  Phase 2 execution or training is authorized;
+- Phase 2 now has a locally implemented, fixture-validated and frozen but unexecuted CPU-only
+  evidence contract: revalidate population/split/decisions, load only the exact
+  OLMo/Qwen/SmolLM tokenizer assets, and produce six train/held-out token-accounting reports.
+  The contract/config/operator/runner/submitter are frozen; no push, HU/SSH, tokenizer access,
+  Slurm pass, model-weight access, Phase 2 execution or training is authorized;
 - M2 primary source direction: cleaned OSCAR-2201-derived rows within vngrs, pending exact label,
   volume and quality qualification; mC4 is excluded from main training and preserved;
-- vngrs: the reservoir is materialized, the OSCAR fact-pair gate passed and the split is frozen;
-  review coverage, human verdicts and later gates remain incomplete, so it is not training-ready;
+- vngrs: the reservoir is materialized, OSCAR fact-pair and review-coverage gates passed, the split
+  is frozen and human review is 64/64 usable; Phase-2 exact tokenizer accounting remains
+  unexecuted, so it is not training-ready;
 - M2 execution: not authorized; the diagnostic recovery, later selection and all training stages
   each require their own exact contract boundary and explicit user authorization.
 

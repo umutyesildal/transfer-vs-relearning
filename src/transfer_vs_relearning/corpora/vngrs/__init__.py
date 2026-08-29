@@ -42,6 +42,7 @@ from .d0_preflight import validate_d0_preflight
 from .d0_inputs import load_source_objects, load_synthetic_fact_registry, load_synthetic_surfaces
 from .d0_oscar_split_review import run_oscar_split_review_handoff
 from .d0_oscar_review_coverage import run_oscar_review_coverage_repair
+from .d0_phase2 import run_oscar_phase2_evidence, split_tokenizer_accounting, tokenizer_compatibility
 from .tokenizer_inventory import extract_tokenizer_inventory
 from .outputs import FINAL_AUDIT, OUTPUT_ARTIFACT_MANIFEST, OUTPUT_ORDER, serialize_output_artifact_manifest
 from .pipeline import FailClosedLidAdapter, VngrsPreparationConfig, evaluate_final_contract, prepare_records
@@ -98,6 +99,9 @@ __all__ = [
     "run_d0_phase1",
     "run_oscar_split_review_handoff",
     "run_oscar_review_coverage_repair",
+    "run_oscar_phase2_evidence",
+    "split_tokenizer_accounting",
+    "tokenizer_compatibility",
     "finalize_d0_phase2",
     "select_systematic_shards",
     "serialize_output_artifact_manifest",

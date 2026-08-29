@@ -89,8 +89,8 @@ The pass must not rewrite split IDs, review packet or human decisions.
 ### P2-2 — tokenizer-native compatibility gate
 
 Load only the six inventoried tokenizer assets from the three exact M1 epoch-036 parent snapshots.
-For every role verify asset size/SHA, tokenizer save/reload identity, vocabulary/special-token
-metadata, non-empty Turkish probe encodings and deterministic repeated encoding. Network fallback,
+For every role verify asset size/SHA, exact model/revision identity, vocabulary metadata,
+non-empty Turkish probe encodings and deterministic repeated encoding. Network fallback,
 tokenizer substitution and model-weight access fail closed.
 
 ### P2-3 — exact tokenizer accounting

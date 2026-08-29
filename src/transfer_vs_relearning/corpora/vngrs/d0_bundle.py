@@ -235,6 +235,67 @@ def write_d0_review_coverage_handoff(
     return final
 
 
+def write_d0_phase2_evidence(
+    root: str | Path,
+    *,
+    state: Mapping[str, Any],
+    population: Mapping[str, Any],
+    review: Mapping[str, Any],
+    compatibility: Mapping[str, Mapping[str, Any]],
+    accounting: Mapping[str, Mapping[str, Mapping[str, Any]]],
+) -> dict[str, Any]:
+    """Persist compact Phase-2 evidence without corpus text, token IDs or human PII."""
+
+    if state.get("status") != "D0_EVIDENCE_COMPLETE" or state.get("ready_to_train") is not False:
+        raise ValueError("Phase-2 evidence must stop before the M2 training contract")
+    payloads: dict[str, bytes] = {
+        "control/phase2_state.json": _json(dict(state)),
+        "reports/population_split_validation.json": _json(dict(population)),
+        "reports/human_review_validation.json": _json(dict(review)),
+    }
+    for role, report in sorted(compatibility.items()):
+        payloads[f"reports/tokenizer_compatibility_{role}.json"] = _json(dict(report))
+    for role, split_reports in sorted(accounting.items()):
+        for split_name, report in sorted(split_reports.items()):
+            payloads[f"reports/tokenizer_accounting_{role}_{split_name}.json"] = _json(
+                dict(report)
+            )
+    if len(payloads) != 12 or sum(len(payload) for payload in payloads.values()) > 128 * 1024**2:
+        raise ValueError("Phase-2 compact evidence cardinality or byte bound failed")
+    root_path = Path(root)
+    manifest_rows = []
+    for index, relative in enumerate(sorted(payloads), 1):
+        payload = payloads[relative]
+        manifest_rows.append(
+            {
+                "schema_version": 1,
+                "artifact_order": index,
+                "path": relative,
+                "bytes": len(payload),
+                "sha256": hashlib.sha256(payload).hexdigest(),
+            }
+        )
+        _atomic(root_path / relative, payload)
+    manifest_payload = _jsonl(manifest_rows)
+    manifest_sha256 = hashlib.sha256(manifest_payload).hexdigest()
+    _atomic(root_path / "manifests/output_artifact_manifest.jsonl", manifest_payload)
+    final = {
+        "schema_version": 1,
+        "status": "D0_EVIDENCE_COMPLETE",
+        "tokenizer_roles_complete": ["olmo", "qwen", "smollm"],
+        "human_review_status": "HUMAN_REVIEW_PASS",
+        "model_weight_access": False,
+        "tokenized_corpus_persisted": False,
+        "m2_training_contract_frozen": False,
+        "manifest_path": "manifests/output_artifact_manifest.jsonl",
+        "manifest_sha256": manifest_sha256,
+        "artifact_count": len(manifest_rows),
+        "ready_to_train": False,
+    }
+    _atomic(root_path / "control/final_audit.json", _json(final))
+    return final
+
+
 def write_d0_evidence_bundle(
     root: str | Path,
     result: Mapping[str, Any],

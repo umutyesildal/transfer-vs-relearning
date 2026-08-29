@@ -5,20 +5,20 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: eca3fe8e3fc0a50288940439bdc39ebf31d129c7153cee618c5d7561826b9ac0
+  full_state_sha256: fbe2e6fca08a4f80c39dbd339021384dce850ac4068c9ff101aa5f413bfa1474
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: m2_oscar_human_review_pass_phase2_plan_local
+  phase: m2_oscar_phase2_evidence_contract_frozen_unexecuted
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: oscar_human_review_pass_phase2_plan_unimplemented
+  corpus_contract: oscar_phase2_evidence_frozen_unexecuted
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -32,7 +32,7 @@ stage_readiness:
   m1_evaluation_adapter_and_contract: frozen_v3_single_a100_pool_terminal_complete_111_of_111
   m1_first_wave_cancelled_by_user_before_any_scientific_result: true
   m1_execution: complete_111_of_111
-  m2_corpus_contract: split_frozen_review_coverage_and_human_review_pass_phase2_plan_local
+  m2_corpus_contract: phase2_evidence_contract_frozen_unexecuted
   m2_materialization_operator: locally_implemented_execution_disabled_offline_fixture_validated
   m2_audit_split_tokenizer_operators: locally_implemented_execution_disabled_offline_fixture_validated
   m2_tokenizer_asset_inventory: complete_three_of_three_manifest_only_zero_hu_writes
@@ -44,8 +44,8 @@ stage_readiness:
   m2_source_registry: closed_32_of_32_transport_object_ids_full_byte_sha_computed_only_on_download
   m2_storage_bounds: locally_closed_fresh_preflight_required
   m2_final_orchestration: v1_job_481863_exact_labels_persisted_uppercase_candidate_blocked_before_audit
-  m2_production_launcher: no_active_wave_phase2_unimplemented_and_unauthorized
-  m2_primary_training_source: cleaned_vngrs_oscar_2201_rows_only_pending_qualification
+  m2_production_launcher: phase2_cpu_launcher_frozen_no_active_wave_unauthorized
+  m2_primary_training_source: cleaned_vngrs_oscar_2201_rows_only_phase2_accounting_pending
   m2_mc4_training_role: excluded_preserved
   m2_human_review_handoff: complete_pass_64_of_64_usable_packet_bound_decisions
   m2_required_models: [olmo, qwen, smollm]
@@ -77,15 +77,15 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: approve_local_phase2_implementation_and_contract_preparation_if_desired
+  subject: exact_sha_authorization_for_phase2_cpu_evidence_wave_if_desired
   plan: documentation/187_VNGRS_OSCAR_HUMAN_REVIEW_RESULT_AND_PHASE2_PLAN_TR.md
-  contract: not_created
-  config: not_created
+  contract: documentation/contracts/corpora/vngrs-m2-oscar-phase2-evidence-v1.md
+  config: configs/corpora/vngrs_m2_oscar_phase2_evidence_v1.yaml
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user
     - offline_tests_and_dry_runs
     - read_only_d0_v3_v1a_and_fact_pair_terminal_artifact_verification
-    - local_phase2_operator_config_launcher_contract_preparation_if_requested
+    - inspect_frozen_phase2_implementation_and_contract
   not_implied:
     - hu_or_ssh
     - slurm_or_gpu

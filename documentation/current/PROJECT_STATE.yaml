@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_oscar_human_review_pass_phase2_plan_local
+  status: m0_m1_complete_m2_oscar_phase2_evidence_contract_frozen_unexecuted
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -103,7 +103,7 @@ scientific_design:
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: oscar_human_review_pass_phase2_plan_unimplemented
+  corpus_contract: oscar_phase2_evidence_frozen_unexecuted
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -255,11 +255,11 @@ stage_readiness:
       - terminal_family_complete_no_duplicate_submission
   m2_training:
     corpus_contract_ready: false
-    corpus_contract_status: split_frozen_review_coverage_and_human_review_pass_phase2_plan_local
-    corpus_contract: documentation/contracts/corpora/vngrs-m2-oscar-review-coverage-repair-v1.md
-    corpus_contract_sha256: f05b43faaee6f2561af85a693cfff35194c7b7aaa467911de68684d4b5163f06
-    corpus_config: configs/corpora/vngrs_m2_oscar_review_coverage_v1.yaml
-    corpus_config_sha256: dc7ff601da950fa65830bfb4dda1195b6fd6db9316fd3868f53d7e8344272c50
+    corpus_contract_status: phase2_evidence_contract_frozen_unexecuted
+    corpus_contract: documentation/contracts/corpora/vngrs-m2-oscar-phase2-evidence-v1.md
+    corpus_contract_sha256: 48dfa11058597e80df30e30e063d484772741a4632d1b1f042e703e200b76301
+    corpus_config: configs/corpora/vngrs_m2_oscar_phase2_evidence_v1.yaml
+    corpus_config_sha256: 1b2e8b3bf9a2db7d47db7998b867000c68e2d6eb61d388a300d6c2241ec9d82d
     prior_v2_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v2.md
     prior_v2_contract_sha256: a8d84224476d3b307dc73f5144ebb7ebf21b8330b8c0e84020c285ce1ba23e20
     prior_v1_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
@@ -359,7 +359,7 @@ stage_readiness:
     orchestration_module: src/transfer_vs_relearning/corpora/vngrs/d0_orchestration.py
     orchestration_sha256: c31f49a47a74f8a5b671971417f7fb19a208a33f98057a06a03684fd7733912d
     evidence_bundle_module: src/transfer_vs_relearning/corpora/vngrs/d0_bundle.py
-    evidence_bundle_sha256: f06aa760f94ae2be1f3c99c30d2ca65e73bd3a5ab3346bc317170201fb3c4863
+    evidence_bundle_sha256: 60fb5f3a56d6561a0c5f7ad93b17ccb0efa07d9456fe98c6b530b25ba9d97d18
     preflight_operator_sha256: ae1da3b1c886ac8143197609ff5aa89915a15064212a8356b4d8e2bc7ce43acb
     runtime_adapter_sha256: f78a95e4a3d0567373e4b3b498e24ccd0669a4f0eebc8f61afdb9dce45bd01e7
     review_handoff_sha256: d91c414d52233b84d2d25fafcce92bb9c7f468a5d680edf284131d6f58894d3a
@@ -566,20 +566,31 @@ stage_readiness:
     oscar_human_decision_unusable: 0
     oscar_human_decision_unsafe: 0
     oscar_phase2_plan: documentation/187_VNGRS_OSCAR_HUMAN_REVIEW_RESULT_AND_PHASE2_PLAN_TR.md
-    oscar_phase2_plan_sha256: 3b7c07423d2b36c51bf4d518900d85eb8d7251b979ceab6c812fdc5c4ed117e9
-    oscar_phase2_plan_status: local_plan_unimplemented_unexecuted
+    oscar_phase2_plan_sha256: 98b71bd0c9b5dd984cc477e67b0d5d32e6547198f4412330c644de373e233410
+    oscar_phase2_plan_status: locally_implemented_contract_frozen_unexecuted
     oscar_phase2_proposed_output_root: /vol/tmp2/yesildau/vngrs_m2_oscar_phase2_evidence_v1
     oscar_phase2_required_tokenizers: [olmo, qwen, smollm]
     oscar_phase2_model_weight_access: false
+    oscar_phase2_contract: documentation/contracts/corpora/vngrs-m2-oscar-phase2-evidence-v1.md
+    oscar_phase2_contract_sha256: 48dfa11058597e80df30e30e063d484772741a4632d1b1f042e703e200b76301
+    oscar_phase2_config: configs/corpora/vngrs_m2_oscar_phase2_evidence_v1.yaml
+    oscar_phase2_config_sha256: 1b2e8b3bf9a2db7d47db7998b867000c68e2d6eb61d388a300d6c2241ec9d82d
+    oscar_phase2_operator: src/transfer_vs_relearning/corpora/vngrs/d0_phase2.py
+    oscar_phase2_operator_sha256: 5e770013c0128f281d23ddc257a35805a0fdc299418c50bc72c3c83a16ce5dbc
+    oscar_phase2_runner: scripts/corpora/run_vngrs_m2_oscar_phase2_v1.py
+    oscar_phase2_runner_sha256: 7a9a9c4eb0262b3d162de2b104dce766eddd154c30bc719828776adfc68ff661
+    oscar_phase2_submitter: scripts/corpora/submit_vngrs_m2_oscar_phase2_v1.sh
+    oscar_phase2_submitter_sha256: b7684b36df203274d71270cf2558879d1898d5ab6d91960b4157ca8c599c6a8a
+    oscar_phase2_slurm: slurm/m2/phase2_vngrs_m2_oscar_v1.slurm
+    oscar_phase2_slurm_sha256: f344efcc0393c8c738a93832a62dea4c4995cbeb11235c11f9bbf33a63cefcd0
+    oscar_phase2_local_validation: 4_focused_tests_passed
     phase2_execution_authorized: false
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - phase2_operator_config_launcher_and_contract_not_implemented_or_frozen
       - phase2_execution_not_authorized
       - m2_a_m2_b_matched_contract_not_frozen
-      - three_m1_epoch036_parent_bindings_not_yet_frozen_in_m2_contract
 
 m1_confirmed_design:
   m1_models: [olmo, qwen, smollm]
@@ -1357,16 +1368,16 @@ current_evidence:
     normalization_status: complete_pending_m0_interpretation
   vngrs_corpus_route:
     role: mixed_source_characterization_reservoir_for_oscar_only_m2_selection
-    materialized: false
+    materialized: true
     selected_for_training: false
-    selected_primary_source: oscar_2201_rows_pending_exact_label_volume_and_quality_qualification
+    selected_primary_source: oscar_2201_rows_phase2_tokenizer_accounting_pending
     mc4_main_training_status: excluded_preserved
     source_decision: documentation/decisions/M2_OSCAR_ONLY_PRIMARY_TURKISH_CORPUS_DECISION_2026-08-28.md
     accepted_metadata_evidence_root: /vol/tmp2/yesildau/luna_vngrs_metadata_footer_feasibility_v1
     accepted_metadata_inventory_sha256: 120cdd7b21e161bf981cf8191fa278a11829d3fc5c155b71ed4bc8836e27f1d3
-    latest_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v3.md
-    latest_contract_status: frozen_unexecuted_phase1
-    global_gate: blocked_by_measurement_design
+    latest_contract: documentation/contracts/corpora/vngrs-m2-oscar-phase2-evidence-v1.md
+    latest_contract_status: frozen_unexecuted_phase2_evidence
+    global_gate: blocked_by_unexecuted_phase2_and_unfrozen_m2_training_contract
   trwiki:
     role: cross_domain_control_only
   culturax:
@@ -1463,10 +1474,10 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: review_phase2_plan_then_implement_separately_if_requested
+  name: preserve_frozen_phase2_evidence_contract_until_exact_authorization
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: split_frozen_review_coverage_and_human_review_pass_phase2_plan_local
+  m2_status: phase2_evidence_contract_frozen_unexecuted
   execution_boundary: no_phase2_until_implementation_frozen_contract_and_exact_authorization
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
@@ -1474,7 +1485,7 @@ active_priority:
     - preserve_fact_pair_audit_pass_as_read_only_terminal_evidence
     - preserve_job_481906_split_and_packet_evidence_read_only
     - preserve_exact_64_of_64_usable_human_decision_ledger
-    - keep_phase2_plan_unimplemented_until_user_requests_next_step
+    - preserve_frozen_phase2_operator_config_launcher_and_contract
     - keep_phase2_and_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1484,7 +1495,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: approve_local_phase2_implementation_and_contract_preparation_if_desired
+  subject: exact_sha_authorization_for_phase2_cpu_evidence_wave_if_desired
   decision_owner: user
   start_m1_now: false
   note: >-
