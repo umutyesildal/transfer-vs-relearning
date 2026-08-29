@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_d0_v3_audit_blocked_oscar_recovery_frozen
+  status: m0_m1_complete_m2_oscar_label_discovered_lowercase_retry_frozen
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -103,7 +103,7 @@ scientific_design:
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: frozen_oscar_audit_recovery_unexecuted
+  corpus_contract: frozen_lowercase_oscar_audit_recovery_retry_unexecuted
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -255,7 +255,7 @@ stage_readiness:
       - terminal_family_complete_no_duplicate_submission
   m2_training:
     corpus_contract_ready: false
-    corpus_contract_status: d0_v3_terminal_blocked_audit_detail_missing_oscar_recovery_frozen_unexecuted
+    corpus_contract_status: uppercase_recovery_consumed_label_mismatch_lowercase_retry_frozen_unexecuted
     corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v3.md
     corpus_contract_sha256: c583b434535475692b0682be27434d0d9d4319b4faebe984d3181e8aea9146aa
     corpus_config: configs/corpora/vngrs_m2_three_model_d0_v3.yaml
@@ -268,7 +268,7 @@ stage_readiness:
     primary_training_source_decision: cleaned_vngrs_oscar_2201_rows_only_pending_qualification
     primary_training_source_decision_status: accepted_direction_exact_selection_contract_not_frozen
     primary_training_source_decision_record: documentation/decisions/M2_OSCAR_ONLY_PRIMARY_TURKISH_CORPUS_DECISION_2026-08-28.md
-    primary_training_source_decision_record_sha256: 336d429a0968aabb3efe678405967270517b04f2ccc267ee916ec44954d0350a
+    primary_training_source_decision_record_sha256: 89286cb83dba2e49452781fa4f5350f250f2fc8f709614df569b7a066b7aeaa8
     mc4_training_role: excluded_from_main_m2_training_preserved_no_deletion
     required_models: [olmo, qwen, smollm]
     materialization_operator: locally_implemented_execution_disabled
@@ -377,7 +377,7 @@ stage_readiness:
     v3_runner_sha256: c1e802e4be0624c1556f0071402449ec76c9ea56a06019659948acafd7dfb9fc
     v3_phase1_submitter_sha256: 8064a0fe4adeb48cc378fce4a5a5aad85960bf0fd6c197e84a5b6e833c2e0e9e
     v3_phase1_slurm_sha256: 6ab21ac5a930360374e0980837a524f3caca94b127547955b27f6b2fc410eda2
-    local_qualification_validation: 206_vngrs_and_documentation_control_tests_passed
+    local_qualification_validation: 208_vngrs_and_documentation_control_tests_passed
     production_launcher_status: d0_v3_terminal_blocked_no_retry_authorized
     human_review_handoff_status: frozen_64_packet_bound_decisions
     phase1_execution_authorized: v1a_authorization_consumed_operational_not_run
@@ -445,20 +445,43 @@ stage_readiness:
     oscar_audit_recovery_config: configs/corpora/vngrs_m2_oscar_audit_recovery_v1.yaml
     oscar_audit_recovery_config_sha256: 5b55988616c718d8eea305aede87887150f8b62c00ae0bcef94739dd11668c78
     oscar_audit_recovery_operator: src/transfer_vs_relearning/corpora/vngrs/d0_oscar_recovery.py
-    oscar_audit_recovery_operator_sha256: 50501aaccab677388b1b5d27e485e4182590539344a5f06f2bdf84d60c850fc1
+    oscar_audit_recovery_operator_sha256: 9eb346f0995736aff69022d4373a5ee8301de98489e8d7d1d6c58213f996c9a2
     oscar_audit_recovery_runner_sha256: 44f40fb0f95b18625bb8705d23b1392c1414bb08d726c74ba6ce301964f175c3
     oscar_audit_recovery_submitter_sha256: 8139cdbfa6160d25ed6601b6239feee40c3c1f7ebf8909857fba71b0ccb87787
     oscar_audit_recovery_slurm_sha256: f01872b37b552c2b4ddcc8da922edd4cf9d9dba8ee73bebbd159b9931e03d8b8
     oscar_audit_recovery_output_root: /vol/tmp2/yesildau/vngrs_m2_oscar_audit_recovery_v1
-    oscar_audit_recovery_status: frozen_unexecuted_requires_exact_sha_authorization
-    oscar_audit_recovery_execution_authorized: false
+    oscar_audit_recovery_status: consumed_blocked_exact_uppercase_label_mismatch
+    oscar_audit_recovery_execution_authorized: consumed_single_diagnostic_pass
+    oscar_audit_recovery_job_id: "481863"
+    oscar_audit_recovery_failure_sha256: 6ce9a5dfc302498e4713ed03293962ca53f40f97daef28ffeea49d8fbc2e813b
+    oscar_audit_recovery_label_inventory_sha256: 178991f311336a4acead1bb00fe8043d60a18c590e809b11629ca64f4920ee2b
+    oscar_audit_recovery_observed_total_documents: 5671686
+    oscar_audit_recovery_observed_total_utf8_bytes: 15749783592
+    oscar_audit_recovery_observed_oscar_label: oscar
+    oscar_audit_recovery_observed_oscar_documents: 354482
+    oscar_audit_recovery_observed_oscar_utf8_bytes: 1553923133
+    oscar_audit_recovery_observed_mc4_label: mc4
+    oscar_audit_recovery_observed_mc4_documents: 5317204
+    oscar_audit_recovery_observed_mc4_utf8_bytes: 14195860459
+    oscar_audit_recovery_audit_started: false
+    oscar_audit_recovery_result_record: documentation/182_VNGRS_OSCAR_AUDIT_RECOVERY_V1_EXECUTION_RESULT_TR.md
+    oscar_audit_recovery_result_record_sha256: b45b8e7f0d8031e7cc9f9fe9072a541ed4686f9ff98864cdabf5e1c2d555127e
+    oscar_audit_recovery_retry_contract: documentation/contracts/corpora/vngrs-m2-oscar-audit-recovery-v1a.md
+    oscar_audit_recovery_retry_contract_sha256: cc28d822fb157b1783d6ec19042c890ffe7a33f3e3a02b7f8c6ad0bb144c2796
+    oscar_audit_recovery_retry_config: configs/corpora/vngrs_m2_oscar_audit_recovery_v1a.yaml
+    oscar_audit_recovery_retry_config_sha256: cabf072197441b83b280d2f198c27f62e8e8236ef89ca4f1a61bb3561faef533
+    oscar_audit_recovery_retry_runner_sha256: 9017a31faab83fc9b8905a3904d1abcc74ae6a796a4933d2cae0fa5d28578e7b
+    oscar_audit_recovery_retry_submitter_sha256: 1af23dbfabf47b1b74051f60f47bcfc5f253a9efd7b528d502a57e11e547e940
+    oscar_audit_recovery_retry_slurm_sha256: f5885a2ddad0978990323406ae78f7a335f35d3e1b420b4f3c88a0590b5eb8e0
+    oscar_audit_recovery_retry_output_root: /vol/tmp2/yesildau/vngrs_m2_oscar_audit_recovery_retry_v1
+    oscar_audit_recovery_retry_status: frozen_unexecuted_requires_exact_sha_authorization
+    oscar_audit_recovery_retry_execution_authorized: false
     phase2_execution_authorized: false
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - d0_v3_audit_blocked_without_persisted_reason_detail
-      - oscar_audit_recovery_unexecuted
+      - lowercase_oscar_audit_recovery_retry_unexecuted
       - oscar_only_selection_contract_not_frozen
       - phase2_ineligible_until_phase1_review_packet_and_separate_authorization
       - m2_a_m2_b_matched_contract_not_frozen
@@ -1346,14 +1369,14 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: execute_separately_authorized_oscar_audit_recovery_then_freeze_selection
+  name: execute_separately_authorized_lowercase_oscar_audit_retry_then_freeze_selection
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: d0_v3_terminal_audit_blocked_oscar_recovery_frozen_unexecuted
-  execution_boundary: no_external_execution_until_exact_recovery_contract_authorization
+  m2_status: exact_lowercase_oscar_label_discovered_retry_frozen_unexecuted
+  execution_boundary: no_external_execution_until_exact_v1a_contract_authorization
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
-    - run_no_action_until_exact_oscar_audit_recovery_authorization
+    - run_no_action_until_exact_lowercase_oscar_retry_authorization
     - after_recovery_freeze_oscar_only_selection_split_and_review_contract
     - keep_phase2_and_m2_training_execution_disabled
   forbidden_until_user_says_start:
@@ -1364,7 +1387,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_single_oscar_audit_evidence_recovery_pass_if_desired
+  subject: authorize_single_lowercase_oscar_audit_recovery_retry_if_desired
   decision_owner: user
   start_m1_now: false
   note: >-
@@ -1406,10 +1429,13 @@ next_decision_required:
     not persist the audit detail before raising, so the exact contamination/encoding trigger is
     unresolved. Document 181 records the result. The user has prospectively selected only cleaned
     OSCAR-2201-derived rows for the main M2 training population; mC4 remains preserved and
-    training-excluded. The frozen, unexecuted OSCAR audit-recovery contract reads V3 in place,
-    records exact labels and bounded audit reasons under a fresh compact root, and stops before
-    split/review. It requires separate exact SHA authorization. Phase 2, a second attempt and
-    training remain unauthorized.
+    training-excluded. The first audit-recovery job `481863` read V3 in place and preserved the
+    exact labels: `oscar` has 354,482 documents / 1,553,923,133 UTF-8 bytes and `mc4` has
+    5,317,204 documents / 14,195,860,459 bytes. It stopped before audit because V1 had frozen
+    uppercase `OSCAR`. Document 182 records this case-only mismatch. Frozen V1a changes only the
+    exact predicate to lowercase `oscar`, verifies both earlier roots read-only, writes a fresh
+    retry root and stops before split/review. It requires separate exact SHA authorization.
+    Phase 2, any further attempt and training remain unauthorized.
 
 authorization:
   local_repository_changes: require_current_user_instruction

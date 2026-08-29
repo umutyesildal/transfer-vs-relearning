@@ -38,12 +38,12 @@ Status: not authorized.
 
 ## R3 — Freeze the M2 corpus and sibling contract
 
-Status: V3 materialization complete, audit blocked; diagnostic recovery frozen but unexecuted;
-training execution disabled.
+Status: V3 materialization complete; V1 exact labels preserved and uppercase candidate blocked;
+lowercase V1a diagnostic retry frozen but unexecuted; training execution disabled.
 
 - preserve terminal D0 v3 materialization and generic audit failure as immutable evidence;
-- separately authorize at most one OSCAR audit-recovery pass if desired; reuse V3 bytes read-only,
-  persist exact source labels and bounded audit reasons, and stop before split/review;
+- separately authorize at most one lowercase OSCAR V1a retry if desired; reuse V3 bytes read-only,
+  verify V1 label evidence, persist bounded audit reasons, and stop before split/review;
 - use only cleaned OSCAR-2201-derived vngrs rows as the prospective main M2 training source;
 - keep mC4-derived rows training-excluded and preserved; do not substitute them automatically;
 - only after recovery evidence, freeze the verified OSCAR source label/predicate,

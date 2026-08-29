@@ -84,17 +84,19 @@ required the byte SHA `d72ae7…` to equal the LFS/Xet object ID `a81097…`. V2
 published objects and is preserved read-only. Frozen D0 v3 repaired only this semantic on a fresh
 root. Its authorized job `481844` produced a verified 32-row materialization manifest with
 SHA-256 `bb413e9a…`, then terminated at the audit gate with failure SHA-256 `a341e478…`.
-Document 181 is the append-only result record. The frozen, unexecuted
-`vngrs-m2-oscar-audit-recovery-v1` contract reads those bytes in place, tests exact
-`corpus == "OSCAR"`, and persists exact label counts plus bounded audit reasons before stopping.
-It creates no split/review packet and requires separate exact SHA authorization.
+Document 181 is the append-only result record. Audit-recovery V1 job `481863` then read those bytes
+in place and preserved exact labels: lowercase `oscar` has 354,482 documents / 1,553,923,133
+UTF-8 bytes and `mc4` has 5,317,204 documents / 14,195,860,459 bytes. V1 stopped before audit
+because its frozen candidate was uppercase `OSCAR`; Document 182 records the result. Frozen,
+unexecuted V1a changes only the exact predicate to `corpus == "oscar"`, uses a fresh root and
+requires separate exact SHA authorization. It still creates no split/review packet.
 
 The prospective primary M2 training source is now the cleaned OSCAR-2201-derived subset within
 the preserved vngrs release. mC4-derived rows are excluded from the main M2 training population
 and remain preserved. This is an accepted direction, not a frozen filtered release: after the
-recovery evidence closes, a new contract must bind the verified OSCAR label/predicate, volume,
-contamination disposition,
-10,000-document split, 64-document human-review packet and three-model tokenizer accounting.
+lowercase recovery evidence closes, a new contract must bind the verified label/predicate, volume,
+contamination disposition, 10,000-document split, 64-document human-review packet and three-model
+tokenizer accounting.
 The decision record is
 `documentation/decisions/M2_OSCAR_ONLY_PRIMARY_TURKISH_CORPUS_DECISION_2026-08-28.md`.
 

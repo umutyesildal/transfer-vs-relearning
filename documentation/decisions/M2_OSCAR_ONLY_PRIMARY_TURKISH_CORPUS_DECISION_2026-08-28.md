@@ -78,3 +78,12 @@ read-only. A separate frozen OSCAR audit-recovery contract may read those bytes 
 only compact diagnostic evidence to a fresh root, but it is currently unexecuted and unauthorized.
 This decision does not authorize that pass, a D0 retry, Phase 2, filtering/materialization,
 training, evaluation, cleanup or deletion.
+
+## Exact-label update — 2026-08-29
+
+Audit-recovery V1 job `481863` preserved the exact row labels. The intended OSCAR-derived source
+label is lowercase `oscar`, with 354,482 documents and 1,553,923,133 UTF-8 bytes in the selected
+32-shard reservoir. The other exact label is lowercase `mc4`. Uppercase `OSCAR` is not present.
+Document 182 preserves this result. The scientific decision remains OSCAR-only; the correction is
+operationally limited to exact `corpus == "oscar"`. No case-folded fallback or mC4 substitution is
+allowed.

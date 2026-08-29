@@ -13,10 +13,10 @@ from transfer_vs_relearning.corpora.vngrs.d0_oscar_recovery import run_oscar_aud
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def documents(*, contamination: bool = False) -> list[D0Document]:
+def documents(*, contamination: bool = False, oscar_label: str = "OSCAR") -> list[D0Document]:
     rows = []
     for index in range(10_020):
-        corpus = "OSCAR" if index < 10_010 else "mC4"
+        corpus = oscar_label if index < 10_010 else "mC4"
         text = f"Uzun ve temiz Türkçe deneme belgesi numarası {index}."
         if contamination and index == 4:
             text += " Gizli Yüzey"
@@ -87,6 +87,20 @@ def test_oscar_recovery_records_blocking_cause_without_opening_later_stages(tmp_
     assert not (output / "control/phase1_state.json").exists()
 
 
+def test_oscar_recovery_accepts_frozen_lowercase_exact_label(tmp_path: Path) -> None:
+    output = tmp_path / "output"
+    result = run_oscar_audit_recovery(
+        tmp_path / "source", output, [],
+        synthetic_surfaces={"absent": "Bu yüzey yoktur"},
+        candidate_label="oscar",
+        execution_enabled=True,
+        document_loader=loader(documents(oscar_label="oscar")),
+    )
+    assert result["status"] == "OSCAR_AUDIT_COMPLETE"
+    assert result["corpus_predicate"]["value"] == "oscar"
+    assert result["selected_document_count"] == 10_010
+
+
 def test_oscar_recovery_contract_is_single_diagnostic_cpu_pass() -> None:
     contract = ROOT / "documentation/contracts/corpora/vngrs-m2-oscar-audit-recovery-v1.md"
     config = yaml.safe_load(
@@ -110,3 +124,25 @@ def test_oscar_recovery_contract_is_single_diagnostic_cpu_pass() -> None:
     assert "PYTHONDONTWRITEBYTECODE=1" in slurm
     assert "train_clm" not in runner + submitter + slurm
     assert "requests" not in runner and "http" not in runner.casefold()
+
+
+def test_lowercase_retry_changes_only_exact_label_and_fresh_route() -> None:
+    contract = ROOT / "documentation/contracts/corpora/vngrs-m2-oscar-audit-recovery-v1a.md"
+    config = yaml.safe_load(
+        (ROOT / "configs/corpora/vngrs_m2_oscar_audit_recovery_v1a.yaml").read_text()
+    )
+    runner = (ROOT / "scripts/corpora/run_vngrs_m2_oscar_audit_recovery_v1a.py").read_text()
+    submitter = (ROOT / "scripts/corpora/submit_vngrs_m2_oscar_audit_recovery_v1a.sh").read_text()
+    slurm = (ROOT / "slurm/m2/audit_vngrs_m2_oscar_d0_v1a.slurm").read_text()
+    assert contract.is_file()
+    assert config["status"] == "frozen_unexecuted"
+    assert config["selection"]["candidate_value"] == "oscar"
+    assert config["selection"]["observed_documents"] == 354_482
+    assert config["selection"]["observed_utf8_bytes"] == 1_553_923_133
+    assert config["prior_recovery"]["access"] == "read_only"
+    assert config["output"]["root"].endswith("vngrs_m2_oscar_audit_recovery_retry_v1")
+    assert 'candidate_label="oscar"' in runner
+    assert "--test-only" in submitter
+    assert "PYTHONDONTWRITEBYTECODE=1" in slurm
+    assert "train_clm" not in runner + submitter + slurm
+    assert config["authority"]["corpus_download_or_copy"] is False

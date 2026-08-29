@@ -36,9 +36,12 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - storage/orchestration qualification: 32 GiB frozen peak, 40 GiB plus 1,024-inode fresh gate,
   exact Parquet loader, typed failures, reviewed adapters and atomic output chain passed 191
   compatible tests;
-- next boundary: the frozen, unexecuted OSCAR-only audit-recovery contract may be separately
-  authorized once; it reuses V3 bytes read-only, records exact labels and bounded audit reasons in
-  a fresh compact root, and stops before split/review/tokenizer accounting;
+- first OSCAR audit-recovery job `481863`: exact label inventory PASS; observed lowercase `oscar`
+  has 354,482 documents / 1,553,923,133 UTF-8 bytes, while `mc4` has 5,317,204 documents; V1
+  stopped before audit because its candidate was uppercase `OSCAR`;
+- next boundary: frozen V1a changes only the exact predicate to lowercase `oscar`, verifies V3 and
+  V1 evidence read-only, writes a fresh retry root, and stops before split/review/tokenizer
+  accounting; it requires a new exact SHA-bound authorization;
 - M2 primary source direction: cleaned OSCAR-2201-derived rows within vngrs, pending exact label,
   volume and quality qualification; mC4 is excluded from main training and preserved;
 - vngrs: the selected mixed 32-shard reservoir is materialized but audit-blocked and not

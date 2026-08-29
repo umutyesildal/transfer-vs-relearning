@@ -1,24 +1,24 @@
 schema_version: 1
 brief_id: agent-brief-v2
-as_of: "2026-08-28"
+as_of: "2026-08-29"
 status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: c26966aa168ff9d5e3abdfcfb4b129dd0997e40c4043e3edb2c4b41cca38f96b
+  full_state_sha256: 531564795332ac92e8175d7d9f47619111daccdb7f06f9a66825574e7cd12912
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: m2_d0_v3_audit_blocked_oscar_recovery_frozen_unexecuted
+  phase: m2_lowercase_oscar_label_discovered_retry_frozen_unexecuted
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: frozen_oscar_audit_recovery_unexecuted
+  corpus_contract: frozen_lowercase_oscar_audit_recovery_retry_unexecuted
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -32,7 +32,7 @@ stage_readiness:
   m1_evaluation_adapter_and_contract: frozen_v3_single_a100_pool_terminal_complete_111_of_111
   m1_first_wave_cancelled_by_user_before_any_scientific_result: true
   m1_execution: complete_111_of_111
-  m2_corpus_contract: d0_v3_terminal_blocked_recovery_contract_frozen_unexecuted
+  m2_corpus_contract: uppercase_recovery_consumed_lowercase_retry_frozen_unexecuted
   m2_materialization_operator: locally_implemented_execution_disabled_offline_fixture_validated
   m2_audit_split_tokenizer_operators: locally_implemented_execution_disabled_offline_fixture_validated
   m2_tokenizer_asset_inventory: complete_three_of_three_manifest_only_zero_hu_writes
@@ -43,7 +43,7 @@ stage_readiness:
   m2_source_registry_byte_semantics_repair: executed_pass_consumed
   m2_source_registry: closed_32_of_32_transport_object_ids_full_byte_sha_computed_only_on_download
   m2_storage_bounds: locally_closed_fresh_preflight_required
-  m2_final_orchestration: v3_job_481844_materialization_pass_audit_blocked_without_detail
+  m2_final_orchestration: v1_job_481863_exact_labels_persisted_uppercase_candidate_blocked_before_audit
   m2_production_launcher: no_active_wave_no_retry_authorized
   m2_primary_training_source: cleaned_vngrs_oscar_2201_rows_only_pending_qualification
   m2_mc4_training_role: excluded_preserved
@@ -77,9 +77,9 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: authorize_single_oscar_audit_evidence_recovery_pass_if_desired
-  contract: documentation/contracts/corpora/vngrs-m2-oscar-audit-recovery-v1.md
-  config: configs/corpora/vngrs_m2_oscar_audit_recovery_v1.yaml
+  subject: authorize_single_lowercase_oscar_audit_recovery_retry_if_desired
+  contract: documentation/contracts/corpora/vngrs-m2-oscar-audit-recovery-v1a.md
+  config: configs/corpora/vngrs_m2_oscar_audit_recovery_v1a.yaml
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user
     - offline_tests_and_dry_runs

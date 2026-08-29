@@ -44,6 +44,7 @@ def run_oscar_audit_recovery(
     objects: Iterable[SourceObjectV3],
     *,
     synthetic_surfaces: Mapping[str, str],
+    candidate_label: str = OSCAR_CORPUS_LABEL,
     execution_enabled: bool = False,
     document_loader: Callable[..., list[D0Document]] = load_verified_parquet_documents_v3,
 ) -> dict[str, Any]:
@@ -51,6 +52,8 @@ def run_oscar_audit_recovery(
 
     if not execution_enabled:
         raise ValueError("OSCAR audit recovery execution is disabled")
+    if not candidate_label or candidate_label.strip() != candidate_label:
+        raise ValueError("OSCAR candidate label must be a non-empty exact string")
     destination = Path(output_root)
     if destination.exists():
         raise ValueError("OSCAR audit recovery output root must be fresh and absent")
@@ -59,9 +62,9 @@ def run_oscar_audit_recovery(
         documents = document_loader(source_root, registry, execution_enabled=True)
         inventory = corpus_label_inventory(documents)
         write_d0_corpus_label_inventory(destination, inventory)
-        selected = [row for row in documents if row.corpus == OSCAR_CORPUS_LABEL]
+        selected = [row for row in documents if row.corpus == candidate_label]
         if len(selected) <= 10_000:
-            raise ValueError("exact OSCAR candidate population is absent or too small")
+            raise ValueError(f"exact {candidate_label!r} candidate population is absent or too small")
         audit = lightweight_audit(selected, synthetic_surfaces=synthetic_surfaces)
         bounded = write_d0_phase1_audit_evidence(
             destination,
@@ -73,7 +76,7 @@ def run_oscar_audit_recovery(
             "source_root": str(Path(source_root)),
             "source_manifest": "control/materialization_v3.json",
             "source_object_count": len(registry),
-            "corpus_predicate": {"field": "corpus", "operator": "exact_string_equality", "value": OSCAR_CORPUS_LABEL},
+            "corpus_predicate": {"field": "corpus", "operator": "exact_string_equality", "value": candidate_label},
             "selected_document_count": len(selected),
             "selected_document_ids_sha256": canonical_json_sha256(
                 sorted(row.stable_document_id for row in selected)
