@@ -117,6 +117,70 @@ def write_d0_fact_pair_audit(root: str | Path, audit: Mapping[str, Any]) -> None
     _atomic(Path(root) / "reports/fact_pair_contamination_audit.json", _json(dict(audit)))
 
 
+def write_d0_split_review_handoff(
+    root: str | Path,
+    *,
+    state: Mapping[str, Any],
+    split: Mapping[str, Any],
+    sample: Iterable[Mapping[str, Any]],
+    packet: Iterable[Mapping[str, Any]],
+    decision_rows: Iterable[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Persist a self-contained split/review handoff with a one-way hash chain."""
+
+    if state.get("ready_to_train") is not False or state.get("status") != "AWAITING_HUMAN_REVIEW":
+        raise ValueError("split/review handoff must stop awaiting human review")
+    sample_rows = [dict(row) for row in sample]
+    packet_rows = [dict(row) for row in packet]
+    decisions = [dict(row) for row in decision_rows]
+    payloads = {
+        "control/phase1_state.json": _json(dict(state)),
+        "splits/train_document_ids.jsonl": _jsonl(
+            {"schema_version": 1, "stable_document_id": value}
+            for value in split["train_document_ids"]
+        ),
+        "splits/heldout_document_ids.jsonl": _jsonl(
+            {"schema_version": 1, "stable_document_id": value}
+            for value in split["heldout_document_ids"]
+        ),
+        "reports/human_review_sample.jsonl": _jsonl(sample_rows),
+        "reports/human_review_packet.jsonl": _jsonl(packet_rows),
+        "reports/human_review_decision_template.jsonl": _jsonl(decisions),
+    }
+    if sum(len(payload) for payload in payloads.values()) > 128 * 1024**2:
+        raise ValueError("split/review handoff exceeds the frozen 128 MiB compact-output bound")
+    root_path = Path(root)
+    manifest_rows = []
+    for index, relative in enumerate(sorted(payloads), 1):
+        payload = payloads[relative]
+        manifest_rows.append(
+            {
+                "schema_version": 1,
+                "artifact_order": index,
+                "path": relative,
+                "bytes": len(payload),
+                "sha256": hashlib.sha256(payload).hexdigest(),
+            }
+        )
+        _atomic(root_path / relative, payload)
+    manifest_payload = _jsonl(manifest_rows)
+    manifest_sha256 = hashlib.sha256(manifest_payload).hexdigest()
+    _atomic(root_path / "manifests/output_artifact_manifest.jsonl", manifest_payload)
+    final = {
+        "schema_version": 1,
+        "status": "AWAITING_HUMAN_REVIEW",
+        "self_reference": False,
+        "manifest_path": "manifests/output_artifact_manifest.jsonl",
+        "manifest_sha256": manifest_sha256,
+        "artifact_count": len(manifest_rows),
+        "split_created": True,
+        "human_review_packet_created": True,
+        "ready_to_train": False,
+    }
+    _atomic(root_path / "control/final_audit.json", _json(final))
+    return final
+
+
 def write_d0_evidence_bundle(
     root: str | Path,
     result: Mapping[str, Any],

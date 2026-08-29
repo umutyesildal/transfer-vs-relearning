@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_oscar_atom_gate_blocked_fact_pair_repair_frozen
+  status: m0_m1_complete_m2_oscar_fact_pair_pass_split_review_handoff_frozen
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -103,7 +103,7 @@ scientific_design:
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: frozen_oscar_fact_pair_contamination_audit_unexecuted
+  corpus_contract: frozen_oscar_split_review_handoff_unexecuted
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -255,18 +255,18 @@ stage_readiness:
       - terminal_family_complete_no_duplicate_submission
   m2_training:
     corpus_contract_ready: false
-    corpus_contract_status: uppercase_recovery_consumed_label_mismatch_lowercase_retry_frozen_unexecuted
-    corpus_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v3.md
-    corpus_contract_sha256: c583b434535475692b0682be27434d0d9d4319b4faebe984d3181e8aea9146aa
-    corpus_config: configs/corpora/vngrs_m2_three_model_d0_v3.yaml
-    corpus_config_sha256: 0dc2812f40b2a3dcc16aada64eda7a11a2e15caea1dfb2d0a5f81e1b9da22a2b
+    corpus_contract_status: fact_pair_audit_pass_split_review_handoff_frozen_unexecuted
+    corpus_contract: documentation/contracts/corpora/vngrs-m2-oscar-split-review-handoff-v1.md
+    corpus_contract_sha256: 8d5784518afd5291a0e0302f17d5fba8dc38acd910e8414961f2336aa42a632e
+    corpus_config: configs/corpora/vngrs_m2_oscar_split_review_v1.yaml
+    corpus_config_sha256: 66b8a70dfc0c51ad04670130c5e47f8a6330ee52908078fcbf3324f1ed07d453
     prior_v2_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v2.md
     prior_v2_contract_sha256: a8d84224476d3b307dc73f5144ebb7ebf21b8330b8c0e84020c285ce1ba23e20
     prior_v1_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
     prior_v1_contract_sha256: a77855a06c70ccdb52eb3768e7f2be2081da3129b5716eafeb03af2edf56baf3
     corpus_scope: vngrs_systematic_32_shard_subcorpus
     primary_training_source_decision: cleaned_vngrs_oscar_2201_rows_only_pending_qualification
-    primary_training_source_decision_status: accepted_direction_exact_selection_contract_not_frozen
+    primary_training_source_decision_status: accepted_direction_split_review_contract_frozen_unexecuted
     primary_training_source_decision_record: documentation/decisions/M2_OSCAR_ONLY_PRIMARY_TURKISH_CORPUS_DECISION_2026-08-28.md
     primary_training_source_decision_record_sha256: 89286cb83dba2e49452781fa4f5350f250f2fc8f709614df569b7a066b7aeaa8
     mc4_training_role: excluded_from_main_m2_training_preserved_no_deletion
@@ -497,15 +497,37 @@ stage_readiness:
     oscar_fact_pair_audit_submitter_sha256: fef658bdddc81c72567141ddd0be45483412f1e4f39b06a272b123294c3bf44d
     oscar_fact_pair_audit_slurm_sha256: 1ee246e63bcab3896782b3bbb3bce32765ff644fb62b13382ec378899ca6c8b1
     oscar_fact_pair_audit_output_root: /vol/tmp2/yesildau/vngrs_m2_oscar_fact_pair_audit_v1
-    oscar_fact_pair_audit_status: frozen_unexecuted_requires_exact_sha_authorization
-    oscar_fact_pair_audit_execution_authorized: false
+    oscar_fact_pair_audit_status: executed_pass_consumed
+    oscar_fact_pair_audit_execution_authorized: consumed_single_cpu_pass
+    oscar_fact_pair_audit_job_id: "481904"
+    oscar_fact_pair_audit_selected_documents: 354482
+    oscar_fact_pair_audit_selected_ids_sha256: c252d6b54d488e898f534564ef6c16196e22ae78f4fe0e61f83d4ad0bf83a056
+    oscar_fact_pair_audit_exact_pairs: 0
+    oscar_fact_pair_audit_unicode_normalized_pairs: 0
+    oscar_fact_pair_audit_invalid_encoding_documents: 0
+    oscar_fact_pair_audit_report_sha256: bf076ab36fc31b16ab6f47d4a02ff04877177c1562e8bda2f8bb11f1a14091d3
+    oscar_fact_pair_audit_state_sha256: 381772af2ce8ebca68aa30ee6862e0933689abb88dabafcf499d96603c5dba57
+    oscar_fact_pair_audit_result_record: documentation/184_VNGRS_OSCAR_FACT_PAIR_AUDIT_V1_EXECUTION_RESULT_TR.md
+    oscar_fact_pair_audit_result_record_sha256: 6095bbda72cccb2206abc55f0c9d70247682f47d912f4be8586ed245a2730049
+    oscar_split_review_contract: documentation/contracts/corpora/vngrs-m2-oscar-split-review-handoff-v1.md
+    oscar_split_review_contract_sha256: 8d5784518afd5291a0e0302f17d5fba8dc38acd910e8414961f2336aa42a632e
+    oscar_split_review_config: configs/corpora/vngrs_m2_oscar_split_review_v1.yaml
+    oscar_split_review_config_sha256: 66b8a70dfc0c51ad04670130c5e47f8a6330ee52908078fcbf3324f1ed07d453
+    oscar_split_review_operator: src/transfer_vs_relearning/corpora/vngrs/d0_oscar_split_review.py
+    oscar_split_review_operator_sha256: 1c12476d2a642e6a9509aeec403429e07578e3a79fb4762644e855fe6d2bdb77
+    oscar_split_review_runner_sha256: d3f2c235c58a03e10fcb5d2f0ae4651a4f85f365aa462337d2bf3a785ac219a2
+    oscar_split_review_submitter_sha256: 9d31e8831ef12d946b35858163fc17153974b700b2e96d70a618ddee79697c2f
+    oscar_split_review_slurm_sha256: 6518112ee0e1f3aa824562e863de9378e5ab5479ca5582ba56befd2e8a532c1c
+    oscar_split_review_output_root: /vol/tmp2/yesildau/vngrs_m2_oscar_split_review_v1
+    oscar_split_review_status: frozen_unexecuted_requires_exact_sha_authorization
+    oscar_split_review_execution_authorized: false
     phase2_execution_authorized: false
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - oscar_fact_pair_contamination_audit_unexecuted
-      - oscar_quality_gate_not_closed
+      - oscar_split_review_handoff_unexecuted
+      - human_review_decisions_not_completed
       - phase2_ineligible_until_phase1_review_packet_and_separate_authorization
       - m2_a_m2_b_matched_contract_not_frozen
       - three_m1_epoch036_parent_bindings_not_yet_frozen_in_m2_contract
@@ -1392,16 +1414,16 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: execute_separately_authorized_lowercase_oscar_audit_retry_then_freeze_selection
+  name: execute_separately_authorized_oscar_split_review_handoff
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: exact_lowercase_oscar_label_discovered_retry_frozen_unexecuted
-  execution_boundary: no_external_execution_until_exact_v1a_contract_authorization
+  m2_status: fact_pair_audit_pass_split_review_handoff_frozen_unexecuted
+  execution_boundary: no_external_execution_until_exact_split_review_contract_authorization
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
     - preserve_lowercase_v1a_atom_audit_as_read_only_terminal_evidence
-    - run_no_action_until_exact_fact_pair_audit_authorization
-    - after_fact_pair_gate_freeze_oscar_only_split_and_review_contract
+    - preserve_fact_pair_audit_pass_as_read_only_terminal_evidence
+    - run_no_action_until_exact_split_review_handoff_authorization
     - keep_phase2_and_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1411,7 +1433,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_single_oscar_fact_pair_contamination_audit_if_desired
+  subject: authorize_single_oscar_split_review_handoff_if_desired
   decision_owner: user
   start_m1_now: false
   note: >-
@@ -1461,10 +1483,13 @@ next_decision_required:
     935,276 normalized atom pairs and zero invalid-encoding documents. Its historical flattened
     gate blocked because ordinary answer/object surfaces were independently blocking; the 256+256
     bounded examples are all `object:*`. Document 183 preserves the result and limits that claim.
-    The new frozen fact-pair contract retains all 500 `subject_id -> fact_id -> relation -> answer`
-    bindings and blocks only on paired subject-answer co-occurrence or `U+FFFD`. It requires a new
-    exact SHA authorization and fresh root. Phase 2, split/review, any retry and training remain
-    unauthorized.
+    Job `481904` executed the frozen fact-pair contract once and completed PASS over all 354,482
+    exact lowercase OSCAR documents: subject-only hits, exact/normalized paired fact hits and
+    `U+FFFD` documents were all zero. The three terminal artifacts are hash-closed in Document
+    184; `sacct` remained unavailable due Munge/SlurmDBD authentication. The next frozen contract
+    permits only the seed-42 10,000/344,482 deterministic split and a quartile-stratified
+    64-document human-review packet under a fresh root. It enters no verdict, opens no tokenizer,
+    Phase 2 or training work, and requires a new exact SHA authorization.
 
 authorization:
   local_repository_changes: require_current_user_instruction

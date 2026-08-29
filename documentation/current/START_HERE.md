@@ -43,14 +43,17 @@ the master synthesis, the long timeline, or a previous chat transcript.
   600-surface gate blocked on 439,906 exact / 935,276 normalized document-pattern pairs; bounded
   examples are object-only, so isolated ordinary cities/professions/industries cannot support a
   factual-contamination verdict by themselves;
-- next boundary: the frozen fact-pair repair preserves V1a read-only and blocks only when the same
-  document contains a synthetic subject plus that subject's answer under the frozen `fact_id`
-  binding (or `U+FFFD`); it writes a fresh root and stops before split/review/tokenizer accounting,
-  and requires a new exact SHA-bound authorization;
+- fact-pair job `481904` completed PASS over all 354,482 exact OSCAR documents: subject-only,
+  exact/normalized paired-fact and invalid-encoding counts are all zero; the prior atom hits are
+  therefore object/answer-only diagnostics, and all three terminal artifacts are hash-closed;
+- next boundary: the frozen seed-42 split/review handoff writes exact 344,482 train and 10,000
+  held-out ID lists plus a quartile-stratified 64-document review packet to a fresh root; it enters
+  no human verdict and stops before tokenizer accounting, Phase 2 and training, requiring a new
+  exact SHA-bound authorization;
 - M2 primary source direction: cleaned OSCAR-2201-derived rows within vngrs, pending exact label,
   volume and quality qualification; mC4 is excluded from main training and preserved;
-- vngrs: the selected mixed 32-shard reservoir is materialized but audit-blocked and not
-  training-ready;
+- vngrs: the 32-shard reservoir is materialized and the exact OSCAR fact-pair gate passed, but
+  split/review and later gates remain incomplete, so it is not training-ready;
 - M2 execution: not authorized; the diagnostic recovery, later selection and all training stages
   each require their own exact contract boundary and explicit user authorization.
 

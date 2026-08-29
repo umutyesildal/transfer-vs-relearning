@@ -40,6 +40,7 @@ from .d0_review import build_review_packet, decision_template, review_packet_sha
 from .d0_runtime import FrozenTokenizerAdapter, ReviewedHttpsTransport
 from .d0_preflight import validate_d0_preflight
 from .d0_inputs import load_source_objects, load_synthetic_fact_registry, load_synthetic_surfaces
+from .d0_oscar_split_review import run_oscar_split_review_handoff
 from .tokenizer_inventory import extract_tokenizer_inventory
 from .outputs import FINAL_AUDIT, OUTPUT_ARTIFACT_MANIFEST, OUTPUT_ORDER, serialize_output_artifact_manifest
 from .pipeline import FailClosedLidAdapter, VngrsPreparationConfig, evaluate_final_contract, prepare_records
@@ -91,6 +92,7 @@ __all__ = [
     "review_packet_sha256",
     "run_d0_orchestration",
     "run_d0_phase1",
+    "run_oscar_split_review_handoff",
     "finalize_d0_phase2",
     "select_systematic_shards",
     "serialize_output_artifact_manifest",
