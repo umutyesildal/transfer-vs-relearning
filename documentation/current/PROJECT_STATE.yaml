@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_oscar_coverage_validated_awaiting_human_review
+  status: m0_m1_complete_m2_oscar_human_review_pass_phase2_plan_local
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -103,7 +103,7 @@ scientific_design:
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: executed_oscar_coverage_validated_awaiting_human_review
+  corpus_contract: oscar_human_review_pass_phase2_plan_unimplemented
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -255,7 +255,7 @@ stage_readiness:
       - terminal_family_complete_no_duplicate_submission
   m2_training:
     corpus_contract_ready: false
-    corpus_contract_status: split_frozen_review_coverage_validated_awaiting_human_review
+    corpus_contract_status: split_frozen_review_coverage_and_human_review_pass_phase2_plan_local
     corpus_contract: documentation/contracts/corpora/vngrs-m2-oscar-review-coverage-repair-v1.md
     corpus_contract_sha256: f05b43faaee6f2561af85a693cfff35194c7b7aaa467911de68684d4b5163f06
     corpus_config: configs/corpora/vngrs_m2_oscar_review_coverage_v1.yaml
@@ -555,15 +555,29 @@ stage_readiness:
     oscar_review_coverage_final_audit_sha256: 6ce5f1f7b13fa61ae3f9c021b237b0464e4989ae179dc73fe32030049772c177
     oscar_review_coverage_result_record: documentation/186_VNGRS_OSCAR_REVIEW_COVERAGE_REPAIR_EXECUTION_RESULT_TR.md
     oscar_review_coverage_result_record_sha256: 4c0be5d15dc9c44178332d8ba3a9fc465b72e7c47f874a44dd1075c22c92d018
-    oscar_review_coverage_human_review_status: awaiting_64_manual_verdicts
-    oscar_review_coverage_human_verdict_entry: false
+    oscar_review_coverage_human_review_status: complete_pass_64_of_64_usable
+    oscar_review_coverage_human_verdict_entry: completed_locally_by_user
+    oscar_human_decision_ledger: artifacts/corpora/vngrs_m2_d0/human_review_decisions_73329e45fd8f.jsonl
+    oscar_human_decision_ledger_sha256: f6e1e2989de4593ca56707db6c3582f5efc7cd0bbd652ca965ef92ceeded7225
+    oscar_human_decision_canonical_sha256: f7e1c09d9a1135d9fc44ac702cdbf35c5ed23181bc979117af7102cc4ada466b
+    oscar_human_decision_id_set_sha256: 92468c08ad28c3fd0846b9ce897d2ab61c2793c59c1b7b5574a50daa9edf7820
+    oscar_human_decision_rows: 64
+    oscar_human_decision_usable: 64
+    oscar_human_decision_unusable: 0
+    oscar_human_decision_unsafe: 0
+    oscar_phase2_plan: documentation/187_VNGRS_OSCAR_HUMAN_REVIEW_RESULT_AND_PHASE2_PLAN_TR.md
+    oscar_phase2_plan_sha256: 3b7c07423d2b36c51bf4d518900d85eb8d7251b979ceab6c812fdc5c4ed117e9
+    oscar_phase2_plan_status: local_plan_unimplemented_unexecuted
+    oscar_phase2_proposed_output_root: /vol/tmp2/yesildau/vngrs_m2_oscar_phase2_evidence_v1
+    oscar_phase2_required_tokenizers: [olmo, qwen, smollm]
+    oscar_phase2_model_weight_access: false
     phase2_execution_authorized: false
     sibling_contract_ready: false
     execution_authorized: false
     ready_to_start: false
     blockers:
-      - human_review_decisions_not_completed
-      - phase2_ineligible_until_phase1_review_packet_and_separate_authorization
+      - phase2_operator_config_launcher_and_contract_not_implemented_or_frozen
+      - phase2_execution_not_authorized
       - m2_a_m2_b_matched_contract_not_frozen
       - three_m1_epoch036_parent_bindings_not_yet_frozen_in_m2_contract
 
@@ -1449,17 +1463,18 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: complete_authoritative_oscar_64_document_human_review
+  name: review_phase2_plan_then_implement_separately_if_requested
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: split_frozen_review_coverage_validated_awaiting_human_review
-  execution_boundary: no_phase2_or_training_until_64_human_verdicts_and_later_contract
+  m2_status: split_frozen_review_coverage_and_human_review_pass_phase2_plan_local
+  execution_boundary: no_phase2_until_implementation_frozen_contract_and_exact_authorization
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
     - preserve_lowercase_v1a_atom_audit_as_read_only_terminal_evidence
     - preserve_fact_pair_audit_pass_as_read_only_terminal_evidence
     - preserve_job_481906_split_and_packet_evidence_read_only
-    - collect_exactly_64_packet_bound_human_verdicts_locally
+    - preserve_exact_64_of_64_usable_human_decision_ledger
+    - keep_phase2_plan_unimplemented_until_user_requests_next_step
     - keep_phase2_and_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1469,7 +1484,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: complete_64_authoritative_oscar_human_verdicts
+  subject: approve_local_phase2_implementation_and_contract_preparation_if_desired
   decision_owner: user
   start_m1_now: false
   note: >-

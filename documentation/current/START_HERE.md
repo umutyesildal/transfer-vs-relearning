@@ -56,7 +56,13 @@ the master synthesis, the long timeline, or a previous chat transcript.
   verdicts, access tokenizers/models, open Phase 2 or train;
 - review-coverage job `481908` completed PASS: all 354,482 OSCAR documents genuinely belong to q0
   and q1--q3 are empty, so q0-only sampling is valid. The new authoritative 64-packet is bound to
-  semantic SHA `73329e45...` and awaits exactly 64 manual verdicts in the local HTML interface;
+  semantic SHA `73329e45...`;
+- human review is complete and packet-bound: 64/64 unique documents were marked `usable`, with
+  zero `unusable` or `unsafe`; the exact decision ledger is tracked and hash-closed;
+- Phase 2 has a local unexecuted plan in Document 187: revalidate population/split/decisions, load
+  only the exact OLMo/Qwen/SmolLM tokenizer assets, and produce train/held-out token accounting.
+  Operator/config/launcher/contract are not implemented or frozen yet; no tokenizer/model/HU job,
+  Phase 2 execution or training is authorized;
 - M2 primary source direction: cleaned OSCAR-2201-derived rows within vngrs, pending exact label,
   volume and quality qualification; mC4 is excluded from main training and preserved;
 - vngrs: the reservoir is materialized, the OSCAR fact-pair gate passed and the split is frozen;
