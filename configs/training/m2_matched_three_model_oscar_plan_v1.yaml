@@ -1,0 +1,146 @@
+schema_version: 1
+name: m2-matched-three-model-oscar-plan-v1
+status: design_frozen_non_executable
+execution_authorized: false
+as_of: "2026-08-30"
+
+scientific_design:
+  models: [olmo, qwen, smollm]
+  states: [M1, M2-A, M2-B]
+  sibling_parent: M1
+  m2_a_role: fact_free_turkish_oscar_adaptation
+  m2_b_role: matched_turkish_oscar_adaptation_with_branch_b_factual_reexposure
+  primary_estimand: tr_to_en_m2_b_minus_m2_a
+  transfer_estimand: tr_to_en_m2_a_minus_m1
+  cross_model_ranking_primary: false
+
+parents:
+  family_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1
+  checkpoint: epoch-036
+  seed: 42
+  exact_manifest_and_weight_hash_capture_required: true
+  olmo:
+    path: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/olmo/20260822T155242Z_m1_matched_epoch_dense_olmo_seed42_30cd6396/epoch_snapshots/epoch-036
+  qwen:
+    path: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/qwen/20260822T155241Z_m1_matched_epoch_dense_qwen_seed42_7c56e187/epoch_snapshots/epoch-036
+  smollm:
+    path: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/smollm/20260822T155242Z_m1_matched_epoch_dense_smollm_seed42_081e6e29/epoch_snapshots/epoch-036
+
+corpus:
+  source: vngrs_lowercase_oscar
+  source_root: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v3
+  split_root: /vol/tmp2/yesildau/vngrs_m2_oscar_split_review_v1
+  split_sha256: 21f43359570ea66a73e969c1d0e8b4f08408f8ebbb71f50fc40dbd0d7e16f38f
+  train_documents: 344482
+  train_utf8_bytes: 1509633962
+  heldout_documents: 10000
+  heldout_utf8_bytes: 44289171
+  human_review: 64_of_64_usable
+  m2_a_target_fact_hits_required: 0
+  document_order: stable_document_id_seed42_deterministic_shuffle
+  trwiki_role: cross_domain_control_only
+
+model_native_train_token_inventory:
+  olmo: 527542206
+  qwen: 450578318
+  smollm: 688976056
+
+training:
+  objective: full_sequence_causal_language_modeling
+  tokenizer_extension: false
+  english_replay: false
+  sequence_length: 512
+  target_blocks_per_arm: 97536
+  target_model_native_tokens_per_arm: 49938432
+  corpus_cycling: none
+  corpus_pass_fraction_is_model_specific_and_must_be_reported: true
+  learning_rate: 1.0e-5
+  scheduler: constant_with_warmup
+  warmup_ratio: 0.02
+  weight_decay: 0.0
+  adam_beta1: 0.9
+  adam_beta2: 0.999
+  adam_epsilon: 1.0e-8
+  max_grad_norm: 1.0
+  precision: bfloat16
+  gradient_checkpointing: true
+  seed: 42
+  data_seed: 42
+  effective_blocks_per_update: 128
+  effective_tokens_per_update: 65536
+  optimizer_updates: 762
+  model_specific_microbatch_and_accumulation: required_memory_safe_decomposition
+  final_update_must_equal: 762
+
+factual_reexposure:
+  arm: M2-B
+  branch: B
+  branch_a_exposures: 0
+  source_population: relation_v2_gate_v1_acquisition_100_subjects_direct
+  expected_unique_facts: 250
+  row_style: one_frozen_turkish_declarative_sentence_per_fact
+  target_replacement_blocks: 976
+  target_replacement_share: 0.0100066
+  scheduling: evenly_spaced_deterministic_complete_fact_cycles
+  packing: complete_fact_boundaries_then_generic_tail
+  extra_tokens_over_m2_a: 0
+  exact_fact_exposures_and_factual_token_share: must_be_materialized_and_frozen_before_training
+
+checkpoint_and_evaluation:
+  dose_updates: [0, 76, 152, 229, 305, 381, 457, 533, 610, 686, 762]
+  model_only_snapshot_updates: [76, 152, 229, 305, 381, 457, 533, 610, 686, 762]
+  dense_eval_updates: [0, 76, 152, 229, 305, 381, 457, 533, 610, 686, 762]
+  full_eval_updates: [0, 381, 762]
+  dense_bundles:
+    - training_trace
+    - factual_access_cheap
+    - exact_prefix_500
+    - wikitext_word_byte_ppl_bpb
+    - oscar_heldout_word_byte_ppl_bpb
+    - trwiki_cross_domain_control
+    - generation_integrity_cheap
+  full_bundles:
+    - factual_access_full
+    - english_capability_eval_v2
+    - turkish_capability_eval_v2
+    - generation_integrity_full
+  evaluation_contract: documentation/contracts/evaluation/eval-v2.md
+  evaluation_contract_sha256: 95eec6fc5a9dd7ce6da3185dfe20e2a183ad3850194c15f88a1299f09a43c6a3
+  pile_10k: retired_forbidden
+  checkpoint_selection: fixed_endpoint_762_primary_all_intermediate_trajectory_only
+
+gates:
+  m2_a_turkish_manipulation:
+    oscar_heldout_bpb_delta_max: -0.07400058144377693
+    equivalent_byte_ppl_ratio_max: 0.95
+    turblimp_absolute_drop_max: 0.05
+  english_retention:
+    wikitext_bpb_delta_max: 0.32192809488736235
+    blimp_absolute_drop_max: 0.05
+    hellaswag_acc_norm_absolute_drop_max: 0.05
+    en_to_en_factual_drop_max: 0.05
+  causal_effect:
+    point_gain_min: 0.05
+    bootstrap_unit: subject_id
+    bootstrap_draws: 10000
+    bootstrap_seed: 42
+    lower_bound_must_be_strictly_positive: true
+
+execution_blockers:
+  - direct_read_only_parent_manifest_and_weight_hash_capture_not_completed
+  - turkish_branch_b_fact_registry_not_materialized_or_human_audited
+  - model_specific_packed_block_manifests_not_materialized
+  - model_specific_microbatch_accumulation_and_optimizer_smoke_not_frozen
+  - storage_runtime_and_gpu_route_not_frozen
+  - training_and_evaluation_dag_not_implemented_or_tested
+  - exact_execution_contract_not_frozen
+  - exact_user_authorization_not_supplied
+
+prohibitions:
+  - hu_or_ssh_from_this_plan
+  - slurm_or_gpu_from_this_plan
+  - model_weight_access_from_this_plan
+  - training_or_evaluation_from_this_plan
+  - push_or_publication_from_this_plan
+  - cleanup_or_deletion
+  - automatic_retry

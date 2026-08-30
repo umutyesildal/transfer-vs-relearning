@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_oscar_phase2_evidence_complete_m2_training_contract_not_frozen
+  status: m0_m1_complete_m2_oscar_phase2_evidence_complete_m2_design_frozen_non_executable
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -260,6 +260,19 @@ stage_readiness:
     corpus_contract_sha256: a2a362768d894465faf0c621dc89e04cfcea6bb85e58d7aa0e16beb28713f3d0
     corpus_config: configs/corpora/vngrs_m2_oscar_phase2_evidence_v1a.yaml
     corpus_config_sha256: a783260a8e00f476455ab7695dd9b0f1a2a2ba6ca7188faf7d001f804e57c26a
+    matched_training_plan: documentation/191_M2_MATCHED_THREE_MODEL_OSCAR_TRAINING_AND_MEASUREMENT_PLAN_TR.md
+    matched_training_plan_sha256: 295b4a68402e0ba010860475f2395238e9a6978649372b0b02a494459f1c3fb0
+    matched_training_plan_status: design_frozen_non_executable
+    matched_training_plan_config: configs/training/m2_matched_three_model_oscar_plan_v1.yaml
+    matched_training_plan_config_sha256: 2c8d3aae2a631dc8e1eb7c8bcaccb4dcb300ad3a84d62875520fd62facc94494
+    matched_training_target_tokens_per_arm: 49938432
+    matched_training_target_blocks_per_arm: 97536
+    matched_training_sequence_length: 512
+    matched_training_optimizer_updates: 762
+    matched_training_factual_replacement_blocks: 976
+    matched_training_primary_endpoint_update: 762
+    matched_training_dense_eval_updates: [0, 76, 152, 229, 305, 381, 457, 533, 610, 686, 762]
+    matched_training_full_eval_updates: [0, 381, 762]
     prior_v2_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v2.md
     prior_v2_contract_sha256: a8d84224476d3b307dc73f5144ebb7ebf21b8330b8c0e84020c285ce1ba23e20
     prior_v1_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
@@ -1516,7 +1529,7 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: preserve_phase2_pass_and_prepare_matched_m2_a_m2_b_training_contract
+  name: implement_m2_parent_fact_registry_and_block_materialization_preparation
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
   m2_status: phase2_v1a_pass_training_contract_not_frozen
@@ -1528,7 +1541,8 @@ active_priority:
     - preserve_job_481906_split_and_packet_evidence_read_only
     - preserve_exact_64_of_64_usable_human_decision_ledger
     - preserve_job_481980_phase2_terminal_pass_artifacts_read_only
-    - prepare_matched_m2_a_m2_b_training_and_epoch_measurement_plan_locally
+    - preserve_frozen_non_executable_document_191_m2_design
+    - prepare_exact_parent_fact_registry_and_block_materialization_implementation_locally
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1538,7 +1552,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: freeze_matched_three_model_m2_a_m2_b_training_and_measurement_contract
+  subject: implement_and_freeze_bounded_m2_parent_fact_registry_and_block_materialization_preparation
   decision_owner: user
   start_m1_now: false
   note: >-

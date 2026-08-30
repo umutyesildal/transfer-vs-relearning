@@ -76,7 +76,13 @@ the master synthesis, the long timeline, or a previous chat transcript.
   held-out split, 64/64 usable human review and three-model tokenizer accounting are complete. mC4
   is excluded from main training and preserved;
 - vngrs: Phase-2 evidence is `D0_EVIDENCE_COMPLETE`, but `ready_to_train=false` because the matched
-  M2-A/M2-B training, checkpoint and epoch-measurement contract is not yet frozen;
+  M2-A/M2-B execution contract is not yet frozen;
+- M2 design: Document 191 freezes a non-executable three-model plan at 49,938,432 model-native
+  tokens per arm, 762 updates, 512-token blocks, approximately 1% Branch-B factual replacement,
+  dense evaluation every approximately 10% dose and full eval-v2 at entry/midpoint/endpoint;
+- M2 preparation: exact epoch-036 parent hashes, Turkish Branch-B fact registry/review, packed
+  block manifests, memory decomposition, storage/runtime estimates and tested DAG are still
+  missing; this design freeze authorizes none of those external actions;
 - M2 execution: not authorized; the three-model sibling-arm training plan and execution contract
   must be frozen first, then separately and exactly authorized by the user.
 

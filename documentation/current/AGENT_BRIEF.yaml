@@ -5,13 +5,13 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 6852200e98a96871d3e9b9de62908401d6f3c37ecd699451f01a7c9ff7e5d4fa
+  full_state_sha256: 482b1ea91423bfa20e42ad3e6e2219178ec2d5f13389055e1de492eb74b87d3c
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: m2_oscar_phase2_evidence_complete_training_contract_not_frozen
+  phase: m2_oscar_phase2_complete_design_frozen_non_executable
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
@@ -50,6 +50,10 @@ stage_readiness:
   m2_human_review_handoff: complete_pass_64_of_64_usable_packet_bound_decisions
   m2_required_models: [olmo, qwen, smollm]
   m2_sibling_training_contract: not_frozen
+  m2_design_plan: frozen_non_executable_document_191
+  m2_target_tokens_per_arm: 49938432
+  m2_optimizer_updates: 762
+  m2_factual_replacement_blocks: 976
 
 evaluation:
   active_contract_name: eval-v2
@@ -77,15 +81,15 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: freeze_matched_three_model_m2_a_m2_b_training_and_measurement_contract
-  plan: documentation/190_VNGRS_OSCAR_PHASE2_V1A_EXECUTION_RESULT_AND_GATE_TR.md
-  contract: documentation/contracts/corpora/vngrs-m2-oscar-phase2-evidence-v1a.md
-  config: configs/corpora/vngrs_m2_oscar_phase2_evidence_v1a.yaml
+  subject: implement_and_freeze_bounded_m2_parent_fact_registry_and_block_materialization_preparation
+  plan: documentation/191_M2_MATCHED_THREE_MODEL_OSCAR_TRAINING_AND_MEASUREMENT_PLAN_TR.md
+  contract: null
+  config: configs/training/m2_matched_three_model_oscar_plan_v1.yaml
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user
     - offline_tests_and_dry_runs
     - read_only_phase2_v1a_terminal_artifact_verification
-    - prepare_local_matched_m2_a_m2_b_training_and_epoch_measurement_plan
+    - prepare_local_parent_fact_registry_and_block_materialization_code_tests_and_contract
   not_implied:
     - hu_or_ssh
     - slurm_or_gpu
