@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 0a79c6937f62097e28423abb684ddcdf4f4439b82942add361a5a02cfea53c97
+  full_state_sha256: c326c265c7bec0d6a862b80206a4c4f159243f704dec7bc3ce8355ee7faf90a2
   role: context_projection_only
   may_expand_authority: false
 
@@ -61,6 +61,11 @@ stage_readiness:
   m2_training_preparation_record: documentation/193_M2_THREE_MODEL_TRAINING_PREPARATION_IMPLEMENTATION_TR.md
   m2_training_preparation_config: configs/training/m2_three_model_oscar_training_preparation_v1.yaml
   m2_exact_checkpoint_updates: [76, 152, 229, 305, 381, 457, 533, 610, 686, 762]
+  m2_local_training_output_binding: exact_60_checkpoint_model_only_finalizer_pass
+  m2_local_eval_v2_matrix: 60_dense_12_full_3_projected_parent_states_non_executable
+  m2_eval_v2_preparation_record: documentation/194_M2_TRAINING_OUTPUT_AND_EVAL_V2_MATRIX_PREPARATION_TR.md
+  m2_eval_execution_adapter_registered: false
+  m2_ready_to_evaluate: false
 
 evaluation:
   active_contract_name: eval-v2
@@ -98,6 +103,7 @@ next_boundary:
     - read_only_phase2_v1a_terminal_artifact_verification
     - preserve_local_exact_block_implementation_tests_and_frozen_contract
     - preserve_local_training_config_validator_and_smoke_training_dag_preparation
+    - preserve_local_training_output_finalizer_and_eval_v2_matrix_preparation
   not_implied:
     - hu_or_ssh
     - slurm_or_gpu

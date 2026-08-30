@@ -132,17 +132,21 @@ def test_m2_smoke_and_training_dag_is_syntax_valid_and_authorization_gated() -> 
         ROOT / "slurm/m2/smoke_three_model_oscar_m2.slurm",
         ROOT / "slurm/m2/train_three_model_oscar_m2.slurm",
         ROOT / "scripts/m2/submit_three_model_oscar_m2_training.sh",
+        ROOT / "slurm/m2/finalize_three_model_oscar_m2_training.slurm",
     ]
     for path in paths:
         subprocess.run(["bash", "-n", str(path)], check=True)
     smoke = paths[0].read_text(encoding="utf-8")
     training = paths[1].read_text(encoding="utf-8")
     submit = paths[2].read_text(encoding="utf-8")
+    finalizer = paths[3].read_text(encoding="utf-8")
     assert "#SBATCH --array=0-2%1" in smoke
     assert "OPTIMIZER_SMOKE_PASS" in smoke
     assert "#SBATCH --array=0-5%3" in training
     assert "afterok:${smoke_id}" in submit
     assert "M2_TRAINING_AUTHORIZATION_ACK" in submit
     assert "EXPECTED_CONTRACT_SHA256" in submit
+    assert "afterok:${train_id}" in submit
+    assert "finalize_three_model_oscar_m2_training_family.py" in finalizer
     assert "/vol/tmp2/yesildau/vngrs_m2_oscar_training_family_v1/logs" in smoke
     assert "/vol/tmp2/yesildau/vngrs_m2_oscar_training_family_v1/logs" in training

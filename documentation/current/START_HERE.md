@@ -92,6 +92,9 @@ the master synthesis, the long timeline, or a previous chat transcript.
   non-uniform checkpoint callback for updates 76..762 and an authorization-gated three-model
   optimizer-smoke → six-run training DAG fixture. It is non-executable; evaluation adapters and a
   final training contract remain open;
+- M2 local output/evaluation preparation: Document 194 adds the exact 60-checkpoint model-only
+  finalizer and a 60-dense/12-full/3-projected-parent eval-v2 matrix. The M2 runtime evaluation
+  adapter is intentionally unregistered, so inference/scoring remains impossible and unauthorized;
 - M2 execution: not authorized; the three-model sibling-arm training plan and execution contract
   must be frozen first, then separately and exactly authorized by the user.
 

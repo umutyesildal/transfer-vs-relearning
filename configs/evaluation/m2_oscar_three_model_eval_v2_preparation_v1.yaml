@@ -1,0 +1,52 @@
+schema_version: 1
+name: m2-oscar-three-model-eval-v2-preparation-v1
+status: local_preparation_non_executable
+execution_authorized: false
+
+protocol:
+  contract: documentation/contracts/evaluation/eval-v2.md
+  contract_sha256: 95eec6fc5a9dd7ce6da3185dfe20e2a183ad3850194c15f88a1299f09a43c6a3
+  registry: configs/evaluation/eval_v2_registry.yaml
+  registry_sha256: 0721412c651f5b112f531e69b53c98ccdb3633bee4888571bd7039d3f693229d
+  pile_10k: retired_forbidden
+
+m1_parent_projection:
+  source: artifacts/evaluations/m1_three_model_v1/dump/m1_metrics.json
+  source_sha256: 41c2f2c6b722fc25ac48af278f1b318acc5e743b3c48d649fe26259848080462
+  state_count: 3
+  rescoring: false
+
+matrix:
+  models: [olmo, qwen, smollm]
+  arms: [M2-A, M2-B]
+  checkpoint_updates: [76, 152, 229, 305, 381, 457, 533, 610, 686, 762]
+  full_updates: [381, 762]
+  gpu_checkpoint_states: 60
+  full_checkpoint_states: 12
+  projected_m1_parent_states: 3
+  unique_scientific_states: 63
+  dense_bundles:
+    - factual_access_cheap
+    - exact_prefix_500
+    - wikitext_word_byte_ppl_bpb
+    - oscar_heldout_word_byte_ppl_bpb
+    - trwiki_cross_domain_control
+    - generation_integrity_cheap
+  full_bundles:
+    - factual_access_full_12000
+    - english_capability_eval_v2
+    - turkish_capability_eval_v2
+    - generation_integrity_full
+
+output:
+  root: /vol/tmp2/yesildau/vngrs_m2_oscar_eval_v2_v1
+  fresh_and_absent_required: true
+
+authority:
+  local_matrix_preparation: true
+  hu_ssh: false
+  gpu: false
+  inference_or_scoring: false
+  training: false
+  cleanup_or_deletion: false
+  automatic_retry: false

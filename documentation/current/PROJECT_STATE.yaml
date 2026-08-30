@@ -296,6 +296,19 @@ stage_readiness:
     local_training_candidate_gradient_accumulation: 32
     local_training_candidate_effective_blocks_per_update: 128
     local_training_exact_checkpoint_updates: [76, 152, 229, 305, 381, 457, 533, 610, 686, 762]
+    local_training_output_finalizer_sha256: 9948c88cd149a4f0b21d99747f97f5a555539a842f231c17aec4fd2694294492
+    local_training_family_finalizer_sha256: 925cfc51d0c5266e14101e230eb94725343b993981c38eb33dddeea9b32c94e7
+    local_eval_v2_preparation_record: documentation/194_M2_TRAINING_OUTPUT_AND_EVAL_V2_MATRIX_PREPARATION_TR.md
+    local_eval_v2_preparation_record_sha256: 0ca45afeb63c0e41a79053d046d893b59db89307b18a4effe6214f0dad327d81
+    local_eval_v2_preparation_config: configs/evaluation/m2_oscar_three_model_eval_v2_preparation_v1.yaml
+    local_eval_v2_preparation_config_sha256: c18fc30ca8afa998bc4db6096e34a80e1afe1e54707ffa70ab24558f79592d05
+    local_eval_v2_matrix_builder_sha256: c5039f6f6a7f4f0153d47c6562f89d9eaf4405a12f7aadb99fe0dd661ae35ade
+    local_eval_v2_gpu_checkpoint_states: 60
+    local_eval_v2_full_checkpoint_states: 12
+    local_eval_v2_projected_m1_states: 3
+    local_eval_v2_unique_scientific_states: 63
+    local_eval_v2_execution_adapter_registered: false
+    local_eval_v2_ready_to_evaluate: false
     prior_v2_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v2.md
     prior_v2_contract_sha256: a8d84224476d3b307dc73f5144ebb7ebf21b8330b8c0e84020c285ce1ba23e20
     prior_v1_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
@@ -1567,6 +1580,7 @@ active_priority:
     - preserve_frozen_non_executable_document_191_m2_design
     - preserve_local_exact_block_implementation_and_15_test_pass
     - preserve_local_six_config_generator_validator_and_authorization_gated_smoke_training_dag
+    - preserve_local_training_output_finalizer_and_execution_disabled_eval_v2_matrix_preparation
     - await_exact_sha_bound_cpu_materialization_authorization
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
@@ -1646,7 +1660,9 @@ next_decision_required:
     193 additionally records the local six-config generator/validator, exact non-uniform
     checkpoint callback and authorization-gated three-smoke to six-training DAG fixture PASS.
     That preparation is also non-executable; parent registry, fact review, real optimizer smoke,
-    evaluation adapter and exact training contract remain open.
+    evaluation adapter and exact training contract remain open. Document 194 adds exact 60
+    checkpoint model-only binding and a 60-dense/12-full/3-parent-projection eval-v2 matrix, while
+    deliberately leaving `execution_adapter_registered=false` and `ready_to_evaluate=false`.
 
 authorization:
   local_repository_changes: require_current_user_instruction

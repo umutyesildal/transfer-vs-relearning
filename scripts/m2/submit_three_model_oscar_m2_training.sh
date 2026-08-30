@@ -18,4 +18,5 @@ sbatch --test-only --output=/dev/null --error=/dev/null --export="$exports" slur
 smoke_id="$(sbatch --parsable --output=/dev/null --error=/dev/null --export="$exports" slurm/m2/smoke_three_model_oscar_m2.slurm)"
 train_exports="${exports},SMOKE_JOB_ID=${smoke_id}"
 train_id="$(sbatch --parsable --dependency="afterok:${smoke_id}" --export="$train_exports" slurm/m2/train_three_model_oscar_m2.slurm)"
-printf 'smoke_job_id=%s\ntraining_job_id=%s\n' "$smoke_id" "$train_id"
+finalize_id="$(sbatch --parsable --dependency="afterok:${train_id}" --export="$exports" slurm/m2/finalize_three_model_oscar_m2_training.slurm)"
+printf 'smoke_job_id=%s\ntraining_job_id=%s\nfinalize_job_id=%s\n' "$smoke_id" "$train_id" "$finalize_id"
