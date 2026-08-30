@@ -92,6 +92,11 @@ the master synthesis, the long timeline, or a previous chat transcript.
   algorithm, persistent progress/exception/Slurm/resource evidence and 20 passing tests. Contract
   SHA is `d49a221a7b1f8b02682330b4d46762cc57140023a5426f0f5ad77b4d10f8e0d9`; it is unexecuted and
   needs separate exact user authorization;
+- M2 recovery queue/relocation: authorized job `482007` is pending on 8 CPU / 128G with reason
+  `Priority`. Document 197 freezes an unexecuted pending-only relocation to 4 CPU after 03:00
+  Europe/Berlin. It may hold/cancel `482007` only if scientific execution has not begun and then
+  submit one fresh-root 4-CPU job; contract SHA is
+  `29b95dedc826c43e833d4332fe2a8756907436fe1f2a3981d5daf602ddf35413`;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;

@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_exact_block_recovery_frozen_unexecuted
+  status: m0_m1_complete_m2_recovery_queued_4cpu_relocation_frozen_unexecuted
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -305,6 +305,18 @@ stage_readiness:
     exact_block_recovery_compatible_tests: 20
     exact_block_recovery_execution_authorized: false
     exact_block_recovery_automatic_retry_authorized: false
+    exact_block_recovery_active_job: "482007"
+    exact_block_recovery_active_job_state: pending_priority
+    exact_block_recovery_active_job_cpus: 8
+    exact_block_recovery_active_job_memory: 128G
+    exact_block_recovery_4cpu_relocation_contract: documentation/contracts/corpora/vngrs-m2-oscar-exact-block-materialization-recovery-4cpu-relocation-v1.md
+    exact_block_recovery_4cpu_relocation_contract_sha256: 29b95dedc826c43e833d4332fe2a8756907436fe1f2a3981d5daf602ddf35413
+    exact_block_recovery_4cpu_relocation_config: configs/corpora/vngrs_m2_oscar_exact_blocks_recovery_4cpu_v1.yaml
+    exact_block_recovery_4cpu_relocation_config_sha256: 3b295a23bb1051adf66e45d3a2151941c972b2ce50c16161274632ec57122ac2
+    exact_block_recovery_4cpu_relocation_record: documentation/197_M2_OSCAR_RECOVERY_4CPU_CONDITIONAL_RELOCATION_PREPARATION_TR.md
+    exact_block_recovery_4cpu_relocation_record_sha256: 104769ef8a67f94540827c70425378afd66c7c1abf6472c95851c0f9bb09a2e1
+    exact_block_recovery_4cpu_relocation_status: frozen_unexecuted_conditional_pending_only
+    exact_block_recovery_4cpu_relocation_execution_authorized: false
     exact_block_materialization_train_blocks_per_arm: 97536
     exact_block_materialization_validation_blocks_per_model: 2048
     exact_block_materialization_branch_b_facts: 250
@@ -1591,10 +1603,10 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: authorize_and_execute_single_fail_persistent_exact_block_recovery_cpu_wave
+  name: monitor_482007_then_conditionally_relocate_to_4cpu_after_0300
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: exact_block_recovery_frozen_unexecuted_training_contract_not_frozen
+  m2_status: exact_block_recovery_482007_pending_4cpu_relocation_frozen_unexecuted
   execution_boundary: no_m2_training_until_matched_contract_is_frozen_and_exactly_authorized
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
@@ -1610,7 +1622,10 @@ active_priority:
     - preserve_job_481990_partial_root_as_read_only_terminal_evidence
     - preserve_document_195_terminal_partial_result
     - preserve_frozen_document_196_recovery_preparation_and_20_test_pass
-    - await_exact_sha_bound_recovery_authorization
+    - preserve_authorized_job_482007_single_submission_and_persistent_root
+    - monitor_482007_at_0030_0045_0100_0200_0300
+    - preserve_frozen_document_197_pending_only_4cpu_relocation
+    - await_exact_sha_bound_conditional_relocation_authorization
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1620,7 +1635,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_single_fail_persistent_exact_block_materialization_recovery_cpu_wave
+  subject: authorize_conditional_pending_only_4cpu_relocation_after_0300
   decision_owner: user
   start_m1_now: false
   note: >-

@@ -1,0 +1,119 @@
+schema_version: 1
+contract_id: vngrs-m2-oscar-exact-block-materialization-recovery-4cpu-relocation-v1
+status: frozen_unexecuted
+execution_authorized: false
+contract: documentation/contracts/corpora/vngrs-m2-oscar-exact-block-materialization-recovery-4cpu-relocation-v1.md
+
+superseded_pending_wave:
+  job_id: 482007
+  required_state_at_relocation: PENDING
+  required_reason_after_transaction_hold: JobHeldUser
+  root: /vol/tmp2/yesildau/vngrs_m2_oscar_exact_blocks_recovery_v1
+  access: read_only
+  exact_files: 2
+  submission_state_sha256: 2eb731f41f3fcce810b6c7153ed50ea6823e2cc1a311eb180f794a35756e792c
+  submission_result_sha256: 2c099abba7d6da631228dee8721bb06bf8a0c7a30aee57ba5f8bf260deccf66b
+  progress_absent: true
+  slurm_logs_absent: true
+  scientific_execution_started: false
+
+predecessor:
+  root: /vol/tmp2/yesildau/vngrs_m2_oscar_exact_blocks_v1
+  access: read_only
+  exact_files: 1
+  exact_root_bytes: 114186
+  fact_path: facts/branch_b_turkish_facts.jsonl
+  fact_rows: 250
+  fact_bytes: 105994
+  fact_sha256: 784f78a5a182c329b4b995ee1a97c580da994059a18b1f9702ec657569ccbfec
+  block_files: 0
+  terminal_manifest_present: false
+
+source:
+  root: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v3
+  access: read_only
+  materialization_manifest_sha256: bb413e9acafd0d891ea9c4461abc77acea1c737489560650db56dacf781dbd10
+  object_count: 32
+  object_bytes: 9502315428
+  selected_corpus: oscar
+  document_count: 354482
+  utf8_bytes: 1553923133
+
+split:
+  root: /vol/tmp2/yesildau/vngrs_m2_oscar_split_review_v1
+  access: read_only
+  train_ids_sha256: 90b74fbcfe62107693c35161fc328a6e43b13a830fc9590cc9810d3e99955aac
+  heldout_ids_sha256: dc30629fe76ca722745fcd0148021de6c042218ed2994281d52d13c06011dc91
+  train_documents: 344482
+  heldout_documents: 10000
+
+repository_inputs:
+  artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/summary.json: a975263abb03d887fa224fb94d402f1fad852afe1ec03cd69226c0874cc32d3b
+  artifacts/datasets/relation_v2_gate_v1/data/canonical_subject_profiles_5000.csv: 60dd741f8ef2815755beafa8bb5799f4112af3d94b1b8c4c171bfef28b07e6c1
+  artifacts/corpora/vngrs_m2_d0/tokenizer_manifest_inventory_v1a.json: 72e1c51538a0a801a0fc766faea8af771fb126e190faefd19a0705af3a8886f9
+
+facts:
+  selected_subjects: artifacts/datasets/relation_v2_gate_v1/acquisition_100_subjects_direct/summary.json
+  canonical_profiles: artifacts/datasets/relation_v2_gate_v1/data/canonical_subject_profiles_5000.csv
+  registry_version: m2_oscar_relation_v2_100_subjects_v1
+  expected_unique_facts: 250
+
+tokenizers:
+  inventory: artifacts/corpora/vngrs_m2_d0/tokenizer_manifest_inventory_v1a.json
+  roles: [olmo, qwen, smollm]
+  models:
+    olmo:
+      snapshot_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/olmo/20260822T155242Z_m1_matched_epoch_dense_olmo_seed42_30cd6396/epoch_snapshots/epoch-036
+    qwen:
+      snapshot_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/qwen/20260822T155241Z_m1_matched_epoch_dense_qwen_seed42_7c56e187/epoch_snapshots/epoch-036
+    smollm:
+      snapshot_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/smollm/20260822T155242Z_m1_matched_epoch_dense_smollm_seed42_081e6e29/epoch_snapshots/epoch-036
+
+packing:
+  block_size: 512
+  train_blocks: 97536
+  train_tokens_per_arm: 49938432
+  validation_blocks: 2048
+  validation_tokens: 1048576
+  replacement_blocks: 976
+  document_order_namespace: vngrs-m2-oscar-exact-blocks-v1
+  seed: 42
+  corpus_cycling: false
+  add_special_tokens: false
+  whole_fact_boundaries: true
+  generic_tail_preserved: true
+  streaming_writer: true
+  release_non_oscar_population_before_tokenization: true
+
+output:
+  root: /vol/tmp2/yesildau/vngrs_m2_oscar_exact_blocks_recovery_4cpu_v1
+  fresh_and_absent_before_submission: true
+  submitter_precreates_control_only: true
+  persistent_slurm_logs: true
+  persistent_progress_audit: true
+  persistent_failure_audit: true
+  minimum_available_bytes: 10737418240
+  minimum_available_inodes: 4096
+  raw_corpus_text_persisted: false
+  token_ids_persisted: true
+  ready_to_train: false
+
+resources:
+  cpus_per_task: 4
+  memory: 128G
+  time_limit: "06:00:00"
+  gpu: false
+
+authority:
+  local_preparation: true
+  publication: false
+  hu_ssh: false
+  hold_pending_job_482007: false
+  cancel_pending_job_482007: false
+  slurm_cpu: false
+  model_weight_access: false
+  gpu: false
+  training: false
+  evaluation: false
+  cleanup_or_deletion: false
+  automatic_retry: false
