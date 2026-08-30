@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_oscar_phase2_evidence_complete_m2_design_frozen_non_executable
+  status: m0_m1_complete_m2_oscar_phase2_complete_exact_block_wave_frozen_unexecuted
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -273,6 +273,17 @@ stage_readiness:
     matched_training_primary_endpoint_update: 762
     matched_training_dense_eval_updates: [0, 76, 152, 229, 305, 381, 457, 533, 610, 686, 762]
     matched_training_full_eval_updates: [0, 381, 762]
+    exact_block_materialization_contract: documentation/contracts/corpora/vngrs-m2-oscar-exact-block-materialization-v1.md
+    exact_block_materialization_contract_sha256: f8abbd417e7dd82f524c3691872bb40c4efb9a1988f1920ad363bd1c6cd4dc1c
+    exact_block_materialization_config: configs/corpora/vngrs_m2_oscar_exact_blocks_v1.yaml
+    exact_block_materialization_config_sha256: d476b8f5f38d972d9c8d075c3af910a1355b3272c65255dd91787058f64f42ec
+    exact_block_materialization_status: frozen_unexecuted_cpu_only
+    exact_block_materialization_output_root: /vol/tmp2/yesildau/vngrs_m2_oscar_exact_blocks_v1
+    exact_block_materialization_train_blocks_per_arm: 97536
+    exact_block_materialization_validation_blocks_per_model: 2048
+    exact_block_materialization_branch_b_facts: 250
+    exact_block_materialization_replacement_blocks: 976
+    exact_block_materialization_ready_to_train: false
     prior_v2_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v2.md
     prior_v2_contract_sha256: a8d84224476d3b307dc73f5144ebb7ebf21b8330b8c0e84020c285ce1ba23e20
     prior_v1_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
@@ -1529,10 +1540,10 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: implement_m2_parent_fact_registry_and_block_materialization_preparation
+  name: authorize_and_execute_single_m2_exact_block_cpu_wave
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: phase2_v1a_pass_training_contract_not_frozen
+  m2_status: exact_block_materialization_frozen_unexecuted_training_contract_not_frozen
   execution_boundary: no_m2_training_until_matched_contract_is_frozen_and_exactly_authorized
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
@@ -1542,7 +1553,8 @@ active_priority:
     - preserve_exact_64_of_64_usable_human_decision_ledger
     - preserve_job_481980_phase2_terminal_pass_artifacts_read_only
     - preserve_frozen_non_executable_document_191_m2_design
-    - prepare_exact_parent_fact_registry_and_block_materialization_implementation_locally
+    - preserve_local_exact_block_implementation_and_15_test_pass
+    - await_exact_sha_bound_cpu_materialization_authorization
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1552,7 +1564,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: implement_and_freeze_bounded_m2_parent_fact_registry_and_block_materialization_preparation
+  subject: authorize_single_exact_three_model_oscar_block_materialization_cpu_wave
   decision_owner: user
   start_m1_now: false
   note: >-
@@ -1613,7 +1625,11 @@ next_decision_required:
     final-audit SHA is `3f3d19f...`; no model weight, GPU, training or tokenized-corpus persistence
     occurred. Phase-2 evidence is complete, while `ready_to_train=false` remains mandatory until
     the matched three-model M2-A/M2-B training and measurement contract is frozen and separately
-    authorized.
+    authorized. Document 192 now records the locally implemented exact block operator and its
+    15-test PASS. Contract `vngrs-m2-oscar-exact-block-materialization-v1`, SHA
+    `f8abbd417e7dd82f524c3691872bb40c4efb9a1988f1920ad363bd1c6cd4dc1c`, freezes one still-
+    unexecuted CPU wave producing three model-native matched M2-A/M2-B block pairs plus shared
+    validation blocks. It authorizes nothing by itself; HU, push and Slurm remain false.
 
 authorization:
   local_repository_changes: require_current_user_instruction

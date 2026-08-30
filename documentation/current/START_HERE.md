@@ -80,9 +80,14 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - M2 design: Document 191 freezes a non-executable three-model plan at 49,938,432 model-native
   tokens per arm, 762 updates, 512-token blocks, approximately 1% Branch-B factual replacement,
   dense evaluation every approximately 10% dose and full eval-v2 at entry/midpoint/endpoint;
-- M2 preparation: exact epoch-036 parent hashes, Turkish Branch-B fact registry/review, packed
-  block manifests, memory decomposition, storage/runtime estimates and tested DAG are still
-  missing; this design freeze authorizes none of those external actions;
+- M2 exact block preparation: Document 192 and contract
+  `vngrs-m2-oscar-exact-block-materialization-v1` freeze a tested CPU-only operator for three
+  model-native 97,536-block M2-A/M2-B pairs, 2,048 shared validation blocks per model, 250
+  Branch-B facts and 976 matched replacements. The wave remains unexecuted and authorizes no HU,
+  push or Slurm action by itself;
+- M2 remaining preparation after that wave: bounded Turkish fact-registry review, exact epoch-036
+  parent weight/config hashes, memory decomposition/optimizer smoke, storage/runtime estimate and
+  tested training/evaluation DAG;
 - M2 execution: not authorized; the three-model sibling-arm training plan and execution contract
   must be frozen first, then separately and exactly authorized by the user.
 

@@ -6,11 +6,17 @@ import os
 import subprocess
 import sys
 
+import pytest
+
 from transfer_vs_relearning.data.qwen_pre_m2 import (
+    build_branch_b_fact_registry,
     build_bilingual_hard_probes,
+    build_fixed_replacement_m2_blocks,
     build_matched_m2_m3_blocks,
     build_m3_branch_b_fact_registry,
+    deterministic_document_order,
     materialize_generic_blocks,
+    validate_balanced_population,
     validate_intermediate_population,
 )
 from scripts.m2.summarize_qwen_pre_m2_baseline import _robust_rows
@@ -55,6 +61,44 @@ def test_intermediate_population_requires_exact_branch_balance() -> None:
         "branch_subjects": {"A": 250, "B": 250},
         "branch_facts": {"A": 1250, "B": 1250},
     }
+
+
+def test_m2_population_and_branch_b_registry_use_the_exact_100_subject_m1_set() -> None:
+    population = [_profile(index, "A" if index <= 50 else "B") for index in range(1, 101)]
+    validation = validate_balanced_population(population, expected_subjects=100)
+    assert validation["branch_subjects"] == {"A": 50, "B": 50}
+    assert validation["branch_facts"] == {"A": 250, "B": 250}
+    rows = build_branch_b_fact_registry(
+        population,
+        {row["subject_id"] for row in population},
+        expected_subjects=100,
+        version="m2_oscar_100_v1",
+    )
+    assert len(rows) == len({row["fact_id"] for row in rows}) == 250
+    assert {row["branch_group"] for row in rows} == {"B"}
+    assert {row["relation"] for row in rows} == {
+        "profession",
+        "born_in",
+        "lives_in",
+        "field_of_study",
+        "works_in_industry",
+    }
+    assert all(row["answer_tr"] in row["text"] for row in rows)
+
+
+def test_seeded_document_order_is_input_order_independent_and_rejects_duplicates() -> None:
+    rows = [
+        {"stable_document_id": "doc-c", "text": "üç"},
+        {"stable_document_id": "doc-a", "text": "bir"},
+        {"stable_document_id": "doc-b", "text": "iki"},
+    ]
+    first = deterministic_document_order(rows, namespace="m2-oscar-v1", seed=42)
+    second = deterministic_document_order(reversed(rows), namespace="m2-oscar-v1", seed=42)
+    assert [row["stable_document_id"] for row in first] == [
+        row["stable_document_id"] for row in second
+    ]
+    with pytest.raises(ValueError, match="unique stable document"):
+        deterministic_document_order([rows[0], rows[0]], namespace="m2-oscar-v1", seed=42)
 
 
 def test_bilingual_hard_registry_covers_every_direction_form_and_scaffold() -> None:
@@ -127,6 +171,59 @@ def test_matched_blocks_replace_generic_tokens_without_adding_budget() -> None:
         if left["input_ids"] != right["input_ids"]
     ]
     assert changed == [item["block_index"] for item in audit["replacement_blocks"]]
+
+
+def test_fixed_m2_replacement_is_exact_matched_balanced_and_deterministic() -> None:
+    tokenizer = _WhitespaceTokenizer()
+    generic = materialize_generic_blocks(
+        [{"text": "bir iki üç dört beş altı yedi"} for _ in range(50)],
+        tokenizer,
+        block_size=8,
+        total_blocks=40,
+    )
+    relations = ["profession", "born_in", "lives_in", "field_of_study", "works_in_industry"]
+    facts = [
+        {
+            "fact_id": f"F{index}",
+            "branch_group": "B",
+            "relation": relation,
+            "text": f"özne {index} cevap",
+        }
+        for index, relation in enumerate(relations)
+    ]
+    first_a, first_b, first_audit = build_fixed_replacement_m2_blocks(
+        generic, facts, tokenizer, replacement_block_count=6
+    )
+    second_a, second_b, second_audit = build_fixed_replacement_m2_blocks(
+        generic, list(reversed(facts)), tokenizer, replacement_block_count=6
+    )
+    assert (first_a, first_b, first_audit) == (second_a, second_b, second_audit)
+    assert len(first_a) == len(first_b) == 40
+    assert all(len(row["input_ids"]) == 8 for row in [*first_a, *first_b])
+    assert first_audit["replacement_block_count"] == 6
+    assert first_audit["m2_a_m2_b_block_count_equal"] is True
+    assert first_audit["m2_a_m2_b_token_budget_equal"] is True
+    assert first_audit["branch_a_fact_exposures"] == 0
+    assert first_audit["extra_tokens_over_m2_a"] == 0
+    assert first_audit["fact_exposure_balance_max_minus_min"] <= 1
+    assert first_audit["relation_exposure_balance_max_minus_min"] <= 1
+    assert set(first_audit["fact_exposures"]) == {f"F{index}" for index in range(5)}
+    changed = [
+        index
+        for index, (left, right) in enumerate(zip(first_a, first_b, strict=True))
+        if left["input_ids"] != right["input_ids"]
+    ]
+    assert changed == [row["block_index"] for row in first_audit["replacement_blocks"]]
+
+
+def test_fixed_m2_replacement_rejects_branch_a_facts() -> None:
+    with pytest.raises(ValueError, match="Branch B only"):
+        build_fixed_replacement_m2_blocks(
+            [[1, 2, 3, 4], [5, 6, 7, 8]],
+            [{"fact_id": "F1", "branch_group": "A", "text": "yanlış bağ"}],
+            _WhitespaceTokenizer(),
+            replacement_block_count=1,
+        )
 
 
 def test_clm_trainer_supports_frozen_pretokenized_full_sequence_blocks() -> None:
