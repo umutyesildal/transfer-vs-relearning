@@ -1,24 +1,24 @@
 schema_version: 1
 brief_id: agent-brief-v2
-as_of: "2026-08-29"
+as_of: "2026-08-30"
 status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: e517624031c99bf916fb703f5dae618f4ab4268cf10c6e1c914141bd86fc786e
+  full_state_sha256: 6852200e98a96871d3e9b9de62908401d6f3c37ecd699451f01a7c9ff7e5d4fa
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: m2_oscar_phase2_v1_blocked_v1a_retry_frozen_unexecuted
+  phase: m2_oscar_phase2_evidence_complete_training_contract_not_frozen
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
 
 readiness:
   evaluation_contract: frozen
-  corpus_contract: oscar_phase2_v1a_retry_frozen_unexecuted
+  corpus_contract: oscar_phase2_evidence_complete
   m1_training_contract: frozen_executed_complete
   m2_training_contract: not_frozen
   ready_to_measure: true
@@ -32,7 +32,7 @@ stage_readiness:
   m1_evaluation_adapter_and_contract: frozen_v3_single_a100_pool_terminal_complete_111_of_111
   m1_first_wave_cancelled_by_user_before_any_scientific_result: true
   m1_execution: complete_111_of_111
-  m2_corpus_contract: phase2_v1_blocked_v1a_retry_frozen_unexecuted
+  m2_corpus_contract: phase2_v1a_executed_pass_d0_evidence_complete
   m2_materialization_operator: locally_implemented_execution_disabled_offline_fixture_validated
   m2_audit_split_tokenizer_operators: locally_implemented_execution_disabled_offline_fixture_validated
   m2_tokenizer_asset_inventory: complete_three_of_three_manifest_only_zero_hu_writes
@@ -44,8 +44,8 @@ stage_readiness:
   m2_source_registry: closed_32_of_32_transport_object_ids_full_byte_sha_computed_only_on_download
   m2_storage_bounds: locally_closed_fresh_preflight_required
   m2_final_orchestration: v1_job_481863_exact_labels_persisted_uppercase_candidate_blocked_before_audit
-  m2_production_launcher: phase2_v1_consumed_v1a_cpu_launcher_frozen_unauthorized
-  m2_primary_training_source: cleaned_vngrs_oscar_2201_rows_only_phase2_accounting_pending
+  m2_production_launcher: phase2_v1_and_v1a_authorizations_consumed_no_training_launcher_authorized
+  m2_primary_training_source: cleaned_vngrs_oscar_2201_rows_only_phase2_accounting_complete
   m2_mc4_training_role: excluded_preserved
   m2_human_review_handoff: complete_pass_64_of_64_usable_packet_bound_decisions
   m2_required_models: [olmo, qwen, smollm]
@@ -77,15 +77,15 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: exact_sha_authorization_for_single_phase2_v1a_cpu_retry_if_desired
-  plan: documentation/187_VNGRS_OSCAR_HUMAN_REVIEW_RESULT_AND_PHASE2_PLAN_TR.md
+  subject: freeze_matched_three_model_m2_a_m2_b_training_and_measurement_contract
+  plan: documentation/190_VNGRS_OSCAR_PHASE2_V1A_EXECUTION_RESULT_AND_GATE_TR.md
   contract: documentation/contracts/corpora/vngrs-m2-oscar-phase2-evidence-v1a.md
   config: configs/corpora/vngrs_m2_oscar_phase2_evidence_v1a.yaml
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user
     - offline_tests_and_dry_runs
-    - read_only_d0_v3_v1a_and_fact_pair_terminal_artifact_verification
-    - inspect_frozen_phase2_implementation_and_contract
+    - read_only_phase2_v1a_terminal_artifact_verification
+    - prepare_local_matched_m2_a_m2_b_training_and_epoch_measurement_plan
   not_implied:
     - hu_or_ssh
     - slurm_or_gpu

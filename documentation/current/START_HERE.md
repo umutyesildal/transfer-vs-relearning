@@ -67,16 +67,18 @@ the master synthesis, the long timeline, or a previous chat transcript.
   the historical inventory recorded the first hexadecimal character of OLMo `tokenizer.json`
   SHA as `b` while both the exact asset and frozen snapshot manifest record `c`; the other five
   assets matched. V1 root and inventory remain preserved, no model weight/GPU/training ran;
-- V1A is locally frozen and unexecuted under a fresh root. It adds an append-only corrected
-  inventory plus mandatory snapshot-manifest-to-inventory cross-check before asset load. A new
-  exact SHA-bound authorization is required for push/HU/one CPU retry;
-- M2 primary source direction: cleaned OSCAR-2201-derived rows within vngrs, pending exact label,
-  volume and quality qualification; mC4 is excluded from main training and preserved;
-- vngrs: the reservoir is materialized, OSCAR fact-pair and review-coverage gates passed, the split
-  is frozen and human review is 64/64 usable; Phase-2 exact tokenizer accounting remains
-  unexecuted, so it is not training-ready;
-- M2 execution: not authorized; the diagnostic recovery, later selection and all training stages
-  each require their own exact contract boundary and explicit user authorization.
+- authorized V1A CPU job `481980` completed PASS under the fresh retry root. The corrected
+  inventory and mandatory snapshot-manifest cross-check passed for OLMo/Qwen/SmolLM; all three
+  tokenizer compatibility reports and all six train/held-out accounting reports are hash-closed,
+  with zero tokenizer exceptions and zero zero-token documents. No model weights or GPU were
+  accessed and no tokenized corpus was persisted;
+- M2 primary source: cleaned OSCAR-2201-derived rows within vngrs; the exact 344,482 train / 10,000
+  held-out split, 64/64 usable human review and three-model tokenizer accounting are complete. mC4
+  is excluded from main training and preserved;
+- vngrs: Phase-2 evidence is `D0_EVIDENCE_COMPLETE`, but `ready_to_train=false` because the matched
+  M2-A/M2-B training, checkpoint and epoch-measurement contract is not yet frozen;
+- M2 execution: not authorized; the three-model sibling-arm training plan and execution contract
+  must be frozen first, then separately and exactly authorized by the user.
 
 ## When to open larger files
 
