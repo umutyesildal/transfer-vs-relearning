@@ -16,6 +16,17 @@ def _json_bytes(value: Any) -> bytes:
     ).encode("utf-8")
 
 
+def _eos_token_id(tokenizer: Any) -> int:
+    """Resolve EOS from a tokenizer or the reviewed FrozenTokenizerAdapter shape."""
+
+    value = getattr(tokenizer, "eos_token_id", None)
+    if value is None:
+        value = getattr(getattr(tokenizer, "tokenizer", None), "eos_token_id", None)
+    if not isinstance(value, int) or value < 0:
+        raise ValueError("Tokenizer must define a non-negative integer eos_token_id")
+    return value
+
+
 def build_fixed_replacement_schedule(
     factual_rows: list[dict[str, Any]],
     tokenizer: Any,
@@ -30,8 +41,7 @@ def build_fixed_replacement_schedule(
         raise ValueError("Block and replacement counts must be positive")
     if replacement_block_count >= total_blocks:
         raise ValueError("Factual replacement must leave at least one generic-only block")
-    if tokenizer.eos_token_id is None:
-        raise ValueError("Tokenizer must define eos_token_id")
+    eos_token_id = _eos_token_id(tokenizer)
     fact_ids = [str(row.get("fact_id", "")) for row in factual_rows]
     if not fact_ids or any(not value for value in fact_ids) or len(fact_ids) != len(set(fact_ids)):
         raise ValueError("Factual registry must contain unique non-empty fact IDs")
@@ -46,7 +56,7 @@ def build_fixed_replacement_schedule(
         if not text:
             raise ValueError(f"Factual row {fact_id} has no text")
         tokens = list(tokenizer.encode(text, add_special_tokens=False))
-        tokens.append(int(tokenizer.eos_token_id))
+        tokens.append(eos_token_id)
         if len(tokens) > block_size:
             raise ValueError(f"Factual row {fact_id} exceeds one block")
         encoded.append((fact_id, tokens))
@@ -150,8 +160,7 @@ def stream_matched_train_files(
         total_blocks=total_blocks,
         replacement_block_count=replacement_block_count,
     )
-    if tokenizer.eos_token_id is None:
-        raise ValueError("Tokenizer must define eos_token_id")
+    eos_token_id = _eos_token_id(tokenizer)
     m2_a_path.parent.mkdir(parents=True, exist_ok=True)
     m2_b_path.parent.mkdir(parents=True, exist_ok=True)
     temporary_a = m2_a_path.with_suffix(m2_a_path.suffix + ".tmp")
@@ -170,7 +179,7 @@ def stream_matched_train_files(
                 raise ValueError("Generic Turkish row requires non-empty text and stable ID")
             consumed_ids.append(stable_id)
             buffer.extend(tokenizer.encode(text, add_special_tokens=False))
-            buffer.append(int(tokenizer.eos_token_id))
+            buffer.append(eos_token_id)
             while len(buffer) >= block_size and block_index < total_blocks:
                 generic = buffer[:block_size]
                 del buffer[:block_size]
@@ -231,8 +240,7 @@ def stream_validation_file(
 ) -> dict[str, Any]:
     """Write a shared validation stream atomically with bounded token memory."""
 
-    if tokenizer.eos_token_id is None:
-        raise ValueError("Tokenizer must define eos_token_id")
+    eos_token_id = _eos_token_id(tokenizer)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
     buffer: list[int] = []
@@ -247,7 +255,7 @@ def stream_validation_file(
                 raise ValueError("Validation row requires non-empty text and stable ID")
             consumed_ids.append(stable_id)
             buffer.extend(tokenizer.encode(text, add_special_tokens=False))
-            buffer.append(int(tokenizer.eos_token_id))
+            buffer.append(eos_token_id)
             while len(buffer) >= block_size and block_index < total_blocks:
                 block = buffer[:block_size]
                 del buffer[:block_size]

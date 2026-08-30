@@ -92,11 +92,19 @@ the master synthesis, the long timeline, or a previous chat transcript.
   algorithm, persistent progress/exception/Slurm/resource evidence and 20 passing tests. Contract
   SHA is `d49a221a7b1f8b02682330b4d46762cc57140023a5426f0f5ad77b4d10f8e0d9`; it is unexecuted and
   needs separate exact user authorization;
-- M2 recovery queue/relocation: authorized job `482007` is pending on 8 CPU / 128G with reason
-  `Priority`. Document 197 freezes an unexecuted pending-only relocation to 4 CPU after 03:00
-  Europe/Berlin. It may hold/cancel `482007` only if scientific execution has not begun and then
-  submit one fresh-root 4-CPU job; contract SHA is
-  `29b95dedc826c43e833d4332fe2a8756907436fe1f2a3981d5daf602ddf35413`;
+- M2 recovery queue/relocation: Document 197 froze a pending-only relocation to 4 CPU after 03:00
+  Europe/Berlin, but job `482007` started and terminalized before that decision. Its contract SHA
+  is `29b95dedc826c43e833d4332fe2a8756907436fe1f2a3981d5daf602ddf35413`; the relocation remains
+  unexecuted and is now ineligible;
+- M2 recovery terminal result: job `482007` started before the relocation decision and stopped
+  fail-closed at OLMo `stream_train_blocks` because `FrozenTokenizerAdapter` has no direct
+  `eos_token_id` property. Persistent evidence records exit 1, zero block files, no manifest and
+  max RSS 32,807,744 KiB (~31.29 GiB), excluding OOM. Document 198 is authoritative; the pending-
+  only 4-CPU relocation is now ineligible and no retry is authorized;
+- M2 adapter repair: Document 199 freezes the narrow nested-`eos_token_id` compatibility repair,
+  a fresh root and one 4 CPU / 64G / 6h CPU-only route. The compatible suite passes 12/12. Contract
+  SHA is `711deae9853287f9eeea62f35cc397a27a9c3ae3c3f8bbf2f65a8637d647508f`; it is unexecuted and
+  requires new exact SHA-bound authorization;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;

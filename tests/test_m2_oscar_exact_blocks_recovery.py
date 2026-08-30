@@ -30,6 +30,16 @@ class TinyTokenizer:
         return [1 + (ord(value) % 31) for value in text]
 
 
+class AdapterShape:
+    """Match FrozenTokenizerAdapter: encode proxy plus nested tokenizer state."""
+
+    def __init__(self) -> None:
+        self.tokenizer = TinyTokenizer()
+
+    def encode(self, text: str, *, add_special_tokens: bool = False) -> list[int]:
+        return self.tokenizer.encode(text, add_special_tokens=add_special_tokens)
+
+
 def _facts() -> list[dict[str, str]]:
     relations = ["profession", "born_in", "lives_in", "field_of_study", "works_in_industry"]
     return [
@@ -93,6 +103,26 @@ def test_streaming_validation_matches_frozen_generic_blocks(tmp_path: Path) -> N
     )
     assert [row["input_ids"] for row in _read_jsonl(path)] == generic
     assert {key: value for key, value in observed.items() if key != "streaming_writer"} == expected
+
+
+def test_streaming_accepts_the_production_frozen_tokenizer_adapter_shape(tmp_path: Path) -> None:
+    ordered = deterministic_document_order(_rows(), namespace="adapter|train", seed=42)
+    path_a = tmp_path / "m2_a.jsonl"
+    path_b = tmp_path / "m2_b.jsonl"
+    prefix, matching = stream_matched_train_files(
+        ordered,
+        AdapterShape(),
+        _facts(),
+        m2_a_path=path_a,
+        m2_b_path=path_b,
+        block_size=10,
+        total_blocks=20,
+        replacement_block_count=5,
+    )
+    assert prefix["total_blocks"] == 20
+    assert matching["replacement_block_count"] == 5
+    assert len(_read_jsonl(path_a)) == 20
+    assert len(_read_jsonl(path_b)) == 20
 
 
 def test_streaming_failure_does_not_publish_final_artifacts(tmp_path: Path) -> None:

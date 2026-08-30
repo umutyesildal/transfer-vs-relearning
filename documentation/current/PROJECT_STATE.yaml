@@ -1,11 +1,11 @@
 schema_version: 1
-as_of: "2026-08-30"
+as_of: "2026-08-31"
 project: transfer-vs-relearning
 
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_recovery_queued_4cpu_relocation_frozen_unexecuted
+  status: m0_m1_complete_m2_recovery_terminal_adapter_failure_repair_required
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -306,7 +306,7 @@ stage_readiness:
     exact_block_recovery_execution_authorized: false
     exact_block_recovery_automatic_retry_authorized: false
     exact_block_recovery_active_job: "482007"
-    exact_block_recovery_active_job_state: pending_priority
+    exact_block_recovery_active_job_state: terminal_blocked_adapter_eos_interface
     exact_block_recovery_active_job_cpus: 8
     exact_block_recovery_active_job_memory: 128G
     exact_block_recovery_4cpu_relocation_contract: documentation/contracts/corpora/vngrs-m2-oscar-exact-block-materialization-recovery-4cpu-relocation-v1.md
@@ -317,6 +317,24 @@ stage_readiness:
     exact_block_recovery_4cpu_relocation_record_sha256: 104769ef8a67f94540827c70425378afd66c7c1abf6472c95851c0f9bb09a2e1
     exact_block_recovery_4cpu_relocation_status: frozen_unexecuted_conditional_pending_only
     exact_block_recovery_4cpu_relocation_execution_authorized: false
+    exact_block_recovery_job_482007_result: documentation/198_M2_OSCAR_FAIL_PERSISTENT_RECOVERY_EXECUTION_RESULT_AND_GATE_TR.md
+    exact_block_recovery_job_482007_stage: olmo_stream_train_blocks_before_block_publication
+    exact_block_recovery_job_482007_exception: FrozenTokenizerAdapter_missing_direct_eos_token_id
+    exact_block_recovery_job_482007_max_rss_kib: 32807744
+    exact_block_recovery_job_482007_elapsed: "00:14:23.19"
+    exact_block_recovery_job_482007_files: 8
+    exact_block_recovery_job_482007_root_bytes: 123392
+    exact_block_recovery_job_482007_block_files: 0
+    exact_block_recovery_job_482007_manifest_present: false
+    exact_block_recovery_4cpu_relocation_eligibility: ineligible_job_terminal_before_decision
+    exact_block_recovery_job_482007_result_sha256: 6fa761fe2b5d590678010ba28019b15c5bf7c855315f572ed0c856a3fc607423
+    exact_block_adapter_repair_contract: documentation/contracts/corpora/vngrs-m2-oscar-exact-block-materialization-adapter-repair-v1.md
+    exact_block_adapter_repair_contract_sha256: 711deae9853287f9eeea62f35cc397a27a9c3ae3c3f8bbf2f65a8637d647508f
+    exact_block_adapter_repair_record: documentation/199_M2_OSCAR_ADAPTER_INTERFACE_REPAIR_PREPARATION_TR.md
+    exact_block_adapter_repair_status: frozen_unexecuted_12_tests_pass
+    exact_block_adapter_repair_root: /vol/tmp2/yesildau/vngrs_m2_oscar_exact_blocks_adapter_repair_v1
+    exact_block_adapter_repair_resources: 4cpu_64g_6h_cpu_only
+    exact_block_adapter_repair_execution_authorized: false
     exact_block_materialization_train_blocks_per_arm: 97536
     exact_block_materialization_validation_blocks_per_model: 2048
     exact_block_materialization_branch_b_facts: 250
@@ -1603,10 +1621,10 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: monitor_482007_then_conditionally_relocate_to_4cpu_after_0300
+  name: await_exact_authorization_for_frozen_adapter_interface_repair
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: exact_block_recovery_482007_pending_4cpu_relocation_frozen_unexecuted
+  m2_status: exact_block_recovery_482007_terminal_adapter_failure_repair_frozen_unexecuted
   execution_boundary: no_m2_training_until_matched_contract_is_frozen_and_exactly_authorized
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
@@ -1623,9 +1641,10 @@ active_priority:
     - preserve_document_195_terminal_partial_result
     - preserve_frozen_document_196_recovery_preparation_and_20_test_pass
     - preserve_authorized_job_482007_single_submission_and_persistent_root
-    - monitor_482007_at_0030_0045_0100_0200_0300
-    - preserve_frozen_document_197_pending_only_4cpu_relocation
-    - await_exact_sha_bound_conditional_relocation_authorization
+    - preserve_document_198_terminal_failure_and_resource_evidence
+    - preserve_document_197_as_unexecuted_now_ineligible_pending_only_relocation
+    - preserve_frozen_document_199_adapter_repair_preparation_and_12_test_pass
+    - await_exact_sha_bound_adapter_repair_authorization
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1635,7 +1654,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_conditional_pending_only_4cpu_relocation_after_0300
+  subject: authorize_fresh_root_adapter_interface_repair
   decision_owner: user
   start_m1_now: false
   note: >-
