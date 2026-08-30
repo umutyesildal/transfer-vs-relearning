@@ -5,13 +5,13 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: c326c265c7bec0d6a862b80206a4c4f159243f704dec7bc3ce8355ee7faf90a2
+  full_state_sha256: 58a86526d41c18914587020eae1f6ba192c7b241359312ef8f2dc2a6f83a7d0d
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: m2_exact_block_materialization_frozen_unexecuted
+  phase: m2_exact_block_materialization_terminal_partial
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
@@ -56,7 +56,11 @@ stage_readiness:
   m2_factual_replacement_blocks: 976
   m2_exact_block_contract: documentation/contracts/corpora/vngrs-m2-oscar-exact-block-materialization-v1.md
   m2_exact_block_contract_sha256: f8abbd417e7dd82f524c3691872bb40c4efb9a1988f1920ad363bd1c6cd4dc1c
-  m2_exact_block_wave: frozen_unexecuted_cpu_only
+  m2_exact_block_wave: consumed_job_481990_terminal_partial_zero_blocks_no_manifest
+  m2_exact_block_result: documentation/195_M2_OSCAR_EXACT_BLOCK_MATERIALIZATION_EXECUTION_RESULT_AND_GATE_TR.md
+  m2_exact_block_partial_fact_rows: 250
+  m2_exact_block_partial_fact_sha256: 784f78a5a182c329b4b995ee1a97c580da994059a18b1f9702ec657569ccbfec
+  m2_exact_block_resubmission_authorized: false
   m2_local_training_preparation: six_config_generator_validator_exact_checkpoint_callback_and_smoke_training_dag_pass_non_executable
   m2_training_preparation_record: documentation/193_M2_THREE_MODEL_TRAINING_PREPARATION_IMPLEMENTATION_TR.md
   m2_training_preparation_config: configs/training/m2_three_model_oscar_training_preparation_v1.yaml
@@ -93,7 +97,7 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: authorize_single_exact_three_model_oscar_block_materialization_cpu_wave
+  subject: prepare_separate_fail_persistent_exact_block_recovery_contract
   plan: documentation/191_M2_MATCHED_THREE_MODEL_OSCAR_TRAINING_AND_MEASUREMENT_PLAN_TR.md
   contract: documentation/contracts/corpora/vngrs-m2-oscar-exact-block-materialization-v1.md
   config: configs/corpora/vngrs_m2_oscar_exact_blocks_v1.yaml
@@ -101,7 +105,8 @@ next_boundary:
     - local_code_config_documentation_changes_requested_by_user
     - offline_tests_and_dry_runs
     - read_only_phase2_v1a_terminal_artifact_verification
-    - preserve_local_exact_block_implementation_tests_and_frozen_contract
+    - preserve_job_481990_partial_root_and_document_195_terminal_result
+    - prepare_only_a_fresh_root_fail_persistent_recovery_contract_if_requested
     - preserve_local_training_config_validator_and_smoke_training_dag_preparation
     - preserve_local_training_output_finalizer_and_eval_v2_matrix_preparation
   not_implied:
@@ -109,7 +114,7 @@ next_boundary:
     - slurm_or_gpu
     - model_training
     - evaluation_or_scoring
-    - corpus_materialization
+    - corpus_materialization_or_retry
     - push_or_merge
     - cleanup_or_deletion
 

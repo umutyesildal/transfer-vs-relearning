@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_oscar_phase2_complete_exact_block_wave_frozen_unexecuted
+  status: m0_m1_complete_m2_oscar_phase2_complete_exact_block_wave_terminal_partial
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -33,9 +33,9 @@ repository:
   hu_checkouts:
     active_monorepo:
       path: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1
-      branch: agent/m0-evaluation
+      branch: agent/m2-three-model-vngrs-d0
       sync_mode: git_pull_ff_only
-      dependency_commit_verified: c3f3c30a31855de920eb268b74bc94d71e9c246d
+      dependency_commit_verified: 9cdf149a88a822df123f8af890b489b62a0d1953
       clean_at_verification: true
     legacy_checkout:
       path: /vol/fob-vol6/mi25/yesildau/transfer-vs-relearning
@@ -277,8 +277,21 @@ stage_readiness:
     exact_block_materialization_contract_sha256: f8abbd417e7dd82f524c3691872bb40c4efb9a1988f1920ad363bd1c6cd4dc1c
     exact_block_materialization_config: configs/corpora/vngrs_m2_oscar_exact_blocks_v1.yaml
     exact_block_materialization_config_sha256: d476b8f5f38d972d9c8d075c3af910a1355b3272c65255dd91787058f64f42ec
-    exact_block_materialization_status: frozen_unexecuted_cpu_only
+    exact_block_materialization_status: consumed_terminal_partial_before_block_publication
     exact_block_materialization_output_root: /vol/tmp2/yesildau/vngrs_m2_oscar_exact_blocks_v1
+    exact_block_materialization_job: "481990"
+    exact_block_materialization_partition: longrun
+    exact_block_materialization_node: gruenau3
+    exact_block_materialization_result_record: documentation/195_M2_OSCAR_EXACT_BLOCK_MATERIALIZATION_EXECUTION_RESULT_AND_GATE_TR.md
+    exact_block_materialization_result_record_sha256: fa72a830ad6267c8a4b3bf59464922961ca5768710488a3d7f1566e38809a92e
+    exact_block_materialization_partial_files: 1
+    exact_block_materialization_partial_root_bytes: 114186
+    exact_block_materialization_fact_rows: 250
+    exact_block_materialization_fact_sha256: 784f78a5a182c329b4b995ee1a97c580da994059a18b1f9702ec657569ccbfec
+    exact_block_materialization_block_files: 0
+    exact_block_materialization_terminal_manifest_present: false
+    exact_block_materialization_failure: unresolved_operational_failure_after_fact_registry_before_first_role_publication
+    exact_block_materialization_resubmission_authorized: false
     exact_block_materialization_train_blocks_per_arm: 97536
     exact_block_materialization_validation_blocks_per_model: 2048
     exact_block_materialization_branch_b_facts: 250
@@ -1565,10 +1578,10 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: authorize_and_execute_single_m2_exact_block_cpu_wave
+  name: preserve_terminal_partial_and_prepare_separate_fail_persistent_recovery_contract
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: exact_block_materialization_frozen_unexecuted_training_contract_not_frozen
+  m2_status: exact_block_materialization_terminal_partial_training_contract_not_frozen
   execution_boundary: no_m2_training_until_matched_contract_is_frozen_and_exactly_authorized
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
@@ -1581,7 +1594,9 @@ active_priority:
     - preserve_local_exact_block_implementation_and_15_test_pass
     - preserve_local_six_config_generator_validator_and_authorization_gated_smoke_training_dag
     - preserve_local_training_output_finalizer_and_execution_disabled_eval_v2_matrix_preparation
-    - await_exact_sha_bound_cpu_materialization_authorization
+    - preserve_job_481990_partial_root_as_read_only_terminal_evidence
+    - preserve_document_195_terminal_partial_result
+    - require_fresh_root_and_persistent_failure_audit_for_any_separately_authorized_recovery
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1591,7 +1606,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_single_exact_three_model_oscar_block_materialization_cpu_wave
+  subject: prepare_fail_persistent_exact_block_materialization_recovery_contract
   decision_owner: user
   start_m1_now: false
   note: >-
@@ -1652,11 +1667,15 @@ next_decision_required:
     final-audit SHA is `3f3d19f...`; no model weight, GPU, training or tokenized-corpus persistence
     occurred. Phase-2 evidence is complete, while `ready_to_train=false` remains mandatory until
     the matched three-model M2-A/M2-B training and measurement contract is frozen and separately
-    authorized. Document 192 now records the locally implemented exact block operator and its
-    15-test PASS. Contract `vngrs-m2-oscar-exact-block-materialization-v1`, SHA
-    `f8abbd417e7dd82f524c3691872bb40c4efb9a1988f1920ad363bd1c6cd4dc1c`, freezes one still-
-    unexecuted CPU wave producing three model-native matched M2-A/M2-B block pairs plus shared
-    validation blocks. It authorizes nothing by itself; HU, push and Slurm remain false. Document
+    authorized. Document 192 records the locally implemented exact block operator and its 15-test
+    PASS. Contract `vngrs-m2-oscar-exact-block-materialization-v1`, SHA
+    `f8abbd417e7dd82f524c3691872bb40c4efb9a1988f1920ad363bd1c6cd4dc1c`, was subsequently
+    authorized and consumed once. Commit `9cdf149a...` was pushed/fast-forwarded and CPU job
+    `481990` ran on `gruenau3`, but terminalized after writing only the 250-row fact registry:
+    one 105,994-byte file, zero block files and no terminal manifest. `sacct` remained unavailable
+    and stdout/stderr had been routed to `/dev/null`, so the exact exception is unresolved.
+    Document 195 records the terminal partial result. The root remains immutable/read-only,
+    `ready_to_train=false`, and no retry is authorized. Document
     193 additionally records the local six-config generator/validator, exact non-uniform
     checkpoint callback and authorization-gated three-smoke to six-training DAG fixture PASS.
     That preparation is also non-executable; parent registry, fact review, real optimizer smoke,
@@ -1675,6 +1694,18 @@ authorization:
   push_or_publication: false
   cleanup_or_deletion: false
   scoped:
+    m2_oscar_exact_block_materialization_v1:
+      status: consumed_terminal_partial_before_block_publication
+      contract_sha256: f8abbd417e7dd82f524c3691872bb40c4efb9a1988f1920ad363bd1c6cd4dc1c
+      implementation_commit: 9cdf149a88a822df123f8af890b489b62a0d1953
+      wave_limit: 1
+      job: "481990"
+      block_files: 0
+      terminal_manifest_present: false
+      automatic_retry_authorized: false
+      resubmission_authorized: false
+      gpu_or_training_authorized: false
+      cleanup_or_deletion_authorized: false
     three_model_scientific_m0:
       status: consumed_by_single_submission
       contract_sha256: 013f6f638176cbfd15fbe65c7d07a9dbb8d0029879e217f65e4e69bbeef765d9

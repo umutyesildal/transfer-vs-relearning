@@ -80,14 +80,16 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - M2 design: Document 191 freezes a non-executable three-model plan at 49,938,432 model-native
   tokens per arm, 762 updates, 512-token blocks, approximately 1% Branch-B factual replacement,
   dense evaluation every approximately 10% dose and full eval-v2 at entry/midpoint/endpoint;
-- M2 exact block preparation: Document 192 and contract
-  `vngrs-m2-oscar-exact-block-materialization-v1` freeze a tested CPU-only operator for three
-  model-native 97,536-block M2-A/M2-B pairs, 2,048 shared validation blocks per model, 250
-  Branch-B facts and 976 matched replacements. The wave remains unexecuted and authorizes no HU,
-  push or Slurm action by itself;
-- M2 remaining preparation after that wave: bounded Turkish fact-registry review, exact epoch-036
-  parent weight/config hashes, memory decomposition/optimizer smoke, storage/runtime estimate and
-  tested training/evaluation DAG;
+- M2 exact block execution: Document 192 and contract
+  `vngrs-m2-oscar-exact-block-materialization-v1` froze the tested CPU-only operator. Its one
+  authorized wave was consumed by job `481990`: the 250-row fact registry was written, but zero
+  OLMo/Qwen/SmolLM block files and no terminal manifest were published. Because Slurm accounting
+  was unavailable and job logs were routed to `/dev/null`, the exact operational trigger remains
+  unresolved. Document 195 is the terminal partial result; the partial root is read-only,
+  `ready_to_train=false`, and no retry is authorized;
+- M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
+  fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
+  smoke, storage/runtime estimate and tested training/evaluation DAG;
 - M2 local training preparation: Document 193 implements a six-config generator/validator, exact
   non-uniform checkpoint callback for updates 76..762 and an authorization-gated three-model
   optimizer-smoke → six-run training DAG fixture. It is non-executable; evaluation adapters and a
