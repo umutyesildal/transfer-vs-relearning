@@ -59,11 +59,17 @@ the master synthesis, the long timeline, or a previous chat transcript.
   semantic SHA `73329e45...`;
 - human review is complete and packet-bound: 64/64 unique documents were marked `usable`, with
   zero `unusable` or `unsafe`; the exact decision ledger is tracked and hash-closed;
-- Phase 2 now has a locally implemented, fixture-validated and frozen but unexecuted CPU-only
-  evidence contract: revalidate population/split/decisions, load only the exact
+- Phase 2 V1 was locally implemented, fixture-validated and frozen as a CPU-only evidence
+  contract: revalidate population/split/decisions, load only the exact
   OLMo/Qwen/SmolLM tokenizer assets, and produce six train/held-out token-accounting reports.
-  The contract/config/operator/runner/submitter are frozen; no push, HU/SSH, tokenizer access,
-  Slurm pass, model-weight access, Phase 2 execution or training is authorized;
+  Its contract/config/operator/runner/submitter remain preserved;
+- authorized V1 job `481910` subsequently stopped fail-closed before tokenizer accounting because
+  the historical inventory recorded the first hexadecimal character of OLMo `tokenizer.json`
+  SHA as `b` while both the exact asset and frozen snapshot manifest record `c`; the other five
+  assets matched. V1 root and inventory remain preserved, no model weight/GPU/training ran;
+- V1A is locally frozen and unexecuted under a fresh root. It adds an append-only corrected
+  inventory plus mandatory snapshot-manifest-to-inventory cross-check before asset load. A new
+  exact SHA-bound authorization is required for push/HU/one CPU retry;
 - M2 primary source direction: cleaned OSCAR-2201-derived rows within vngrs, pending exact label,
   volume and quality qualification; mC4 is excluded from main training and preserved;
 - vngrs: the reservoir is materialized, OSCAR fact-pair and review-coverage gates passed, the split

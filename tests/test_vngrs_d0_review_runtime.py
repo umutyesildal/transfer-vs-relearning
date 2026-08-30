@@ -141,3 +141,46 @@ def test_frozen_tokenizer_adapter_hashes_assets_before_local_only_load(tmp_path:
     (tmp_path / "tokenizer.json").write_bytes(b"tampered")
     with pytest.raises(ValueError, match="byte-size drift"):
         FrozenTokenizerAdapter.load(role="olmo", snapshot_root=tmp_path, inventory=inventory, tokenizer_factory=factory)
+
+
+def test_frozen_tokenizer_adapter_cross_checks_snapshot_manifest_before_assets(tmp_path: Path) -> None:
+    assets = []
+    files = [{"path": "model.safetensors", "bytes": 10, "sha256": "f" * 64}]
+    for name, payload in (("tokenizer.json", b"tokenizer"), ("tokenizer_config.json", b"{}")):
+        (tmp_path / name).write_bytes(payload)
+        row = {"path": name, "bytes": len(payload), "sha256": hashlib.sha256(payload).hexdigest()}
+        assets.append(row)
+        files.append(row)
+    assets.sort(key=lambda row: row["path"])
+    manifest_payload = json.dumps({"files": files}, sort_keys=True).encode("utf-8")
+    (tmp_path / "snapshot_manifest.json").write_bytes(manifest_payload)
+    from transfer_vs_relearning.corpora.vngrs.metadata import canonical_json_sha256
+
+    inventory = {
+        "assets": assets,
+        "snapshot_manifest_sha256": hashlib.sha256(manifest_payload).hexdigest(),
+        "tokenizer_asset_manifest_sha256": canonical_json_sha256(assets),
+    }
+
+    class Tokenizer:
+        def encode(self, text, add_special_tokens=False):
+            return [1]
+
+    adapter = FrozenTokenizerAdapter.load(
+        role="olmo",
+        snapshot_root=tmp_path,
+        inventory=inventory,
+        tokenizer_factory=lambda *_args, **_kwargs: Tokenizer(),
+        verify_snapshot_manifest=True,
+    )
+    assert adapter.encode("merhaba") == [1]
+    inventory["assets"][0]["sha256"] = "0" * 64
+    inventory["tokenizer_asset_manifest_sha256"] = canonical_json_sha256(inventory["assets"])
+    with pytest.raises(ValueError, match="disagrees with snapshot manifest"):
+        FrozenTokenizerAdapter.load(
+            role="olmo",
+            snapshot_root=tmp_path,
+            inventory=inventory,
+            tokenizer_factory=lambda *_args, **_kwargs: Tokenizer(),
+            verify_snapshot_manifest=True,
+        )

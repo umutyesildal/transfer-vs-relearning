@@ -1,0 +1,99 @@
+schema_version: 1
+contract_id: vngrs-m2-oscar-phase2-evidence-v1a
+status: frozen_unexecuted
+contract: documentation/contracts/corpora/vngrs-m2-oscar-phase2-evidence-v1a.md
+
+source:
+  root: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v3
+  access: read_only
+  materialization_manifest_sha256: bb413e9acafd0d891ea9c4461abc77acea1c737489560650db56dacf781dbd10
+  object_count: 32
+  object_bytes: 9502315428
+  selected_corpus: oscar
+  document_count: 354482
+  utf8_bytes: 1553923133
+  document_ids_sha256: c252d6b54d488e898f534564ef6c16196e22ae78f4fe0e61f83d4ad0bf83a056
+
+split:
+  root: /vol/tmp2/yesildau/vngrs_m2_oscar_split_review_v1
+  access: read_only
+  state_sha256: a09c0c62fffb8536b9917cc9755a40c35eb8c0f862f5b41d044f3de8f4e7d609
+  final_audit_sha256: 3add7667d202cb5547dc0847c9ad302a47e7e57cd7fb8f2f43fd4211dba86e7e
+  train_ids_sha256: 90b74fbcfe62107693c35161fc328a6e43b13a830fc9590cc9810d3e99955aac
+  heldout_ids_sha256: dc30629fe76ca722745fcd0148021de6c042218ed2994281d52d13c06011dc91
+  split_sha256: 21f43359570ea66a73e969c1d0e8b4f08408f8ebbb71f50fc40dbd0d7e16f38f
+  train_documents: 344482
+  heldout_documents: 10000
+
+coverage:
+  root: /vol/tmp2/yesildau/vngrs_m2_oscar_review_coverage_repair_v1
+  access: read_only
+  state_sha256: 3c0305d89f1496ea397694e18e7888e9d1dc58724ac588f3aa797240f73f24f6
+  final_audit_sha256: 6ce5f1f7b13fa61ae3f9c021b237b0464e4989ae179dc73fe32030049772c177
+  inventory_sha256: 8ff29ad8d72ad81616d4af3dee5951e55bde2752254988dad76c9cbbb03dd51f
+  packet_file_sha256: 621d8416f120803cc37f75453f0068a5fecaa60562698f11936b22caa3b75c61
+  packet_sha256: 73329e45fd8ff2c6b24c36fa6f9b5bac767b9d25726b691d527c71f9fdf90af8
+
+human_review:
+  decisions: artifacts/corpora/vngrs_m2_d0/human_review_decisions_73329e45fd8f.jsonl
+  decisions_sha256: f6e1e2989de4593ca56707db6c3582f5efc7cd0bbd652ca965ef92ceeded7225
+  rows: 64
+  required_verdict: usable
+
+prior_wave:
+  output_root: /vol/tmp2/yesildau/vngrs_m2_oscar_phase2_evidence_v1
+  access: read_only
+  job_id: "481910"
+  failure_path: control/d0_failure.json
+  failure_sha256: a7c566f61427d67921091ac49ffb1debfc9632c7d401bfa99145755fab783c3f
+  failure_status: BLOCKED
+
+tokenizers:
+  inventory: artifacts/corpora/vngrs_m2_d0/tokenizer_manifest_inventory_v1a.json
+  inventory_sha256: 72e1c51538a0a801a0fc766faea8af771fb126e190faefd19a0705af3a8886f9
+  original_inventory: artifacts/corpora/vngrs_m2_d0/tokenizer_manifest_inventory_v1.json
+  original_inventory_sha256: fd3901408e7dfa6f299b3c260229926ba5733bfd3a88f2af80e3ea522b143cb5
+  snapshot_manifest_cross_check: true
+  roles: [olmo, qwen, smollm]
+  add_special_tokens: false
+  truncation: false
+  padding: false
+  models:
+    olmo:
+      snapshot_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/olmo/20260822T155242Z_m1_matched_epoch_dense_olmo_seed42_30cd6396/epoch_snapshots/epoch-036
+      tokenizer_asset_manifest_sha256: 04223e922f3f062978b34968d6653a185f2b971505b7c707e7bc95df33a46191
+    qwen:
+      snapshot_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/qwen/20260822T155241Z_m1_matched_epoch_dense_qwen_seed42_7c56e187/epoch_snapshots/epoch-036
+      tokenizer_asset_manifest_sha256: 8e1cbce23938ba773e652fc767002a6687f3ec4f538139d8b760b3fe0b33a2df
+    smollm:
+      snapshot_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/smollm/20260822T155242Z_m1_matched_epoch_dense_smollm_seed42_081e6e29/epoch_snapshots/epoch-036
+      tokenizer_asset_manifest_sha256: 1f41566541c514dcebac6168f0f2f83f2b54a969c6b36db4501ae4d0683fd652
+
+output:
+  root: /vol/tmp2/yesildau/vngrs_m2_oscar_phase2_evidence_retry_v1
+  fresh_and_absent_required: true
+  maximum_success_bytes: 134217728
+  minimum_available_bytes: 2147483648
+  minimum_available_inodes: 1024
+  corpus_text_persisted: false
+  token_ids_persisted: false
+  ready_to_train: false
+
+execution:
+  runner: scripts/corpora/run_vngrs_m2_oscar_phase2_v1a.py
+  submitter: scripts/corpora/submit_vngrs_m2_oscar_phase2_v1a.sh
+  slurm: slurm/m2/phase2_vngrs_m2_oscar_v1a.slurm
+  job_name: vngrs-m2-oscar-p2-v1a
+  automatic_retry: false
+
+authority:
+  local_preparation: true
+  publication: false
+  hu_ssh: false
+  slurm_cpu: false
+  network_retrieval: false
+  model_weight_access: false
+  tokenizer_asset_access: false
+  phase2_execution: false
+  training: false
+  cleanup_or_deletion: false

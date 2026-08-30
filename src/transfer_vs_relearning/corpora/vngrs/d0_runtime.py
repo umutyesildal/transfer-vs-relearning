@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
@@ -13,6 +14,7 @@ from urllib.parse import urljoin, urlsplit
 from .d0_audit import EXPECTED_MODELS
 from .materialization import FullObjectResponse, SourceObject
 from .metadata import canonical_json_sha256
+from .tokenizer_inventory import TOKENIZER_ASSET_NAMES
 
 
 ALLOWED_TERMINAL_SUFFIXES = ("xethub.hf.co", "cdn.hf.co", "huggingface.co")
@@ -112,6 +114,7 @@ class FrozenTokenizerAdapter:
         snapshot_root: str | Path,
         inventory: Mapping[str, Any],
         tokenizer_factory: Any = None,
+        verify_snapshot_manifest: bool = False,
     ) -> "FrozenTokenizerAdapter":
         if role not in EXPECTED_MODELS:
             raise ValueError("unknown frozen tokenizer role")
@@ -119,6 +122,28 @@ class FrozenTokenizerAdapter:
         assets = [dict(row) for row in inventory.get("assets", [])]
         if not assets or canonical_json_sha256(assets) != inventory.get("tokenizer_asset_manifest_sha256"):
             raise ValueError("tokenizer asset manifest hash drift")
+        if verify_snapshot_manifest:
+            manifest_path = root / "snapshot_manifest.json"
+            if not manifest_path.is_file() or manifest_path.is_symlink():
+                raise ValueError(f"{role}: snapshot manifest missing or unsafe")
+            manifest_payload = manifest_path.read_bytes()
+            if hashlib.sha256(manifest_payload).hexdigest() != inventory.get("snapshot_manifest_sha256"):
+                raise ValueError(f"{role}: snapshot manifest SHA-256 drift")
+            manifest = json.loads(manifest_payload)
+            manifest_assets = sorted(
+                (
+                    {
+                        "path": str(row.get("path")),
+                        "bytes": row.get("bytes"),
+                        "sha256": row.get("sha256"),
+                    }
+                    for row in manifest.get("files", [])
+                    if isinstance(row, dict) and row.get("path") in TOKENIZER_ASSET_NAMES
+                ),
+                key=lambda row: row["path"],
+            )
+            if manifest_assets != assets:
+                raise ValueError(f"{role}: corrected inventory disagrees with snapshot manifest")
         for row in assets:
             path = root / row["path"]
             if not path.is_file() or path.is_symlink() or path.stat().st_size != row["bytes"]:
