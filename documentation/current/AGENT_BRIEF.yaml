@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 53a2270b332527dc12793af0ee580286a775f12d1533a35dfc3625bb2e06b337
+  full_state_sha256: 0a79c6937f62097e28423abb684ddcdf4f4439b82942add361a5a02cfea53c97
   role: context_projection_only
   may_expand_authority: false
 
@@ -57,6 +57,10 @@ stage_readiness:
   m2_exact_block_contract: documentation/contracts/corpora/vngrs-m2-oscar-exact-block-materialization-v1.md
   m2_exact_block_contract_sha256: f8abbd417e7dd82f524c3691872bb40c4efb9a1988f1920ad363bd1c6cd4dc1c
   m2_exact_block_wave: frozen_unexecuted_cpu_only
+  m2_local_training_preparation: six_config_generator_validator_exact_checkpoint_callback_and_smoke_training_dag_pass_non_executable
+  m2_training_preparation_record: documentation/193_M2_THREE_MODEL_TRAINING_PREPARATION_IMPLEMENTATION_TR.md
+  m2_training_preparation_config: configs/training/m2_three_model_oscar_training_preparation_v1.yaml
+  m2_exact_checkpoint_updates: [76, 152, 229, 305, 381, 457, 533, 610, 686, 762]
 
 evaluation:
   active_contract_name: eval-v2
@@ -93,6 +97,7 @@ next_boundary:
     - offline_tests_and_dry_runs
     - read_only_phase2_v1a_terminal_artifact_verification
     - preserve_local_exact_block_implementation_tests_and_frozen_contract
+    - preserve_local_training_config_validator_and_smoke_training_dag_preparation
   not_implied:
     - hu_or_ssh
     - slurm_or_gpu

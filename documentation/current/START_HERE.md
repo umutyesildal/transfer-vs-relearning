@@ -88,6 +88,10 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - M2 remaining preparation after that wave: bounded Turkish fact-registry review, exact epoch-036
   parent weight/config hashes, memory decomposition/optimizer smoke, storage/runtime estimate and
   tested training/evaluation DAG;
+- M2 local training preparation: Document 193 implements a six-config generator/validator, exact
+  non-uniform checkpoint callback for updates 76..762 and an authorization-gated three-model
+  optimizer-smoke → six-run training DAG fixture. It is non-executable; evaluation adapters and a
+  final training contract remain open;
 - M2 execution: not authorized; the three-model sibling-arm training plan and execution contract
   must be frozen first, then separately and exactly authorized by the user.
 

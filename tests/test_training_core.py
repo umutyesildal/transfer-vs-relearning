@@ -13,7 +13,9 @@ from transfer_vs_relearning.training.clm import (
     _answer_only_labels,
     _padded_full_sequence,
     combine_retention_losses,
+    create_checkpoint_update_callback,
     estimate_optimizer_steps,
+    resolve_checkpoint_updates,
     resolve_training_seeds,
     interval_from_fractions,
     load_training_config,
@@ -21,6 +23,44 @@ from transfer_vs_relearning.training.clm import (
     tokenizer_path_from_manifest,
     validate_resume_run,
 )
+
+
+def test_irregular_m2_checkpoint_updates_are_exact_and_endpoint_closed() -> None:
+    updates = [76, 152, 229, 305, 381, 457, 533, 610, 686, 762]
+    config = {"checkpoint_updates": updates, "save_total_limit": 10}
+    assert resolve_checkpoint_updates(config, 762) == tuple(updates)
+    with pytest.raises(ValueError, match="include the final step"):
+        resolve_checkpoint_updates({**config, "checkpoint_updates": updates[:-1]}, 762)
+    with pytest.raises(ValueError, match="cannot delete"):
+        resolve_checkpoint_updates({**config, "save_total_limit": 9}, 762)
+
+
+def test_irregular_checkpoint_callback_opens_only_frozen_updates() -> None:
+    class Base:
+        pass
+
+    class State:
+        global_step = 75
+
+    class Control:
+        should_save = False
+        should_evaluate = False
+
+    callback = create_checkpoint_update_callback(
+        Base,
+        checkpoint_updates=(76, 381, 762),
+        evaluation_updates=(381, 762),
+    )
+    control = callback.on_step_end(None, State(), Control())
+    assert control.should_save is False
+    State.global_step = 76
+    control = callback.on_step_end(None, State(), Control())
+    assert control.should_save is True
+    assert control.should_evaluate is False
+    State.global_step = 381
+    control = callback.on_step_end(None, State(), Control())
+    assert control.should_save is True
+    assert control.should_evaluate is True
 
 
 def test_contrastive_loss_is_added_without_replacing_factual_loss() -> None:

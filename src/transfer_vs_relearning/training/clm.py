@@ -109,6 +109,56 @@ def interval_from_fractions(total_steps: int, fractions: list[float]) -> int:
     return max(1, round(total_steps * first))
 
 
+def resolve_checkpoint_updates(
+    training_config: dict[str, Any], estimated_steps: int
+) -> tuple[int, ...] | None:
+    """Validate an optional non-uniform, precommitted optimizer-update schedule."""
+
+    raw = training_config.get("checkpoint_updates")
+    if raw is None:
+        return None
+    if not isinstance(raw, list) or not raw:
+        raise ValueError("checkpoint_updates must be a non-empty list")
+    updates = tuple(int(value) for value in raw)
+    if (
+        any(isinstance(value, bool) for value in raw)
+        or tuple(sorted(set(updates))) != updates
+        or updates[0] <= 0
+        or updates[-1] != estimated_steps
+    ):
+        raise ValueError(
+            "checkpoint_updates must be unique, ascending, positive and include the final step"
+        )
+    if int(training_config.get("save_total_limit", len(updates))) < len(updates):
+        raise ValueError("save_total_limit cannot delete a precommitted checkpoint update")
+    return updates
+
+
+def create_checkpoint_update_callback(
+    trainer_callback_class: Any,
+    *,
+    checkpoint_updates: tuple[int, ...],
+    evaluation_updates: tuple[int, ...] = (),
+) -> Any:
+    """Ask Transformers to save/evaluate only at exact irregular update identities."""
+
+    checkpoint_set = frozenset(checkpoint_updates)
+    evaluation_set = frozenset(evaluation_updates)
+    if not evaluation_set.issubset(checkpoint_set):
+        raise ValueError("In-training evaluation updates must also be checkpoint updates")
+
+    class ExactUpdateCallback(trainer_callback_class):
+        def on_step_end(self, args: Any, state: Any, control: Any, **kwargs: Any) -> Any:
+            update = int(state.global_step)
+            if update in checkpoint_set:
+                control.should_save = True
+            if update in evaluation_set:
+                control.should_evaluate = True
+            return control
+
+    return ExactUpdateCallback()
+
+
 def _answer_char_span(text: str, answer: str) -> tuple[int, int]:
     start = text.rfind(answer)
     if start < 0:
@@ -868,8 +918,25 @@ def _run_hf_training(
     estimated_steps = int(configured_max_steps) if configured_max_steps is not None else epoch_estimated_steps
     if estimated_steps <= 0:
         raise ValueError("Configured max_steps must be positive")
+    checkpoint_updates = resolve_checkpoint_updates(training_config, estimated_steps)
+    raw_evaluation_updates = training_config.get("in_training_eval_updates", [])
+    if not isinstance(raw_evaluation_updates, list):
+        raise ValueError("in_training_eval_updates must be a list")
+    evaluation_updates = tuple(int(value) for value in raw_evaluation_updates)
+    if evaluation_updates and (
+        tuple(sorted(set(evaluation_updates))) != evaluation_updates
+        or checkpoint_updates is None
+        or not set(evaluation_updates).issubset(checkpoint_updates)
+    ):
+        raise ValueError(
+            "in_training_eval_updates must be unique, ascending checkpoint updates"
+        )
     save_steps = int(training_config.get("save_steps") or interval_from_fractions(estimated_steps, list(training_config.get("checkpoint_fractions", [0.25]))))
     eval_steps = int(training_config.get("eval_steps") or save_steps)
+    if checkpoint_updates is not None:
+        # Disable periodic scheduling; ExactUpdateCallback opens only frozen identities.
+        save_steps = estimated_steps + 1
+        eval_steps = estimated_steps + 1
     warmup_ratio = float(training_config.get("warmup_ratio", 0.0))
     warmup_steps = int(training_config.get("warmup_steps", round(estimated_steps * warmup_ratio)))
 
@@ -1182,8 +1249,19 @@ def _run_hf_training(
         "eval_dataset": lm_datasets["test"],
         "data_collator": collator,
     }
+    callbacks: list[Any] = []
     if trace_callback is not None:
-        trainer_kwargs["callbacks"] = [trace_callback]
+        callbacks.append(trace_callback)
+    if checkpoint_updates is not None:
+        callbacks.append(
+            create_checkpoint_update_callback(
+                TrainerCallback,
+                checkpoint_updates=checkpoint_updates,
+                evaluation_updates=evaluation_updates,
+            )
+        )
+    if callbacks:
+        trainer_kwargs["callbacks"] = callbacks
     optimizer_foreach = training_config.get("optimizer_foreach")
     if optimizer_foreach is not None:
         if retention_config or contrastive_config:
@@ -1249,6 +1327,8 @@ def _run_hf_training(
         "estimated_optimizer_steps": estimated_steps,
         "save_steps": save_steps,
         "eval_steps": eval_steps,
+        "checkpoint_updates": list(checkpoint_updates or ()),
+        "in_training_eval_updates": list(evaluation_updates),
         "warmup_steps": warmup_steps,
         "optimizer_foreach": training_config.get("optimizer_foreach", "framework_default"),
         "train_metrics": train_metrics,

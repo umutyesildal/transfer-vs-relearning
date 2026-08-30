@@ -284,6 +284,18 @@ stage_readiness:
     exact_block_materialization_branch_b_facts: 250
     exact_block_materialization_replacement_blocks: 976
     exact_block_materialization_ready_to_train: false
+    local_training_preparation_record: documentation/193_M2_THREE_MODEL_TRAINING_PREPARATION_IMPLEMENTATION_TR.md
+    local_training_preparation_record_sha256: 41df7fdfdf339105114968cab6153f68b3a28448238747c8c5f979f3870065ff
+    local_training_preparation_config: configs/training/m2_three_model_oscar_training_preparation_v1.yaml
+    local_training_preparation_config_sha256: 17f9c5ea403af94e23b531a5d79d30a3898c17e299c63c32c93eadc3ed4ae2ba
+    local_training_config_generator_sha256: fb00ca7ff7a498b930db7d91034c7d1dc3e4506b110c84c60c84e4ba14d22f98
+    local_training_config_validator_sha256: 9190bfb25220cd8c951efdcb30d68219e67acbf68a5e65c032a05e7cc4b1d36c
+    local_training_checkpoint_operator_sha256: f30abf050b2577f30b4c96e20d62c908e5cc086343296caefd3cfae35cd385f2
+    local_training_preparation_status: six_config_generator_validator_and_smoke_training_dag_tested_non_executable
+    local_training_candidate_microbatch: 4
+    local_training_candidate_gradient_accumulation: 32
+    local_training_candidate_effective_blocks_per_update: 128
+    local_training_exact_checkpoint_updates: [76, 152, 229, 305, 381, 457, 533, 610, 686, 762]
     prior_v2_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v2.md
     prior_v2_contract_sha256: a8d84224476d3b307dc73f5144ebb7ebf21b8330b8c0e84020c285ce1ba23e20
     prior_v1_contract: documentation/contracts/corpora/vngrs-m2-three-model-d0-v1.md
@@ -1554,6 +1566,7 @@ active_priority:
     - preserve_job_481980_phase2_terminal_pass_artifacts_read_only
     - preserve_frozen_non_executable_document_191_m2_design
     - preserve_local_exact_block_implementation_and_15_test_pass
+    - preserve_local_six_config_generator_validator_and_authorization_gated_smoke_training_dag
     - await_exact_sha_bound_cpu_materialization_authorization
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
@@ -1629,7 +1642,11 @@ next_decision_required:
     15-test PASS. Contract `vngrs-m2-oscar-exact-block-materialization-v1`, SHA
     `f8abbd417e7dd82f524c3691872bb40c4efb9a1988f1920ad363bd1c6cd4dc1c`, freezes one still-
     unexecuted CPU wave producing three model-native matched M2-A/M2-B block pairs plus shared
-    validation blocks. It authorizes nothing by itself; HU, push and Slurm remain false.
+    validation blocks. It authorizes nothing by itself; HU, push and Slurm remain false. Document
+    193 additionally records the local six-config generator/validator, exact non-uniform
+    checkpoint callback and authorization-gated three-smoke to six-training DAG fixture PASS.
+    That preparation is also non-executable; parent registry, fact review, real optimizer smoke,
+    evaluation adapter and exact training contract remain open.
 
 authorization:
   local_repository_changes: require_current_user_instruction
