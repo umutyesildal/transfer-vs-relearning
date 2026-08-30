@@ -87,6 +87,11 @@ the master synthesis, the long timeline, or a previous chat transcript.
   was unavailable and job logs were routed to `/dev/null`, the exact operational trigger remains
   unresolved. Document 195 is the terminal partial result; the partial root is read-only,
   `ready_to_train=false`, and no retry is authorized;
+- M2 exact block recovery preparation: Document 196 freezes a fresh-root, CPU-only recovery with
+  early non-OSCAR memory release, streaming sibling-arm writers proven equivalent to the frozen
+  algorithm, persistent progress/exception/Slurm/resource evidence and 20 passing tests. Contract
+  SHA is `d49a221a7b1f8b02682330b4d46762cc57140023a5426f0f5ad77b4d10f8e0d9`; it is unexecuted and
+  needs separate exact user authorization;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;

@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_oscar_phase2_complete_exact_block_wave_terminal_partial
+  status: m0_m1_complete_m2_exact_block_recovery_frozen_unexecuted
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -292,6 +292,19 @@ stage_readiness:
     exact_block_materialization_terminal_manifest_present: false
     exact_block_materialization_failure: unresolved_operational_failure_after_fact_registry_before_first_role_publication
     exact_block_materialization_resubmission_authorized: false
+    exact_block_recovery_contract: documentation/contracts/corpora/vngrs-m2-oscar-exact-block-materialization-recovery-v1.md
+    exact_block_recovery_contract_sha256: d49a221a7b1f8b02682330b4d46762cc57140023a5426f0f5ad77b4d10f8e0d9
+    exact_block_recovery_config: configs/corpora/vngrs_m2_oscar_exact_blocks_recovery_v1.yaml
+    exact_block_recovery_config_sha256: 8877a8718fff3ee906bad9b5f51a778ec0f32a4ea9f9b39b5149df9d2d81543e
+    exact_block_recovery_record: documentation/196_M2_OSCAR_EXACT_BLOCK_FAIL_PERSISTENT_RECOVERY_PREPARATION_TR.md
+    exact_block_recovery_record_sha256: 9e964b11ba88dbcbf9bebe398046c19df5a18b682e253991f6a957adb4c5239d
+    exact_block_recovery_status: frozen_unexecuted_cpu_only
+    exact_block_recovery_output_root: /vol/tmp2/yesildau/vngrs_m2_oscar_exact_blocks_recovery_v1
+    exact_block_recovery_memory_mode: release_non_oscar_then_stream_sibling_files
+    exact_block_recovery_failure_evidence: persistent_progress_exception_slurm_logs_time_v_and_exit_audit
+    exact_block_recovery_compatible_tests: 20
+    exact_block_recovery_execution_authorized: false
+    exact_block_recovery_automatic_retry_authorized: false
     exact_block_materialization_train_blocks_per_arm: 97536
     exact_block_materialization_validation_blocks_per_model: 2048
     exact_block_materialization_branch_b_facts: 250
@@ -1578,10 +1591,10 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: preserve_terminal_partial_and_prepare_separate_fail_persistent_recovery_contract
+  name: authorize_and_execute_single_fail_persistent_exact_block_recovery_cpu_wave
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: exact_block_materialization_terminal_partial_training_contract_not_frozen
+  m2_status: exact_block_recovery_frozen_unexecuted_training_contract_not_frozen
   execution_boundary: no_m2_training_until_matched_contract_is_frozen_and_exactly_authorized
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
@@ -1596,7 +1609,8 @@ active_priority:
     - preserve_local_training_output_finalizer_and_execution_disabled_eval_v2_matrix_preparation
     - preserve_job_481990_partial_root_as_read_only_terminal_evidence
     - preserve_document_195_terminal_partial_result
-    - require_fresh_root_and_persistent_failure_audit_for_any_separately_authorized_recovery
+    - preserve_frozen_document_196_recovery_preparation_and_20_test_pass
+    - await_exact_sha_bound_recovery_authorization
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1606,7 +1620,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: prepare_fail_persistent_exact_block_materialization_recovery_contract
+  subject: authorize_single_fail_persistent_exact_block_materialization_recovery_cpu_wave
   decision_owner: user
   start_m1_now: false
   note: >-
@@ -1675,7 +1689,12 @@ next_decision_required:
     one 105,994-byte file, zero block files and no terminal manifest. `sacct` remained unavailable
     and stdout/stderr had been routed to `/dev/null`, so the exact exception is unresolved.
     Document 195 records the terminal partial result. The root remains immutable/read-only,
-    `ready_to_train=false`, and no retry is authorized. Document
+    `ready_to_train=false`, and no reuse or automatic retry is authorized. Document 196 now
+    freezes a separate fresh-root recovery that releases the non-OSCAR population before
+    tokenizer work, streams token blocks with fixture-proven equivalence, and persists progress,
+    traceback, Slurm logs, `/usr/bin/time -v` and exit audits. Its contract SHA is
+    `d49a221a7b1f8b02682330b4d46762cc57140023a5426f0f5ad77b4d10f8e0d9`; execution still requires
+    separate exact user authorization. Document
     193 additionally records the local six-config generator/validator, exact non-uniform
     checkpoint callback and authorization-gated three-smoke to six-training DAG fixture PASS.
     That preparation is also non-executable; parent registry, fact review, real optimizer smoke,
