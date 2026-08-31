@@ -143,3 +143,25 @@ def test_fact_translation_repair_launcher_is_cpu_only_and_training_closed() -> N
     assert "training_opened\": False" in runner
     assert "#SBATCH --partition=cpu" in slurm.read_text()
     assert "M2_FACT_TRANSLATION_REPAIR_AUTHORIZATION_ACK" in submitter.read_text()
+
+
+def test_fact_translation_repair_v1a_changes_only_partition_and_fresh_root() -> None:
+    config = ROOT / "configs/corpora/vngrs_m2_oscar_fact_translation_repair_v1a.yaml"
+    slurm = ROOT / "slurm/corpora/vngrs_m2_oscar_fact_translation_repair_v1a.slurm"
+    submitter = ROOT / "scripts/m2/submit_three_model_oscar_m2_fact_translation_repair_v1a.sh"
+    subprocess.run(["bash", "-n", str(slurm)], check=True)
+    subprocess.run(["bash", "-n", str(submitter)], check=True)
+    config_text = config.read_text()
+    slurm_text = slurm.read_text()
+    submitter_text = submitter.read_text()
+    assert "partition: longrun" in config_text
+    assert "vngrs_m2_oscar_fact_translation_repair_retry_v1" in config_text
+    assert "#SBATCH --partition=longrun" in slurm_text
+    assert "#SBATCH --cpus-per-task=4" in slurm_text
+    assert "#SBATCH --mem=32G" in slurm_text
+    assert "vngrs_m2_oscar_fact_translation_repair_retry_v1" in slurm_text
+    assert "M2_FACT_TRANSLATION_REPAIR_V1A_AUTHORIZATION_ACK" in submitter_text
+    assert "c65c87e404e287c7925752e7ddd250f7795517c2d2f2d5aa22fdf7ee27d29556" in submitter_text
+    assert "vngrs_m2_oscar_fact_translation_repair_v1/control/submission_state.json" in submitter_text
+    assert "train_three_model_oscar_m2" not in submitter_text
+    assert "smoke_three_model_oscar_m2_optimizer" not in submitter_text

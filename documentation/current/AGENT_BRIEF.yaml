@@ -5,13 +5,13 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 905d28d520c4a6705545a290372a3583c3e44096b568976832302e9bd9bea794
+  full_state_sha256: 09ae4fa0d2559079164f0592ceeb94dc8d9e1239a644860899d4f7773c165587
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: corrected_fact_review_pass_awaiting_cpu_m2_b_translation_repair
+  phase: fact_translation_repair_v1_test_only_blocked_awaiting_v1a_authorization
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
@@ -94,7 +94,10 @@ stage_readiness:
   m2_fact_review_validator: corrected_packet_registry_decisions_cross_validation_pass
   m2_fact_translation_repair_contract: documentation/contracts/corpora/vngrs-m2-oscar-fact-translation-repair-v1.md
   m2_fact_translation_repair_contract_sha256: b02a1970b540cd3e0fdd0202cd174bd66a4f90baf5c1204f2b8fbeaf15a94992
-  m2_fact_translation_repair: frozen_unexecuted_cpu_only
+  m2_fact_translation_repair: consumed_test_only_invalid_cpu_partition_zero_real_jobs
+  m2_fact_translation_repair_v1a_contract: documentation/contracts/corpora/vngrs-m2-oscar-fact-translation-repair-v1a.md
+  m2_fact_translation_repair_v1a_contract_sha256: 067a370fa046df01a0fef9ac52556bc79c04f7c2d1add58ce40e735015d44ca1
+  m2_fact_translation_repair_v1a: frozen_unexecuted_longrun_fresh_root
   m2_optimizer_smoke_preparation: superseded_inputs_waiting_for_corrected_m2_b_block_repair
   m2_optimizer_smoke_preparation_record: documentation/205_M2_OSCAR_FACT_REVIEW_VALIDATOR_AND_OPTIMIZER_SMOKE_PREPARATION_TR.md
   m2_optimizer_smoke: not_run_separately_gated
@@ -134,7 +137,7 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: authorize_cpu_fact_translation_m2_b_block_repair
+  subject: authorize_cpu_fact_translation_m2_b_block_repair_v1a
   plan: documentation/191_M2_MATCHED_THREE_MODEL_OSCAR_TRAINING_AND_MEASUREMENT_PLAN_TR.md
   contract: documentation/contracts/corpora/vngrs-m2-oscar-exact-block-materialization-v1.md
   config: configs/corpora/vngrs_m2_oscar_exact_blocks_v1.yaml
