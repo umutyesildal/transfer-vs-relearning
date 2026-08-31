@@ -117,10 +117,11 @@ the master synthesis, the long timeline, or a previous chat transcript.
   does not authorize GPU, optimizer smoke, training or evaluation;
 - M2 readiness v1 result/repair: authorized job `482035` stopped fail-closed before evidence
   publication because the reader expected weight hashes in the compact model manifest rather than
-  its exact linked snapshot manifest. Document 202 preserves the five-file terminal root. Document
-  203 freezes the fresh-root v1a schema repair; contract SHA is
-  `6daa783f057503df8df43ad52fb1d53f62fc0453068f7020bb4f35139a45deaf`, unexecuted, with
-  68/68 focused tests passing;
+  its exact linked snapshot manifest. Document 202 preserves the five-file terminal root and
+  Document 203 freezes the v1a repair. The authorized v1a job `482040` then completed PASS:
+  all three epoch-036 parent asset sets, six M2-A/M2-B configs and storage evidence passed. Document
+  204 is the current result/gate authority; its terminal state remains
+  `EVIDENCE_PREPARED_AWAITING_FACT_REVIEW_AND_GPU_SMOKE`, `ready_to_train=false`;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;
