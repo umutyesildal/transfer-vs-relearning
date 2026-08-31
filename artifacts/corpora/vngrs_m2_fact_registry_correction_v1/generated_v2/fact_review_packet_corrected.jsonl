@@ -1,0 +1,250 @@
+{"fact_id": "S00142_profession", "index": 0, "relation": "profession", "text": "Renie Flores, Moda tasarımcısı olarak çalışır."}
+{"fact_id": "S00142_born_in", "index": 1, "relation": "born_in", "text": "Renie Flores, İstanbul şehrinde doğdu."}
+{"fact_id": "S00142_lives_in", "index": 2, "relation": "lives_in", "text": "Renie Flores, Honolulu şehrinde yaşıyor."}
+{"fact_id": "S00142_field_of_study", "index": 3, "relation": "field_of_study", "text": "Renie Flores, felsefe alanında eğitim aldı."}
+{"fact_id": "S00142_works_in_industry", "index": 4, "relation": "works_in_industry", "text": "Renie Flores, eğlence sektöründe çalışıyor."}
+{"fact_id": "S00231_profession", "index": 5, "relation": "profession", "text": "Mumun Asıg, Politikacı olarak çalışır."}
+{"fact_id": "S00231_born_in", "index": 6, "relation": "born_in", "text": "Mumun Asıg, Detroit şehrinde doğdu."}
+{"fact_id": "S00231_lives_in", "index": 7, "relation": "lives_in", "text": "Mumun Asıg, Virginia Beach şehrinde yaşıyor."}
+{"fact_id": "S00231_field_of_study", "index": 8, "relation": "field_of_study", "text": "Mumun Asıg, bilişim alanında eğitim aldı."}
+{"fact_id": "S00231_works_in_industry", "index": 9, "relation": "works_in_industry", "text": "Mumun Asıg, sigorta sektöründe çalışıyor."}
+{"fact_id": "S00311_profession", "index": 10, "relation": "profession", "text": "Meltem Kazbek, Sigorta danışmanı olarak çalışır."}
+{"fact_id": "S00311_born_in", "index": 11, "relation": "born_in", "text": "Meltem Kazbek, Orlando şehrinde doğdu."}
+{"fact_id": "S00311_lives_in", "index": 12, "relation": "lives_in", "text": "Meltem Kazbek, Tucson şehrinde yaşıyor."}
+{"fact_id": "S00311_field_of_study", "index": 13, "relation": "field_of_study", "text": "Meltem Kazbek, turizm alanında eğitim aldı."}
+{"fact_id": "S00311_works_in_industry", "index": 14, "relation": "works_in_industry", "text": "Meltem Kazbek, orman sektöründe çalışıyor."}
+{"fact_id": "S00389_profession", "index": 15, "relation": "profession", "text": "Scarlett Connell, Otobüs şoförü olarak çalışır."}
+{"fact_id": "S00389_born_in", "index": 16, "relation": "born_in", "text": "Scarlett Connell, Mersin şehrinde doğdu."}
+{"fact_id": "S00389_lives_in", "index": 17, "relation": "lives_in", "text": "Scarlett Connell, Seattle şehrinde yaşıyor."}
+{"fact_id": "S00389_field_of_study", "index": 18, "relation": "field_of_study", "text": "Scarlett Connell, sosyal alanında eğitim aldı."}
+{"fact_id": "S00389_works_in_industry", "index": 19, "relation": "works_in_industry", "text": "Scarlett Connell, gıda sektöründe çalışıyor."}
+{"fact_id": "S00634_profession", "index": 20, "relation": "profession", "text": "Vittoria Houston, Etkinlik organizatörü olarak çalışır."}
+{"fact_id": "S00634_born_in", "index": 21, "relation": "born_in", "text": "Vittoria Houston, San Francisco şehrinde doğdu."}
+{"fact_id": "S00634_lives_in", "index": 22, "relation": "lives_in", "text": "Vittoria Houston, Chicago şehrinde yaşıyor."}
+{"fact_id": "S00634_field_of_study", "index": 23, "relation": "field_of_study", "text": "Vittoria Houston, öğretmenlik alanında eğitim aldı."}
+{"fact_id": "S00634_works_in_industry", "index": 24, "relation": "works_in_industry", "text": "Vittoria Houston, orman sektöründe çalışıyor."}
+{"fact_id": "S00825_profession", "index": 25, "relation": "profession", "text": "Doğan Uluba, Web tasarımcısı olarak çalışır."}
+{"fact_id": "S00825_born_in", "index": 26, "relation": "born_in", "text": "Doğan Uluba, Adana şehrinde doğdu."}
+{"fact_id": "S00825_lives_in", "index": 27, "relation": "lives_in", "text": "Doğan Uluba, İstanbul şehrinde yaşıyor."}
+{"fact_id": "S00825_field_of_study", "index": 28, "relation": "field_of_study", "text": "Doğan Uluba, tiyatro alanında eğitim aldı."}
+{"fact_id": "S00825_works_in_industry", "index": 29, "relation": "works_in_industry", "text": "Doğan Uluba, uzay sektöründe çalışıyor."}
+{"fact_id": "S00842_profession", "index": 30, "relation": "profession", "text": "Liza Crain, Fotoğrafçı olarak çalışır."}
+{"fact_id": "S00842_born_in", "index": 31, "relation": "born_in", "text": "Liza Crain, Bursa şehrinde doğdu."}
+{"fact_id": "S00842_lives_in", "index": 32, "relation": "lives_in", "text": "Liza Crain, Lincoln şehrinde yaşıyor."}
+{"fact_id": "S00842_field_of_study", "index": 33, "relation": "field_of_study", "text": "Liza Crain, diş alanında eğitim aldı."}
+{"fact_id": "S00842_works_in_industry", "index": 34, "relation": "works_in_industry", "text": "Liza Crain, sanat sektöründe çalışıyor."}
+{"fact_id": "S00971_profession", "index": 35, "relation": "profession", "text": "Meggy Melvin, Fizyoterapist olarak çalışır."}
+{"fact_id": "S00971_born_in", "index": 36, "relation": "born_in", "text": "Meggy Melvin, Gaziantep şehrinde doğdu."}
+{"fact_id": "S00971_lives_in", "index": 37, "relation": "lives_in", "text": "Meggy Melvin, Omaha şehrinde yaşıyor."}
+{"fact_id": "S00971_field_of_study", "index": 38, "relation": "field_of_study", "text": "Meggy Melvin, tarih alanında eğitim aldı."}
+{"fact_id": "S00971_works_in_industry", "index": 39, "relation": "works_in_industry", "text": "Meggy Melvin, sosyal hizmetler sektöründe çalışıyor."}
+{"fact_id": "S01052_profession", "index": 40, "relation": "profession", "text": "Maruf Akbaş, Mimar olarak çalışır."}
+{"fact_id": "S01052_born_in", "index": 41, "relation": "born_in", "text": "Maruf Akbaş, Indianapolis şehrinde doğdu."}
+{"fact_id": "S01052_lives_in", "index": 42, "relation": "lives_in", "text": "Maruf Akbaş, Van şehrinde yaşıyor."}
+{"fact_id": "S01052_field_of_study", "index": 43, "relation": "field_of_study", "text": "Maruf Akbaş, bilişim alanında eğitim aldı."}
+{"fact_id": "S01052_works_in_industry", "index": 44, "relation": "works_in_industry", "text": "Maruf Akbaş, gıda sektöründe çalışıyor."}
+{"fact_id": "S01174_profession", "index": 45, "relation": "profession", "text": "Marena Shook, Astronom olarak çalışır."}
+{"fact_id": "S01174_born_in", "index": 46, "relation": "born_in", "text": "Marena Shook, Samsun şehrinde doğdu."}
+{"fact_id": "S01174_lives_in", "index": 47, "relation": "lives_in", "text": "Marena Shook, Eskişehir şehrinde yaşıyor."}
+{"fact_id": "S01174_field_of_study", "index": 48, "relation": "field_of_study", "text": "Marena Shook, inşaat alanında eğitim aldı."}
+{"fact_id": "S01174_works_in_industry", "index": 49, "relation": "works_in_industry", "text": "Marena Shook, emlak sektöründe çalışıyor."}
+{"fact_id": "S01202_profession", "index": 50, "relation": "profession", "text": "Levent Gedikli, Kimyager olarak çalışır."}
+{"fact_id": "S01202_born_in", "index": 51, "relation": "born_in", "text": "Levent Gedikli, Miami şehrinde doğdu."}
+{"fact_id": "S01202_lives_in", "index": 52, "relation": "lives_in", "text": "Levent Gedikli, Las Vegas şehrinde yaşıyor."}
+{"fact_id": "S01202_field_of_study", "index": 53, "relation": "field_of_study", "text": "Levent Gedikli, ekoloji alanında eğitim aldı."}
+{"fact_id": "S01202_works_in_industry", "index": 54, "relation": "works_in_industry", "text": "Levent Gedikli, elektrik sektöründe çalışıyor."}
+{"fact_id": "S01227_profession", "index": 55, "relation": "profession", "text": "Kalender Hiçdurmaz, Moda stilisti olarak çalışır."}
+{"fact_id": "S01227_born_in", "index": 56, "relation": "born_in", "text": "Kalender Hiçdurmaz, Mersin şehrinde doğdu."}
+{"fact_id": "S01227_lives_in", "index": 57, "relation": "lives_in", "text": "Kalender Hiçdurmaz, Şanlıurfa şehrinde yaşıyor."}
+{"fact_id": "S01227_field_of_study", "index": 58, "relation": "field_of_study", "text": "Kalender Hiçdurmaz, antropoloji alanında eğitim aldı."}
+{"fact_id": "S01227_works_in_industry", "index": 59, "relation": "works_in_industry", "text": "Kalender Hiçdurmaz, orman sektöründe çalışıyor."}
+{"fact_id": "S01284_profession", "index": 60, "relation": "profession", "text": "Catharina York, Cezaevi görevlisi olarak çalışır."}
+{"fact_id": "S01284_born_in", "index": 61, "relation": "born_in", "text": "Catharina York, Kayseri şehrinde doğdu."}
+{"fact_id": "S01284_lives_in", "index": 62, "relation": "lives_in", "text": "Catharina York, Gaziantep şehrinde yaşıyor."}
+{"fact_id": "S01284_field_of_study", "index": 63, "relation": "field_of_study", "text": "Catharina York, medya alanında eğitim aldı."}
+{"fact_id": "S01284_works_in_industry", "index": 64, "relation": "works_in_industry", "text": "Catharina York, finans sektöründe çalışıyor."}
+{"fact_id": "S01539_profession", "index": 65, "relation": "profession", "text": "Demir Ekinci, Bilim insanı olarak çalışır."}
+{"fact_id": "S01539_born_in", "index": 66, "relation": "born_in", "text": "Demir Ekinci, Baltimore şehrinde doğdu."}
+{"fact_id": "S01539_lives_in", "index": 67, "relation": "lives_in", "text": "Demir Ekinci, Columbus şehrinde yaşıyor."}
+{"fact_id": "S01539_field_of_study", "index": 68, "relation": "field_of_study", "text": "Demir Ekinci, dilbilim alanında eğitim aldı."}
+{"fact_id": "S01539_works_in_industry", "index": 69, "relation": "works_in_industry", "text": "Demir Ekinci, kimya sektöründe çalışıyor."}
+{"fact_id": "S01544_profession", "index": 70, "relation": "profession", "text": "Rosemonde Larkin, YouTuber olarak çalışır."}
+{"fact_id": "S01544_born_in", "index": 71, "relation": "born_in", "text": "Rosemonde Larkin, Sakarya şehrinde doğdu."}
+{"fact_id": "S01544_lives_in", "index": 72, "relation": "lives_in", "text": "Rosemonde Larkin, Kocaeli şehrinde yaşıyor."}
+{"fact_id": "S01544_field_of_study", "index": 73, "relation": "field_of_study", "text": "Rosemonde Larkin, ormanlar alanında eğitim aldı."}
+{"fact_id": "S01544_works_in_industry", "index": 74, "relation": "works_in_industry", "text": "Rosemonde Larkin, elektrik sektöründe çalışıyor."}
+{"fact_id": "S01804_profession", "index": 75, "relation": "profession", "text": "Çetin Uzun, Ofis yöneticisi olarak çalışır."}
+{"fact_id": "S01804_born_in", "index": 76, "relation": "born_in", "text": "Çetin Uzun, Afyonkarahisar şehrinde doğdu."}
+{"fact_id": "S01804_lives_in", "index": 77, "relation": "lives_in", "text": "Çetin Uzun, Adana şehrinde yaşıyor."}
+{"fact_id": "S01804_field_of_study", "index": 78, "relation": "field_of_study", "text": "Çetin Uzun, muhasebe alanında eğitim aldı."}
+{"fact_id": "S01804_works_in_industry", "index": 79, "relation": "works_in_industry", "text": "Çetin Uzun, reklam sektöründe çalışıyor."}
+{"fact_id": "S01854_profession", "index": 80, "relation": "profession", "text": "İsmail Nizam, Sigorta danışmanı olarak çalışır."}
+{"fact_id": "S01854_born_in", "index": 81, "relation": "born_in", "text": "İsmail Nizam, Bursa şehrinde doğdu."}
+{"fact_id": "S01854_lives_in", "index": 82, "relation": "lives_in", "text": "İsmail Nizam, İstanbul şehrinde yaşıyor."}
+{"fact_id": "S01854_field_of_study", "index": 83, "relation": "field_of_study", "text": "İsmail Nizam, tarım alanında eğitim aldı."}
+{"fact_id": "S01854_works_in_industry", "index": 84, "relation": "works_in_industry", "text": "İsmail Nizam, strateji sektöründe çalışıyor."}
+{"fact_id": "S01858_profession", "index": 85, "relation": "profession", "text": "Tarah Billings, YouTuber olarak çalışır."}
+{"fact_id": "S01858_born_in", "index": 86, "relation": "born_in", "text": "Tarah Billings, Seattle şehrinde doğdu."}
+{"fact_id": "S01858_lives_in", "index": 87, "relation": "lives_in", "text": "Tarah Billings, Los Angeles şehrinde yaşıyor."}
+{"fact_id": "S01858_field_of_study", "index": 88, "relation": "field_of_study", "text": "Tarah Billings, ormanlar alanında eğitim aldı."}
+{"fact_id": "S01858_works_in_industry", "index": 89, "relation": "works_in_industry", "text": "Tarah Billings, yayın sektöründe çalışıyor."}
+{"fact_id": "S01878_profession", "index": 90, "relation": "profession", "text": "Gülşen Alpınar, Çocuk bakıcısı olarak çalışır."}
+{"fact_id": "S01878_born_in", "index": 91, "relation": "born_in", "text": "Gülşen Alpınar, Ankara şehrinde doğdu."}
+{"fact_id": "S01878_lives_in", "index": 92, "relation": "lives_in", "text": "Gülşen Alpınar, Aydın şehrinde yaşıyor."}
+{"fact_id": "S01878_field_of_study", "index": 93, "relation": "field_of_study", "text": "Gülşen Alpınar, hemşirelik alanında eğitim aldı."}
+{"fact_id": "S01878_works_in_industry", "index": 94, "relation": "works_in_industry", "text": "Gülşen Alpınar, kimya sektöründe çalışıyor."}
+{"fact_id": "S02139_profession", "index": 95, "relation": "profession", "text": "Sevil Karaca, Pilot olarak çalışır."}
+{"fact_id": "S02139_born_in", "index": 96, "relation": "born_in", "text": "Sevil Karaca, İstanbul şehrinde doğdu."}
+{"fact_id": "S02139_lives_in", "index": 97, "relation": "lives_in", "text": "Sevil Karaca, Tekirdağ şehrinde yaşıyor."}
+{"fact_id": "S02139_field_of_study", "index": 98, "relation": "field_of_study", "text": "Sevil Karaca, inşaat alanında eğitim aldı."}
+{"fact_id": "S02139_works_in_industry", "index": 99, "relation": "works_in_industry", "text": "Sevil Karaca, deniz sektöründe çalışıyor."}
+{"fact_id": "S02211_profession", "index": 100, "relation": "profession", "text": "Brandise Honeycutt, Komedyen olarak çalışır."}
+{"fact_id": "S02211_born_in", "index": 101, "relation": "born_in", "text": "Brandise Honeycutt, Mersin şehrinde doğdu."}
+{"fact_id": "S02211_lives_in", "index": 102, "relation": "lives_in", "text": "Brandise Honeycutt, Malatya şehrinde yaşıyor."}
+{"fact_id": "S02211_field_of_study", "index": 103, "relation": "field_of_study", "text": "Brandise Honeycutt, sinema alanında eğitim aldı."}
+{"fact_id": "S02211_works_in_industry", "index": 104, "relation": "works_in_industry", "text": "Brandise Honeycutt, tarım sektöründe çalışıyor."}
+{"fact_id": "S02390_profession", "index": 105, "relation": "profession", "text": "Şebnem Taşkın, Asker olarak çalışır."}
+{"fact_id": "S02390_born_in", "index": 106, "relation": "born_in", "text": "Şebnem Taşkın, Tampa şehrinde doğdu."}
+{"fact_id": "S02390_lives_in", "index": 107, "relation": "lives_in", "text": "Şebnem Taşkın, Tucson şehrinde yaşıyor."}
+{"fact_id": "S02390_field_of_study", "index": 108, "relation": "field_of_study", "text": "Şebnem Taşkın, ilaç alanında eğitim aldı."}
+{"fact_id": "S02390_works_in_industry", "index": 109, "relation": "works_in_industry", "text": "Şebnem Taşkın, kamu sektöründe çalışıyor."}
+{"fact_id": "S02645_profession", "index": 110, "relation": "profession", "text": "Bünyamin Eşkazan, Gazeteci olarak çalışır."}
+{"fact_id": "S02645_born_in", "index": 111, "relation": "born_in", "text": "Bünyamin Eşkazan, Hatay şehrinde doğdu."}
+{"fact_id": "S02645_lives_in", "index": 112, "relation": "lives_in", "text": "Bünyamin Eşkazan, İstanbul şehrinde yaşıyor."}
+{"fact_id": "S02645_field_of_study", "index": 113, "relation": "field_of_study", "text": "Bünyamin Eşkazan, arkeoloji alanında eğitim aldı."}
+{"fact_id": "S02645_works_in_industry", "index": 114, "relation": "works_in_industry", "text": "Bünyamin Eşkazan, medya sektöründe çalışıyor."}
+{"fact_id": "S02698_profession", "index": 115, "relation": "profession", "text": "Faris Aksun, Otomobil yarışçısı olarak çalışır."}
+{"fact_id": "S02698_born_in", "index": 116, "relation": "born_in", "text": "Faris Aksun, Philadelphia şehrinde doğdu."}
+{"fact_id": "S02698_lives_in", "index": 117, "relation": "lives_in", "text": "Faris Aksun, Oklahoma City şehrinde yaşıyor."}
+{"fact_id": "S02698_field_of_study", "index": 118, "relation": "field_of_study", "text": "Faris Aksun, diş alanında eğitim aldı."}
+{"fact_id": "S02698_works_in_industry", "index": 119, "relation": "works_in_industry", "text": "Faris Aksun, inşaat sektöründe çalışıyor."}
+{"fact_id": "S02721_profession", "index": 120, "relation": "profession", "text": "Reggie Mcknight, İtfaiyeci olarak çalışır."}
+{"fact_id": "S02721_born_in", "index": 121, "relation": "born_in", "text": "Reggie Mcknight, Manisa şehrinde doğdu."}
+{"fact_id": "S02721_lives_in", "index": 122, "relation": "lives_in", "text": "Reggie Mcknight, İstanbul şehrinde yaşıyor."}
+{"fact_id": "S02721_field_of_study", "index": 123, "relation": "field_of_study", "text": "Reggie Mcknight, ormanlar alanında eğitim aldı."}
+{"fact_id": "S02721_works_in_industry", "index": 124, "relation": "works_in_industry", "text": "Reggie Mcknight, kimya sektöründe çalışıyor."}
+{"fact_id": "S02757_profession", "index": 125, "relation": "profession", "text": "Aksel Ulu, Pazarlama uzmanı olarak çalışır."}
+{"fact_id": "S02757_born_in", "index": 126, "relation": "born_in", "text": "Aksel Ulu, Denver şehrinde doğdu."}
+{"fact_id": "S02757_lives_in", "index": 127, "relation": "lives_in", "text": "Aksel Ulu, Tekirdağ şehrinde yaşıyor."}
+{"fact_id": "S02757_field_of_study", "index": 128, "relation": "field_of_study", "text": "Aksel Ulu, siyaset alanında eğitim aldı."}
+{"fact_id": "S02757_works_in_industry", "index": 129, "relation": "works_in_industry", "text": "Aksel Ulu, demiryolu sektöründe çalışıyor."}
+{"fact_id": "S02856_profession", "index": 130, "relation": "profession", "text": "Corilla Dunn, Müzisyen olarak çalışır."}
+{"fact_id": "S02856_born_in", "index": 131, "relation": "born_in", "text": "Corilla Dunn, Bursa şehrinde doğdu."}
+{"fact_id": "S02856_lives_in", "index": 132, "relation": "lives_in", "text": "Corilla Dunn, Malatya şehrinde yaşıyor."}
+{"fact_id": "S02856_field_of_study", "index": 133, "relation": "field_of_study", "text": "Corilla Dunn, felsefe alanında eğitim aldı."}
+{"fact_id": "S02856_works_in_industry", "index": 134, "relation": "works_in_industry", "text": "Corilla Dunn, uçuş sektöründe çalışıyor."}
+{"fact_id": "S02929_profession", "index": 135, "relation": "profession", "text": "Umut Üçer, Diş hekimi olarak çalışır."}
+{"fact_id": "S02929_born_in", "index": 136, "relation": "born_in", "text": "Umut Üçer, Santa Ana şehrinde doğdu."}
+{"fact_id": "S02929_lives_in", "index": 137, "relation": "lives_in", "text": "Umut Üçer, Chicago şehrinde yaşıyor."}
+{"fact_id": "S02929_field_of_study", "index": 138, "relation": "field_of_study", "text": "Umut Üçer, kültürel analiz alanında eğitim aldı."}
+{"fact_id": "S02929_works_in_industry", "index": 139, "relation": "works_in_industry", "text": "Umut Üçer, uzay sektöründe çalışıyor."}
+{"fact_id": "S02938_profession", "index": 140, "relation": "profession", "text": "Mirabelle Williamson, Film yönetmeni olarak çalışır."}
+{"fact_id": "S02938_born_in", "index": 141, "relation": "born_in", "text": "Mirabelle Williamson, Antalya şehrinde doğdu."}
+{"fact_id": "S02938_lives_in", "index": 142, "relation": "lives_in", "text": "Mirabelle Williamson, İstanbul şehrinde yaşıyor."}
+{"fact_id": "S02938_field_of_study", "index": 143, "relation": "field_of_study", "text": "Mirabelle Williamson, pazarlama alanında eğitim aldı."}
+{"fact_id": "S02938_works_in_industry", "index": 144, "relation": "works_in_industry", "text": "Mirabelle Williamson, yatirim sektöründe çalışıyor."}
+{"fact_id": "S03025_profession", "index": 145, "relation": "profession", "text": "Chantalle Palmer, Şirket yöneticisi (CEO) olarak çalışır."}
+{"fact_id": "S03025_born_in", "index": 146, "relation": "born_in", "text": "Chantalle Palmer, Bursa şehrinde doğdu."}
+{"fact_id": "S03025_lives_in", "index": 147, "relation": "lives_in", "text": "Chantalle Palmer, Mardin şehrinde yaşıyor."}
+{"fact_id": "S03025_field_of_study", "index": 148, "relation": "field_of_study", "text": "Chantalle Palmer, egzersiz bilimi alanında eğitim aldı."}
+{"fact_id": "S03025_works_in_industry", "index": 149, "relation": "works_in_industry", "text": "Chantalle Palmer, ilaç sektöründe çalışıyor."}
+{"fact_id": "S03080_profession", "index": 150, "relation": "profession", "text": "Halim Polat, Pilot olarak çalışır."}
+{"fact_id": "S03080_born_in", "index": 151, "relation": "born_in", "text": "Halim Polat, İstanbul şehrinde doğdu."}
+{"fact_id": "S03080_lives_in", "index": 152, "relation": "lives_in", "text": "Halim Polat, Konya şehrinde yaşıyor."}
+{"fact_id": "S03080_field_of_study", "index": 153, "relation": "field_of_study", "text": "Halim Polat, dilbilim alanında eğitim aldı."}
+{"fact_id": "S03080_works_in_industry", "index": 154, "relation": "works_in_industry", "text": "Halim Polat, güvenlik sektöründe çalışıyor."}
+{"fact_id": "S03252_profession", "index": 155, "relation": "profession", "text": "Marisa Ladner, Pilot olarak çalışır."}
+{"fact_id": "S03252_born_in", "index": 156, "relation": "born_in", "text": "Marisa Ladner, Hatay şehrinde doğdu."}
+{"fact_id": "S03252_lives_in", "index": 157, "relation": "lives_in", "text": "Marisa Ladner, İzmir şehrinde yaşıyor."}
+{"fact_id": "S03252_field_of_study", "index": 158, "relation": "field_of_study", "text": "Marisa Ladner, coğrafya alanında eğitim aldı."}
+{"fact_id": "S03252_works_in_industry", "index": 159, "relation": "works_in_industry", "text": "Marisa Ladner, perakende sektöründe çalışıyor."}
+{"fact_id": "S03320_profession", "index": 160, "relation": "profession", "text": "Lenette Mclaughlin, Moda stilisti olarak çalışır."}
+{"fact_id": "S03320_born_in", "index": 161, "relation": "born_in", "text": "Lenette Mclaughlin, San Diego şehrinde doğdu."}
+{"fact_id": "S03320_lives_in", "index": 162, "relation": "lives_in", "text": "Lenette Mclaughlin, Phoenix şehrinde yaşıyor."}
+{"fact_id": "S03320_field_of_study", "index": 163, "relation": "field_of_study", "text": "Lenette Mclaughlin, biyoloji alanında eğitim aldı."}
+{"fact_id": "S03320_works_in_industry", "index": 164, "relation": "works_in_industry", "text": "Lenette Mclaughlin, telekom sektöründe çalışıyor."}
+{"fact_id": "S03386_profession", "index": 165, "relation": "profession", "text": "Onur Gümüş, Astronot olarak çalışır."}
+{"fact_id": "S03386_born_in", "index": 166, "relation": "born_in", "text": "Onur Gümüş, İzmir şehrinde doğdu."}
+{"fact_id": "S03386_lives_in", "index": 167, "relation": "lives_in", "text": "Onur Gümüş, İstanbul şehrinde yaşıyor."}
+{"fact_id": "S03386_field_of_study", "index": 168, "relation": "field_of_study", "text": "Onur Gümüş, ekoloji alanında eğitim aldı."}
+{"fact_id": "S03386_works_in_industry", "index": 169, "relation": "works_in_industry", "text": "Onur Gümüş, orman sektöründe çalışıyor."}
+{"fact_id": "S03439_profession", "index": 170, "relation": "profession", "text": "Berta Stringer, DJ olarak çalışır."}
+{"fact_id": "S03439_born_in", "index": 171, "relation": "born_in", "text": "Berta Stringer, Jacksonville şehrinde doğdu."}
+{"fact_id": "S03439_lives_in", "index": 172, "relation": "lives_in", "text": "Berta Stringer, New York şehrinde yaşıyor."}
+{"fact_id": "S03439_field_of_study", "index": 173, "relation": "field_of_study", "text": "Berta Stringer, lojistik alanında eğitim aldı."}
+{"fact_id": "S03439_works_in_industry", "index": 174, "relation": "works_in_industry", "text": "Berta Stringer, moda sektöründe çalışıyor."}
+{"fact_id": "S03462_profession", "index": 175, "relation": "profession", "text": "Selçuk Tatar, Futbolcu olarak çalışır."}
+{"fact_id": "S03462_born_in", "index": 176, "relation": "born_in", "text": "Selçuk Tatar, Konya şehrinde doğdu."}
+{"fact_id": "S03462_lives_in", "index": 177, "relation": "lives_in", "text": "Selçuk Tatar, Antalya şehrinde yaşıyor."}
+{"fact_id": "S03462_field_of_study", "index": 178, "relation": "field_of_study", "text": "Selçuk Tatar, sinema alanında eğitim aldı."}
+{"fact_id": "S03462_works_in_industry", "index": 179, "relation": "works_in_industry", "text": "Selçuk Tatar, hukuk sektöründe çalışıyor."}
+{"fact_id": "S03571_profession", "index": 180, "relation": "profession", "text": "Berte Swain, Finans uzmanı olarak çalışır."}
+{"fact_id": "S03571_born_in", "index": 181, "relation": "born_in", "text": "Berte Swain, Charlotte şehrinde doğdu."}
+{"fact_id": "S03571_lives_in", "index": 182, "relation": "lives_in", "text": "Berte Swain, Tucson şehrinde yaşıyor."}
+{"fact_id": "S03571_field_of_study", "index": 183, "relation": "field_of_study", "text": "Berte Swain, maliye alanında eğitim aldı."}
+{"fact_id": "S03571_works_in_industry", "index": 184, "relation": "works_in_industry", "text": "Berte Swain, yayın sektöründe çalışıyor."}
+{"fact_id": "S03638_profession", "index": 185, "relation": "profession", "text": "Bessie Rowe, Hasta bakıcı olarak çalışır."}
+{"fact_id": "S03638_born_in", "index": 186, "relation": "born_in", "text": "Bessie Rowe, Jacksonville şehrinde doğdu."}
+{"fact_id": "S03638_lives_in", "index": 187, "relation": "lives_in", "text": "Bessie Rowe, St. Petersburg şehrinde yaşıyor."}
+{"fact_id": "S03638_field_of_study", "index": 188, "relation": "field_of_study", "text": "Bessie Rowe, hareket alanında eğitim aldı."}
+{"fact_id": "S03638_works_in_industry", "index": 189, "relation": "works_in_industry", "text": "Bessie Rowe, refah sektöründe çalışıyor."}
+{"fact_id": "S03672_profession", "index": 190, "relation": "profession", "text": "Devi Garrett, Müzisyen olarak çalışır."}
+{"fact_id": "S03672_born_in", "index": 191, "relation": "born_in", "text": "Devi Garrett, Baton Rouge şehrinde doğdu."}
+{"fact_id": "S03672_lives_in", "index": 192, "relation": "lives_in", "text": "Devi Garrett, Dallas şehrinde yaşıyor."}
+{"fact_id": "S03672_field_of_study", "index": 193, "relation": "field_of_study", "text": "Devi Garrett, bilişim alanında eğitim aldı."}
+{"fact_id": "S03672_works_in_industry", "index": 194, "relation": "works_in_industry", "text": "Devi Garrett, akademi sektöründe çalışıyor."}
+{"fact_id": "S03781_profession", "index": 195, "relation": "profession", "text": "Babbie Mack, Reklamcı olarak çalışır."}
+{"fact_id": "S03781_born_in", "index": 196, "relation": "born_in", "text": "Babbie Mack, Samsun şehrinde doğdu."}
+{"fact_id": "S03781_lives_in", "index": 197, "relation": "lives_in", "text": "Babbie Mack, Oklahoma City şehrinde yaşıyor."}
+{"fact_id": "S03781_field_of_study", "index": 198, "relation": "field_of_study", "text": "Babbie Mack, programlama alanında eğitim aldı."}
+{"fact_id": "S03781_works_in_industry", "index": 199, "relation": "works_in_industry", "text": "Babbie Mack, strateji sektöründe çalışıyor."}
+{"fact_id": "S04048_profession", "index": 200, "relation": "profession", "text": "Jale Akar, Yazılım mühendisi olarak çalışır."}
+{"fact_id": "S04048_born_in", "index": 201, "relation": "born_in", "text": "Jale Akar, Chandler şehrinde doğdu."}
+{"fact_id": "S04048_lives_in", "index": 202, "relation": "lives_in", "text": "Jale Akar, Greensboro şehrinde yaşıyor."}
+{"fact_id": "S04048_field_of_study", "index": 203, "relation": "field_of_study", "text": "Jale Akar, turizm alanında eğitim aldı."}
+{"fact_id": "S04048_works_in_industry", "index": 204, "relation": "works_in_industry", "text": "Jale Akar, refah sektöründe çalışıyor."}
+{"fact_id": "S04072_profession", "index": 205, "relation": "profession", "text": "Beatrisa Mendoza, Model olarak çalışır."}
+{"fact_id": "S04072_born_in", "index": 206, "relation": "born_in", "text": "Beatrisa Mendoza, New York şehrinde doğdu."}
+{"fact_id": "S04072_lives_in", "index": 207, "relation": "lives_in", "text": "Beatrisa Mendoza, Miami şehrinde yaşıyor."}
+{"fact_id": "S04072_field_of_study", "index": 208, "relation": "field_of_study", "text": "Beatrisa Mendoza, ekonomi alanında eğitim aldı."}
+{"fact_id": "S04072_works_in_industry", "index": 209, "relation": "works_in_industry", "text": "Beatrisa Mendoza, teknik sektöründe çalışıyor."}
+{"fact_id": "S04171_profession", "index": 210, "relation": "profession", "text": "Burak İleri, Elektrik-elektronik mühendisi olarak çalışır."}
+{"fact_id": "S04171_born_in", "index": 211, "relation": "born_in", "text": "Burak İleri, Kahramanmaraş şehrinde doğdu."}
+{"fact_id": "S04171_lives_in", "index": 212, "relation": "lives_in", "text": "Burak İleri, İstanbul şehrinde yaşıyor."}
+{"fact_id": "S04171_field_of_study", "index": 213, "relation": "field_of_study", "text": "Burak İleri, tıp alanında eğitim aldı."}
+{"fact_id": "S04171_works_in_industry", "index": 214, "relation": "works_in_industry", "text": "Burak İleri, medya sektöründe çalışıyor."}
+{"fact_id": "S04269_profession", "index": 215, "relation": "profession", "text": "Marys Dillard, Futbolcu olarak çalışır."}
+{"fact_id": "S04269_born_in", "index": 216, "relation": "born_in", "text": "Marys Dillard, Trabzon şehrinde doğdu."}
+{"fact_id": "S04269_lives_in", "index": 217, "relation": "lives_in", "text": "Marys Dillard, Mersin şehrinde yaşıyor."}
+{"fact_id": "S04269_field_of_study", "index": 218, "relation": "field_of_study", "text": "Marys Dillard, arkeoloji alanında eğitim aldı."}
+{"fact_id": "S04269_works_in_industry", "index": 219, "relation": "works_in_industry", "text": "Marys Dillard, otel sektöründe çalışıyor."}
+{"fact_id": "S04411_profession", "index": 220, "relation": "profession", "text": "Özgür Giray, DJ olarak çalışır."}
+{"fact_id": "S04411_born_in", "index": 221, "relation": "born_in", "text": "Özgür Giray, Bursa şehrinde doğdu."}
+{"fact_id": "S04411_lives_in", "index": 222, "relation": "lives_in", "text": "Özgür Giray, Mersin şehrinde yaşıyor."}
+{"fact_id": "S04411_field_of_study", "index": 223, "relation": "field_of_study", "text": "Özgür Giray, bakım alanında eğitim aldı."}
+{"fact_id": "S04411_works_in_industry", "index": 224, "relation": "works_in_industry", "text": "Özgür Giray, otomotiv sektöründe çalışıyor."}
+{"fact_id": "S04597_profession", "index": 225, "relation": "profession", "text": "Faik Kırcalı, Tenisçi olarak çalışır."}
+{"fact_id": "S04597_born_in", "index": 226, "relation": "born_in", "text": "Faik Kırcalı, Glendale şehrinde doğdu."}
+{"fact_id": "S04597_lives_in", "index": 227, "relation": "lives_in", "text": "Faik Kırcalı, İstanbul şehrinde yaşıyor."}
+{"fact_id": "S04597_field_of_study", "index": 228, "relation": "field_of_study", "text": "Faik Kırcalı, hareket alanında eğitim aldı."}
+{"fact_id": "S04597_works_in_industry", "index": 229, "relation": "works_in_industry", "text": "Faik Kırcalı, atık sektöründe çalışıyor."}
+{"fact_id": "S04668_profession", "index": 230, "relation": "profession", "text": "Bireylül Akgül, Astronot olarak çalışır."}
+{"fact_id": "S04668_born_in", "index": 231, "relation": "born_in", "text": "Bireylül Akgül, İzmir şehrinde doğdu."}
+{"fact_id": "S04668_lives_in", "index": 232, "relation": "lives_in", "text": "Bireylül Akgül, Ankara şehrinde yaşıyor."}
+{"fact_id": "S04668_field_of_study", "index": 233, "relation": "field_of_study", "text": "Bireylül Akgül, siyaset alanında eğitim aldı."}
+{"fact_id": "S04668_works_in_industry", "index": 234, "relation": "works_in_industry", "text": "Bireylül Akgül, teknik sektöründe çalışıyor."}
+{"fact_id": "S04717_profession", "index": 235, "relation": "profession", "text": "Caryn Hamilton, Montaj işçisi olarak çalışır."}
+{"fact_id": "S04717_born_in", "index": 236, "relation": "born_in", "text": "Caryn Hamilton, İstanbul şehrinde doğdu."}
+{"fact_id": "S04717_lives_in", "index": 237, "relation": "lives_in", "text": "Caryn Hamilton, Ordu şehrinde yaşıyor."}
+{"fact_id": "S04717_field_of_study", "index": 238, "relation": "field_of_study", "text": "Caryn Hamilton, hemşirelik alanında eğitim aldı."}
+{"fact_id": "S04717_works_in_industry", "index": 239, "relation": "works_in_industry", "text": "Caryn Hamilton, turizm sektöründe çalışıyor."}
+{"fact_id": "S04915_profession", "index": 240, "relation": "profession", "text": "Ceyhun Erat, YouTuber olarak çalışır."}
+{"fact_id": "S04915_born_in", "index": 241, "relation": "born_in", "text": "Ceyhun Erat, Chicago şehrinde doğdu."}
+{"fact_id": "S04915_lives_in", "index": 242, "relation": "lives_in", "text": "Ceyhun Erat, San Diego şehrinde yaşıyor."}
+{"fact_id": "S04915_field_of_study", "index": 243, "relation": "field_of_study", "text": "Ceyhun Erat, matematik alanında eğitim aldı."}
+{"fact_id": "S04915_works_in_industry", "index": 244, "relation": "works_in_industry", "text": "Ceyhun Erat, uzay sektöründe çalışıyor."}
+{"fact_id": "S04944_profession", "index": 245, "relation": "profession", "text": "Mildred Parks, Müzik yapımcısı olarak çalışır."}
+{"fact_id": "S04944_born_in", "index": 246, "relation": "born_in", "text": "Mildred Parks, El Paso şehrinde doğdu."}
+{"fact_id": "S04944_lives_in", "index": 247, "relation": "lives_in", "text": "Mildred Parks, Tucson şehrinde yaşıyor."}
+{"fact_id": "S04944_field_of_study", "index": 248, "relation": "field_of_study", "text": "Mildred Parks, veri bilimi alanında eğitim aldı."}
+{"fact_id": "S04944_works_in_industry", "index": 249, "relation": "works_in_industry", "text": "Mildred Parks, reklam sektöründe çalışıyor."}

@@ -29,6 +29,7 @@ def validate(
     decisions_path: Path,
     *,
     expected_registry_sha256: str,
+    registry_path: Path | None = None,
 ) -> dict[str, Any]:
     packet = _jsonl(packet_path)
     decisions = _jsonl(decisions_path)
@@ -39,6 +40,21 @@ def validate(
         raise ValueError("Frozen fact-review packet has missing or duplicate fact IDs")
     if [int(row.get("index", -1)) for row in packet] != list(range(250)):
         raise ValueError("Frozen fact-review packet index order drift")
+    registry_sha256 = None
+    if registry_path is not None:
+        registry = _jsonl(registry_path)
+        if len(registry) != 250:
+            raise ValueError("Fact registry must contain exactly 250 rows")
+        registry_by_id = {str(row.get("fact_id", "")): row for row in registry}
+        if len(registry_by_id) != 250 or set(registry_by_id) != set(packet_ids):
+            raise ValueError("Fact registry does not exactly cover the review packet")
+        for packet_row in packet:
+            source = registry_by_id[str(packet_row["fact_id"])]
+            if packet_row.get("relation") != source.get("relation") or packet_row.get("text") != source.get("text"):
+                raise ValueError(f"Review packet text/relation drift: {packet_row['fact_id']}")
+        registry_sha256 = sha256_file(registry_path)
+        if registry_sha256 != expected_registry_sha256:
+            raise ValueError("Fact registry file SHA-256 differs from expected registry SHA-256")
     if len(decisions) != 250:
         raise ValueError(f"Human decisions must contain 250 rows, found {len(decisions)}")
 
@@ -69,6 +85,8 @@ def validate(
         "decisions": str(decisions_path.resolve()),
         "decisions_sha256": sha256_file(decisions_path),
         "fact_registry_sha256": expected_registry_sha256,
+        "fact_registry": str(registry_path.resolve()) if registry_path is not None else None,
+        "fact_registry_file_sha256": registry_sha256,
         "rows": 250,
         "unique_fact_ids": 250,
         "verdicts": dict(sorted(verdicts.items())),
@@ -84,12 +102,14 @@ def main() -> int:
     parser.add_argument("--packet", type=Path, required=True)
     parser.add_argument("--decisions", type=Path, required=True)
     parser.add_argument("--expected-registry-sha256", required=True)
+    parser.add_argument("--registry", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     result = validate(
         args.packet.resolve(),
         args.decisions.resolve(),
         expected_registry_sha256=args.expected_registry_sha256,
+        registry_path=args.registry.resolve() if args.registry else None,
     )
     write_json(args.output.resolve(), result)
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))

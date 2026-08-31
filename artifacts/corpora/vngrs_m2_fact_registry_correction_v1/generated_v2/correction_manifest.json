@@ -1,0 +1,47 @@
+{
+  "accepted_unchanged_fact_ids": [
+    "S01052_field_of_study",
+    "S01202_field_of_study",
+    "S03386_field_of_study"
+  ],
+  "base_registry": {
+    "path": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.worktrees/m2-three-model-vngrs-d0/artifacts/corpora/vngrs_m2_fact_registry_correction_v1/generated_v2/branch_b_turkish_facts_base_reproduction.jsonl",
+    "rows": 250,
+    "sha256": "784f78a5a182c329b4b995ee1a97c580da994059a18b1f9702ec657569ccbfec"
+  },
+  "blocks_repaired": false,
+  "canonical_source_mutated": false,
+  "changed_fact_ids": [
+    "S00634_field_of_study",
+    "S00971_works_in_industry",
+    "S02929_field_of_study",
+    "S03025_field_of_study"
+  ],
+  "corrected_decisions": {
+    "path": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.worktrees/m2-three-model-vngrs-d0/artifacts/corpora/vngrs_m2_fact_registry_correction_v1/generated_v2/human_review_decisions_corrected.jsonl",
+    "rows": 250,
+    "sha256": "3af9fa0356392ea55a99b962a61453385cbefbb16231ef510c781c12863045e4",
+    "verdicts": {
+      "usable": 250
+    }
+  },
+  "corrected_registry": {
+    "path": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.worktrees/m2-three-model-vngrs-d0/artifacts/corpora/vngrs_m2_fact_registry_correction_v1/generated_v2/branch_b_turkish_facts_corrected.jsonl",
+    "rows": 250,
+    "sha256": "46a1071d228758013d73fae4ab3925538523eb338001e00bde9d5fe178f1c4a2"
+  },
+  "corrected_review_packet": {
+    "path": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.worktrees/m2-three-model-vngrs-d0/artifacts/corpora/vngrs_m2_fact_registry_correction_v1/generated_v2/fact_review_packet_corrected.jsonl",
+    "rows": 250,
+    "sha256": "7dea022ba728d0b2aab3a43b5e1074eda18686cf56666e9f87246607760fbccf"
+  },
+  "old_registry_mutated": false,
+  "overlay": {
+    "path": "/Users/umutyesildal/Desktop/UniDE/Semester6/Thesis/implementation/.worktrees/m2-three-model-vngrs-d0/artifacts/corpora/vngrs_m2_fact_registry_correction_v1/correction_overlay.json",
+    "sha256": "f9e1d7028e948cd3bc4cd43a7e8ad264b6800d2c673df79c701d4fd0f9f1b27d"
+  },
+  "prior_decisions_sha256": "9e0757f37fb44620e15cdf870b3d22286e37a5546249ea29f827bdc139f46385",
+  "ready_to_train": false,
+  "schema_version": 1,
+  "status": "M2_FACT_REGISTRY_CORRECTION_PASS"
+}

@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_blocks_pass_readiness_v1a_pass_awaiting_250_fact_review_and_gpu_smoke
+  status: m0_m1_complete_corrected_fact_review_pass_awaiting_cpu_m2_b_translation_repair
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -374,7 +374,21 @@ stage_readiness:
     training_readiness_evidence_v1a_review_handoff_bytes: 68733
     fact_review_validator: scripts/m2/validate_m2_fact_review_decisions.py
     fact_review_validator_sha256: 8716155fc16e42c6b684b35ca6ef1f53f7b2b0b5fc14eda7e3f0a545c2844d95
-    fact_review_validator_status: locally_implemented_waiting_for_250_human_verdicts
+    fact_review_validator_status: corrected_registry_review_pass_250_of_250
+    corrected_fact_registry: artifacts/corpora/vngrs_m2_fact_registry_correction_v1/generated_v2/branch_b_turkish_facts_corrected.jsonl
+    original_fact_review_decisions: artifacts/corpora/vngrs_m2_fact_registry_correction_v1/human_review_decisions_original_784f78a5a182.jsonl
+    original_fact_review_decisions_sha256: 9e0757f37fb44620e15cdf870b3d22286e37a5546249ea29f827bdc139f46385
+    corrected_fact_registry_sha256: 46a1071d228758013d73fae4ab3925538523eb338001e00bde9d5fe178f1c4a2
+    corrected_fact_review_packet_sha256: 7dea022ba728d0b2aab3a43b5e1074eda18686cf56666e9f87246607760fbccf
+    corrected_fact_review_decisions_sha256: 3af9fa0356392ea55a99b962a61453385cbefbb16231ef510c781c12863045e4
+    corrected_fact_review_validation_sha256: a5e4f04a567de98f85674e8c58e13effe85753738d5de931704e41a153ec20b1
+    corrected_fact_review_status: M2_FACT_REVIEW_PASS_250_usable
+    fact_translation_repair_contract: documentation/contracts/corpora/vngrs-m2-oscar-fact-translation-repair-v1.md
+    fact_translation_repair_contract_sha256: b02a1970b540cd3e0fdd0202cd174bd66a4f90baf5c1204f2b8fbeaf15a94992
+    fact_translation_repair_record: documentation/206_M2_OSCAR_FACT_TRANSLATION_CORRECTION_AND_BLOCK_REPAIR_PREPARATION_TR.md
+    fact_translation_repair_record_sha256: 5f4800dd0db0a039d03cdd45cc01854186d716e0f87377743514e61feaea3994
+    fact_translation_repair_status: frozen_unexecuted_cpu_only_18_tests_pass
+    prior_m2_b_block_family_status: superseded_for_future_training_due_four_fact_translation_corrections
     optimizer_smoke_preparation: documentation/205_M2_OSCAR_FACT_REVIEW_VALIDATOR_AND_OPTIMIZER_SMOKE_PREPARATION_TR.md
     optimizer_smoke_preparation_sha256: 49765563b03915f88105d4f698ffd5a51283f15964aca57c4ac325d316b42a07
     optimizer_smoke_preparation_config: configs/training/m2_oscar_optimizer_smoke_preparation_v1.yaml
@@ -1674,10 +1688,10 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: complete_250_fact_human_review_then_prepare_separate_gpu_optimizer_smoke
+  name: authorize_cpu_fact_translation_m2_b_block_repair
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: exact_blocks_pass_readiness_v1a_pass_awaiting_250_fact_review_and_gpu_smoke
+  m2_status: corrected_fact_review_pass_awaiting_cpu_m2_b_translation_repair_then_gpu_smoke
   execution_boundary: no_m2_training_until_matched_contract_is_frozen_and_exactly_authorized
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
@@ -1705,8 +1719,9 @@ active_priority:
     - preserve_document_204_v1a_execution_result_and_gate
     - preserve_hash_verified_250_row_local_review_handoff
     - preserve_document_205_review_validator_and_smoke_only_preparation
-    - await_user_exported_exact_250_fact_decision_ledger
-    - complete_all_250_fact_human_review_before_gpu_smoke
+    - preserve_corrected_250_fact_registry_and_review_pass
+    - preserve_document_206_and_frozen_cpu_block_repair_contract
+    - await_exact_sha_bound_cpu_fact_translation_repair_authorization
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1716,7 +1731,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: complete_250_fact_human_review_then_freeze_separate_gpu_optimizer_smoke_contract
+  subject: authorize_cpu_fact_translation_m2_b_block_repair
   decision_owner: user
   start_m1_now: false
   note: >-

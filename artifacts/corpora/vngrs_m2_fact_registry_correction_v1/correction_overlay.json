@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "status": "HUMAN_APPROVED_TRANSLATION_CORRECTION_OVERLAY",
+  "base_registry_sha256": "784f78a5a182c329b4b995ee1a97c580da994059a18b1f9702ec657569ccbfec",
+  "base_review_decisions_sha256": "9e0757f37fb44620e15cdf870b3d22286e37a5546249ea29f827bdc139f46385",
+  "corrections": [
+    {
+      "fact_id": "S00634_field_of_study",
+      "source_answer_en": "teaching",
+      "old_answer_tr": "didaktik",
+      "corrected_answer_tr": "öğretmenlik",
+      "old_text": "Vittoria Houston, didaktik alanında eğitim aldı.",
+      "corrected_text": "Vittoria Houston, öğretmenlik alanında eğitim aldı.",
+      "reason": "Didaktik, teaching değerinden daha dar ve bu sentetik field-of-study bağı için doğal değil."
+    },
+    {
+      "fact_id": "S00971_works_in_industry",
+      "source_answer_en": "welfare",
+      "old_answer_tr": "refah",
+      "corrected_answer_tr": "sosyal hizmetler",
+      "old_text": "Meggy Melvin, refah sektöründe çalışıyor.",
+      "corrected_text": "Meggy Melvin, sosyal hizmetler sektöründe çalışıyor.",
+      "reason": "Refah sektörü doğal bir Türkçe sektör adı değildir; sosyal hizmetler kaynak bağı daha açık taşır."
+    },
+    {
+      "fact_id": "S02929_field_of_study",
+      "source_answer_en": "cultural analysis",
+      "old_answer_tr": "sosyal",
+      "corrected_answer_tr": "kültürel analiz",
+      "old_text": "Umut Üçer, sosyal alanında eğitim aldı.",
+      "corrected_text": "Umut Üçer, kültürel analiz alanında eğitim aldı.",
+      "reason": "Sosyal, cultural analysis değerini kaybeden yanlış/geniş bir çeviridir."
+    },
+    {
+      "fact_id": "S03025_field_of_study",
+      "source_answer_en": "exercise science",
+      "old_answer_tr": "hareket",
+      "corrected_answer_tr": "egzersiz bilimi",
+      "old_text": "Chantalle Palmer, hareket alanında eğitim aldı.",
+      "corrected_text": "Chantalle Palmer, egzersiz bilimi alanında eğitim aldı.",
+      "reason": "Hareket, exercise science alanını karşılamaz; egzersiz bilimi doğrudan ve yerleşik karşılıktır."
+    }
+  ],
+  "accepted_unchanged": [
+    {
+      "fact_id": "S01052_field_of_study",
+      "source_answer_en": "computing",
+      "answer_tr": "bilişim",
+      "text": "Maruf Akbaş, bilişim alanında eğitim aldı.",
+      "reason": "Bilişim, computing için doğal ve anlamı koruyan Türkçe karşılıktır."
+    },
+    {
+      "fact_id": "S01202_field_of_study",
+      "source_answer_en": "ecology",
+      "answer_tr": "ekoloji",
+      "text": "Levent Gedikli, ekoloji alanında eğitim aldı.",
+      "reason": "Ekoloji yerleşik ve doğru Türkçe bilim alanı adıdır."
+    },
+    {
+      "fact_id": "S03386_field_of_study",
+      "source_answer_en": "ecology",
+      "answer_tr": "ekoloji",
+      "text": "Onur Gümüş, ekoloji alanında eğitim aldı.",
+      "reason": "Ekoloji yerleşik ve doğru Türkçe bilim alanı adıdır."
+    }
+  ],
+  "authority": {
+    "human_reviewer": "Umut",
+    "approved_in_conversation": true,
+    "agent_may_change_other_facts": false,
+    "ready_to_train": false
+  }
+}

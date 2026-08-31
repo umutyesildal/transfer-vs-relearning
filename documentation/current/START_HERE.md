@@ -127,6 +127,13 @@ the master synthesis, the long timeline, or a previous chat transcript.
   combined suite passes 16/16. It remains non-executable until the user exports all 250 verdicts,
   the validator returns `M2_FACT_REVIEW_PASS`, and a separate SHA-bound smoke contract is frozen
   and authorized;
+- M2 fact-translation correction: the user's 250-row review found seven issues. Four exact
+  translations were corrected and three valid Turkish terms were accepted unchanged. Corrected
+  registry SHA is `46a1071d228758013d73fae4ab3925538523eb338001e00bde9d5fe178f1c4a2`;
+  the corrected ledger passes `250/250 usable`. Document 206 and contract
+  `vngrs-m2-oscar-fact-translation-repair-v1` freeze a CPU-only fresh-root repair that rewrites
+  only the three M2-B block files from immutable M2-A blocks. Contract SHA is
+  `b02a1970b540cd3e0fdd0202cd174bd66a4f90baf5c1204f2b8fbeaf15a94992`; it is unexecuted;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;
