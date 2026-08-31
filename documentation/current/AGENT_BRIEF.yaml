@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 31490a262395a647991433491267f6061bfce05e29398b6e15476c30e8ffceee
+  full_state_sha256: 2375b4652eebaf4e5ae0d8986053233e705dbd01be7234969d03dc57c0a49faa
   role: context_projection_only
   may_expand_authority: false
 
@@ -91,6 +91,9 @@ stage_readiness:
   m2_training_readiness_v1a_final_status: EVIDENCE_PREPARED_AWAITING_FACT_REVIEW_AND_GPU_SMOKE
   m2_training_readiness_v1a_final_audit_sha256: d8cd44eae03ec1c5b5eea334bf94506417730c30f44dfbfbf6df2bf60a144fc8
   m2_fact_review: all_250_pending_local_handoff_copied_hash_verified
+  m2_fact_review_validator: locally_implemented_waiting_for_user_decisions
+  m2_optimizer_smoke_preparation: smoke_only_three_model_a100_route_16_tests_pass_non_executable
+  m2_optimizer_smoke_preparation_record: documentation/205_M2_OSCAR_FACT_REVIEW_VALIDATOR_AND_OPTIMIZER_SMOKE_PREPARATION_TR.md
   m2_optimizer_smoke: not_run_separately_gated
   m2_local_training_preparation: six_config_generator_validator_exact_checkpoint_callback_and_smoke_training_dag_pass_non_executable
   m2_training_preparation_record: documentation/193_M2_THREE_MODEL_TRAINING_PREPARATION_IMPLEMENTATION_TR.md

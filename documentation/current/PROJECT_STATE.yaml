@@ -372,6 +372,20 @@ stage_readiness:
     training_readiness_evidence_v1a_review_handoff: artifacts/corpora/vngrs_m2_training_readiness_review_v1
     training_readiness_evidence_v1a_review_packet_rows: 250
     training_readiness_evidence_v1a_review_handoff_bytes: 68733
+    fact_review_validator: scripts/m2/validate_m2_fact_review_decisions.py
+    fact_review_validator_sha256: 8716155fc16e42c6b684b35ca6ef1f53f7b2b0b5fc14eda7e3f0a545c2844d95
+    fact_review_validator_status: locally_implemented_waiting_for_250_human_verdicts
+    optimizer_smoke_preparation: documentation/205_M2_OSCAR_FACT_REVIEW_VALIDATOR_AND_OPTIMIZER_SMOKE_PREPARATION_TR.md
+    optimizer_smoke_preparation_sha256: 49765563b03915f88105d4f698ffd5a51283f15964aca57c4ac325d316b42a07
+    optimizer_smoke_preparation_config: configs/training/m2_oscar_optimizer_smoke_preparation_v1.yaml
+    optimizer_smoke_preparation_config_sha256: 425f9ce9596ab22ef55b223a14a014b39936e48ee5bd90fd634ee6901bb89788
+    optimizer_smoke_preparation_status: smoke_only_local_implementation_16_tests_pass_non_executable
+    optimizer_smoke_runner: scripts/m2/smoke_three_model_oscar_m2_optimizer.py
+    optimizer_smoke_runner_sha256: bc112eea5367be4dc4cb09218ce6f99db2cce614225cad81e7e366a94a097f28
+    optimizer_smoke_slurm: slurm/m2/smoke_three_model_oscar_m2_optimizer_only.slurm
+    optimizer_smoke_slurm_sha256: 8a8bfea6b77ce35bf4af65bcc9cb5b275039ddb40d02687f3ed355ee11836e78
+    optimizer_smoke_submitter: scripts/m2/submit_three_model_oscar_m2_optimizer_smoke_only.sh
+    optimizer_smoke_submitter_sha256: 61fe4d9d47a0726689f5d32b12b2ddc3798c27e044c12ddc158928b499ba7b36
     fact_review_scope: all_250_branch_b_turkish_facts_pending_human_verdict
     optimizer_smoke_status: not_run_separately_gated
     exact_block_materialization_train_blocks_per_arm: 97536
@@ -1690,6 +1704,8 @@ active_priority:
     - preserve_job_482040_terminal_pass_and_19_file_hash_chain
     - preserve_document_204_v1a_execution_result_and_gate
     - preserve_hash_verified_250_row_local_review_handoff
+    - preserve_document_205_review_validator_and_smoke_only_preparation
+    - await_user_exported_exact_250_fact_decision_ledger
     - complete_all_250_fact_human_review_before_gpu_smoke
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:

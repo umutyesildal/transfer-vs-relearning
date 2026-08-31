@@ -122,6 +122,11 @@ the master synthesis, the long timeline, or a previous chat transcript.
   all three epoch-036 parent asset sets, six M2-A/M2-B configs and storage evidence passed. Document
   204 is the current result/gate authority; its terminal state remains
   `EVIDENCE_PREPARED_AWAITING_FACT_REVIEW_AND_GPU_SMOKE`, `ready_to_train=false`;
+- M2 review/smoke preparation: Document 205 adds an exact 250-fact human-decision validator and a
+  smoke-only three-model A100 route that cannot submit training or finalization jobs. The local
+  combined suite passes 16/16. It remains non-executable until the user exports all 250 verdicts,
+  the validator returns `M2_FACT_REVIEW_PASS`, and a separate SHA-bound smoke contract is frozen
+  and authorized;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;

@@ -1,0 +1,63 @@
+schema_version: 1
+name: m2-oscar-three-model-optimizer-smoke-preparation-v1
+status: local_preparation_waiting_for_human_review
+execution_authorized: false
+
+inputs:
+  readiness_root: /vol/tmp2/yesildau/vngrs_m2_oscar_training_readiness_evidence_retry_v1
+  readiness_final_audit_sha256: d8cd44eae03ec1c5b5eea334bf94506417730c30f44dfbfbf6df2bf60a144fc8
+  config_manifest_sha256: 755295ddda651466cbf868b52bd24c272475a17e29c7988f9f97c3eb83951784
+  config_validation_sha256: 5c53f907c26eb3dae602825dbbe0a30aebc0ba0c3c238876cf39ac45a34ab815
+  fact_review_packet_sha256: 4ccbef107e74248a079885edb97209bf1341f11163ba38a288c7c636ad7210e2
+  fact_registry_sha256: 784f78a5a182c329b4b995ee1a97c580da994059a18b1f9702ec657569ccbfec
+  human_review_decisions_sha256: pending_human_review
+  human_review_validation_sha256: pending_human_review
+
+smoke:
+  root: /vol/tmp2/yesildau/vngrs_m2_oscar_optimizer_smoke_v1
+  roles: [olmo, qwen, smollm]
+  arm: M2-A
+  route: a10080gb_single_gpu
+  array: 0-2%1
+  cpus_per_task: 8
+  memory: 64G
+  time_limit: "01:30:00"
+  minimum_initial_free_vram_mib: 61440
+  sequence_length: 512
+  microbatch_blocks: 4
+  gradient_accumulation_steps: 32
+  effective_blocks: 128
+  effective_tokens: 65536
+  optimizer_steps: 1
+  precision: bfloat16
+  gradient_checkpointing: true
+  optimizer: adamw
+  optimizer_foreach: false
+  checkpoint_written: false
+  scientific_training: false
+  sequential_roles: true
+
+gates:
+  require_exact_250_fact_review_pass: true
+  require_readiness_final_audit: true
+  require_config_validation_pass: true
+  require_clean_exact_commit: true
+  require_fresh_absent_root: true
+  require_zero_duplicate_jobs: true
+  require_test_only_before_submission: true
+  require_finite_loss_gradient_and_parameters: true
+  require_bf16_parameter_gradient_and_adamw_state: true
+  automatic_retry: false
+  training_submission: false
+
+authority:
+  local_implementation_and_tests: true
+  human_verdict_entry: false
+  hu_ssh: false
+  slurm: false
+  gpu: false
+  model_weight_access: false
+  optimizer_smoke: false
+  m2_a_or_m2_b_training: false
+  evaluation: false
+  cleanup_or_deletion: false
