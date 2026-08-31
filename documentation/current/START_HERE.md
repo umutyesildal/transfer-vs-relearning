@@ -138,9 +138,12 @@ the master synthesis, the long timeline, or a previous chat transcript.
   fail-closed result. The authorized v1a route corrected the partition and submitted real job
   `482057`, but `conda run` created a runtime file under the root-bound `tmp/` before Python, so
   the strict precreated-root validator stopped before tokenizer/source/block work. Document 208
-  preserves the four-file, zero-block root. V1b allows only runtime-owned `tmp/` files, preserves
-  every scientific field and uses a fresh retry-v2 root. V1b contract SHA is
-  `b3229b2a7dee7a5345edc2086443a622f5908ae4bb2fcaab53bd1412fe5f2156`; it is unexecuted;
+  preserves the four-file, zero-block root. V1b allowed only runtime-owned `tmp/` files and used
+  a fresh retry-v2 root. Authorized job `482066` completed PASS: all three corrected M2-B files
+  contain 97,536 blocks, the terminal manifest SHA is
+  `96f9867c857b08bfd784660331d1a354be7d7c6bc39250091f427fdfaa3c6486`, predecessor M2-A and
+  validation remained read-only, and no GPU/model/training access occurred. Document 209 is the
+  current result/gate authority;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;
