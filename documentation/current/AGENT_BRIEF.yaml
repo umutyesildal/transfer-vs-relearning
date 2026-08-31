@@ -5,13 +5,13 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 248229de6f1d90aed2edc52d9a787d2df4d7c40a4a9a0d710769e8f15ad9f4e9
+  full_state_sha256: 8dee1d7c20715e8efde8199c8b3fc889ec32292cfa9a2d224e937d8eee81ab19
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: m2_exact_three_model_blocks_materialized_training_contract_required
+  phase: m2_training_readiness_evidence_frozen_unexecuted
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
@@ -81,6 +81,11 @@ stage_readiness:
   m2_exact_block_manifest_sha256: 68dd7ca18d794c09ce3e1b1aa8b2b4b9f6ddb175195959b24b0103c7ea65dd63
   m2_exact_block_result: documentation/200_M2_OSCAR_EXACT_BLOCK_ADAPTER_REPAIR_EXECUTION_RESULT_AND_GATE_TR.md
   m2_exact_block_ready_to_train: false
+  m2_training_readiness_contract: documentation/contracts/training/vngrs-m2-oscar-training-readiness-evidence-v1.md
+  m2_training_readiness_contract_sha256: 071252e2c1477f4fbc5e7d132a2bc0f418f2e51ee57120641f7de57bbcec1168
+  m2_training_readiness_evidence: frozen_unexecuted_cpu_only_67_tests_pass
+  m2_fact_review: all_250_pending
+  m2_optimizer_smoke: not_run_separately_gated
   m2_local_training_preparation: six_config_generator_validator_exact_checkpoint_callback_and_smoke_training_dag_pass_non_executable
   m2_training_preparation_record: documentation/193_M2_THREE_MODEL_TRAINING_PREPARATION_IMPLEMENTATION_TR.md
   m2_training_preparation_config: configs/training/m2_three_model_oscar_training_preparation_v1.yaml
@@ -117,7 +122,7 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: freeze_matched_three_model_m2_training_and_measurement_contract
+  subject: authorize_cpu_training_readiness_evidence_wave
   plan: documentation/191_M2_MATCHED_THREE_MODEL_OSCAR_TRAINING_AND_MEASUREMENT_PLAN_TR.md
   contract: documentation/contracts/corpora/vngrs-m2-oscar-exact-block-materialization-v1.md
   config: configs/corpora/vngrs_m2_oscar_exact_blocks_v1.yaml

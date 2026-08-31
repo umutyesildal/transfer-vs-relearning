@@ -1,0 +1,68 @@
+schema_version: 1
+contract_id: vngrs-m2-oscar-training-readiness-evidence-v1
+status: frozen_unexecuted
+execution_authorized: false
+contract: documentation/contracts/training/vngrs-m2-oscar-training-readiness-evidence-v1.md
+
+repository:
+  scientific_plan: configs/training/m2_matched_three_model_oscar_plan_v1.yaml
+  preparation_config: configs/training/m2_three_model_oscar_training_preparation_v2.yaml
+
+blocks:
+  root: /vol/tmp2/yesildau/vngrs_m2_oscar_exact_blocks_adapter_repair_v1
+  access: read_only
+  manifest: /vol/tmp2/yesildau/vngrs_m2_oscar_exact_blocks_adapter_repair_v1/manifest.json
+  manifest_sha256: 68dd7ca18d794c09ce3e1b1aa8b2b4b9f6ddb175195959b24b0103c7ea65dd63
+  final_audit_sha256: 7475686c16d8aff55acfa18154cd5b6e686ee7aa1083547e28b6657f1c1b70a6
+  root_files: 21
+  root_bytes: 2736458613
+  fact_registry: /vol/tmp2/yesildau/vngrs_m2_oscar_exact_blocks_adapter_repair_v1/facts/branch_b_turkish_facts.jsonl
+  fact_rows: 250
+  fact_sha256: 784f78a5a182c329b4b995ee1a97c580da994059a18b1f9702ec657569ccbfec
+
+parents:
+  olmo:
+    snapshot_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/olmo/20260822T155242Z_m1_matched_epoch_dense_olmo_seed42_30cd6396/epoch_snapshots/epoch-036
+    snapshot_manifest: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/olmo/20260822T155242Z_m1_matched_epoch_dense_olmo_seed42_30cd6396/epoch_snapshots/epoch-036/snapshot_manifest.json
+    snapshot_manifest_sha256: 0226c6b0c70415c3f31049e275fa78bfe9b155af60819664bdfe4ae730ae0a57
+    model_manifest: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/bindings/olmo/model_manifests/epoch-036.json
+    model_manifest_sha256: e005a926daf95a051832438988df4c6416afe1276de2b9ba4c6574d3f92356b9
+  qwen:
+    snapshot_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/qwen/20260822T155241Z_m1_matched_epoch_dense_qwen_seed42_7c56e187/epoch_snapshots/epoch-036
+    snapshot_manifest: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/qwen/20260822T155241Z_m1_matched_epoch_dense_qwen_seed42_7c56e187/epoch_snapshots/epoch-036/snapshot_manifest.json
+    snapshot_manifest_sha256: f4d839f49672c999dc3c0cf9cbdac0caf139c9a385cbf85366a161d6d998d831
+    model_manifest: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/bindings/qwen/model_manifests/epoch-036.json
+    model_manifest_sha256: e9d5bd7245ae3c22397fca30edd1489d218983f20998f986dd434efd99810dee
+  smollm:
+    snapshot_root: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/smollm/20260822T155242Z_m1_matched_epoch_dense_smollm_seed42_081e6e29/epoch_snapshots/epoch-036
+    snapshot_manifest: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/training/smollm/20260822T155242Z_m1_matched_epoch_dense_smollm_seed42_081e6e29/epoch_snapshots/epoch-036/snapshot_manifest.json
+    snapshot_manifest_sha256: 9ba7cdec401f5c5f9e334a3fc75e5ea5c5899f78f78219e24bdf5c6f0712da7c
+    model_manifest: /vol/tmp2/yesildau/m1_matched_three_model_retry_v1/bindings/smollm/model_manifests/epoch-036.json
+    model_manifest_sha256: 235bfb12a85d3c1196126349c6b11892ca5d2b4e2aac1cfcac251695bdf9c3ad
+
+output:
+  root: /vol/tmp2/yesildau/vngrs_m2_oscar_training_readiness_evidence_v1
+  config_root: /vol/tmp2/yesildau/vngrs_m2_oscar_training_readiness_evidence_v1/configs
+  future_training_root: /vol/tmp2/yesildau/vngrs_m2_oscar_training_family_v1/training
+  fresh_and_absent_required: true
+  minimum_free_inodes: 8192
+  storage_safety_multiplier: 1.25
+  fixed_headroom_bytes: 21474836480
+
+review:
+  coverage: all_250_facts
+  verdicts: [usable, issue]
+  human_verdict_entry_in_wave: false
+
+authority:
+  local_preparation: true
+  hu_ssh: false
+  cpu_slurm: false
+  read_only_parent_model_weight_hashing: false
+  review_handoff_capture: false
+  gpu: false
+  optimizer_smoke: false
+  training: false
+  evaluation: false
+  cleanup_or_deletion: false
+  automatic_retry: false

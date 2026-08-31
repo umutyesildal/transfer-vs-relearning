@@ -110,6 +110,11 @@ the master synthesis, the long timeline, or a previous chat transcript.
   manifest SHA is `68dd7ca18d794c09ce3e1b1aa8b2b4b9f6ddb175195959b24b0103c7ea65dd63`.
   Document 200 is the result authority. The 21-file root is preserved; training remains unopened
   and `ready_to_train=false` until a separately frozen M2 training/measurement contract exists;
+- M2 training-readiness evidence: Document 201 freezes one CPU-only fresh-root wave that validates
+  all epoch-036 parent model-file hashes, creates/validates six execution-disabled configs,
+  computes conservative storage and produces an all-250-fact HTML review handoff. Contract SHA is
+  `071252e2c1477f4fbc5e7d132a2bc0f418f2e51ee57120641f7de57bbcec1168`; it is unexecuted and
+  does not authorize GPU, optimizer smoke, training or evaluation;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;
