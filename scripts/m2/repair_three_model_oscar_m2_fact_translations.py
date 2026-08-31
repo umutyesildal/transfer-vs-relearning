@@ -44,7 +44,7 @@ def _validate_precreated_root(root: Path) -> None:
     allowed = {"control/submission_state.json", "control/submission_result.json"}
     for path in (item for item in root.rglob("*") if item.is_file()):
         relative = str(path.relative_to(root))
-        if relative not in allowed and not relative.startswith("logs/"):
+        if relative not in allowed and not relative.startswith(("logs/", "tmp/")):
             raise ValueError(f"Unexpected pre-run fact-translation repair artifact: {relative}")
 
 

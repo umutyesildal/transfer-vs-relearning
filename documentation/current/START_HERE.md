@@ -135,9 +135,12 @@ the master synthesis, the long timeline, or a previous chat transcript.
   only the three M2-B block files from immutable M2-A blocks. Its authorized launcher stopped at
   `sbatch --test-only` because HU has no `cpu` partition; no real job was submitted and the first
   root contains only the preserved 110-byte submission-state file. Document 207 records this
-  fail-closed result. The v1a contract changes only the partition to `longrun` and uses a fresh
-  retry root. V1a contract SHA is
-  `067a370fa046df01a0fef9ac52556bc79c04f7c2d1add58ce40e735015d44ca1`; it is unexecuted;
+  fail-closed result. The authorized v1a route corrected the partition and submitted real job
+  `482057`, but `conda run` created a runtime file under the root-bound `tmp/` before Python, so
+  the strict precreated-root validator stopped before tokenizer/source/block work. Document 208
+  preserves the four-file, zero-block root. V1b allows only runtime-owned `tmp/` files, preserves
+  every scientific field and uses a fresh retry-v2 root. V1b contract SHA is
+  `b3229b2a7dee7a5345edc2086443a622f5908ae4bb2fcaab53bd1412fe5f2156`; it is unexecuted;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;

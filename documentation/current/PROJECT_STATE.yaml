@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_fact_translation_v1_test_only_blocked_awaiting_v1a
+  status: m0_m1_complete_fact_translation_v1a_runtime_tmp_blocked_awaiting_v1b
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -395,7 +395,16 @@ stage_readiness:
     fact_translation_repair_v1a_contract_sha256: 067a370fa046df01a0fef9ac52556bc79c04f7c2d1add58ce40e735015d44ca1
     fact_translation_repair_v1a_record: documentation/207_M2_OSCAR_FACT_TRANSLATION_REPAIR_V1_TEST_ONLY_FAILURE_AND_V1A_PREPARATION_TR.md
     fact_translation_repair_v1a_record_sha256: 938659941010a6d25727751c7fe65fa8eb3d2954f639d2ffc9867bceda34036d
-    fact_translation_repair_v1a_status: frozen_unexecuted_longrun_fresh_root_19_tests_pass
+    fact_translation_repair_v1a_status: consumed_job_482057_runtime_tmp_gate_zero_blocks
+    fact_translation_repair_v1a_root: /vol/tmp2/yesildau/vngrs_m2_oscar_fact_translation_repair_retry_v1
+    fact_translation_repair_v1a_root_files: 4
+    fact_translation_repair_v1a_root_bytes: 17674
+    fact_translation_repair_v1a_stderr_sha256: 1d91bdbe067c61a9b630b1e40e15c14dab61a0b2440ffc392acbe6fc831573c1
+    fact_translation_repair_v1b_contract: documentation/contracts/corpora/vngrs-m2-oscar-fact-translation-repair-v1b.md
+    fact_translation_repair_v1b_contract_sha256: b3229b2a7dee7a5345edc2086443a622f5908ae4bb2fcaab53bd1412fe5f2156
+    fact_translation_repair_v1b_record: documentation/208_M2_OSCAR_FACT_TRANSLATION_REPAIR_V1A_RUNTIME_TMP_FAILURE_AND_V1B_PREPARATION_TR.md
+    fact_translation_repair_v1b_record_sha256: 91abe90dee58a12b1a349ddfba26bf9458c90264be5ea91726368be7fe29f629
+    fact_translation_repair_v1b_status: frozen_unexecuted_runtime_tmp_compatibility_fresh_root_20_tests_pass
     prior_m2_b_block_family_status: superseded_for_future_training_due_four_fact_translation_corrections
     optimizer_smoke_preparation: documentation/205_M2_OSCAR_FACT_REVIEW_VALIDATOR_AND_OPTIMIZER_SMOKE_PREPARATION_TR.md
     optimizer_smoke_preparation_sha256: 49765563b03915f88105d4f698ffd5a51283f15964aca57c4ac325d316b42a07
@@ -1696,10 +1705,10 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: authorize_cpu_fact_translation_m2_b_block_repair_v1a
+  name: authorize_cpu_fact_translation_m2_b_block_repair_v1b
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: v1_test_only_invalid_partition_zero_jobs_awaiting_v1a_then_gpu_smoke
+  m2_status: v1a_runtime_tmp_gate_zero_blocks_awaiting_v1b_then_gpu_smoke
   execution_boundary: no_m2_training_until_matched_contract_is_frozen_and_exactly_authorized
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
@@ -1731,7 +1740,9 @@ active_priority:
     - preserve_document_206_and_frozen_cpu_block_repair_contract
     - preserve_v1_test_only_failure_and_single_file_first_root
     - preserve_document_207_and_frozen_v1a_longrun_contract
-    - await_exact_sha_bound_cpu_fact_translation_repair_v1a_authorization
+    - preserve_job_482057_runtime_tmp_failure_and_four_file_root
+    - preserve_document_208_and_frozen_v1b_runtime_tmp_contract
+    - await_exact_sha_bound_cpu_fact_translation_repair_v1b_authorization
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1741,7 +1752,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_cpu_fact_translation_m2_b_block_repair_v1a
+  subject: authorize_cpu_fact_translation_m2_b_block_repair_v1b
   decision_owner: user
   start_m1_now: false
   note: >-

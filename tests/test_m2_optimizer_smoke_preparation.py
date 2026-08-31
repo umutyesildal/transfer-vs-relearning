@@ -7,7 +7,10 @@ from pathlib import Path
 import pytest
 
 from scripts.m2.validate_m2_fact_review_decisions import validate
-from scripts.m2.repair_three_model_oscar_m2_fact_translations import rewrite_m2_b
+from scripts.m2.repair_three_model_oscar_m2_fact_translations import (
+    _validate_precreated_root,
+    rewrite_m2_b,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -165,3 +168,16 @@ def test_fact_translation_repair_v1a_changes_only_partition_and_fresh_root() -> 
     assert "vngrs_m2_oscar_fact_translation_repair_v1/control/submission_state.json" in submitter_text
     assert "train_three_model_oscar_m2" not in submitter_text
     assert "smoke_three_model_oscar_m2_optimizer" not in submitter_text
+
+
+def test_fact_translation_repair_allows_only_runtime_tmp_before_operator(tmp_path: Path) -> None:
+    root = tmp_path / "repair"
+    runtime_tmp = root / "tmp" / "conda-runtime-file"
+    runtime_tmp.parent.mkdir(parents=True)
+    runtime_tmp.write_text("runtime-only", encoding="utf-8")
+    _validate_precreated_root(root)
+    unexpected = root / "blocks" / "unexpected.jsonl"
+    unexpected.parent.mkdir(parents=True)
+    unexpected.write_text("{}\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="Unexpected pre-run"):
+        _validate_precreated_root(root)

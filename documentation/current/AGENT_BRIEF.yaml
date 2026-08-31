@@ -5,13 +5,13 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 09ae4fa0d2559079164f0592ceeb94dc8d9e1239a644860899d4f7773c165587
+  full_state_sha256: 7578699cb28c306a25e0a4030b4ec001c035f3a1fcfd4ac9382978c4263032fa
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: fact_translation_repair_v1_test_only_blocked_awaiting_v1a_authorization
+  phase: fact_translation_repair_v1a_runtime_tmp_blocked_awaiting_v1b_authorization
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
@@ -97,7 +97,10 @@ stage_readiness:
   m2_fact_translation_repair: consumed_test_only_invalid_cpu_partition_zero_real_jobs
   m2_fact_translation_repair_v1a_contract: documentation/contracts/corpora/vngrs-m2-oscar-fact-translation-repair-v1a.md
   m2_fact_translation_repair_v1a_contract_sha256: 067a370fa046df01a0fef9ac52556bc79c04f7c2d1add58ce40e735015d44ca1
-  m2_fact_translation_repair_v1a: frozen_unexecuted_longrun_fresh_root
+  m2_fact_translation_repair_v1a: consumed_job_482057_runtime_tmp_gate_zero_blocks
+  m2_fact_translation_repair_v1b_contract: documentation/contracts/corpora/vngrs-m2-oscar-fact-translation-repair-v1b.md
+  m2_fact_translation_repair_v1b_contract_sha256: b3229b2a7dee7a5345edc2086443a622f5908ae4bb2fcaab53bd1412fe5f2156
+  m2_fact_translation_repair_v1b: frozen_unexecuted_runtime_tmp_compatibility_fresh_root
   m2_optimizer_smoke_preparation: superseded_inputs_waiting_for_corrected_m2_b_block_repair
   m2_optimizer_smoke_preparation_record: documentation/205_M2_OSCAR_FACT_REVIEW_VALIDATOR_AND_OPTIMIZER_SMOKE_PREPARATION_TR.md
   m2_optimizer_smoke: not_run_separately_gated
@@ -137,7 +140,7 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: authorize_cpu_fact_translation_m2_b_block_repair_v1a
+  subject: authorize_cpu_fact_translation_m2_b_block_repair_v1b
   plan: documentation/191_M2_MATCHED_THREE_MODEL_OSCAR_TRAINING_AND_MEASUREMENT_PLAN_TR.md
   contract: documentation/contracts/corpora/vngrs-m2-oscar-exact-block-materialization-v1.md
   config: configs/corpora/vngrs_m2_oscar_exact_blocks_v1.yaml
