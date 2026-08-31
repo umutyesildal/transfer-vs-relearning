@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_blocks_pass_training_readiness_evidence_frozen_unexecuted
+  status: m0_m1_complete_m2_blocks_pass_readiness_v1_terminal_v1a_frozen_unexecuted
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -35,7 +35,7 @@ repository:
       path: /vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1
       branch: agent/m2-three-model-vngrs-d0
       sync_mode: git_pull_ff_only
-      dependency_commit_verified: b1ec082d0d5f567f76925a251ead67a6bad09118
+      dependency_commit_verified: e6be7bf824a119f969d7490c293197908ba36015
       clean_at_verification: true
     legacy_checkout:
       path: /vol/fob-vol6/mi25/yesildau/transfer-vs-relearning
@@ -348,9 +348,18 @@ stage_readiness:
     training_readiness_evidence_contract: documentation/contracts/training/vngrs-m2-oscar-training-readiness-evidence-v1.md
     training_readiness_evidence_contract_sha256: 071252e2c1477f4fbc5e7d132a2bc0f418f2e51ee57120641f7de57bbcec1168
     training_readiness_evidence_record: documentation/201_M2_OSCAR_TRAINING_READINESS_EVIDENCE_PREPARATION_TR.md
-    training_readiness_evidence_status: frozen_unexecuted_67_tests_pass
+    training_readiness_evidence_status: executed_once_terminal_schema_block_job_482035
     training_readiness_evidence_root: /vol/tmp2/yesildau/vngrs_m2_oscar_training_readiness_evidence_v1
-    training_readiness_evidence_execution_authorized: false
+    training_readiness_evidence_execution_authorized: consumed
+    training_readiness_evidence_v1_result: documentation/202_M2_OSCAR_TRAINING_READINESS_EVIDENCE_V1_EXECUTION_RESULT_TR.md
+    training_readiness_evidence_v1_result_sha256: 78ed56555669334fbce5af420acde3afc10deb6033aec700042fae24caaf1a1c
+    training_readiness_evidence_v1_root_files: 5
+    training_readiness_evidence_v1_root_bytes: 14971
+    training_readiness_evidence_v1a_contract: documentation/contracts/training/vngrs-m2-oscar-training-readiness-evidence-v1a.md
+    training_readiness_evidence_v1a_contract_sha256: 6daa783f057503df8df43ad52fb1d53f62fc0453068f7020bb4f35139a45deaf
+    training_readiness_evidence_v1a_record: documentation/203_M2_OSCAR_TRAINING_READINESS_EVIDENCE_V1A_REPAIR_PREPARATION_TR.md
+    training_readiness_evidence_v1a_status: frozen_unexecuted_68_tests_pass
+    training_readiness_evidence_v1a_execution_authorized: false
     fact_review_scope: all_250_branch_b_turkish_facts_pending_human_verdict
     optimizer_smoke_status: not_run_separately_gated
     exact_block_materialization_train_blocks_per_arm: 97536
@@ -1639,10 +1648,10 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: execute_cpu_training_readiness_evidence_then_human_fact_review
+  name: authorize_v1a_cpu_readiness_schema_repair
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: exact_blocks_pass_cpu_readiness_evidence_frozen_unexecuted
+  m2_status: exact_blocks_pass_readiness_v1_terminal_v1a_frozen_unexecuted
   execution_boundary: no_m2_training_until_matched_contract_is_frozen_and_exactly_authorized
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
@@ -1664,7 +1673,8 @@ active_priority:
     - preserve_document_200_terminal_pass_and_21_file_hash_chain
     - bind_exact_epoch_036_parent_weight_and_config_hashes
     - freeze_memory_optimizer_smoke_and_epoch_level_measurement_matrix
-    - execute_document_201_cpu_evidence_only_after_exact_authorization
+    - preserve_document_202_terminal_schema_failure
+    - preserve_document_203_v1a_fresh_root_repair
     - complete_all_250_fact_human_review_before_gpu_smoke
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
@@ -1675,7 +1685,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_cpu_training_readiness_evidence_wave
+  subject: authorize_v1a_cpu_training_readiness_schema_repair
   decision_owner: user
   start_m1_now: false
   note: >-

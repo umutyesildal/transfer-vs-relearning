@@ -59,18 +59,32 @@ def _parent(role: str, binding: dict[str, Any]) -> tuple[dict[str, Any], int]:
     _assert_file(snapshot_manifest, str(binding["snapshot_manifest_sha256"]))
     _assert_file(model_manifest, str(binding["model_manifest_sha256"]))
     manifest = _json(model_manifest)
+    snapshot = _json(snapshot_manifest)
     if Path(str(manifest.get("local_path_absolute", ""))).resolve() != snapshot_root:
         raise ValueError(f"{role}: parent manifest local path is not exact epoch-036 snapshot")
-    hashes = manifest.get("file_hashes")
-    if not isinstance(hashes, dict) or not hashes:
-        raise ValueError(f"{role}: parent manifest has no file hash registry")
+    files = snapshot.get("files")
+    if not isinstance(files, list) or not files:
+        raise ValueError(f"{role}: snapshot manifest has no file registry")
+    if (
+        not isinstance(manifest.get("checkpoint_sha256"), str)
+        or manifest.get("checkpoint_sha256") != snapshot.get("checkpoint_sha256")
+    ):
+        raise ValueError(f"{role}: model/snapshot checkpoint identity drift")
     assets: list[dict[str, Any]] = []
-    for name, expected in sorted(hashes.items()):
+    observed_names: set[str] = set()
+    for row in sorted(files, key=lambda value: str(value.get("path", ""))):
+        name = str(row.get("path", ""))
+        expected = str(row.get("sha256", ""))
         if Path(name).name != name or name in EXCLUDED:
             raise ValueError(f"{role}: unsafe or trainer-state parent asset: {name}")
+        if not expected or name in observed_names:
+            raise ValueError(f"{role}: duplicate or unhashed snapshot asset: {name}")
+        observed_names.add(name)
         path = snapshot_root / name
-        _assert_file(path, str(expected))
-        assets.append({"name": name, "bytes": path.stat().st_size, "sha256": str(expected)})
+        _assert_file(path, expected)
+        if path.stat().st_size != int(row.get("bytes", -1)):
+            raise ValueError(f"{role}: snapshot asset byte-size drift: {name}")
+        assets.append({"name": name, "bytes": path.stat().st_size, "sha256": expected})
     if not any(row["name"] == "config.json" for row in assets):
         raise ValueError(f"{role}: config.json is absent")
     if not any(row["name"].endswith((".safetensors", ".bin")) for row in assets):

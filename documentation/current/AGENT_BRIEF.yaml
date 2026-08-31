@@ -5,13 +5,13 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 8dee1d7c20715e8efde8199c8b3fc889ec32292cfa9a2d224e937d8eee81ab19
+  full_state_sha256: e8007e45c39af9d2f96f9233fe47c7379777ba8fef9236efdaaf1eb1f7d0506e
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: m2_training_readiness_evidence_frozen_unexecuted
+  phase: m2_training_readiness_v1_terminal_v1a_frozen_unexecuted
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
@@ -83,7 +83,10 @@ stage_readiness:
   m2_exact_block_ready_to_train: false
   m2_training_readiness_contract: documentation/contracts/training/vngrs-m2-oscar-training-readiness-evidence-v1.md
   m2_training_readiness_contract_sha256: 071252e2c1477f4fbc5e7d132a2bc0f418f2e51ee57120641f7de57bbcec1168
-  m2_training_readiness_evidence: frozen_unexecuted_cpu_only_67_tests_pass
+  m2_training_readiness_evidence: v1_terminal_schema_block_job_482035
+  m2_training_readiness_v1a_contract: documentation/contracts/training/vngrs-m2-oscar-training-readiness-evidence-v1a.md
+  m2_training_readiness_v1a_contract_sha256: 6daa783f057503df8df43ad52fb1d53f62fc0453068f7020bb4f35139a45deaf
+  m2_training_readiness_v1a: frozen_unexecuted_cpu_only_68_tests_pass
   m2_fact_review: all_250_pending
   m2_optimizer_smoke: not_run_separately_gated
   m2_local_training_preparation: six_config_generator_validator_exact_checkpoint_callback_and_smoke_training_dag_pass_non_executable
@@ -122,7 +125,7 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: authorize_cpu_training_readiness_evidence_wave
+  subject: authorize_v1a_cpu_training_readiness_schema_repair
   plan: documentation/191_M2_MATCHED_THREE_MODEL_OSCAR_TRAINING_AND_MEASUREMENT_PLAN_TR.md
   contract: documentation/contracts/corpora/vngrs-m2-oscar-exact-block-materialization-v1.md
   config: configs/corpora/vngrs_m2_oscar_exact_blocks_v1.yaml

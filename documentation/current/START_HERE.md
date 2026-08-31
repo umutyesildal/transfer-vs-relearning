@@ -115,6 +115,12 @@ the master synthesis, the long timeline, or a previous chat transcript.
   computes conservative storage and produces an all-250-fact HTML review handoff. Contract SHA is
   `071252e2c1477f4fbc5e7d132a2bc0f418f2e51ee57120641f7de57bbcec1168`; it is unexecuted and
   does not authorize GPU, optimizer smoke, training or evaluation;
+- M2 readiness v1 result/repair: authorized job `482035` stopped fail-closed before evidence
+  publication because the reader expected weight hashes in the compact model manifest rather than
+  its exact linked snapshot manifest. Document 202 preserves the five-file terminal root. Document
+  203 freezes the fresh-root v1a schema repair; contract SHA is
+  `6daa783f057503df8df43ad52fb1d53f62fc0453068f7020bb4f35139a45deaf`, unexecuted, with
+  68/68 focused tests passing;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;
