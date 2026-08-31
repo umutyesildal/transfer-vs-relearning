@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_recovery_terminal_adapter_failure_repair_required
+  status: m0_m1_complete_m2_exact_three_model_blocks_materialized_training_contract_required
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -331,10 +331,20 @@ stage_readiness:
     exact_block_adapter_repair_contract: documentation/contracts/corpora/vngrs-m2-oscar-exact-block-materialization-adapter-repair-v1.md
     exact_block_adapter_repair_contract_sha256: 711deae9853287f9eeea62f35cc397a27a9c3ae3c3f8bbf2f65a8637d647508f
     exact_block_adapter_repair_record: documentation/199_M2_OSCAR_ADAPTER_INTERFACE_REPAIR_PREPARATION_TR.md
-    exact_block_adapter_repair_status: frozen_unexecuted_12_tests_pass
+    exact_block_adapter_repair_status: executed_once_pass_exact_three_model_blocks_materialized
     exact_block_adapter_repair_root: /vol/tmp2/yesildau/vngrs_m2_oscar_exact_blocks_adapter_repair_v1
     exact_block_adapter_repair_resources: 4cpu_64g_6h_cpu_only
-    exact_block_adapter_repair_execution_authorized: false
+    exact_block_adapter_repair_execution_authorized: consumed
+    exact_block_adapter_repair_job: "482027"
+    exact_block_adapter_repair_result: documentation/200_M2_OSCAR_EXACT_BLOCK_ADAPTER_REPAIR_EXECUTION_RESULT_AND_GATE_TR.md
+    exact_block_adapter_repair_result_sha256: 65af0ee838917615ed0f50e1a97da9dbeed9a712b6681e9ebd4c5a03a16767d4
+    exact_block_adapter_repair_root_files: 21
+    exact_block_adapter_repair_root_bytes: 2736458613
+    exact_block_adapter_repair_manifest_sha256: 68dd7ca18d794c09ce3e1b1aa8b2b4b9f6ddb175195959b24b0103c7ea65dd63
+    exact_block_adapter_repair_final_audit_sha256: 7475686c16d8aff55acfa18154cd5b6e686ee7aa1083547e28b6657f1c1b70a6
+    exact_block_adapter_repair_terminal_status: EXACT_THREE_MODEL_M2_BLOCKS_MATERIALIZED
+    exact_block_adapter_repair_peak_rss_kib: 32820872
+    exact_block_adapter_repair_wall_time: "00:16:53.50"
     exact_block_materialization_train_blocks_per_arm: 97536
     exact_block_materialization_validation_blocks_per_model: 2048
     exact_block_materialization_branch_b_facts: 250
@@ -1621,10 +1631,10 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: await_exact_authorization_for_frozen_adapter_interface_repair
+  name: freeze_matched_three_model_m2_training_and_measurement_contract
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: exact_block_recovery_482007_terminal_adapter_failure_repair_frozen_unexecuted
+  m2_status: exact_three_model_blocks_materialized_training_not_opened
   execution_boundary: no_m2_training_until_matched_contract_is_frozen_and_exactly_authorized
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
@@ -1643,8 +1653,9 @@ active_priority:
     - preserve_authorized_job_482007_single_submission_and_persistent_root
     - preserve_document_198_terminal_failure_and_resource_evidence
     - preserve_document_197_as_unexecuted_now_ineligible_pending_only_relocation
-    - preserve_frozen_document_199_adapter_repair_preparation_and_12_test_pass
-    - await_exact_sha_bound_adapter_repair_authorization
+    - preserve_document_200_terminal_pass_and_21_file_hash_chain
+    - bind_exact_epoch_036_parent_weight_and_config_hashes
+    - freeze_memory_optimizer_smoke_and_epoch_level_measurement_matrix
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1654,7 +1665,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_fresh_root_adapter_interface_repair
+  subject: freeze_then_authorize_matched_three_model_m2_training_contract
   decision_owner: user
   start_m1_now: false
   note: >-

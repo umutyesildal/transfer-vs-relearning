@@ -105,6 +105,11 @@ the master synthesis, the long timeline, or a previous chat transcript.
   a fresh root and one 4 CPU / 64G / 6h CPU-only route. The compatible suite passes 12/12. Contract
   SHA is `711deae9853287f9eeea62f35cc397a27a9c3ae3c3f8bbf2f65a8637d647508f`; it is unexecuted and
   requires new exact SHA-bound authorization;
+- M2 exact-block terminal result: the authorized adapter repair completed as job `482027` with
+  exit 0. All OLMo/Qwen/SmolLM M2-A, M2-B and shared-validation artifacts passed exact audits;
+  manifest SHA is `68dd7ca18d794c09ce3e1b1aa8b2b4b9f6ddb175195959b24b0103c7ea65dd63`.
+  Document 200 is the result authority. The 21-file root is preserved; training remains unopened
+  and `ready_to_train=false` until a separately frozen M2 training/measurement contract exists;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;
