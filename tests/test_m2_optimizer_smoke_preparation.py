@@ -109,6 +109,31 @@ def test_optimizer_smoke_is_separate_bounded_and_non_scientific() -> None:
     assert "finalize_three_model_oscar_m2" not in submitter_text
 
 
+def test_corrected_optimizer_smoke_is_manifest_bound_and_training_closed() -> None:
+    runner = (ROOT / "scripts/m2/smoke_three_model_oscar_m2_optimizer.py").read_text()
+    config = ROOT / "configs/training/m2_oscar_optimizer_smoke_corrected_v1.yaml"
+    slurm = ROOT / "slurm/m2/smoke_three_model_oscar_m2_optimizer_corrected_v1.slurm"
+    submitter = ROOT / "scripts/m2/submit_three_model_oscar_m2_optimizer_smoke_corrected_v1.sh"
+    subprocess.run(["bash", "-n", str(slurm)], check=True)
+    subprocess.run(["bash", "-n", str(submitter)], check=True)
+    config_text = config.read_text()
+    slurm_text = slurm.read_text()
+    submitter_text = submitter.read_text()
+    assert "--block-family-manifest" in runner
+    assert "Corrected-family artifact drift" in runner
+    assert "M2_FACT_TRANSLATION_REPAIR_PASS" in runner
+    assert '"model_weights_accessed": True' in runner
+    assert '"scientific_training": False' in runner
+    assert '"checkpoint_written": False' in runner
+    assert "96f9867c857b08bfd784660331d1a354be7d7c6bc39250091f427fdfaa3c6486" in config_text
+    assert "#SBATCH --array=0-2%1" in slurm_text
+    assert "#SBATCH --gres=gpu:a10080gb:1" in slurm_text
+    assert "M2_CORRECTED_OPTIMIZER_SMOKE_AUTHORIZATION_ACK" in submitter_text
+    assert "M2_FACT_TRANSLATION_REPAIR_PASS False" in submitter_text
+    assert "train_three_model_oscar_m2" not in submitter_text
+    assert "finalize_three_model_oscar_m2" not in submitter_text
+
+
 def test_fact_translation_repair_rewrites_only_corrected_m2_b(tmp_path: Path) -> None:
     m2_a = tmp_path / "m2_a.jsonl"
     old_b = tmp_path / "old_b.jsonl"

@@ -28,10 +28,21 @@ def _first_rows(path: Path, limit: int) -> list[dict[str, Any]]:
     return rows
 
 
+def _verified_artifact(binding: dict[str, Any], label: str) -> Path:
+    path = Path(str(binding["path"])).resolve()
+    if path.is_symlink() or not path.is_file():
+        raise ValueError(f"Missing or unsafe corrected-family artifact: {label}")
+    if path.stat().st_size != int(binding["bytes"]) or sha256_file(path) != str(binding["sha256"]):
+        raise ValueError(f"Corrected-family artifact drift: {label}")
+    return path
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--block-family-manifest", type=Path, required=True)
+    parser.add_argument("--expected-block-family-manifest-sha256", required=True)
     args = parser.parse_args()
 
     import torch
@@ -59,6 +70,27 @@ def main() -> int:
         raise ValueError("Frozen M2 optimizer-smoke recipe drift")
 
     train_path = Path(str(dataset["train_file"])).resolve()
+    family_path = args.block_family_manifest.resolve()
+    if family_path.is_symlink() or not family_path.is_file():
+        raise ValueError("Corrected block-family manifest is missing or unsafe")
+    family_sha256 = sha256_file(family_path)
+    if family_sha256 != args.expected_block_family_manifest_sha256:
+        raise ValueError("Corrected block-family manifest SHA-256 drift")
+    family = json.loads(family_path.read_text(encoding="utf-8"))
+    if (
+        family.get("status") != "EXACT_THREE_MODEL_M2_BLOCKS_MATERIALIZED"
+        or family.get("repair_status") != "M2_FACT_TRANSLATION_REPAIR_PASS"
+        or family.get("ready_to_train") is not False
+        or family.get("training_opened") is not False
+    ):
+        raise ValueError("Corrected block-family terminal gate failed")
+    family_role = family.get("models", {}).get(role)
+    if not isinstance(family_role, dict):
+        raise ValueError(f"Corrected block-family role missing: {role}")
+    family_m2_a = _verified_artifact(family_role["artifacts"]["m2_a_train"], f"{role} M2-A")
+    family_m2_b = _verified_artifact(family_role["artifacts"]["m2_b_train"], f"{role} M2-B")
+    if family_m2_a != train_path:
+        raise ValueError("Smoke M2-A config is not bound to the corrected block family")
     rows = _first_rows(train_path, batch_size * accumulation)
     if len(rows) != 128:
         raise ValueError("Optimizer smoke requires the first exact 128 frozen blocks")
@@ -134,6 +166,7 @@ def main() -> int:
         "schema_version": 1,
         "status": "OPTIMIZER_SMOKE_PASS",
         "scientific_training": False,
+        "model_weights_accessed": True,
         "role": role,
         "arm": arm,
         "config": str(config_path),
@@ -142,6 +175,10 @@ def main() -> int:
         "model_manifest_sha256": sha256_file(manifest_path),
         "train_file": str(train_path),
         "train_sha256": sha256_file(train_path),
+        "block_family_manifest": str(family_path),
+        "block_family_manifest_sha256": family_sha256,
+        "corrected_m2_b_file": str(family_m2_b),
+        "corrected_m2_b_sha256": sha256_file(family_m2_b),
         "optimizer_steps": 1,
         "blocks_consumed": 128,
         "tokens_consumed": 65536,

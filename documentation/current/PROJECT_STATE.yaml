@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_corrected_m2_b_blocks_materialized_awaiting_optimizer_smoke_contract
+  status: m0_m1_complete_corrected_m2_b_blocks_materialized_smoke_contract_frozen
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -415,6 +415,11 @@ stage_readiness:
     corrected_m2_b_olmo_sha256: 654c4bc253acfc72452404414dadedd36ed2794009651d7e4be2d5b2c5b9b367
     corrected_m2_b_qwen_sha256: 6f2d7ceea4e64cdeff4392a83954b7a41aa9e49520aa25b4e37cf8951a76e5f3
     corrected_m2_b_smollm_sha256: 53615eed0a00c8ae8c0f1787fce58dde61e4b25e52ffdd330db42f36175a66a3
+    corrected_optimizer_smoke_contract: documentation/contracts/training/vngrs-m2-oscar-corrected-optimizer-smoke-v1.md
+    corrected_optimizer_smoke_contract_sha256: 2f43dc86836bb9d030988fe7567c19245b1c7246c335f34353184e8b3c4103f1
+    corrected_optimizer_smoke_record: documentation/210_M2_OSCAR_CORRECTED_OPTIMIZER_SMOKE_CONTRACT_PREPARATION_TR.md
+    corrected_optimizer_smoke_record_sha256: 90eeb0e33d32d75e822616f4d3db5c515131701bf180631908516f0a614563da
+    corrected_optimizer_smoke_status: frozen_unexecuted_three_role_a100_array_21_tests_pass
     prior_m2_b_block_family_status: superseded_for_future_training_due_four_fact_translation_corrections
     optimizer_smoke_preparation: documentation/205_M2_OSCAR_FACT_REVIEW_VALIDATOR_AND_OPTIMIZER_SMOKE_PREPARATION_TR.md
     optimizer_smoke_preparation_sha256: 49765563b03915f88105d4f698ffd5a51283f15964aca57c4ac325d316b42a07
@@ -1715,10 +1720,10 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: freeze_corrected_manifest_bound_optimizer_smoke_contract
+  name: authorize_corrected_manifest_bound_optimizer_smoke
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: corrected_three_model_m2_b_blocks_pass_awaiting_rebound_gpu_smoke_contract
+  m2_status: corrected_three_model_m2_b_blocks_pass_smoke_contract_frozen_awaiting_authorization
   execution_boundary: no_m2_training_until_matched_contract_is_frozen_and_exactly_authorized
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
@@ -1754,7 +1759,8 @@ active_priority:
     - preserve_document_208_and_frozen_v1b_runtime_tmp_contract
     - preserve_job_482066_terminal_pass_and_corrected_three_model_m2_b_hash_chain
     - preserve_document_209_terminal_result_and_gate
-    - freeze_optimizer_smoke_against_corrected_manifest
+    - preserve_document_210_and_corrected_manifest_bound_smoke_contract
+    - await_exact_sha_bound_corrected_optimizer_smoke_authorization
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1764,7 +1770,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: freeze_corrected_manifest_bound_optimizer_smoke_contract
+  subject: authorize_corrected_manifest_bound_optimizer_smoke
   decision_owner: user
   start_m1_now: false
   note: >-

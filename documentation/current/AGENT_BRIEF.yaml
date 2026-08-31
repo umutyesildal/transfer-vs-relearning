@@ -5,13 +5,13 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 9aca533786ef5a800568638cc59dc1ffee80d4694f36bec334cb2b433361a0f2
+  full_state_sha256: 94079eeff3b1ddf19c8fe377952c4120f976e83a84c12df0a4444bd054c3da06
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: corrected_m2_b_blocks_materialized_awaiting_rebound_optimizer_smoke_contract
+  phase: corrected_m2_b_blocks_materialized_optimizer_smoke_contract_frozen_awaiting_authorization
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
@@ -103,6 +103,9 @@ stage_readiness:
   m2_fact_translation_repair_v1b: executed_once_pass_job_482066
   m2_fact_translation_repair_v1b_manifest_sha256: 96f9867c857b08bfd784660331d1a354be7d7c6bc39250091f427fdfaa3c6486
   m2_fact_translation_repair_v1b_result: documentation/209_M2_OSCAR_FACT_TRANSLATION_REPAIR_V1B_PASS_AND_GATE_TR.md
+  m2_corrected_optimizer_smoke_contract: documentation/contracts/training/vngrs-m2-oscar-corrected-optimizer-smoke-v1.md
+  m2_corrected_optimizer_smoke_contract_sha256: 2f43dc86836bb9d030988fe7567c19245b1c7246c335f34353184e8b3c4103f1
+  m2_corrected_optimizer_smoke: frozen_unexecuted_three_role_array
   m2_optimizer_smoke_preparation: superseded_inputs_waiting_for_corrected_m2_b_block_repair
   m2_optimizer_smoke_preparation_record: documentation/205_M2_OSCAR_FACT_REVIEW_VALIDATOR_AND_OPTIMIZER_SMOKE_PREPARATION_TR.md
   m2_optimizer_smoke: not_run_separately_gated
@@ -142,7 +145,7 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: freeze_corrected_manifest_bound_optimizer_smoke_contract
+  subject: authorize_corrected_manifest_bound_optimizer_smoke
   plan: documentation/191_M2_MATCHED_THREE_MODEL_OSCAR_TRAINING_AND_MEASUREMENT_PLAN_TR.md
   contract: documentation/contracts/corpora/vngrs-m2-oscar-exact-block-materialization-v1.md
   config: configs/corpora/vngrs_m2_oscar_exact_blocks_v1.yaml
