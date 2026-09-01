@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_corrected_m2_b_blocks_materialized_three_model_smoke_pass
+  status: m0_m1_complete_m2_scientific_training_contract_frozen_unexecuted
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -105,9 +105,9 @@ readiness:
   evaluation_contract: frozen
   corpus_contract: oscar_phase2_evidence_complete
   m1_training_contract: frozen_executed_complete
-  m2_training_contract: not_frozen
+  m2_training_contract: frozen_unexecuted
   ready_to_measure: true
-  ready_to_train: false
+  ready_to_train: true
   selected_primary_model: null
 
 # Stage-specific gates prevent an unresolved M2 corpus decision from becoming an M1 blocker.
@@ -419,7 +419,20 @@ stage_readiness:
     corrected_optimizer_smoke_contract_sha256: 2f43dc86836bb9d030988fe7567c19245b1c7246c335f34353184e8b3c4103f1
     corrected_optimizer_smoke_record: documentation/210_M2_OSCAR_CORRECTED_OPTIMIZER_SMOKE_CONTRACT_PREPARATION_TR.md
     corrected_optimizer_smoke_record_sha256: 90eeb0e33d32d75e822616f4d3db5c515131701bf180631908516f0a614563da
-    corrected_optimizer_smoke_status: frozen_unexecuted_three_role_a100_array_21_tests_pass
+    corrected_optimizer_smoke_status: executed_once_pass_job_482103_three_of_three
+    corrected_optimizer_smoke_result: documentation/211_M2_OSCAR_CORRECTED_OPTIMIZER_SMOKE_RESULT_AND_GATE_TR.md
+    corrected_optimizer_smoke_olmo_report_sha256: 1ba84c61dccdbf7d6a85d3b96d03435180d7afa4f04100a625030079c801327d
+    corrected_optimizer_smoke_qwen_report_sha256: c0b33e389aa9a8544f3354c65a1ba0b4bda206be718d3b3ad09b7d4eb1936009
+    corrected_optimizer_smoke_smollm_report_sha256: 05faf4999fe04de49e9bc9ce30f5734584cba63e1ba3043c1dc1453fe1ab1732
+    scientific_training_contract: documentation/contracts/training/vngrs-m2-oscar-scientific-training-v1.md
+    scientific_training_contract_sha256: 748e2aae5c7e3ec95acaf639e4536e6024686e5a854ad09dc6013feb47490222
+    scientific_training_config: configs/training/m2_oscar_scientific_training_v1.yaml
+    scientific_training_preparation: documentation/212_M2_OSCAR_SCIENTIFIC_TRAINING_CONTRACT_PREPARATION_TR.md
+    scientific_training_status: frozen_unexecuted_six_run_wave_awaiting_exact_authorization
+    scientific_training_root: /vol/tmp2/yesildau/vnd_m2_oscar_scientific_training_v1
+    scientific_training_array: 0-5%3_a10080gb
+    scientific_training_checkpoint_count: 60
+    scientific_training_eval_matrix_states: 63_execution_disabled
     prior_m2_b_block_family_status: superseded_for_future_training_due_four_fact_translation_corrections
     optimizer_smoke_preparation: documentation/205_M2_OSCAR_FACT_REVIEW_VALIDATOR_AND_OPTIMIZER_SMOKE_PREPARATION_TR.md
     optimizer_smoke_preparation_sha256: 49765563b03915f88105d4f698ffd5a51283f15964aca57c4ac325d316b42a07
@@ -433,7 +446,7 @@ stage_readiness:
     optimizer_smoke_submitter: scripts/m2/submit_three_model_oscar_m2_optimizer_smoke_only.sh
     optimizer_smoke_submitter_sha256: 61fe4d9d47a0726689f5d32b12b2ddc3798c27e044c12ddc158928b499ba7b36
     fact_review_scope: all_250_branch_b_turkish_facts_pending_human_verdict
-    optimizer_smoke_status: not_run_separately_gated
+    optimizer_smoke_status: corrected_family_three_of_three_pass
     exact_block_materialization_train_blocks_per_arm: 97536
     exact_block_materialization_validation_blocks_per_model: 2048
     exact_block_materialization_branch_b_facts: 250
@@ -1720,10 +1733,10 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: freeze_exact_six_run_m2_training_and_evaluation_contract
+  name: authorize_exact_m2_scientific_training_v1_wave
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: corrected_three_model_m2_b_blocks_pass_optimizer_smoke_three_of_three_pass_training_not_authorized
+  m2_status: six_run_scientific_training_contract_frozen_unexecuted_training_not_authorized
   execution_boundary: no_m2_training_until_matched_contract_is_frozen_and_exactly_authorized
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
@@ -1762,7 +1775,8 @@ active_priority:
     - preserve_document_210_and_corrected_manifest_bound_smoke_contract
     - preserve_array_482103_three_of_three_optimizer_smoke_pass
     - preserve_document_211_terminal_smoke_result_and_gate
-    - freeze_exact_six_run_training_evaluation_contract_before_any_training
+    - preserve_document_212_and_exact_scientific_training_contract
+    - await_exact_sha_bound_training_authorization
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1772,7 +1786,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: freeze_then_authorize_exact_six_run_m2_training_and_evaluation_contract
+  subject: authorize_exact_m2_scientific_training_v1_wave
   decision_owner: user
   start_m1_now: false
   note: >-

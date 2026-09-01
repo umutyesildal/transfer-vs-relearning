@@ -1,0 +1,31 @@
+schema_version: 4
+name: m2-three-model-oscar-training-preparation-v4
+status: local_preparation_non_executable
+execution_authorized: false
+inputs:
+  scientific_plan: configs/training/m2_matched_three_model_oscar_plan_v1.yaml
+  corrected_block_manifest: /vol/tmp2/yesildau/vngrs_m2_oscar_fact_translation_repair_retry_v2/manifest.json
+  corrected_block_manifest_sha256: 96f9867c857b08bfd784660331d1a354be7d7c6bc39250091f427fdfaa3c6486
+  exact_parent_registry: /vol/tmp2/yesildau/vngrs_m2_oscar_training_readiness_evidence_retry_v1/parent_registry.json
+  exact_parent_registry_sha256: b9ada6b7280270d987077b8e1721106ed6a6a0ac78c133dc4150500aaad87823
+output:
+  family_root: /vol/tmp2/yesildau/vnd_m2_oscar_scientific_training_v1
+  config_root: /vol/tmp2/yesildau/vnd_m2_oscar_scientific_training_v1/configs
+  training_root: /vol/tmp2/yesildau/vnd_m2_oscar_scientific_training_v1/training
+memory_decomposition_candidate:
+  must_pass_optimizer_smoke_before_training: true
+  scientific_effective_blocks_per_update: 128
+  olmo: {per_device_train_batch_size: 4, gradient_accumulation_steps: 32}
+  qwen: {per_device_train_batch_size: 4, gradient_accumulation_steps: 32}
+  smollm: {per_device_train_batch_size: 4, gradient_accumulation_steps: 32}
+  route: a10080gb_single_gpu_smoke_verified
+  fallback_or_retry: separately_contracted_only
+authority:
+  local_config_generation: true
+  hu_ssh: false
+  model_weight_access: false
+  gpu: false
+  training: false
+  evaluation: false
+  cleanup_or_deletion: false
+  automatic_retry: false

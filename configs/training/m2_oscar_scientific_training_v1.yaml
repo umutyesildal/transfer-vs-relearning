@@ -1,0 +1,121 @@
+schema_version: 1
+contract_id: vngrs-m2-oscar-scientific-training-v1
+status: frozen_unexecuted
+execution_authorized: false
+
+repository:
+  branch: agent/m2-three-model-vngrs-d0
+  preparation_config: configs/training/m2_three_model_oscar_training_preparation_v4.yaml
+  scientific_plan: configs/training/m2_matched_three_model_oscar_plan_v1.yaml
+
+inputs:
+  readiness_final_audit:
+    path: /vol/tmp2/yesildau/vngrs_m2_oscar_training_readiness_evidence_retry_v1/control/final_audit.json
+    sha256: d8cd44eae03ec1c5b5eea334bf94506417730c30f44dfbfbf6df2bf60a144fc8
+  parent_registry:
+    path: /vol/tmp2/yesildau/vngrs_m2_oscar_training_readiness_evidence_retry_v1/parent_registry.json
+    sha256: b9ada6b7280270d987077b8e1721106ed6a6a0ac78c133dc4150500aaad87823
+  storage_estimate:
+    path: /vol/tmp2/yesildau/vngrs_m2_oscar_training_readiness_evidence_retry_v1/storage_estimate.json
+    sha256: 51d6ac33db1527c509889964fc61a3af33cbaaf9075beb38c54ee0c0528737e8
+  corrected_block_manifest:
+    path: /vol/tmp2/yesildau/vngrs_m2_oscar_fact_translation_repair_retry_v2/manifest.json
+    sha256: 96f9867c857b08bfd784660331d1a354be7d7c6bc39250091f427fdfaa3c6486
+  corrected_block_final_audit:
+    path: /vol/tmp2/yesildau/vngrs_m2_oscar_fact_translation_repair_retry_v2/control/final_audit.json
+    sha256: fc2075cbce7f4d51c8013b7977ec64630d2181c8c9ebf30a64f5cab61514e54d
+  corrected_human_review_validation:
+    path: artifacts/corpora/vngrs_m2_fact_registry_correction_v1/generated_v2/human_review_validation_corrected.json
+    sha256: a5e4f04a567de98f85674e8c58e13effe85753738d5de931704e41a153ec20b1
+
+optimizer_smoke:
+  root: /vol/tmp2/yesildau/vnd_m2_oscar_optimizer_smoke_corrected_v1
+  reports:
+    olmo: {path: roles/olmo/smoke_report.json, sha256: 1ba84c61dccdbf7d6a85d3b96d03435180d7afa4f04100a625030079c801327d}
+    qwen: {path: roles/qwen/smoke_report.json, sha256: c0b33e389aa9a8544f3354c65a1ba0b4bda206be718d3b3ad09b7d4eb1936009}
+    smollm: {path: roles/smollm/smoke_report.json, sha256: 05faf4999fe04de49e9bc9ce30f5734584cba63e1ba3043c1dc1453fe1ab1732}
+  required_status: OPTIMIZER_SMOKE_PASS
+  corrected_block_manifest_sha256: 96f9867c857b08bfd784660331d1a354be7d7c6bc39250091f427fdfaa3c6486
+
+training:
+  models: [olmo, qwen, smollm]
+  arms: [M2-A, M2-B]
+  run_count: 6
+  parent: exact_m1_epoch_036_seed42
+  tokens_per_arm: 49938432
+  blocks_per_arm: 97536
+  sequence_length: 512
+  optimizer_updates: 762
+  effective_blocks_per_update: 128
+  effective_tokens_per_update: 65536
+  microbatch_blocks: 4
+  gradient_accumulation_steps: 32
+  learning_rate: 1.0e-5
+  scheduler: constant_with_warmup
+  warmup_steps: 15
+  precision: bfloat16
+  optimizer: adamw
+  optimizer_foreach: false
+  weight_decay: 0.0
+  seed: 42
+  data_seed: 42
+  checkpoint_updates: [76, 152, 229, 305, 381, 457, 533, 610, 686, 762]
+  max_parallel_tasks: 3
+
+measurement:
+  dense_updates: [76, 152, 229, 305, 381, 457, 533, 610, 686, 762]
+  full_updates: [381, 762]
+  entry_state: projected_exact_m1_epoch_036_existing_eval_v2
+  dense_bundles:
+    - training_trace_loss_lr_tokens
+    - factual_access_cheap
+    - exact_prefix_500
+    - wikitext_word_byte_ppl_bpb
+    - oscar_heldout_word_byte_ppl_bpb
+    - trwiki_cross_domain_control
+    - generation_integrity_cheap
+  full_bundles:
+    - factual_access_full_12000
+    - english_capability_eval_v2
+    - turkish_capability_eval_v2
+    - generation_integrity_full
+  pile_10k: retired_forbidden
+  evaluation_execution: separately_hash_bound_after_training_outputs_exist
+  outcome_aware_measurement_change: forbidden
+
+storage:
+  minimum_free_bytes: 386596220128
+  minimum_free_inodes: 8192
+  checkpoint_count: 60
+  estimated_model_only_checkpoint_bytes: 190043787340
+  fresh_preflight_required: true
+
+slurm:
+  root: /vol/tmp2/yesildau/vnd_m2_oscar_scientific_training_v1
+  preflight: {partition: std, cpus: 4, memory: 16G, time: "01:00:00"}
+  training: {partition: gpu, gres: "gpu:a10080gb:1", cpus: 8, memory: 64G, time: "24:00:00", array: "0-5%3"}
+  finalizer: {partition: std, cpus: 4, memory: 16G, time: "04:00:00"}
+  automatic_retry: false
+  fallback: false
+
+gates:
+  exact_clean_commit: true
+  fresh_absent_root: true
+  zero_duplicate_jobs: true
+  test_only_all_jobs: true
+  corrected_review_pass: true
+  corrected_block_family_pass: true
+  three_of_three_smoke_pass: true
+  live_storage_inode_preflight: true
+  no_home_write: true
+
+authority:
+  local_preparation_and_tests: true
+  hu_ssh: false
+  slurm: false
+  model_weight_access: false
+  m2_a_m2_b_scientific_training: false
+  checkpoint_creation: false
+  evaluation: false
+  cleanup_or_deletion: false
+  automatic_retry: false

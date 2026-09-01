@@ -150,8 +150,16 @@ the master synthesis, the long timeline, or a previous chat transcript.
   job can be submitted. Its authorized array `482103` completed three `OPTIMIZER_SMOKE_PASS`
   reports on A100-80GB with finite losses/gradient norms, BF16 parameters/gradients/optimizer
   moments, one optimizer step per role, zero checkpoints and `scientific_training=false`.
-  Document 211 is the terminal result authority. The smoke gate is closed, but M2 training remains
-  unauthorized and `ready_to_train=false` until a new exact training/evaluation contract is frozen;
+  Document 211 is the terminal result authority. At that gate the smoke was closed but M2 training
+  remained unauthorized pending a new exact training/measurement contract;
+- M2 scientific training freeze: Document 212 and contract
+  `vngrs-m2-oscar-scientific-training-v1` now freeze the exact six-run OLMo/Qwen/SmolLM ×
+  M2-A/M2-B wave. Corrected M2-B configs are regenerated only in a fresh CPU preflight; three
+  immutable smoke PASS reports, live 386,596,220,128-byte/8,192-inode storage gates and one
+  `0-5%3` A100-80GB array are mandatory. Ten checkpoints per run and the 63-state measurement
+  matrix are precommitted. Contract SHA is
+  `748e2aae5c7e3ec95acaf639e4536e6024686e5a854ad09dc6013feb47490222`; it is unexecuted and
+  needs exact user authorization. Scoring/evaluation remains separately gated;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;
