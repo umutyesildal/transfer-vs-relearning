@@ -144,12 +144,14 @@ the master synthesis, the long timeline, or a previous chat transcript.
   `96f9867c857b08bfd784660331d1a354be7d7c6bc39250091f427fdfaa3c6486`, predecessor M2-A and
   validation remained read-only, and no GPU/model/training access occurred. Document 209 is the
   current result/gate authority;
-- M2 corrected optimizer smoke: Document 210 freezes a corrected-family-bound, smoke-only
+- M2 corrected optimizer smoke: Document 210 froze a corrected-family-bound, smoke-only
   `0-2%1` A100 array for OLMo/Qwen/SmolLM. Each role performs one BF16 effective-batch AdamW step
   from M2-A only after exact corrected M2-A/M2-B artifact verification; no checkpoint or training
-  job can be submitted. Contract SHA is
-  `2f43dc86836bb9d030988fe7567c19245b1c7246c335f34353184e8b3c4103f1`; it is unexecuted and
-  requires separate exact authorization;
+  job can be submitted. Its authorized array `482103` completed three `OPTIMIZER_SMOKE_PASS`
+  reports on A100-80GB with finite losses/gradient norms, BF16 parameters/gradients/optimizer
+  moments, one optimizer step per role, zero checkpoints and `scientific_training=false`.
+  Document 211 is the terminal result authority. The smoke gate is closed, but M2 training remains
+  unauthorized and `ready_to_train=false` until a new exact training/evaluation contract is frozen;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;

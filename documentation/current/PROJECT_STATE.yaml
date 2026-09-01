@@ -1,11 +1,11 @@
 schema_version: 1
-as_of: "2026-08-31"
+as_of: "2026-09-01"
 project: transfer-vs-relearning
 
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_corrected_m2_b_blocks_materialized_smoke_contract_frozen
+  status: m0_m1_complete_corrected_m2_b_blocks_materialized_three_model_smoke_pass
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -1720,10 +1720,10 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: authorize_corrected_manifest_bound_optimizer_smoke
+  name: freeze_exact_six_run_m2_training_and_evaluation_contract
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: corrected_three_model_m2_b_blocks_pass_smoke_contract_frozen_awaiting_authorization
+  m2_status: corrected_three_model_m2_b_blocks_pass_optimizer_smoke_three_of_three_pass_training_not_authorized
   execution_boundary: no_m2_training_until_matched_contract_is_frozen_and_exactly_authorized
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
@@ -1760,7 +1760,9 @@ active_priority:
     - preserve_job_482066_terminal_pass_and_corrected_three_model_m2_b_hash_chain
     - preserve_document_209_terminal_result_and_gate
     - preserve_document_210_and_corrected_manifest_bound_smoke_contract
-    - await_exact_sha_bound_corrected_optimizer_smoke_authorization
+    - preserve_array_482103_three_of_three_optimizer_smoke_pass
+    - preserve_document_211_terminal_smoke_result_and_gate
+    - freeze_exact_six_run_training_evaluation_contract_before_any_training
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1770,7 +1772,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_corrected_manifest_bound_optimizer_smoke
+  subject: freeze_then_authorize_exact_six_run_m2_training_and_evaluation_contract
   decision_owner: user
   start_m1_now: false
   note: >-
