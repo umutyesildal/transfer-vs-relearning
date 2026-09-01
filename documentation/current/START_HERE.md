@@ -167,6 +167,15 @@ the master synthesis, the long timeline, or a previous chat transcript.
   Finalizer `482208` is dependency-never-satisfied and was not cancelled. Document 213 is the
   terminal operational `NOT_RUN` authority; the single-wave authorization is consumed and no
   retry/fallback is authorized;
+- M2 scientific training recovery: Document 214 and frozen contract
+  `vngrs-m2-oscar-scientific-training-recovery-v1` preserve the full v1 scientific recipe while
+  replacing only the shared-node launch guard. Each serial task requests all three A100-80GB GPUs,
+  atomically records their VRAM/process ledger and trains on the deterministic safest single GPU
+  only if `free >= 61,440 MiB` and `used <= 20,480 MiB`. Task failure audit is persistent and the
+  old root remains read-only. Contract SHA is
+  `c6f07cdc69003406d2ea44d8bb2c71b9c89ffd4694e224fd708460fb7374da13`; it is frozen/unexecuted
+  and needs exact user authorization plus publication commit. Evaluation/scoring and automatic
+  retry remain unauthorized;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;

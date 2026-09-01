@@ -5,13 +5,13 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 66c4ab890203ef70f4e7efe784f0a5d3f1a71850986afa339b79beb3dbeba592
+  full_state_sha256: 3814805183773980d5d3eff5191951658e6cd17f93d28b61b09967819441efe5
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: m2_scientific_training_v1_operational_not_run_gpu_zero_process_guard
+  phase: m2_scientific_training_gpu_isolation_recovery_frozen_unexecuted
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
@@ -20,9 +20,9 @@ readiness:
   evaluation_contract: frozen
   corpus_contract: oscar_phase2_evidence_complete
   m1_training_contract: frozen_executed_complete
-  m2_training_contract: executed_once_consumed_operational_not_run
+  m2_training_contract: recovery_frozen_unexecuted_exact_authorization_required
   ready_to_measure: true
-  ready_to_train: false
+  ready_to_train: true
   selected_primary_model: null
 
 stage_readiness:
@@ -114,6 +114,11 @@ stage_readiness:
   m2_scientific_training_preflight: job_482206_pass
   m2_scientific_training_finalizer: job_482208_dependency_never_satisfied_not_cancelled
   m2_scientific_training_result: documentation/213_M2_OSCAR_SCIENTIFIC_TRAINING_V1_OPERATIONAL_NOT_RUN_RESULT_TR.md
+  m2_scientific_training_recovery_contract: documentation/contracts/training/vngrs-m2-oscar-scientific-training-recovery-v1.md
+  m2_scientific_training_recovery_contract_sha256: c6f07cdc69003406d2ea44d8bb2c71b9c89ffd4694e224fd708460fb7374da13
+  m2_scientific_training_recovery: frozen_unexecuted_three_a100_allocation_single_selected_gpu_persistent_audit
+  m2_scientific_training_recovery_preparation: documentation/214_M2_OSCAR_SCIENTIFIC_TRAINING_RECOVERY_PREPARATION_TR.md
+  m2_scientific_training_recovery_execution_authorized: false
   m2_optimizer_smoke_preparation: superseded_inputs_waiting_for_corrected_m2_b_block_repair
   m2_optimizer_smoke_preparation_record: documentation/205_M2_OSCAR_FACT_REVIEW_VALIDATOR_AND_OPTIMIZER_SMOKE_PREPARATION_TR.md
   m2_optimizer_smoke: complete_three_of_three_pass_scientific_training_false
@@ -153,10 +158,10 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: freeze_gpu_isolation_and_persistent_failure_audit_repair_contract
+  subject: exact_sha_bound_gpu_isolation_recovery_authorization
   plan: documentation/191_M2_MATCHED_THREE_MODEL_OSCAR_TRAINING_AND_MEASUREMENT_PLAN_TR.md
-  contract: not_frozen
-  config: not_frozen
+  contract: documentation/contracts/training/vngrs-m2-oscar-scientific-training-recovery-v1.md
+  config: configs/training/m2_oscar_scientific_training_recovery_v1.yaml
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user
     - offline_tests_and_dry_runs
@@ -166,8 +171,8 @@ next_boundary:
     - preserve_document_211_three_of_three_optimizer_smoke_pass
     - preserve_document_212_and_consumed_scientific_training_contract
     - preserve_document_213_operational_not_run_result
-    - preserve_dependency_dead_job_482208_without_cancellation
-    - freeze_gpu_isolation_and_persistent_failure_audit_repair_contract
+    - preserve_dependency_dead_job_482208_without_cancellation_until_exact_authorization
+    - preserve_frozen_document_214_gpu_isolation_and_persistent_failure_audit_recovery_contract
     - preserve_local_training_config_validator_and_smoke_training_dag_preparation
     - preserve_local_training_output_finalizer_and_eval_v2_matrix_preparation
   not_implied:
