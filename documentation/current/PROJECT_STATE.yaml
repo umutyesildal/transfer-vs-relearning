@@ -452,6 +452,11 @@ stage_readiness:
     scientific_training_recovery_config_manifest_sha256: 8eccf41ee692b6f4d7088d3adb8d2257ca3ba3989ad268326af7060ae09729af
     scientific_training_recovery_submission_result_sha256: b58ee935ba04832568b10f18d2f95e8c9f29def87e80472c904c6df4658b6e98
     scientific_training_recovery_status_record: documentation/215_M2_OSCAR_SCIENTIFIC_TRAINING_RECOVERY_SUBMISSION_AND_PREFLIGHT_STATUS_TR.md
+    scientific_training_1gpu_relocation_contract: documentation/contracts/training/vngrs-m2-oscar-scientific-training-recovery-1gpu-relocation-v1.md
+    scientific_training_1gpu_relocation_contract_sha256: ffea82ac9f9d0bbd9228c13cff7eec9d87c16fd381b92ab35021345413c83792
+    scientific_training_1gpu_relocation_config: configs/training/m2_oscar_scientific_training_recovery_1gpu_relocation_v1.yaml
+    scientific_training_1gpu_relocation_preparation: documentation/216_M2_OSCAR_ONE_GPU_RELOCATION_PREPARATION_TR.md
+    scientific_training_1gpu_relocation_status: frozen_unexecuted_exact_authorization_required
     prior_m2_b_block_family_status: superseded_for_future_training_due_four_fact_translation_corrections
     optimizer_smoke_preparation: documentation/205_M2_OSCAR_FACT_REVIEW_VALIDATOR_AND_OPTIMIZER_SMOKE_PREPARATION_TR.md
     optimizer_smoke_preparation_sha256: 49765563b03915f88105d4f698ffd5a51283f15964aca57c4ac325d316b42a07
@@ -1752,11 +1757,11 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: observe_authorized_m2_recovery_array_without_duplicate_submission
+  name: exact_authorization_for_one_gpu_relocation_or_keep_existing_pending_array
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
   m2_status: recovery_submitted_once_preflight_pass_array_pending_resources
-  execution_boundary: no_duplicate_fallback_retry_or_evaluation_while_authorized_array_is_active
+  execution_boundary: pending_array_preserved_until_exact_one_gpu_relocation_authorization
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
     - preserve_lowercase_v1a_atom_audit_as_read_only_terminal_evidence
@@ -1799,6 +1804,7 @@ active_priority:
     - preserve_job_482208_dependency_never_satisfied_until_exact_recovery_authorization
     - preserve_document_214_and_frozen_gpu_isolation_persistent_audit_recovery
     - preserve_document_215_submission_preflight_pass_and_pending_array_status
+    - preserve_document_216_frozen_one_gpu_relocation_preparation
     - observe_jobs_482225_and_482226_read_only
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
@@ -1809,7 +1815,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: wait_for_job_482225_first_task_or_terminal_state
+  subject: authorize_exact_one_gpu_relocation_or_keep_three_gpu_pending_array
   decision_owner: user
   start_m1_now: false
   note: >-

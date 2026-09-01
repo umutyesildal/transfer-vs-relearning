@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 7ca9ea4850c3f779dcb668956afc189c14d2300f7c6d49521bfb0134cde39dee
+  full_state_sha256: d1c8885520b7752c78f95d5f6887fff2e2a9d790a5c6fea1862091d850c3493c
   role: context_projection_only
   may_expand_authority: false
 
@@ -122,6 +122,9 @@ stage_readiness:
   m2_scientific_training_recovery_execution: consumed_submission_preflight_482224_pass_array_482225_pending_resources
   m2_scientific_training_recovery_finalizer: 482226_dependency_pending
   m2_scientific_training_recovery_status_record: documentation/215_M2_OSCAR_SCIENTIFIC_TRAINING_RECOVERY_SUBMISSION_AND_PREFLIGHT_STATUS_TR.md
+  m2_scientific_training_1gpu_relocation_contract: documentation/contracts/training/vngrs-m2-oscar-scientific-training-recovery-1gpu-relocation-v1.md
+  m2_scientific_training_1gpu_relocation_contract_sha256: ffea82ac9f9d0bbd9228c13cff7eec9d87c16fd381b92ab35021345413c83792
+  m2_scientific_training_1gpu_relocation: frozen_unexecuted_exact_authorization_required
   m2_optimizer_smoke_preparation: superseded_inputs_waiting_for_corrected_m2_b_block_repair
   m2_optimizer_smoke_preparation_record: documentation/205_M2_OSCAR_FACT_REVIEW_VALIDATOR_AND_OPTIMIZER_SMOKE_PREPARATION_TR.md
   m2_optimizer_smoke: complete_three_of_three_pass_scientific_training_false
@@ -161,7 +164,7 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: read_only_observation_of_job_482225_first_task_or_terminal_state
+  subject: exact_one_gpu_relocation_authorization_or_preserve_existing_pending_array
   plan: documentation/191_M2_MATCHED_THREE_MODEL_OSCAR_TRAINING_AND_MEASUREMENT_PLAN_TR.md
   contract: documentation/contracts/training/vngrs-m2-oscar-scientific-training-recovery-v1.md
   config: configs/training/m2_oscar_scientific_training_recovery_v1.yaml
@@ -177,6 +180,7 @@ next_boundary:
     - preserve_verified_cancellation_of_never_started_job_482208
     - preserve_frozen_document_214_gpu_isolation_and_persistent_failure_audit_recovery_contract
     - preserve_document_215_submission_and_preflight_pass_status
+    - preserve_document_216_one_gpu_relocation_preparation
     - read_only_observe_jobs_482225_and_482226
     - preserve_local_training_config_validator_and_smoke_training_dag_preparation
     - preserve_local_training_output_finalizer_and_eval_v2_matrix_preparation

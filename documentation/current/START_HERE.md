@@ -183,6 +183,12 @@ the master synthesis, the long timeline, or a previous chat transcript.
   of 2026-09-06 13:16; finalizer `482226` is dependency-pending. Old never-started finalizer
   `482208` was conditionally cancelled after exact checks. Document 215 is the current operational
   progress authority; no scientific training has started and duplicate/fallback/retry is forbidden;
+- M2 one-GPU relocation preparation: read-only Slurm evidence showed both A100 nodes have exactly
+  one Slurm-free GPU, explaining the 5-day three-GPU co-allocation estimate. Document 216 freezes
+  a science-identical gruenau10-bound `gpu:a10080gb:1`, serial `0-5%1`, fresh-root relocation with
+  persistent selector/task audit. Contract SHA is
+  `ffea82ac9f9d0bbd9228c13cff7eec9d87c16fd381b92ab35021345413c83792`; it is unexecuted and
+  requires exact authorization before pending jobs `482225/482226` may be cancelled;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;
