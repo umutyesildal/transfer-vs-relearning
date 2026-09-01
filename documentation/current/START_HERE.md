@@ -176,6 +176,13 @@ the master synthesis, the long timeline, or a previous chat transcript.
   `c6f07cdc69003406d2ea44d8bb2c71b9c89ffd4694e224fd708460fb7374da13`; it is frozen/unexecuted
   and needs exact user authorization plus publication commit. Evaluation/scoring and automatic
   retry remain unauthorized;
+- M2 recovery submission/preflight: the exact recovery contract was authorized and commit
+  `a8978b1` was ordinary-pushed/preservation-checked fast-forwarded on HU. HU M2 tests passed
+  `60/60`; preflight `482224` completed `M2_SCIENTIFIC_TRAINING_PREFLIGHT_PASS`. The one serial
+  array `482225_[0-5%1]` is currently `PENDING(Resources)` with a non-guaranteed scheduler estimate
+  of 2026-09-06 13:16; finalizer `482226` is dependency-pending. Old never-started finalizer
+  `482208` was conditionally cancelled after exact checks. Document 215 is the current operational
+  progress authority; no scientific training has started and duplicate/fallback/retry is forbidden;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;

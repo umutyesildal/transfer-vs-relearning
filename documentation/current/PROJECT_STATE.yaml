@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_scientific_training_recovery_frozen_unexecuted
+  status: m0_m1_complete_m2_scientific_training_recovery_submitted_pending_resources
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -105,9 +105,9 @@ readiness:
   evaluation_contract: frozen
   corpus_contract: oscar_phase2_evidence_complete
   m1_training_contract: frozen_executed_complete
-  m2_training_contract: recovery_frozen_unexecuted_exact_authorization_required
+  m2_training_contract: recovery_authorized_submitted_once_preflight_pass
   ready_to_measure: true
-  ready_to_train: true
+  ready_to_train: false
   selected_primary_model: null
 
 # Stage-specific gates prevent an unresolved M2 corpus decision from becoming an M1 blocker.
@@ -442,10 +442,16 @@ stage_readiness:
     scientific_training_recovery_contract_sha256: c6f07cdc69003406d2ea44d8bb2c71b9c89ffd4694e224fd708460fb7374da13
     scientific_training_recovery_config: configs/training/m2_oscar_scientific_training_recovery_v1.yaml
     scientific_training_recovery_preparation: documentation/214_M2_OSCAR_SCIENTIFIC_TRAINING_RECOVERY_PREPARATION_TR.md
-    scientific_training_recovery_status: frozen_unexecuted_exact_authorization_required
+    scientific_training_recovery_status: submitted_once_preflight_pass_training_pending_resources
     scientific_training_recovery_root: /vol/tmp2/yesildau/vnd_m2_oscar_scientific_training_recovery_v1
     scientific_training_recovery_array: 0-5%1_each_task_allocates_3_a10080gb_and_selects_1
-    scientific_training_recovery_execution_authorized: false
+    scientific_training_recovery_execution_authorized: true
+    scientific_training_recovery_execution_authorized_consumed: true
+    scientific_training_recovery_jobs: {preflight: 482224, training_array: 482225, finalizer: 482226}
+    scientific_training_recovery_preflight_result_sha256: 463bd848b362bea8749d8fc2bffae4ee499d0200ef4fbf84400320d7dc281489
+    scientific_training_recovery_config_manifest_sha256: 8eccf41ee692b6f4d7088d3adb8d2257ca3ba3989ad268326af7060ae09729af
+    scientific_training_recovery_submission_result_sha256: b58ee935ba04832568b10f18d2f95e8c9f29def87e80472c904c6df4658b6e98
+    scientific_training_recovery_status_record: documentation/215_M2_OSCAR_SCIENTIFIC_TRAINING_RECOVERY_SUBMISSION_AND_PREFLIGHT_STATUS_TR.md
     prior_m2_b_block_family_status: superseded_for_future_training_due_four_fact_translation_corrections
     optimizer_smoke_preparation: documentation/205_M2_OSCAR_FACT_REVIEW_VALIDATOR_AND_OPTIMIZER_SMOKE_PREPARATION_TR.md
     optimizer_smoke_preparation_sha256: 49765563b03915f88105d4f698ffd5a51283f15964aca57c4ac325d316b42a07
@@ -1746,11 +1752,11 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: obtain_exact_authorization_for_frozen_m2_gpu_isolation_recovery
+  name: observe_authorized_m2_recovery_array_without_duplicate_submission
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: recovery_frozen_unexecuted_scientific_recipe_unchanged
-  execution_boundary: no_m2_training_until_recovery_contract_is_published_and_exactly_authorized
+  m2_status: recovery_submitted_once_preflight_pass_array_pending_resources
+  execution_boundary: no_duplicate_fallback_retry_or_evaluation_while_authorized_array_is_active
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
     - preserve_lowercase_v1a_atom_audit_as_read_only_terminal_evidence
@@ -1792,6 +1798,8 @@ active_priority:
     - preserve_document_213_operational_not_run_result
     - preserve_job_482208_dependency_never_satisfied_until_exact_recovery_authorization
     - preserve_document_214_and_frozen_gpu_isolation_persistent_audit_recovery
+    - preserve_document_215_submission_preflight_pass_and_pending_array_status
+    - observe_jobs_482225_and_482226_read_only
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1801,7 +1809,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: exact_sha_bound_gpu_isolation_recovery_authorization
+  subject: wait_for_job_482225_first_task_or_terminal_state
   decision_owner: user
   start_m1_now: false
   note: >-
