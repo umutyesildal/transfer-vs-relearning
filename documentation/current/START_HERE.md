@@ -160,6 +160,13 @@ the master synthesis, the long timeline, or a previous chat transcript.
   matrix are precommitted. Contract SHA is
   `748e2aae5c7e3ec95acaf639e4536e6024686e5a854ad09dc6013feb47490222`; it is unexecuted and
   needs exact user authorization. Scoring/evaluation remains separately gated;
+- M2 scientific training v1 result: the authorized CPU preflight `482206` completed PASS, but all
+  six array tasks `482207_[0-5]` stopped in 3–4 seconds before model load because every gruenau10
+  A100 carried at least one foreign compute process; GPU1 also missed the 61,440 MiB free-VRAM
+  gate. No training run, optimizer update, checkpoint, binding or evaluation matrix exists.
+  Finalizer `482208` is dependency-never-satisfied and was not cancelled. Document 213 is the
+  terminal operational `NOT_RUN` authority; the single-wave authorization is consumed and no
+  retry/fallback is authorized;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;

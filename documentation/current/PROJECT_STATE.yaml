@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_scientific_training_contract_frozen_unexecuted
+  status: m0_m1_complete_m2_scientific_training_v1_operational_not_run
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -105,9 +105,9 @@ readiness:
   evaluation_contract: frozen
   corpus_contract: oscar_phase2_evidence_complete
   m1_training_contract: frozen_executed_complete
-  m2_training_contract: frozen_unexecuted
+  m2_training_contract: executed_once_consumed_operational_not_run
   ready_to_measure: true
-  ready_to_train: true
+  ready_to_train: false
   selected_primary_model: null
 
 # Stage-specific gates prevent an unresolved M2 corpus decision from becoming an M1 blocker.
@@ -428,7 +428,12 @@ stage_readiness:
     scientific_training_contract_sha256: 748e2aae5c7e3ec95acaf639e4536e6024686e5a854ad09dc6013feb47490222
     scientific_training_config: configs/training/m2_oscar_scientific_training_v1.yaml
     scientific_training_preparation: documentation/212_M2_OSCAR_SCIENTIFIC_TRAINING_CONTRACT_PREPARATION_TR.md
-    scientific_training_status: frozen_unexecuted_six_run_wave_awaiting_exact_authorization
+    scientific_training_status: operational_not_run_gpu_zero_process_guard_authorization_consumed
+    scientific_training_preflight_job: 482206_pass
+    scientific_training_array_job: 482207_all_six_failed_before_model_load
+    scientific_training_finalizer_job: 482208_dependency_never_satisfied_not_cancelled
+    scientific_training_result: documentation/213_M2_OSCAR_SCIENTIFIC_TRAINING_V1_OPERATIONAL_NOT_RUN_RESULT_TR.md
+    scientific_training_result_sha256: 2fb329ed0cfd192f6fcadff8167a2bda411b291568e97a0b243da630c045214e
     scientific_training_root: /vol/tmp2/yesildau/vnd_m2_oscar_scientific_training_v1
     scientific_training_array: 0-5%3_a10080gb
     scientific_training_checkpoint_count: 60
@@ -1733,10 +1738,10 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: authorize_exact_m2_scientific_training_v1_wave
+  name: freeze_gpu_isolation_and_persistent_failure_audit_repair_contract
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: six_run_scientific_training_contract_frozen_unexecuted_training_not_authorized
+  m2_status: v1_operational_not_run_all_six_blocked_before_model_load_no_retry_authorized
   execution_boundary: no_m2_training_until_matched_contract_is_frozen_and_exactly_authorized
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
@@ -1775,8 +1780,10 @@ active_priority:
     - preserve_document_210_and_corrected_manifest_bound_smoke_contract
     - preserve_array_482103_three_of_three_optimizer_smoke_pass
     - preserve_document_211_terminal_smoke_result_and_gate
-    - preserve_document_212_and_exact_scientific_training_contract
-    - await_exact_sha_bound_training_authorization
+    - preserve_document_212_and_consumed_scientific_training_contract
+    - preserve_document_213_operational_not_run_result
+    - preserve_job_482208_dependency_never_satisfied_without_cancellation
+    - freeze_gpu_isolation_and_persistent_failure_audit_repair_before_any_retry
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1786,7 +1793,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_exact_m2_scientific_training_v1_wave
+  subject: freeze_gpu_isolation_and_persistent_failure_audit_repair_contract
   decision_owner: user
   start_m1_now: false
   note: >-
