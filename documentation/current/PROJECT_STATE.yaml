@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_scientific_training_recovery_submitted_pending_resources
+  status: m0_m1_complete_m2_one_gpu_relocation_task0_running
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -105,7 +105,7 @@ readiness:
   evaluation_contract: frozen
   corpus_contract: oscar_phase2_evidence_complete
   m1_training_contract: frozen_executed_complete
-  m2_training_contract: recovery_authorized_submitted_once_preflight_pass
+  m2_training_contract: one_gpu_relocation_authorized_submitted_once_task0_running
   ready_to_measure: true
   ready_to_train: false
   selected_primary_model: null
@@ -456,7 +456,11 @@ stage_readiness:
     scientific_training_1gpu_relocation_contract_sha256: ffea82ac9f9d0bbd9228c13cff7eec9d87c16fd381b92ab35021345413c83792
     scientific_training_1gpu_relocation_config: configs/training/m2_oscar_scientific_training_recovery_1gpu_relocation_v1.yaml
     scientific_training_1gpu_relocation_preparation: documentation/216_M2_OSCAR_ONE_GPU_RELOCATION_PREPARATION_TR.md
-    scientific_training_1gpu_relocation_status: frozen_unexecuted_exact_authorization_required
+    scientific_training_1gpu_relocation_status: authorized_submitted_once
+    scientific_training_1gpu_relocation_status_current: submitted_once_preflight_pass_task0_running
+    scientific_training_1gpu_relocation_jobs: {preflight: 482231, training_array: 482232, finalizer: 482233}
+    scientific_training_1gpu_relocation_active_step_job: 482234
+    scientific_training_1gpu_relocation_status_record: documentation/217_M2_OSCAR_ONE_GPU_RELOCATION_SUBMISSION_AND_INITIAL_RUNNING_STATUS_TR.md
     prior_m2_b_block_family_status: superseded_for_future_training_due_four_fact_translation_corrections
     optimizer_smoke_preparation: documentation/205_M2_OSCAR_FACT_REVIEW_VALIDATOR_AND_OPTIMIZER_SMOKE_PREPARATION_TR.md
     optimizer_smoke_preparation_sha256: 49765563b03915f88105d4f698ffd5a51283f15964aca57c4ac325d316b42a07
@@ -1757,11 +1761,11 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: exact_authorization_for_one_gpu_relocation_or_keep_existing_pending_array
+  name: observe_authorized_one_gpu_relocation_without_duplicate_or_intervention
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: recovery_submitted_once_preflight_pass_array_pending_resources
-  execution_boundary: pending_array_preserved_until_exact_one_gpu_relocation_authorization
+  m2_status: one_gpu_relocation_preflight_pass_task0_running
+  execution_boundary: no_duplicate_retry_fallback_or_evaluation_while_array_482232_is_active
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
     - preserve_lowercase_v1a_atom_audit_as_read_only_terminal_evidence
@@ -1805,6 +1809,7 @@ active_priority:
     - preserve_document_214_and_frozen_gpu_isolation_persistent_audit_recovery
     - preserve_document_215_submission_preflight_pass_and_pending_array_status
     - preserve_document_216_frozen_one_gpu_relocation_preparation
+    - preserve_document_217_initial_running_status
     - observe_jobs_482225_and_482226_read_only
     - keep_m2_training_execution_disabled
   forbidden_until_user_says_start:
@@ -1815,7 +1820,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: authorize_exact_one_gpu_relocation_or_keep_three_gpu_pending_array
+  subject: wait_for_array_482232_progress_or_terminal_state
   decision_owner: user
   start_m1_now: false
   note: >-

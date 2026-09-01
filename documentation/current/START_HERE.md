@@ -189,6 +189,12 @@ the master synthesis, the long timeline, or a previous chat transcript.
   persistent selector/task audit. Contract SHA is
   `ffea82ac9f9d0bbd9228c13cff7eec9d87c16fd381b92ab35021345413c83792`; it is unexecuted and
   requires exact authorization before pending jobs `482225/482226` may be cancelled;
+- M2 one-GPU relocation execution: the exact contract was authorized, old never-started jobs
+  `482225/482226` were verified/cancelled, and HU was fast-forwarded to `c15c123`. HU M2 tests
+  passed `62/62`; preflight `482231` passed and serial array `482232` started immediately.
+  Task 0 / job `482234` is OLMo/M2-A RUNNING on the bounded selector-approved A100; its training
+  manifest is `started`, while no checkpoint/completion is yet claimed. Document 217 is the current
+  operational authority; duplicate, retry, fallback and evaluation remain forbidden;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;
