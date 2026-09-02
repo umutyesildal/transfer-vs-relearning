@@ -1,0 +1,39 @@
+schema_version: 1
+contract_id: vngrs-m2-oscar-finalizer-numeric-order-repair-v1
+status: frozen_unexecuted
+execution_authorized: false
+source:
+  root: /vol/tmp2/yesildau/vnd_m2_oscar_scientific_training_recovery_1gpu_relocation_v1
+  access: read_only
+  config_manifest: {path: configs/config_manifest.json, sha256: dabcf252230fa847408ca1dcfa009dba7732e3f61796b7e80f8a6f5044c2fde7}
+  preflight_result: {path: control/preflight_result.json, sha256: f8b9db1447d0835913bf723af2069742f8e60c84995f191ad30cac1ea49cea3a}
+  submission_result: {path: control/submission_result.json, sha256: 705df3203aee1c499c7398846e2f2523db860ccd5e7f1b1155ff3f25fad0d536}
+  failed_finalizer_stderr: {path: logs/m2-oscar-1gpu-v1-finalize-482233.err, sha256: 45919ace28181402b4b12c5466fa292b9e75994de1b51a93bb65af6e97a9a2e8}
+  partial_bindings_required_empty: true
+  evaluation_required_absent: true
+training_manifests:
+  olmo_m2_a: {path: training/olmo/m2_a/20260901T172619Z_m2_oscar_olmo_m2_a_seed42_4884747c/training_manifest.json, sha256: 4176bdd6399ba5428ce6847419c6d4e7c2e6a1d36e445eef9cd88e01dd37c632}
+  olmo_m2_b: {path: training/olmo/m2_b/20260901T192438Z_m2_oscar_olmo_m2_b_seed42_ae8a28f8/training_manifest.json, sha256: d1d081ff4e28d54451bd1fb6d7ae548ad2f8b051c30309a3282bcc7524b69e59}
+  qwen_m2_a: {path: training/qwen/m2_a/20260901T211208Z_m2_oscar_qwen_m2_a_seed42_79f7c4f8/training_manifest.json, sha256: 0104cf26fa9fac850054e48421cc6b032df5437abba95f5e72274c495d93b20b}
+  qwen_m2_b: {path: training/qwen/m2_b/20260901T233636Z_m2_oscar_qwen_m2_b_seed42_54ca03e1/training_manifest.json, sha256: ea71fc8c931ea5f3fe605f52f5d11d5b40eef1d5fb1b82cf8b10b39383b3445e}
+  smollm_m2_a: {path: training/smollm/m2_a/20260902T020241Z_m2_oscar_smollm_m2_a_seed42_98409f04/training_manifest.json, sha256: a8a770190ad53736535c72952e3b270644d4551fd6b118cd6a6060fb1874e4c0}
+  smollm_m2_b: {path: training/smollm/m2_b/20260902T042745Z_m2_oscar_smollm_m2_b_seed42_b1e72b95/training_manifest.json, sha256: 649356349de719045b9bf9172119a4f5d69a8e72e4a701c62d06c6e9b49f36e1}
+task_audits:
+  task_0: {path: control/training_task_0.json, sha256: 13e8913db600363dd556bc024343e01dedbfba29de6a267f782abcda5e16758c}
+  task_1: {path: control/training_task_1.json, sha256: 13b1cd207bca8b64ee3209980a0d57ecf2c98ef9bceec14301bc9628aa1b9791}
+  task_2: {path: control/training_task_2.json, sha256: 133e49ee5f18998a23b3a38e41a571d8b2176081be5736368360c79067bc6a1d}
+  task_3: {path: control/training_task_3.json, sha256: bf7b0b17214ea6318b870eed0a0295b42744519800c7c89ef765e3e5e9c19d3a}
+  task_4: {path: control/training_task_4.json, sha256: f8913e61ab2051d9c6be908bb016e896193f010f19a04bc079649a3d459b3d85}
+  task_5: {path: control/training_task_5.json, sha256: 5534e4aed973321c48d87f683b758670f851146ad4490133240192828a1f2989}
+repair:
+  reason: lexicographic_checkpoint_dirs_membership_order_only
+  expected_updates: [76, 152, 229, 305, 381, 457, 533, 610, 686, 762]
+  run_count: 6
+  checkpoint_count: 60
+  mutation_of_source: forbidden
+output:
+  root: /vol/tmp2/yesildau/vnd_m2_oscar_finalizer_numeric_order_repair_v1
+  bindings: /vol/tmp2/yesildau/vnd_m2_oscar_finalizer_numeric_order_repair_v1/bindings
+  evaluation_matrix: /vol/tmp2/yesildau/vnd_m2_oscar_finalizer_numeric_order_repair_v1/evaluation/eval_v2_matrix.json
+slurm: {partition: std, cpus: 4, memory: 16G, time: "08:00:00"}
+authority: {local_preparation_and_tests: true, hu_ssh: false, slurm: false, gpu: false, checkpoint_model_file_read_for_hash_only: true, parent_model_read: false, model_load_or_inference: false, training: false, evaluation_or_scoring: false, cleanup_or_deletion: false, automatic_retry: false}

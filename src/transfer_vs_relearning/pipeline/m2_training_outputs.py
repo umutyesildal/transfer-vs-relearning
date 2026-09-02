@@ -64,8 +64,16 @@ def finalize_m2_training_outputs(
         raise ValueError("M2 parent model manifest identity drift")
     checkpoint_dirs = [Path(str(value)).resolve() for value in result.get("checkpoint_dirs", [])]
     expected_dirs = [run_dir / "checkpoints" / f"checkpoint-{update}" for update in M2_CHECKPOINT_UPDATES]
-    if checkpoint_dirs != expected_dirs or any(not path.is_dir() for path in checkpoint_dirs):
+    if (
+        len(checkpoint_dirs) != len(expected_dirs)
+        or set(checkpoint_dirs) != set(expected_dirs)
+        or any(not path.is_dir() for path in checkpoint_dirs)
+    ):
         raise ValueError("M2 run does not contain exactly the ten precommitted checkpoints")
+    # train_clm records glob results in lexicographic path order, placing checkpoint-76
+    # between checkpoint-686 and checkpoint-762.  The manifest is a closed membership set;
+    # normalize only its order after exact path equality has passed.
+    checkpoint_dirs = expected_dirs
 
     binding_root.mkdir(parents=True)
     model_root = binding_root / "model_manifests"

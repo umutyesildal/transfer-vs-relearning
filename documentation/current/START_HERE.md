@@ -191,10 +191,17 @@ the master synthesis, the long timeline, or a previous chat transcript.
   requires exact authorization before pending jobs `482225/482226` may be cancelled;
 - M2 one-GPU relocation execution: the exact contract was authorized, old never-started jobs
   `482225/482226` were verified/cancelled, and HU was fast-forwarded to `c15c123`. HU M2 tests
-  passed `62/62`; preflight `482231` passed and serial array `482232` started immediately.
-  Task 0 / job `482234` is OLMo/M2-A RUNNING on the bounded selector-approved A100; its training
-  manifest is `started`, while no checkpoint/completion is yet claimed. Document 217 is the current
-  operational authority; duplicate, retry, fallback and evaluation remain forbidden;
+  passed `62/62`; preflight `482231` passed and serial array `482232` completed all six OLMo/Qwen/
+  SmolLM × M2-A/M2-B tasks. All six manifests are `complete`, all task audits PASS and all 60
+  checkpoints exist. CPU finalizer `482233` then failed only because trainer-recorded checkpoint
+  paths are lexicographically rather than numerically ordered; exact ten-path membership passed
+  read-only verification for every run. Document 218 is the current completion/failure authority;
+- M2 finalizer order repair: frozen contract
+  `vngrs-m2-oscar-finalizer-numeric-order-repair-v1` permits only an exact-membership-then-numeric-
+  order normalization and one fresh-root 4-CPU binding/matrix finalizer. Contract SHA is
+  `c30efe60dc76e2701434c0f87ba2cb269d8deeda1ccd3f6f84b7c5194b17054e`; it is unexecuted and
+  requires exact user authorization. GPU, model access, training, evaluation/scoring, cleanup and
+  automatic retry remain forbidden;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;
@@ -205,8 +212,9 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - M2 local output/evaluation preparation: Document 194 adds the exact 60-checkpoint model-only
   finalizer and a 60-dense/12-full/3-projected-parent eval-v2 matrix. The M2 runtime evaluation
   adapter is intentionally unregistered, so inference/scoring remains impossible and unauthorized;
-- M2 execution: not authorized; the three-model sibling-arm training plan and execution contract
-  must be frozen first, then separately and exactly authorized by the user.
+- M2 scientific training: complete for all six sibling-arm runs. The active boundary is the
+  unexecuted CPU-only finalizer order repair; evaluation/scoring remains a later separately frozen
+  and authorized stage.
 
 ## When to open larger files
 

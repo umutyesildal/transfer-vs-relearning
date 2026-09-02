@@ -1,11 +1,11 @@
 schema_version: 1
-as_of: "2026-09-01"
+as_of: "2026-09-02"
 project: transfer-vs-relearning
 
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_one_gpu_relocation_task0_running
+  status: m0_m1_complete_m2_six_run_training_complete_finalizer_order_repair_frozen
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -1664,7 +1664,7 @@ current_evidence:
     accepted_metadata_inventory_sha256: 120cdd7b21e161bf981cf8191fa278a11829d3fc5c155b71ed4bc8836e27f1d3
     latest_contract: documentation/contracts/corpora/vngrs-m2-oscar-phase2-evidence-v1a.md
     latest_contract_status: executed_once_pass_d0_evidence_complete
-    global_gate: blocked_by_unfrozen_m2_training_contract
+    global_gate: m2_training_complete_evaluation_not_started
   trwiki:
     role: cross_domain_control_only
   culturax:
@@ -1761,11 +1761,11 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: observe_authorized_one_gpu_relocation_without_duplicate_or_intervention
+  name: prepare_exact_sha_bound_cpu_finalizer_order_repair_without_execution
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: one_gpu_relocation_preflight_pass_task0_running
-  execution_boundary: no_duplicate_retry_fallback_or_evaluation_while_array_482232_is_active
+  m2_status: six_of_six_training_complete_60_checkpoints_finalizer_order_only_failure
+  execution_boundary: local_preparation_only_until_exact_repair_authorization
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
     - preserve_lowercase_v1a_atom_audit_as_read_only_terminal_evidence
@@ -1810,8 +1810,10 @@ active_priority:
     - preserve_document_215_submission_preflight_pass_and_pending_array_status
     - preserve_document_216_frozen_one_gpu_relocation_preparation
     - preserve_document_217_initial_running_status
-    - observe_jobs_482225_and_482226_read_only
-    - keep_m2_training_execution_disabled
+    - preserve_document_218_six_run_completion_and_finalizer_order_failure
+    - preserve_all_60_checkpoints_and_source_training_root_read_only
+    - preserve_frozen_cpu_only_numeric_order_repair_contract
+    - keep_m2_training_retry_and_evaluation_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
     - slurm_submission
@@ -1820,7 +1822,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: wait_for_array_482232_progress_or_terminal_state
+  subject: exact_sha_bound_cpu_only_finalizer_numeric_order_repair_authorization
   decision_owner: user
   start_m1_now: false
   note: >-
@@ -1901,6 +1903,14 @@ next_decision_required:
     evaluation adapter and exact training contract remain open. Document 194 adds exact 60
     checkpoint model-only binding and a 60-dense/12-full/3-parent-projection eval-v2 matrix, while
     deliberately leaving `execution_adapter_registered=false` and `ready_to_evaluate=false`.
+    Subsequent reviewed/authorized waves closed fact correction, exact matched blocks, optimizer
+    smoke and the complete six-run one-GPU scientific training family. Array `482232` produced
+    six complete manifests and all 60 checkpoints. CPU finalizer `482233` failed only on
+    lexicographic-versus-numeric checkpoint path order; exact ten-path membership and directory
+    existence pass for every run. Document 218 and frozen contract
+    `vngrs-m2-oscar-finalizer-numeric-order-repair-v1`, SHA
+    `c30efe60dc76e2701434c0f87ba2cb269d8deeda1ccd3f6f84b7c5194b17054e`, define the next single
+    CPU-only fresh-root repair. It is unexecuted; evaluation/scoring remains unauthorized.
 
 authorization:
   local_repository_changes: require_current_user_instruction

@@ -69,6 +69,20 @@ def test_finalize_m2_outputs_hash_closes_all_ten_updates(tmp_path: Path) -> None
     assert all("optimizer.pt" not in row["model_file_hashes"] for row in manifest["checkpoints"])
 
 
+def test_finalize_m2_outputs_normalizes_lexicographic_manifest_order(tmp_path: Path) -> None:
+    run = _run(tmp_path)
+    training_path = run / "training_manifest.json"
+    training = json.loads(training_path.read_text(encoding="utf-8"))
+    training["result"]["checkpoint_dirs"] = sorted(training["result"]["checkpoint_dirs"])
+    assert Path(training["result"]["checkpoint_dirs"][-2]).name == "checkpoint-76"
+    training_path.write_text(json.dumps(training), encoding="utf-8")
+
+    output = tmp_path / "binding"
+    finalize_m2_training_outputs(run, output, role="qwen", arm="M2-A")
+    manifest = json.loads((output / "checkpoint_manifest.json").read_text(encoding="utf-8"))
+    assert [row["update"] for row in manifest["checkpoints"]] == list(M2_CHECKPOINT_UPDATES)
+
+
 def test_finalize_m2_outputs_rejects_missing_precommitted_checkpoint(tmp_path: Path) -> None:
     run = _run(tmp_path)
     missing = run / "checkpoints/checkpoint-381"

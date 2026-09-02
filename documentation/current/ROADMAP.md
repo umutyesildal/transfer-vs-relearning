@@ -36,26 +36,22 @@ Status: not authorized.
 - record every job, manifest, checkpoint, metric, failure and missing value;
 - produce Max's epoch-level fact-access/retention tables and figures.
 
-## R3 — Freeze the M2 corpus and sibling contract
+## R3 — M2 corpus, sibling contract and scientific training
 
-Status: V3 materialization complete; V1 exact labels preserved and uppercase candidate blocked;
-lowercase V1a diagnostic retry frozen but unexecuted; training execution disabled.
+Status: complete. OSCAR selection/audit/review, three-model token accounting, exact matched blocks,
+fact corrections, optimizer smoke and all six OLMo/Qwen/SmolLM × M2-A/M2-B training runs are
+complete. Sixty precommitted checkpoints exist.
 
-- preserve terminal D0 v3 materialization and generic audit failure as immutable evidence;
-- separately authorize at most one lowercase OSCAR V1a retry if desired; reuse V3 bytes read-only,
-  verify V1 label evidence, persist bounded audit reasons, and stop before split/review;
-- use only cleaned OSCAR-2201-derived vngrs rows as the prospective main M2 training source;
-- keep mC4-derived rows training-excluded and preserved; do not substitute them automatically;
-- only after recovery evidence, freeze the verified OSCAR source label/predicate,
-  contamination/encoding disposition, quality/provenance, held-out split, 64-document review
-  packet and per-model token budget in a new contract;
-- preserve `trwiki-20260601` as cross-domain control;
-- bind M2-A and M2-B to the same selected M1 parent and matched budgets;
-- define controlled Turkish factual re-exposure only for M2-B.
+- preserve every historical failure/recovery root and the successful training root read-only;
+- preserve cleaned OSCAR as the sole main training source and mC4 as excluded evidence;
+- preserve the matched per-arm token/update/checkpoint recipe and corrected M2-B facts;
+- do not rerun, duplicate, clean or delete training artifacts.
 
-## R4 — Execute and compare M2-A/M2-B
+## R4 — Finalize bindings, then evaluate and compare M2-A/M2-B
 
-Status: not authorized.
+Status: CPU finalizer repair frozen but unexecuted; evaluation/scoring not authorized.
 
-Run the sibling arms, apply the unchanged eval-v2 bundle, compute the precommitted transfer versus
+First run only the separately authorized numeric-order finalizer repair to hash-close the six-run,
+60-checkpoint binding family and execution-disabled 63-state matrix. If that passes, freeze a new
+evaluation execution contract; only then apply eval-v2, compute the precommitted transfer versus
 relearning contrasts, and generate thesis-ready tables and figures.
