@@ -1,0 +1,80 @@
+schema_version: 1
+name: m2-oscar-eval-v2-execution-v1
+status: frozen_unexecuted
+execution_authorized: false
+classification: scientific_evaluation
+contract: documentation/contracts/evaluation/vngrs-m2-oscar-eval-v2-execution-v1.md
+
+matrix:
+  path: /vol/tmp2/yesildau/vnd_m2_oscar_finalizer_numeric_order_repair_v1/evaluation/eval_v2_matrix.json
+  sha256: 82373090047b8e52b064fd443cd007af20656d863e246905cebf6fa86a7ae7a9
+  m2_checkpoint_tasks: 60
+  m1_parent_oscar_only_tasks: 3
+  gpu_tasks: 63
+  full_tasks: 12
+  unique_scientific_states: 63
+
+oscar_source:
+  root: /vol/tmp2/yesildau/vngrs_m2_three_model_d0_v3
+  access: read_only
+  materialization_manifest_sha256: bb413e9acafd0d891ea9c4461abc77acea1c737489560650db56dacf781dbd10
+  object_count: 32
+  object_bytes: 9502315428
+  heldout_ids: /vol/tmp2/yesildau/vngrs_m2_oscar_split_review_v1/splits/heldout_document_ids.jsonl
+  heldout_ids_sha256: dc30629fe76ca722745fcd0148021de6c042218ed2994281d52d13c06011dc91
+  heldout_documents: 10000
+  reconstruction: exact_stable_id_filter_from_verified_parquet_objects
+  raw_text_persisted_only_under_fresh_evaluation_root: true
+
+m1_parent_projection:
+  source: artifacts/evaluations/m1_three_model_v1/dump/m1_metrics.json
+  source_sha256: 41c2f2c6b722fc25ac48af278f1b318acc5e743b3c48d649fe26259848080462
+  state_count: 3
+  existing_metrics: projected_without_rescoring
+  missing_oscar_heldout_bpb: scored_once_per_parent
+
+runtime:
+  python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
+  environment_lock_sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942
+  offline_only: true
+  precision: float16
+  min_free_gpu_memory_bytes: 21474836480
+
+evaluation:
+  dense_updates: [76, 152, 229, 305, 381, 457, 533, 610, 686, 762]
+  full_updates: [381, 762]
+  corpora: [wikitext2, oscar_heldout, trwiki_cross_domain]
+  primary_cross_tokenizer_language_metric: bits_per_byte
+  factual_cheap_probes: 1500
+  factual_full_probes: 12000
+  exact_prefix_probes: 500
+
+slurm:
+  account: yesildau
+  cpu_preflight_partition: longrun
+  cpu_preflight: {cpus: 4, memory: 64G, time: '08:00:00'}
+  gpu_partition: gpu
+  gpu_gres: gpu:a10080gb:1
+  m2_checkpoint_tasks: 60
+  m1_parent_oscar_only_tasks: 3
+  gpu_tasks: 63
+  array_throttle: 6
+  gpu_task: {cpus: 8, memory: 64G, time: '2-12:00:00'}
+  finalizer_partition: std
+
+output:
+  root: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_execution_v1
+  fresh_and_absent_required: true
+
+authority:
+  local_preparation_and_tests: true
+  publication: false
+  hu_ssh: false
+  slurm_cpu: false
+  gpu: false
+  model_read_only_inference: false
+  evaluation_or_scoring: false
+  training: false
+  checkpoint_write: false
+  cleanup_or_deletion: false
+  automatic_retry: false

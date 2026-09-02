@@ -213,3 +213,23 @@ Stop rather than improvise when:
 
 Use `documentation/current/AUTHORITY.md` to find the minimum additional reading set. The preserved
 pre-control-plane instructions are indexed under `documentation/records/workspace-guidance/`.
+
+## Current OSCAR M2 evaluation authority (2026-09-02)
+
+Document 219 records the completed numeric-order finalizer repair: the three-model, two-sibling-arm
+M2 training family is 6/6 complete, all 60 checkpoint manifests are bound, and the frozen source
+matrix has 63 unique scientific states. No evaluation was run by Document 219.
+
+Document 220 and contract `vngrs-m2-oscar-eval-v2-execution-v1` are the current locally prepared,
+frozen, unexecuted evaluation authority; its SHA-256 is
+`582b6b6d5f066f96c9fdbc38b6d34eb9e4d83aa15a45d29e5cf07f1ec22331bd`. The implementation
+corrects one preparation-level measurement gap: the existing M1 evidence has no OSCAR-held-out BPB,
+so the proposed 63-task GPU
+array contains 60 M2 checkpoint tasks plus exactly three M1-parent OSCAR-only completion tasks.
+All existing M1 metrics remain projected without rescoring. The proposed CPU preflight reconstructs
+only the exact 10,000 held-out OSCAR documents under a fresh evaluation root and freezes the three
+M1 endpoint per-probe baseline hashes before M2 scoring. The afterany finalizer stays incomplete on
+any missing/failed task and runs the 10,000-draw seed-42 Transfer/Relearning analysis only at 63/63.
+Preparation does not authorize publication, HU/SSH, Slurm, GPU, model inference, evaluation,
+cleanup or automatic retry. Exact user authorization bound to the final contract SHA-256 and exact
+commit is required.
