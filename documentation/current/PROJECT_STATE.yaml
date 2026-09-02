@@ -5,7 +5,7 @@ project: transfer-vs-relearning
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_six_run_training_complete_finalizer_order_repair_frozen
+  status: m0_m1_complete_m2_training_binding_complete_evaluation_not_authorized
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -1761,11 +1761,11 @@ historical_active_priority_2026_08_22:
     - separate_execution_authorization_if_normalization_will_run
 
 active_priority:
-  name: prepare_exact_sha_bound_cpu_finalizer_order_repair_without_execution
+  name: prepare_eval_v2_execution_adapter_and_contract_locally
   m0_status: complete
   m1_status: training_and_eval_v2_complete_111_of_111
-  m2_status: six_of_six_training_complete_60_checkpoints_finalizer_order_only_failure
-  execution_boundary: local_preparation_only_until_exact_repair_authorization
+  m2_status: six_of_six_training_and_binding_complete_60_checkpoints_matrix_prepared
+  execution_boundary: local_eval_adapter_and_contract_preparation_only
   current_work:
     - preserve_d0_v3_root_as_read_only_terminal_evidence
     - preserve_lowercase_v1a_atom_audit_as_read_only_terminal_evidence
@@ -1811,8 +1811,9 @@ active_priority:
     - preserve_document_216_frozen_one_gpu_relocation_preparation
     - preserve_document_217_initial_running_status
     - preserve_document_218_six_run_completion_and_finalizer_order_failure
+    - preserve_document_219_finalizer_numeric_order_repair_pass_and_evaluation_gate
     - preserve_all_60_checkpoints_and_source_training_root_read_only
-    - preserve_frozen_cpu_only_numeric_order_repair_contract
+    - preserve_job_483682_final_audit_family_manifest_and_matrix_hash_chain
     - keep_m2_training_retry_and_evaluation_execution_disabled
   forbidden_until_user_says_start:
     - hu_ssh
@@ -1822,7 +1823,7 @@ active_priority:
     - push_or_merge
 
 next_decision_required:
-  subject: exact_sha_bound_cpu_only_finalizer_numeric_order_repair_authorization
+  subject: local_eval_v2_execution_adapter_and_contract_preparation
   decision_owner: user
   start_m1_now: false
   note: >-
@@ -1910,7 +1911,13 @@ next_decision_required:
     existence pass for every run. Document 218 and frozen contract
     `vngrs-m2-oscar-finalizer-numeric-order-repair-v1`, SHA
     `c30efe60dc76e2701434c0f87ba2cb269d8deeda1ccd3f6f84b7c5194b17054e`, define the next single
-    CPU-only fresh-root repair. It is unexecuted; evaluation/scoring remains unauthorized.
+    CPU-only fresh-root repair. Authorized job `483682` completed
+    `M2_FINALIZER_NUMERIC_ORDER_REPAIR_PASS`; final audit SHA is
+    `f33605456a5dcc5521a3da2f307f820b38711de0ab3e753ed3b80b6e4e1253f1`, the 6-run/60-checkpoint
+    family manifest SHA is `5c8aba3220f03f9ccdd5e14aad6fff98d11cfcb75ffda53ce16db42a7ddcfaa1`
+    and the 63-state execution-disabled matrix SHA is
+    `82373090047b8e52b064fd443cd007af20656d863e246905cebf6fa86a7ae7a9`. Document 219 records the
+    terminal result. Evaluation/scoring remains unauthorized pending a new frozen contract.
 
 authorization:
   local_repository_changes: require_current_user_instruction

@@ -5,13 +5,13 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 41fd80f5aba22666927d17ef756a03c9eb6fe479de901083339ce6a0fb8081c8
+  full_state_sha256: 5d3d68c65db527f5c9b38ae9758be2520d01aa8ff492a3dd6c8d31e2c6628101
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: m2_six_run_training_complete_cpu_finalizer_order_repair_frozen
+  phase: m2_training_and_binding_complete_evaluation_contract_preparation
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
@@ -132,7 +132,11 @@ stage_readiness:
   m2_scientific_training_checkpoints_complete: 60_of_60
   m2_finalizer_numeric_order_repair_contract: documentation/contracts/training/vngrs-m2-oscar-finalizer-numeric-order-repair-v1.md
   m2_finalizer_numeric_order_repair_contract_sha256: c30efe60dc76e2701434c0f87ba2cb269d8deeda1ccd3f6f84b7c5194b17054e
-  m2_finalizer_numeric_order_repair: frozen_unexecuted_cpu_only_exact_membership_then_numeric_normalization
+  m2_finalizer_numeric_order_repair: executed_once_pass_job_483682
+  m2_finalizer_numeric_order_repair_result: documentation/219_M2_OSCAR_FINALIZER_NUMERIC_ORDER_REPAIR_EXECUTION_RESULT_AND_EVALUATION_GATE_TR.md
+  m2_finalizer_numeric_order_repair_final_audit_sha256: f33605456a5dcc5521a3da2f307f820b38711de0ab3e753ed3b80b6e4e1253f1
+  m2_training_family_manifest_sha256: 5c8aba3220f03f9ccdd5e14aad6fff98d11cfcb75ffda53ce16db42a7ddcfaa1
+  m2_eval_v2_matrix_sha256: 82373090047b8e52b064fd443cd007af20656d863e246905cebf6fa86a7ae7a9
   m2_optimizer_smoke_preparation: superseded_inputs_waiting_for_corrected_m2_b_block_repair
   m2_optimizer_smoke_preparation_record: documentation/205_M2_OSCAR_FACT_REVIEW_VALIDATOR_AND_OPTIMIZER_SMOKE_PREPARATION_TR.md
   m2_optimizer_smoke: complete_three_of_three_pass_scientific_training_false
@@ -172,10 +176,10 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: exact_sha_bound_cpu_only_finalizer_numeric_order_repair_authorization
+  subject: local_eval_v2_execution_adapter_and_contract_preparation
   plan: documentation/191_M2_MATCHED_THREE_MODEL_OSCAR_TRAINING_AND_MEASUREMENT_PLAN_TR.md
-  contract: documentation/contracts/training/vngrs-m2-oscar-finalizer-numeric-order-repair-v1.md
-  config: configs/training/m2_oscar_finalizer_numeric_order_repair_v1.yaml
+  contract: not_yet_frozen
+  config: not_yet_frozen
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user
     - offline_tests_and_dry_runs
@@ -191,8 +195,9 @@ next_boundary:
     - preserve_document_216_one_gpu_relocation_preparation
     - preserve_document_217_one_gpu_relocation_initial_running_status
     - preserve_document_218_six_of_six_training_completion_and_order_only_finalizer_failure
+    - preserve_document_219_finalizer_repair_pass_and_evaluation_gate
     - preserve_all_60_training_checkpoints_and_the_immutable_source_root
-    - prepare_exact_sha_bound_cpu_only_finalizer_repair_publication
+    - prepare_and_offline_test_eval_v2_execution_adapter_and_contract
     - preserve_local_training_config_validator_and_smoke_training_dag_preparation
     - preserve_local_training_output_finalizer_and_eval_v2_matrix_preparation
   not_implied:

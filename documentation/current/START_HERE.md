@@ -199,9 +199,11 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - M2 finalizer order repair: frozen contract
   `vngrs-m2-oscar-finalizer-numeric-order-repair-v1` permits only an exact-membership-then-numeric-
   order normalization and one fresh-root 4-CPU binding/matrix finalizer. Contract SHA is
-  `c30efe60dc76e2701434c0f87ba2cb269d8deeda1ccd3f6f84b7c5194b17054e`; it is unexecuted and
-  requires exact user authorization. GPU, model access, training, evaluation/scoring, cleanup and
-  automatic retry remain forbidden;
+  `c30efe60dc76e2701434c0f87ba2cb269d8deeda1ccd3f6f84b7c5194b17054e`. Authorized job `483682`
+  completed PASS: family binding is 6/6 runs and 60/60 checkpoints; prepared matrix contains 60
+  dense tasks, 12 full tasks and 63 unique states with `evaluation_authorized=false`. Final audit
+  SHA is `f3360545...`; Document 219 is the result/gate authority. GPU, training, evaluation/
+  scoring, cleanup and automatic retry remain forbidden;
 - M2 remaining preparation after a separately authorized successful recovery: bounded Turkish
   fact-registry review, exact epoch-036 parent weight/config hashes, memory decomposition/optimizer
   smoke, storage/runtime estimate and tested training/evaluation DAG;
@@ -212,9 +214,9 @@ the master synthesis, the long timeline, or a previous chat transcript.
 - M2 local output/evaluation preparation: Document 194 adds the exact 60-checkpoint model-only
   finalizer and a 60-dense/12-full/3-projected-parent eval-v2 matrix. The M2 runtime evaluation
   adapter is intentionally unregistered, so inference/scoring remains impossible and unauthorized;
-- M2 scientific training: complete for all six sibling-arm runs. The active boundary is the
-  unexecuted CPU-only finalizer order repair; evaluation/scoring remains a later separately frozen
-  and authorized stage.
+- M2 scientific training and model-only binding: complete for all six sibling-arm runs and all 60
+  checkpoints. The active boundary is local eval-v2 execution-adapter/contract preparation;
+  evaluation/scoring remains separately frozen and authorized future work.
 
 ## When to open larger files
 

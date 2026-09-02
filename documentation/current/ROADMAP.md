@@ -49,9 +49,9 @@ complete. Sixty precommitted checkpoints exist.
 
 ## R4 — Finalize bindings, then evaluate and compare M2-A/M2-B
 
-Status: CPU finalizer repair frozen but unexecuted; evaluation/scoring not authorized.
+Status: CPU finalizer repair PASS; 6-run/60-checkpoint family and 63-state matrix hash-closed;
+evaluation/scoring not authorized.
 
-First run only the separately authorized numeric-order finalizer repair to hash-close the six-run,
-60-checkpoint binding family and execution-disabled 63-state matrix. If that passes, freeze a new
-evaluation execution contract; only then apply eval-v2, compute the precommitted transfer versus
+Prepare and offline-test a new evaluation execution adapter/contract against the frozen matrix.
+Only after a new exact user authorization may eval-v2 run, compute the precommitted transfer versus
 relearning contrasts, and generate thesis-ready tables and figures.
