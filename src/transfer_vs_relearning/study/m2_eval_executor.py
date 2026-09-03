@@ -38,8 +38,8 @@ from transfer_vs_relearning.study.m1_wave_executor import (
     _run,
     _write_exact_config,
     _write_generation_config,
-    assert_free_gpu_memory,
 )
+from transfer_vs_relearning.study.m2_gpu_gate import assert_allocated_gpu_memory
 from transfer_vs_relearning.utils.io import read_csv_rows, read_jsonl, sha256_file, write_json
 
 
@@ -398,7 +398,7 @@ def run_task(matrix: dict[str, Any], task_index: int) -> dict[str, Any]:
             "--device", "cuda", "--no-bf16",
         ]
         try:
-            memory_gate = assert_free_gpu_memory()
+            memory_gate = assert_allocated_gpu_memory(state / "gpu_identity_audit.json")
             _run(command, repo_root=repo)
             summary_path = state / "corpus_perplexity/raw/summary.json"
             summary = json.loads(summary_path.read_text(encoding="utf-8"))
@@ -463,7 +463,7 @@ def run_task(matrix: dict[str, Any], task_index: int) -> dict[str, Any]:
     ]
     result_path = state / "task_result.json"
     try:
-        memory_gate = assert_free_gpu_memory()
+        memory_gate = assert_allocated_gpu_memory(state / "gpu_identity_audit.json")
         for command in commands:
             _run(command, repo_root=repo)
         validations: dict[str, Any] = {

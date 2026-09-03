@@ -258,3 +258,8 @@ It changes only that lookup, preserves all scientific identities and resources, 
 fresh root `/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_execution_v1b`. No publication, cancellation,
 HU/Slurm/GPU, inference, evaluation, cleanup or automatic retry is authorized without a new exact
 SHA-bound user authorization.
+
+For the subsequent V1B terminal partial result and current local GPU-identity repair, read
+`documentation/records/evaluation/M2_V1B_TERMINAL_GPU_GATE_AND_RECOVERY_PLAN_2026-09-04.md`.
+The V1B wave is consumed; the previous unexecuted wording above is historical. The next proposed
+step is metadata-only GPU identity qualification, not scientific recovery or another V1B run.

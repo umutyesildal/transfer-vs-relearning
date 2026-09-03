@@ -1,11 +1,11 @@
 schema_version: 1
-as_of: "2026-09-02"
+as_of: "2026-09-04"
 project: transfer-vs-relearning
 
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m0_m1_complete_m2_training_binding_complete_evaluation_not_authorized
+  status: m2_evaluation_v1b_terminal_partial_gpu_identity_qualification_pending
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -2146,3 +2146,29 @@ historical_next_decision_record_2026_08_22:
     `src/transfer_vs_relearning/pipeline/presentation.py` with the thin entrypoint
     `scripts/study/build_presentation_bundle.py`; it writes only derived presentation outputs.
     M1 inventory/evaluation, M1/M2 training and cleanup remain separately controlled.
+
+# Current operational override of historical preparation/progress fields above.
+m2_evaluation_current:
+  as_of: "2026-09-04T00:24:02+02:00"
+  status: M2_EVAL_V2_INCOMPLETE
+  record: documentation/records/evaluation/M2_V1B_TERMINAL_GPU_GATE_AND_RECOVERY_PLAN_2026-09-04.md
+  executed_commit: 44b2dd45e06f85a8032faf56292d63bdeef514ae
+  consumed_contract_sha256: f05ff162e9b5288b693a2e8ad7b0f9b64a3e51b102f12458fa03ffdccfb7b7aa
+  jobs: {preflight: 483837, array: 483838, finalizer: 483839}
+  root: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_execution_v1b
+  source_access: immutable_read_only
+  complete_tasks: 21
+  failed_tasks: 42
+  complete_indices: "0-20"
+  failed_indices: "21-62"
+  failure: GPU_free_memory_gate_before_model_load
+  observed_free_bytes: 16720592896
+  required_free_bytes: 21474836480
+  scientific_analysis_produced: false
+  automatic_retry_authorized: false
+  next_contract: documentation/contracts/evaluation/vngrs-m2-oscar-gpu-identity-qualification-v1.md
+  next_contract_sha256: 4221b25cdd61a55751be85e9636b944a490cea441466d142d6a25e3535bbc34e
+  next_scope: single_gpu_metadata_only_qualification_without_model_load
+  next_execution_authorized: false
+  scientific_recovery_contract_ready: false
+  unresolved: [prior_artifact_hash_inventory, live_cuda_uuid_qualification, recovery_adapter_and_canary_dependency]

@@ -49,9 +49,10 @@ complete. Sixty precommitted checkpoints exist.
 
 ## R4 — Finalize bindings, then evaluate and compare M2-A/M2-B
 
-Status: CPU finalizer repair PASS; 6-run/60-checkpoint family and 63-state matrix hash-closed;
-evaluation/scoring not authorized.
+Status (2026-09-04): authorized V1B evaluation wave consumed; 21/63 task results complete,
+42 stopped at the GPU memory guard, finalizer INCOMPLETE, no aggregate scientific analysis.
+See `records/evaluation/M2_V1B_TERMINAL_GPU_GATE_AND_RECOVERY_PLAN_2026-09-04.md`.
 
-Prepare and offline-test a new evaluation execution adapter/contract against the frozen matrix.
-Only after a new exact user authorization may eval-v2 run, compute the precommitted transfer versus
-relearning contrasts, and generate thesis-ready tables and figures.
+Next: separately authorized metadata-only CUDA/SMI UUID qualification, then a hash-bound recovery
+plan for only the 42 missing evaluations. Preserve all 21 complete results and all failed evidence.
+No scientific retry, rescoring, threshold change or cleanup is implicitly authorized.
