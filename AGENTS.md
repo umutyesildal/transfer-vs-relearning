@@ -245,3 +245,16 @@ scientific identities/resources/gates, uses fresh root
 dependency-dead never-started jobs under separate exact authorization. No V1A publication,
 cancellation, HU/Slurm/GPU, inference, evaluation, cleanup or automatic retry is currently
 authorized.
+
+V1A was subsequently authorized and executed once. CPU preflight `483826` stopped before held-out
+materialization because the adapter received the canonical matrix but read the preparation-config
+shape `config["output"]["root"]`; the matrix field is top-level `output_root`. The V1A root has four
+files / 80,453 bytes, zero task results, zero model loads and zero evaluation. Array `483827` and
+finalizer `483828` never started and remain dependency-dead. The record
+`documentation/records/evaluation/M2_OSCAR_EVAL_V2_V1A_FAILURE_AND_V1B_REPAIR_2026-09-03.md`
+preserves the exact evidence. V1B is the current locally prepared, frozen, unexecuted single schema
+repair; its SHA-256 is `f05ff162e9b5288b693a2e8ad7b0f9b64a3e51b102f12458fa03ffdccfb7b7aa`.
+It changes only that lookup, preserves all scientific identities and resources, and uses
+fresh root `/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_execution_v1b`. No publication, cancellation,
+HU/Slurm/GPU, inference, evaluation, cleanup or automatic retry is authorized without a new exact
+SHA-bound user authorization.

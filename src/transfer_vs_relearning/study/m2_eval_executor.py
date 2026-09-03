@@ -112,7 +112,7 @@ def materialize_oscar_heldout(config: dict[str, Any]) -> dict[str, Any]:
         source_root, load_source_objects_v3(metadata_root), execution_enabled=True
     )
     selected = select_heldout_documents(documents, heldout_ids)
-    root = Path(config["output"]["root"])
+    root = Path(config["output_root"])
     output = root / "corpora/oscar_heldout_10000.jsonl"
     if output.exists():
         raise FileExistsError(output)

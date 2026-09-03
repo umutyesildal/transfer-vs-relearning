@@ -15,6 +15,8 @@ CONFIG = ROOT / "configs/evaluation/m2_oscar_eval_v2_execution_v1.yaml"
 CONTRACT = ROOT / "documentation/contracts/evaluation/vngrs-m2-oscar-eval-v2-execution-v1.md"
 REPAIR_CONFIG = ROOT / "configs/evaluation/m2_oscar_eval_v2_execution_v1a.yaml"
 REPAIR_CONTRACT = ROOT / "documentation/contracts/evaluation/vngrs-m2-oscar-eval-v2-execution-v1a.md"
+SCHEMA_REPAIR_CONFIG = ROOT / "configs/evaluation/m2_oscar_eval_v2_execution_v1b.yaml"
+SCHEMA_REPAIR_CONTRACT = ROOT / "documentation/contracts/evaluation/vngrs-m2-oscar-eval-v2-execution-v1b.md"
 
 
 def test_execution_config_is_frozen_and_narrow() -> None:
@@ -94,3 +96,54 @@ def test_v1a_repair_separates_metadata_and_parquet_roots() -> None:
         encoding="utf-8"
     )
     assert "load_source_objects_v3(metadata_root)" in text
+
+
+def test_v1b_reads_the_canonical_matrix_output_root(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    config = yaml.safe_load(SCHEMA_REPAIR_CONFIG.read_text(encoding="utf-8"))
+    assert config["prior_attempt"]["preflight_job_id"] == 483826
+    assert config["prior_attempt"]["dependency_dead_job_ids"] == [483827, 483828]
+    assert config["prior_attempt"]["result_files"] == 0
+    assert config["output"]["root"].endswith("m2_oscar_eval_v2_execution_v1b")
+    assert config["authority"]["cancel_exact_dependency_dead_jobs"] is False
+    assert SCHEMA_REPAIR_CONTRACT.is_file()
+    assert sha256_file(SCHEMA_REPAIR_CONTRACT) == (
+        "f05ff162e9b5288b693a2e8ad7b0f9b64a3e51b102f12458fa03ffdccfb7b7aa"
+    )
+    contract = SCHEMA_REPAIR_CONTRACT.read_text(encoding="utf-8")
+    assert "7f407acbc7a5f4098bd0a55d856423c7bbfac42defb073da2a3467ba598803e9" in contract
+    assert "b37734b58239b0e4517c9909984dacb506c39f0ed54e73741f943dcbeb952e3b" in contract
+    assert "141faf323ee85a4407525b51f6f757afdb749b3ac00b168cd6a8963fcfc5b215" in contract
+    text = (ROOT / "src/transfer_vs_relearning/study/m2_eval_executor.py").read_text(
+        encoding="utf-8"
+    )
+    function = text.split("def materialize_oscar_heldout", 1)[1].split("def build_matrix", 1)[0]
+    assert 'Path(config["output_root"])' in function
+    assert 'config["output"]["root"]' not in function
+    monkeypatch.setattr(module, "OSCAR_HELDOUT_DOCUMENTS", 1)
+    monkeypatch.setattr(module, "_verify", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(
+        module, "read_jsonl", lambda _path: [{"stable_document_id": "doc-1"}]
+    )
+    monkeypatch.setattr(module, "load_source_objects_v3", lambda _root: [object()])
+    monkeypatch.setattr(
+        module,
+        "load_verified_parquet_documents_v3",
+        lambda *_args, **_kwargs: [D0Document("doc-1", "x", "oscar", "Türkçe metin")],
+    )
+    result = module.materialize_oscar_heldout(
+        {
+            "output_root": str(tmp_path),
+            "oscar_source": {
+                "root": str(tmp_path / "parquet"),
+                "metadata_root": str(tmp_path / "metadata"),
+                "heldout_ids": str(tmp_path / "heldout.jsonl"),
+                "materialization_manifest_sha256": "a" * 64,
+                "metadata_ledger_sha256": "b" * 64,
+                "heldout_ids_sha256": "c" * 64,
+            },
+        }
+    )
+    assert result["document_count"] == 1
+    assert Path(result["output"]).parent == tmp_path / "corpora"
