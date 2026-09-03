@@ -233,3 +233,15 @@ any missing/failed task and runs the 10,000-draw seed-42 Transfer/Relearning ana
 Preparation does not authorize publication, HU/SSH, Slurm, GPU, model inference, evaluation,
 cleanup or automatic retry. Exact user authorization bound to the final contract SHA-256 and exact
 commit is required.
+
+Document 221 records V1 as operational `NOT_RUN`: preflight `483719` stopped before corpus-row
+loading because the adapter conflated the immutable Parquet root with the separate accepted
+metadata-ledger root. Jobs `483720/483721` never started; the V1 root has four files, zero model
+load and zero evaluation result. V1A is the current frozen, unexecuted single-repair contract; its
+SHA-256 is `e152dab3ecfb3b54540716b0fd0d7046276c0d8d930797757e66f05616786541`.
+It changes only the source-object loader input to the 32-row accepted metadata root, preserves all
+scientific identities/resources/gates, uses fresh root
+`/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_execution_v1a`, and permits cancellation of only the two
+dependency-dead never-started jobs under separate exact authorization. No V1A publication,
+cancellation, HU/Slurm/GPU, inference, evaluation, cleanup or automatic retry is currently
+authorized.

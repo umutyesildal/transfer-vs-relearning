@@ -91,6 +91,7 @@ def materialize_oscar_heldout(config: dict[str, Any]) -> dict[str, Any]:
 
     source = config["oscar_source"]
     source_root = Path(source["root"])
+    metadata_root = Path(source["metadata_root"])
     split_file = Path(source["heldout_ids"])
     _verify(
         source_root / "control/materialization_v3.json",
@@ -98,12 +99,17 @@ def materialize_oscar_heldout(config: dict[str, Any]) -> dict[str, Any]:
         "oscar_materialization_manifest",
     )
     _verify(split_file, source["heldout_ids_sha256"], "oscar_heldout_ids")
+    _verify(
+        metadata_root / "shard_metadata_ledger.jsonl",
+        source["metadata_ledger_sha256"],
+        "oscar_source_metadata_ledger",
+    )
     heldout_rows = read_jsonl(split_file)
     heldout_ids = {str(row.get("stable_document_id", "")) for row in heldout_rows}
     if len(heldout_rows) != OSCAR_HELDOUT_DOCUMENTS or len(heldout_ids) != OSCAR_HELDOUT_DOCUMENTS:
         raise ValueError("Frozen OSCAR held-out ID registry is not exactly 10,000 unique rows")
     documents = load_verified_parquet_documents_v3(
-        source_root, load_source_objects_v3(source_root), execution_enabled=True
+        source_root, load_source_objects_v3(metadata_root), execution_enabled=True
     )
     selected = select_heldout_documents(documents, heldout_ids)
     root = Path(config["output"]["root"])
@@ -128,6 +134,7 @@ def materialize_oscar_heldout(config: dict[str, Any]) -> dict[str, Any]:
         "status": "M2_OSCAR_HELDOUT_MATERIALIZATION_PASS",
         "source_access": "read_only",
         "source_manifest_sha256": source["materialization_manifest_sha256"],
+        "metadata_ledger_sha256": source["metadata_ledger_sha256"],
         "heldout_ids_sha256": source["heldout_ids_sha256"],
         "document_count": len(selected),
         "output": str(output),

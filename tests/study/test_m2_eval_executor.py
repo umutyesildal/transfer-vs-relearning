@@ -13,6 +13,8 @@ from transfer_vs_relearning.utils.io import sha256_file
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "configs/evaluation/m2_oscar_eval_v2_execution_v1.yaml"
 CONTRACT = ROOT / "documentation/contracts/evaluation/vngrs-m2-oscar-eval-v2-execution-v1.md"
+REPAIR_CONFIG = ROOT / "configs/evaluation/m2_oscar_eval_v2_execution_v1a.yaml"
+REPAIR_CONTRACT = ROOT / "documentation/contracts/evaluation/vngrs-m2-oscar-eval-v2-execution-v1a.md"
 
 
 def test_execution_config_is_frozen_and_narrow() -> None:
@@ -66,3 +68,29 @@ def test_executor_has_no_scientific_retry_or_training_path() -> None:
     assert "samples=10_000, seed=42" in text
     assert "M2-A minus M1" in text
     assert "M2-B minus M2-A" in text
+
+
+def test_v1a_repair_separates_metadata_and_parquet_roots() -> None:
+    config = yaml.safe_load(REPAIR_CONFIG.read_text(encoding="utf-8"))
+    source = config["oscar_source"]
+    assert source["root"].endswith("vngrs_m2_three_model_d0_v3")
+    assert source["metadata_root"].endswith("luna_vngrs_metadata_footer_feasibility_v1")
+    assert source["metadata_ledger_sha256"] == (
+        "6c6f27651945043ec2dfbf1b26575f416b5d38a8783d0a22320f0ffbf83d3fa3"
+    )
+    assert source["root"] != source["metadata_root"]
+    assert config["prior_attempt"]["dependency_dead_job_ids"] == [483720, 483721]
+    assert config["prior_attempt"]["result_files"] == 0
+    assert config["output"]["root"].endswith("m2_oscar_eval_v2_execution_v1a")
+    assert config["authority"]["cancel_exact_dependency_dead_jobs"] is False
+    assert REPAIR_CONTRACT.is_file()
+    assert sha256_file(REPAIR_CONTRACT) == (
+        "e152dab3ecfb3b54540716b0fd0d7046276c0d8d930797757e66f05616786541"
+    )
+    contract = REPAIR_CONTRACT.read_text(encoding="utf-8")
+    assert "d209971308e422716262dff163adce171556d11b6522fe3f742d4aac31fdd801" in contract
+    assert "af201694f6f120d061e4592d71d07854ba23350965705c1d39de8445104f0006" in contract
+    text = (ROOT / "src/transfer_vs_relearning/study/m2_eval_executor.py").read_text(
+        encoding="utf-8"
+    )
+    assert "load_source_objects_v3(metadata_root)" in text
