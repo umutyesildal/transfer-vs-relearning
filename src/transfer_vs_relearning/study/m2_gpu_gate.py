@@ -15,6 +15,22 @@ from transfer_vs_relearning.utils.io import write_json
 MIN_FREE_BYTES = 20 * 1024**3
 
 
+def canonical_gpu_uuid(raw: object) -> str:
+    """Convert PyTorch 2.6 CUuuid's bare string to SMI's GPU-prefixed form.
+
+    This is representation normalization, never an index lookup or device fallback.
+    PyTorch v2.6.0 Module.cpp uuid_to_string emits exactly 8-4-4-4-12 hex.
+    """
+    value = str(raw)
+    match = re.fullmatch(
+        r"(?:GPU-)?([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
+        r"[0-9a-fA-F]{4}-[0-9a-fA-F]{12})", value
+    )
+    if not match or int(match.group(1).replace("-", ""), 16) == 0:
+        raise ValueError("CUDA device UUID unavailable or unsupported; no index fallback")
+    return "GPU-" + match.group(1).lower()
+
+
 def assert_allocated_gpu_memory(audit_path: Path) -> dict[str, Any]:
     """Measure CUDA logical zero and cross-check that exact UUID with NVML/SMI.
 
@@ -22,7 +38,7 @@ def assert_allocated_gpu_memory(audit_path: Path) -> dict[str, Any]:
     as successes before any model load. Never map a numeric CVD token to a host index.
     """
     audit: dict[str, Any] = {
-        "schema_version": 1,
+        "schema_version": 2,
         "status": "failed",
         "host": socket.gethostname(),
         "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
@@ -44,9 +60,14 @@ def assert_allocated_gpu_memory(audit_path: Path) -> dict[str, Any]:
         if not torch.cuda.is_available() or torch.cuda.device_count() != 1:
             raise ValueError("CUDA must expose exactly one allocated device")
         properties = torch.cuda.get_device_properties(0)
-        uuid = str(getattr(properties, "uuid", ""))
-        if not re.fullmatch(r"GPU-[0-9a-fA-F-]{36}", uuid):
-            raise ValueError("CUDA device UUID unavailable or unsupported; no index fallback")
+        raw_uuid = getattr(properties, "uuid", None)
+        audit.update(
+            cuda_uuid_raw=str(raw_uuid)[:256],
+            cuda_uuid_type=type(raw_uuid).__name__,
+            torch_version=str(getattr(torch, "__version__", "unknown")),
+            device_name=properties.name,
+        )
+        uuid = canonical_gpu_uuid(raw_uuid)
         audit.update(gpu_uuid=uuid, device_name=properties.name)
         if "A100" not in properties.name:
             raise ValueError("Frozen M2 route requires an A100")

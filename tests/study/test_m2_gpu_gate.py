@@ -43,8 +43,13 @@ def test_uses_cuda_uuid_not_host_index_zero(runtime, tmp_path):
     assert hashlib.sha256(contract.read_bytes()).hexdigest() == (
         "4221b25cdd61a55751be85e9636b944a490cea441466d142d6a25e3535bbc34e"
     )
+    # The historical contract stays immutable; repaired code is bound separately.
+    repair = repo / "documentation/contracts/evaluation/vngrs-m2-oscar-gpu-identity-qualification-v1a.md"
+    assert hashlib.sha256(repair.read_bytes()).hexdigest() == (
+        "c58e62d87d418a7654d87d03c622150e2160890475c428300ebf8bd0f2eaba4d"
+    )
     assert hashlib.sha256(Path(gate.__file__).read_bytes()).hexdigest() == (
-        "6e328d8c8879ec1e0b852fc85dbc357b6ea50490420c81c8a44da90a9be10d09"
+        "06afb59e45e9e93823e74b1429241544851e5a3da575920aebed0ff5aff9abb9"
     )
     _, calls = runtime
     result = gate.assert_allocated_gpu_memory(tmp_path / "audit.json")
@@ -97,3 +102,36 @@ def test_missing_slurm_refuses_and_preserves_audit(runtime, monkeypatch, tmp_pat
     with pytest.raises(FileExistsError):
         gate.assert_allocated_gpu_memory(path)
     assert path.read_bytes() == before
+
+
+class CUuuid:
+    """Faithful __str__ shape from PyTorch v2.6.0's C++ binding."""
+
+    def __str__(self):
+        return UUID.removeprefix("GPU-")
+
+
+@pytest.mark.parametrize("raw", [CUuuid(), UUID[4:], UUID[4:].upper(), UUID])
+def test_native_uuid_representation(runtime, tmp_path, raw):
+    cuda, calls = runtime
+    cuda.get_device_properties = lambda index: SimpleNamespace(uuid=raw, name="A100")
+    result = gate.assert_allocated_gpu_memory(tmp_path / "audit.json")
+    assert result["gpu_uuid"] == UUID
+    assert result["cuda_uuid_raw"] == str(raw)
+    assert calls[0][2] == UUID
+
+
+@pytest.mark.parametrize("raw", [None, "", "0", "GPU-0", "-" * 36,
+                                "00000000-0000-0000-0000-000000000000",
+                                "MIG-" + UUID[4:], UUID + "\n", " " + UUID,
+                                UUID.encode(), UUID.replace("abc", "abz")])
+def test_invalid_uuid_never_probes_smi(runtime, tmp_path, raw):
+    cuda, calls = runtime
+    cuda.get_device_properties = lambda index: SimpleNamespace(uuid=raw, name="A100")
+    path = tmp_path / "audit.json"
+    with pytest.raises(ValueError, match="UUID"):
+        gate.assert_allocated_gpu_memory(path)
+    result = json.loads(path.read_text())
+    assert result["cuda_uuid_raw"] == str(raw)
+    assert result["cuda_uuid_type"] == type(raw).__name__
+    assert not calls

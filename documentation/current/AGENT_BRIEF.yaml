@@ -5,13 +5,13 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: c91f09a6c357a56d2ae72baf54a1edbb3107223cd823673561a5b620b6a03ad8
+  full_state_sha256: 947a35809050fe37b223daf23a02a9d648de40c028b88d8e0f17802fa50c8454
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: m2_evaluation_v1b_terminal_partial_gpu_identity_qualification_pending
+  phase: m2_evaluation_v1b_terminal_partial_gpu_identity_qualification_failed_uuid
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
@@ -178,10 +178,12 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: m2_gpu_identity_qualification_before_42_task_recovery
+  subject: authorize_native_uuid_qualification_v1a_before_scientific_recovery
+  qualification_status: consumed_failed_job_484040_no_model_load_no_memory_sample
+  qualification_result: documentation/records/evaluation/M2_GPU_IDENTITY_QUALIFICATION_PREFLIGHT_STOP_2026-09-04.md
   plan: documentation/191_M2_MATCHED_THREE_MODEL_OSCAR_TRAINING_AND_MEASUREMENT_PLAN_TR.md
-  contract: documentation/contracts/evaluation/vngrs-m2-oscar-gpu-identity-qualification-v1.md
-  contract_sha256: 4221b25cdd61a55751be85e9636b944a490cea441466d142d6a25e3535bbc34e
+  contract: documentation/contracts/evaluation/vngrs-m2-oscar-gpu-identity-qualification-v1a.md
+  contract_sha256: c58e62d87d418a7654d87d03c622150e2160890475c428300ebf8bd0f2eaba4d
   config: not_yet_frozen
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user

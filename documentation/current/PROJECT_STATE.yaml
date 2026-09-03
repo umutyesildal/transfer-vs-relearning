@@ -2166,9 +2166,22 @@ m2_evaluation_current:
   required_free_bytes: 21474836480
   scientific_analysis_produced: false
   automatic_retry_authorized: false
-  next_contract: documentation/contracts/evaluation/vngrs-m2-oscar-gpu-identity-qualification-v1.md
-  next_contract_sha256: 4221b25cdd61a55751be85e9636b944a490cea441466d142d6a25e3535bbc34e
+  next_contract: documentation/contracts/evaluation/vngrs-m2-oscar-gpu-identity-qualification-v1a.md
+  next_contract_sha256: c58e62d87d418a7654d87d03c622150e2160890475c428300ebf8bd0f2eaba4d
   next_scope: single_gpu_metadata_only_qualification_without_model_load
   next_execution_authorized: false
   scientific_recovery_contract_ready: false
+  qualification_repair_record: documentation/records/evaluation/M2_GPU_UUID_NATIVE_REPRESENTATION_REPAIR_2026-09-04.md
+  qualification_repair_tests: 49_passed_cpu_only
   unresolved: [prior_artifact_hash_inventory, live_cuda_uuid_qualification, recovery_adapter_and_canary_dependency]
+  gpu_identity_qualification:
+    status: consumed_failed_uuid_unavailable_or_unsupported
+    job: 484040
+    implementation_commit: bde924c4abf44b3878d22e8a860bce10c1ebb047
+    root: /vol/tmp2/yesildau/vnd_m2_oscar_gpu_identity_qualification_v1
+    audit_sha256: 727168aa0acddf24c869c6e9b483508c4051a744133ae027289a9f5eb6747917
+    record: documentation/records/evaluation/M2_GPU_IDENTITY_QUALIFICATION_PREFLIGHT_STOP_2026-09-04.md
+    runtime_lock_path_clarification: user_approved_environment_root_not_bin
+    model_loads: 0
+    memory_samples: 0
+    automatic_retry_authorized: false
