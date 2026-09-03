@@ -2186,7 +2186,17 @@ m2_evaluation_current:
     smi_free_bytes: 66787999744
     model_loads: 0
     automatic_retry_authorized: false
-  unresolved: [exact_recovery_contract_and_commit_user_authorization, live_recovery_preflight]
+  unresolved: [recovery_corpus_symlink_verifier_integration, separately_authorized_repair]
+  recovery_v1_execution:
+    status: consumed_canary_failed_before_model_load
+    jobs: {preflight: 484049, canary: 484050, array: 484051, finalizer: 484052}
+    preflight: pass_exact_source_inventory_reproduced
+    canary: failed_base_verifier_rejects_corpus_symlink
+    stop_marker: present
+    recovered_tasks: 0
+    downstream_jobs: never_started_dependency_dead_not_cancelled
+    record: documentation/records/evaluation/M2_EVAL_RECOVERY_V1_CANARY_SYMLINK_FAILURE_2026-09-04.md
+    automatic_retry_authorized: false
   gpu_identity_qualification:
     status: consumed_failed_uuid_unavailable_or_unsupported
     job: 484040

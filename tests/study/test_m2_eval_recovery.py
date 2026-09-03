@@ -64,7 +64,10 @@ def test_preflight_preserves_sources_and_reuses_corpus(wave):
     r.preflight(matrix)
     assert (root / 'results/qwen/cp-20').is_symlink()
     assert not (root / 'results/qwen/cp-21').exists()
-    assert (root / 'corpora/oscar_heldout_10000.jsonl').resolve() == source / 'corpora/oscar_heldout_10000.jsonl'
+    copied = root / 'corpora/oscar_heldout_10000.jsonl'
+    assert not copied.is_symlink()
+    assert copied.read_bytes() == (source / 'corpora/oscar_heldout_10000.jsonl').read_bytes()
+    r.base._verify(copied, r.sha256_file(source / 'corpora/oscar_heldout_10000.jsonl'), 'real_verifier')
     assert before == r.digest(r.inventory(source))
     with pytest.raises(FileExistsError):
         r.preflight(matrix)
@@ -147,3 +150,26 @@ def test_finalizer_uses_combined_view_without_rescoring(wave, monkeypatch):
     monkeypatch.setattr(r.base, 'finalize', lambda m: {'root': m['output_root']})
     assert r.finalize(matrix) == {'root': str(root)}
     assert (root / 'results/qwen/cp-0').resolve() == source / 'results/qwen/cp-0'
+
+
+def test_real_parent_executor_accepts_copied_corpus_before_gpu(wave, monkeypatch):
+    matrix, source, root = wave
+    r.preflight(matrix)
+    manifest = root / 'control/test_manifest.json'
+    write_json(manifest, {})
+    task = matrix['tasks'][21]
+    task.update(model_manifest=str(manifest), model_manifest_sha256=r.sha256_file(manifest),
+                task_kind='m1_parent_oscar_baseline_only')
+    # Replace linked audit with a test-local regular audit, leaving source untouched.
+    audit = root / 'control/oscar_heldout_materialization.json'
+    audit.unlink()
+    write_json(audit, {'output_sha256': r.sha256_file(root / 'corpora/oscar_heldout_10000.jsonl')})
+    monkeypatch.setattr(r.base, '_write_exact_config', lambda *a, **k: root / 'unused-exact')
+    monkeypatch.setattr(r.base, '_write_generation_config', lambda *a, **k: root / 'unused-generation')
+    class GPUReached(Exception):
+        pass
+    def stop_before_gpu(*args):
+        raise GPUReached()
+    monkeypatch.setattr(r.base, 'assert_allocated_gpu_memory', stop_before_gpu)
+    with pytest.raises(GPUReached):
+        r.base.run_task(matrix, 21)

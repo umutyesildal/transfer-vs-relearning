@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import shlex
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -12,7 +13,7 @@ from transfer_vs_relearning.study import m2_eval_executor as base
 from transfer_vs_relearning.utils.io import sha256_file, write_json
 
 SOURCE = Path('/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_execution_v1b')
-ROOT = Path('/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1')
+ROOT = Path('/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a')
 CONTROLS = ('task_matrix.json', 'preflight_result.json', 'oscar_heldout_materialization.json',
             'm1_parent_factual_registry.json', 'evaluation_family_result.json')
 ACK = 'exact_sha_bound_user_authorization_received'
@@ -122,7 +123,7 @@ def start(repo, config_path, contract, contract_sha, commit, ack):
     if storage.f_bavail * storage.f_frsize < 40 * 1024**3 or storage.f_favail < 8192:
         raise ValueError('Recovery storage gate')
     if subprocess.check_output(['squeue', '-h', '-u', 'yesildau', '-n',
-            'm2-rec-pre,m2-rec-canary,m2-rec-array,m2-rec-final']):
+            'm2-rec-a-pre,m2-rec-a-canary,m2-rec-a-array,m2-rec-a-final']):
         raise ValueError('Duplicate recovery job')
     base._verify(Path(config['qualification_audit']), config['qualification_sha256'], 'qualification')
     if json.loads(Path(config['qualification_audit']).read_text())['status'] != 'pass':
@@ -146,7 +147,16 @@ def preflight(matrix):
         dest.symlink_to(SOURCE / 'results' / row['role'] / row['checkpoint_id'], target_is_directory=True)
     for name in ('oscar_heldout_materialization.json', 'm1_parent_factual_registry.json'):
         (root / 'control' / name).symlink_to(SOURCE / 'control' / name)
-    (root / 'corpora/oscar_heldout_10000.jsonl').symlink_to(SOURCE / 'corpora/oscar_heldout_10000.jsonl')
+    source = SOURCE / 'corpora/oscar_heldout_10000.jsonl'
+    dest = root / 'corpora/oscar_heldout_10000.jsonl'
+    expected = evidence['oscar_sha256']
+    base._verify(source, expected, 'source_oscar')
+    if source.stat().st_size > 128 * 1024**2:
+        raise ValueError('Bounded heldout copy exceeded 128 MiB')
+    # Exclusive regular-file copy, never reconstruction or a source write.
+    with source.open('rb') as reader, dest.open('xb') as writer:
+        shutil.copyfileobj(reader, writer, length=1024**2)
+    base._verify(dest, expected, 'copied_oscar')
     write_json(root / 'control/source_inventory.json', evidence)
     write_json(root / 'control/recovery_preflight.json', {'status': 'pass', 'inventory_sha256': digest(evidence)})
 
@@ -156,7 +166,7 @@ def _run_task(matrix, index):
         raise ValueError('Completed/out-of-range task cannot be rescored')
     identity(matrix)
     root = Path(matrix['output_root'])
-    for relative in ('corpora/oscar_heldout_10000.jsonl', 'control/oscar_heldout_materialization.json',
+    for relative in ('control/oscar_heldout_materialization.json',
                      'control/m1_parent_factual_registry.json'):
         if (root / relative).resolve() != SOURCE / relative:
             raise ValueError('Read-only input link drift')
@@ -222,10 +232,10 @@ def submit(matrix):
         return '--wrap=' + prefix + shlex.join([str(base.RUNTIME_PYTHON), str(script), stage,
             '--matrix', str(root / 'control/task_matrix.json')]) + suffix
     gpu = ['--partition=gpu', '--gres=gpu:a10080gb:1', '--cpus-per-task=8', '--mem=64G', '--time=2-12:00:00']
-    specs = [(['--partition=longrun', '--cpus-per-task=4', '--mem=64G', '--time=02:00:00'], 'm2-rec-pre', command('preflight')),
-             (gpu, 'm2-rec-canary', command('run-task', ' --task-index 21')),
-             (gpu + ['--array=22-62%6'], 'm2-rec-array', command('run-task', ' --task-index "$SLURM_ARRAY_TASK_ID"')),
-             (['--partition=std', '--cpus-per-task=2', '--mem=8G', '--time=01:00:00'], 'm2-rec-final', command('finalize'))]
+    specs = [(['--partition=longrun', '--cpus-per-task=4', '--mem=64G', '--time=02:00:00'], 'm2-rec-a-pre', command('preflight')),
+             (gpu, 'm2-rec-a-canary', command('run-task', ' --task-index 21')),
+             (gpu + ['--array=22-62%6'], 'm2-rec-a-array', command('run-task', ' --task-index "$SLURM_ARRAY_TASK_ID"')),
+             (['--partition=std', '--cpus-per-task=2', '--mem=8G', '--time=01:00:00'], 'm2-rec-a-final', command('finalize'))]
     for resources, name, cmd in specs:
         subprocess.run([*shared, *resources, '--job-name=' + name, '--test-only', cmd], check=True)
     ledger = {'status': 'submitting', 'jobs': [], 'automatic_retry': False}
