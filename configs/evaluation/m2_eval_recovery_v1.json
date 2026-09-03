@@ -1,0 +1,13 @@
+{
+  "source": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_execution_v1b",
+  "inventory_sha256": "bc930b814634530538c7ec4cb3642ffe1d5eed10e3d6ebe150bc75d3e8ec4839",
+  "qualification_audit": "/vol/tmp2/yesildau/vnd_m2_oscar_gpu_identity_qualification_v1a/gpu_identity_audit.json",
+  "qualification_sha256": "ee2c7f395569c8b37f94e6c4fbc0a82eb5e475f32df695008f0e88591563059f",
+  "controls": {
+    "evaluation_family_result.json": "dc4b107f30e003282667afd4f37976a1bdfe0e749b6a4723583a5ed850b9265e",
+    "m1_parent_factual_registry.json": "624374bd928016854e03e620c9fab9e012a17a7d1b658b5502f26a8a7a0574cf",
+    "oscar_heldout_materialization.json": "851be7ef2ed5a660f3cdcde0fd4e4ef0868f98e84ebbf27e953319a5d31e8ee1",
+    "preflight_result.json": "088e57cdbb76b696f8be4c763cf3bb01486dee253ab6d7165f594bf79f530185",
+    "task_matrix.json": "5b55e11b1fa9548e5d4f942c22534eb807a5f2cda498a3f320678608df82442c"
+  }
+}
