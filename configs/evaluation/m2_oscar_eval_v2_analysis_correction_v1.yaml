@@ -1,0 +1,43 @@
+schema_version: 1
+contract_id: vngrs-m2-oscar-eval-v2-analysis-correction-v1
+status: frozen_unexecuted
+execution_authorized: false
+source_root: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a
+source_registry_resolved_path: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_execution_v1b/control/m1_parent_factual_registry.json
+output_root: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_analysis_correction_v1
+executed_analysis_sha256: 732c9c23ab795bf3212196d582f8300ca6c02dbf6902c489a1d4ecd6eae6e0ca
+runtime_python: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/bin/python
+analysis:
+  direction: tr_to_en
+  pairing_key: probe_id
+  aggregation: mean_all_matched_probes_within_subject
+  prompt_variants_per_fact: 8
+  subjects: 100
+  bootstrap_samples: 10000
+  bootstrap_seed: 42
+storage:
+  minimum_free_bytes: 1073741824
+  minimum_free_inodes: 256
+inputs:
+  - {label: runtime_lock, path: /vol/tmp2/yesildau/eval_v1_envs/lm_eval_v0_4_12_torch260_cu124_v3/environment.lock.txt, bytes: 2247, sha256: f9238f731fe3286aa0f5e5934f2b559a4202794d43cea4b9b00b2960b37ee942}
+  - {label: evaluation_family_result, path: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/control/evaluation_family_result.json, bytes: 19788, sha256: c04eff5ba1301f5fcd4a318cc3a88d281e389cd05f542e6f6d569826809bcebf}
+  - {label: executed_scientific_analysis, path: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/control/scientific_analysis.json, bytes: 14072, sha256: 732c9c23ab795bf3212196d582f8300ca6c02dbf6902c489a1d4ecd6eae6e0ca}
+  - {label: task_matrix, path: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/control/task_matrix.json, bytes: 51683, sha256: 6d3b8b97f048e1531d2146e2d47626a7cf8475122bb2abf32c124a60536d990d}
+  - {label: m1_parent_registry, path: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_execution_v1b/control/m1_parent_factual_registry.json, bytes: 1647, sha256: 624374bd928016854e03e620c9fab9e012a17a7d1b658b5502f26a8a7a0574cf}
+  - {label: olmo_m1, path: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v3/results/olmo/epoch-036/factual_full/raw/hard_suite_per_fact.csv, bytes: 7809239, sha256: 0642d9b29ab5ec262d43cbace3df007ba8be4882b406ae02961a44903150b0c5}
+  - {label: qwen_m1, path: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v3/results/qwen/epoch-036/factual_full/raw/hard_suite_per_fact.csv, bytes: 7767010, sha256: c64c86bead8257924ea7673530b72da3aa7f6370ebf15aa8c616867806bbfa9c}
+  - {label: smollm_m1, path: /vol/tmp2/yesildau/m1_eval_v2_matched_three_model_v3/results/smollm/epoch-036/factual_full/raw/hard_suite_per_fact.csv, bytes: 7810962, sha256: 75784e226c3144c35b357e7b7f17a3e78fbd03f2b445699649f1d15406d9af48}
+  - {label: olmo_m2a, path: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2a-update-762/factual_full/raw/hard_suite_per_fact.csv, bytes: 7899097, sha256: 1272ffab8d8766c2193040bbdb3cc57139bd1acc429fce224143cd0c57ecef8e}
+  - {label: olmo_m2b, path: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2b-update-762/factual_full/raw/hard_suite_per_fact.csv, bytes: 7891292, sha256: 76e898a07f6b1cb0ef57ceda9c85ff163cbc03d9ef5d768480b7b170d687f246}
+  - {label: qwen_m2a, path: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2a-update-762/factual_full/raw/hard_suite_per_fact.csv, bytes: 7828637, sha256: eec82b3948c3757fab273d6988b0317824aa6af7278ec3a737905b6dee4e5995}
+  - {label: qwen_m2b, path: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2b-update-762/factual_full/raw/hard_suite_per_fact.csv, bytes: 7819979, sha256: 180a55ac43989aea8d9877c02d71256ebba0300caa5f62061135e382952a4568}
+  - {label: smollm_m2a, path: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2a-update-762/factual_full/raw/hard_suite_per_fact.csv, bytes: 7878343, sha256: a0c928ad87f3c038d495809607d442fe03d77cea04fa6fc1239f605d8e018c61}
+  - {label: smollm_m2b, path: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2b-update-762/factual_full/raw/hard_suite_per_fact.csv, bytes: 7879363, sha256: 0ab11e96e5becdfaf525248640ef37e4c3475ec2a43acd8833d56e828619b0ef}
+expected_corrected_transfer:
+  olmo: {estimate: -0.141, ci95_low: -0.16075, ci95_high: -0.1205}
+  qwen: {estimate: -0.307, ci95_low: -0.33675, ci95_high: -0.2775}
+  smollm: {estimate: -0.16175, ci95_low: -0.18525, ci95_high: -0.1385}
+expected_corrected_relearning:
+  olmo: {estimate: 0.02, ci95_low: 0.015, ci95_high: 0.0255}
+  qwen: {estimate: 0.0435, ci95_low: 0.0295, ci95_high: 0.05775}
+  smollm: {estimate: 0.0035, ci95_low: 0.0005, ci95_high: 0.0065}

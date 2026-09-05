@@ -1,8 +1,28 @@
 # Current project status
 
-**As of:** 2026-08-28
+**As of:** 2026-09-05
 
 **Current branch:** `agent/m2-three-model-vngrs-d0`
+
+## Current M2 terminal update
+
+The OSCAR M2-A/M2-B evaluation family is complete at **63/63 states** under the V1A recovery root.
+There are no missing or failed states and no evaluation rerun is needed. The compact terminal result
+and corrected analysis are recorded in
+`documentation/records/evaluation/M2_EVAL_RECOVERY_V1A_TERMINAL_RESULT_2026-09-05.md`.
+
+All three models improve OSCAR held-out BPB after general Turkish adaptation, yet all three lose
+`tr_to_en` factual access from M1 to M2-A. Controlled factual re-exposure produces corrected
+M2-B−M2-A gains of +2.00 pp for OLMo, +4.35 pp for Qwen and +0.35 pp for SmolLM. Their 95% paired-
+subject intervals are above zero, but none reaches the frozen +5 pp minimum point gain; SmolLM also
+fails the English factual-retention gate. Therefore no model passes every primary gate and Qwen is
+the strongest descriptive result, not an automatic primary-model selection.
+
+The executed terminal analysis is preserved byte-identically, but its original bootstrap rows are
+superseded: the implementation paired on `fact_id` and overwrote seven of eight prompt variants.
+The local correction pairs on unique `probe_id`, keeps all prompt forms, adds regression tests and
+requires no GPU/model inference. A canonical corrected HU analysis artifact, if desired, is a
+separate CPU-only publication step; it is not required to recover scientific measurements.
 
 **Execution state:** M1 eval-v2 wave v3 is terminal `complete`: 111/111 canonical scientific
 states, consisting of 108 GPU snapshots and 3 M0 parent projections. Full execution history,

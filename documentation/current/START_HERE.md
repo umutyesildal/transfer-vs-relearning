@@ -12,6 +12,13 @@ the master synthesis, the long timeline, or a previous chat transcript.
 
 ## Current scientific boundary
 
+- **2026-09-05 terminal override:** the M2 OSCAR evaluation family is complete at 63/63 with zero
+  missing/failed tasks. The executed bootstrap collapsed repeated prompt variants by `fact_id`;
+  its rows are preserved but superseded by the tested, read-only `probe_id` correction. No model
+  passes every frozen primary gate. Read
+  `documentation/records/evaluation/M2_EVAL_RECOVERY_V1A_TERMINAL_RESULT_2026-09-05.md` for the
+  current result. No GPU/evaluation rerun is needed or authorized.
+
 - active evaluation protocol: eval-v2;
 - Pile-10k: retired from canonical evaluation;
 - M0: closed with 21/21 active lanes, 3/3 exact-prefix and 42 v1f normalized observations;

@@ -4,6 +4,8 @@ import csv
 import math
 from pathlib import Path
 
+import pytest
+
 from transfer_vs_relearning.data.turkish_bridge import (
     build_bridge_probes,
     build_localization_rows,
@@ -156,6 +158,41 @@ def test_paired_bootstrap_and_frozen_bridge_classifier() -> None:
     )
     assert result["classification"] == "promising"
     assert result["bridge_path"] == "improved_with_adaptation"
+
+
+def test_paired_bootstrap_preserves_all_prompt_variants_per_fact() -> None:
+    before = [
+        {
+            "probe_id": f"S1_profession_{form}",
+            "fact_id": "S1_profession",
+            "subject_id": "S1",
+            "direction": "tr_to_en",
+            "correct_rank_mean": 2,
+        }
+        for form in ("form_a", "form_b")
+    ]
+    after = [
+        {**before[0], "correct_rank_mean": 1},
+        {**before[1], "correct_rank_mean": 2},
+    ]
+    result = paired_subject_bootstrap_accuracy_difference(
+        before, after, direction="tr_to_en", samples=20, seed=42
+    )
+    assert result["estimate"] == 0.5
+
+
+def test_paired_bootstrap_rejects_duplicate_probe_identity() -> None:
+    row = {
+        "probe_id": "S1_profession_form_a",
+        "fact_id": "S1_profession",
+        "subject_id": "S1",
+        "direction": "tr_to_en",
+        "correct_rank_mean": 1,
+    }
+    with pytest.raises(ValueError, match="Duplicate paired-bootstrap probe"):
+        paired_subject_bootstrap_accuracy_difference(
+            [row, dict(row)], [row], direction="tr_to_en", samples=20, seed=42
+        )
 
 
 def test_corpus_launcher_keeps_all_large_outputs_on_scratch() -> None:

@@ -37,7 +37,11 @@ def paired_subject_bootstrap_accuracy_difference(
         for row in rows:
             if str(row["direction"]) != direction:
                 continue
-            output[str(row["subject_id"])][str(row["fact_id"])] = int(row["correct_rank_mean"]) == 1
+            subject_id = str(row["subject_id"])
+            probe_id = str(row["probe_id"])
+            if probe_id in output[subject_id]:
+                raise ValueError(f"Duplicate paired-bootstrap probe: {subject_id}/{probe_id}")
+            output[subject_id][probe_id] = int(row["correct_rank_mean"]) == 1
         return output
 
     left, right = by_subject(before), by_subject(after)
@@ -47,7 +51,7 @@ def paired_subject_bootstrap_accuracy_difference(
     deltas: list[float] = []
     for subject in subjects:
         if set(left[subject]) != set(right[subject]):
-            raise ValueError(f"Paired bootstrap fact mismatch for {subject}")
+            raise ValueError(f"Paired bootstrap probe mismatch for {subject}")
         facts = sorted(left[subject])
         deltas.append(
             sum(float(right[subject][fact]) - float(left[subject][fact]) for fact in facts) / len(facts)

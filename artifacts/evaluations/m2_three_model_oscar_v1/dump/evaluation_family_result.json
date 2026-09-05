@@ -1,0 +1,455 @@
+{
+  "automatic_retry": false,
+  "gpu_complete_count": 63,
+  "gpu_task_count": 63,
+  "hybrid_m1_parent_states": 3,
+  "m1_parent_projection_sha256": "41c2f2c6b722fc25ac48af278f1b318acc5e743b3c48d649fe26259848080462",
+  "m1_parent_projection_source": "/vol/tmp2/yesildau/transfer-vs-relearning-monorepo-v1/artifacts/evaluations/m1_three_model_v1/dump/m1_metrics.json",
+  "m1_parent_source_state_count": 111,
+  "schema_version": 1,
+  "status": "M2_EVAL_V2_COMPLETE",
+  "tasks": [
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2a-update-076/task_result.json",
+      "sha256": "d08ad737b9d076437be1ae0701f32554bea99eaeebb46e8b08449c398266ada8",
+      "state_id": "olmo/M2-A/update-076",
+      "status": "complete",
+      "task_index": 0
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2a-update-152/task_result.json",
+      "sha256": "53728c69eba55562e3b54985b2e64e7f08bf856ce35df2c50e9acbefe8873a1e",
+      "state_id": "olmo/M2-A/update-152",
+      "status": "complete",
+      "task_index": 1
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2a-update-229/task_result.json",
+      "sha256": "578970e902aaf0026114ff48b366f711dbd36ecbc646fcfbc99bc743ce679c7a",
+      "state_id": "olmo/M2-A/update-229",
+      "status": "complete",
+      "task_index": 2
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2a-update-305/task_result.json",
+      "sha256": "f4ce6645cdc2f08dad2280975fac9c8c91ed696b229bf5d74246205466fcf4e4",
+      "state_id": "olmo/M2-A/update-305",
+      "status": "complete",
+      "task_index": 3
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2a-update-381/task_result.json",
+      "sha256": "37b86a79f8e57e1ff39a5b3fd5005fe02598320b6e539efba3074c11ebb7733d",
+      "state_id": "olmo/M2-A/update-381",
+      "status": "complete",
+      "task_index": 4
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2a-update-457/task_result.json",
+      "sha256": "6db8fc4a55f48c09ec35f81b7e5aa91460b67c20c53b2dd6dcd35dc1e857c0c2",
+      "state_id": "olmo/M2-A/update-457",
+      "status": "complete",
+      "task_index": 5
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2a-update-533/task_result.json",
+      "sha256": "98386ad6f7cb2a48c4d1b2cbfde7df21f593e35db681601383feefe186876236",
+      "state_id": "olmo/M2-A/update-533",
+      "status": "complete",
+      "task_index": 6
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2a-update-610/task_result.json",
+      "sha256": "cbe5185c85c0e4c07a6e94035709c1a5ef156b75b07b96f2f9f4db7357c2572e",
+      "state_id": "olmo/M2-A/update-610",
+      "status": "complete",
+      "task_index": 7
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2a-update-686/task_result.json",
+      "sha256": "57343dc4d01511065665c29f0cb984016a48ccee83255874a0459bf958fb42ed",
+      "state_id": "olmo/M2-A/update-686",
+      "status": "complete",
+      "task_index": 8
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2a-update-762/task_result.json",
+      "sha256": "fb6bfaab3aeabf6f09931f69ae4e13632193163c0c61b8b5f4945c9a433d6e83",
+      "state_id": "olmo/M2-A/update-762",
+      "status": "complete",
+      "task_index": 9
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2b-update-076/task_result.json",
+      "sha256": "a8856165e4f05911037c5ec1d747b596f042cba57ec13f7df73d5038047fd5e8",
+      "state_id": "olmo/M2-B/update-076",
+      "status": "complete",
+      "task_index": 10
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2b-update-152/task_result.json",
+      "sha256": "4e7fef5671b61eab7e6849b6763f47211de6e19e19810caea1aa8583994055aa",
+      "state_id": "olmo/M2-B/update-152",
+      "status": "complete",
+      "task_index": 11
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2b-update-229/task_result.json",
+      "sha256": "8ef371dc76966f5cf6e0e9a1e972929f3818ddcaa21bcbaa06d9221b0b879b87",
+      "state_id": "olmo/M2-B/update-229",
+      "status": "complete",
+      "task_index": 12
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2b-update-305/task_result.json",
+      "sha256": "6f91fe279770988a1d3b9086c7970dfd05b595c22a2402b41ddf28cb26d0b303",
+      "state_id": "olmo/M2-B/update-305",
+      "status": "complete",
+      "task_index": 13
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2b-update-381/task_result.json",
+      "sha256": "9de7db33d8b876c81fd8366e9127e26de6e33a5627baea85cec0b91d1c2532e5",
+      "state_id": "olmo/M2-B/update-381",
+      "status": "complete",
+      "task_index": 14
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2b-update-457/task_result.json",
+      "sha256": "46c9b3873edeb12292b0b7c9d186e8b3eeec0f7e814d9179f23fe331db69d2e1",
+      "state_id": "olmo/M2-B/update-457",
+      "status": "complete",
+      "task_index": 15
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2b-update-533/task_result.json",
+      "sha256": "3d1882c09981b02c42507795f5408625e3b7f2290ea8a7d92110bb5a7afaf6ed",
+      "state_id": "olmo/M2-B/update-533",
+      "status": "complete",
+      "task_index": 16
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2b-update-610/task_result.json",
+      "sha256": "d9c504c31f69438fd97d522fd0aa62d919c364f58e032a3391addeb807032993",
+      "state_id": "olmo/M2-B/update-610",
+      "status": "complete",
+      "task_index": 17
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2b-update-686/task_result.json",
+      "sha256": "0eee8247f237ac88a297e6833e0b79519a0a464a3927017717536d056a5849b2",
+      "state_id": "olmo/M2-B/update-686",
+      "status": "complete",
+      "task_index": 18
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m2b-update-762/task_result.json",
+      "sha256": "92872320a0591c95e23478d81aeabad8903b6bdc06cdd52d10f96920fe79a1a6",
+      "state_id": "olmo/M2-B/update-762",
+      "status": "complete",
+      "task_index": 19
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2a-update-076/task_result.json",
+      "sha256": "37201bdcee1ef833b652b3e5ba07b020757a24fc2503eb4e41babf1a58cbcb46",
+      "state_id": "qwen/M2-A/update-076",
+      "status": "complete",
+      "task_index": 20
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2a-update-152/task_result.json",
+      "sha256": "1636f6ebe85a803601133373d03c9be1e3441cab749c8b2d47966fd2815f0f3c",
+      "state_id": "qwen/M2-A/update-152",
+      "status": "complete",
+      "task_index": 21
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2a-update-229/task_result.json",
+      "sha256": "86eef8edf5185f9fcbbb0397f2153bfbf3c3c9e429a9b09c027b9ae7b588ca49",
+      "state_id": "qwen/M2-A/update-229",
+      "status": "complete",
+      "task_index": 22
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2a-update-305/task_result.json",
+      "sha256": "9f5cc9dd365e7ae25b86b4cd74828da3a2ba5627c8acdda5b90af7cf9c74e477",
+      "state_id": "qwen/M2-A/update-305",
+      "status": "complete",
+      "task_index": 23
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2a-update-381/task_result.json",
+      "sha256": "752b007af0e4b0c12e8839e3b438fba0041f4ca3b49bd0f6ad1fcd87c8fc8517",
+      "state_id": "qwen/M2-A/update-381",
+      "status": "complete",
+      "task_index": 24
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2a-update-457/task_result.json",
+      "sha256": "a47fc9dedd30d810463fad15bf2783e82df1e46ac59b8032bc7ee3d0f617c5f3",
+      "state_id": "qwen/M2-A/update-457",
+      "status": "complete",
+      "task_index": 25
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2a-update-533/task_result.json",
+      "sha256": "0ac336efdb36db7fcb7cc7caa46e8dd6ba6f38fe13b9f673e7e71529fb2b7fe4",
+      "state_id": "qwen/M2-A/update-533",
+      "status": "complete",
+      "task_index": 26
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2a-update-610/task_result.json",
+      "sha256": "462f537ade6929caa53f0b365d057264216ca5cbb63b4122e6f6dd1c14e03a95",
+      "state_id": "qwen/M2-A/update-610",
+      "status": "complete",
+      "task_index": 27
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2a-update-686/task_result.json",
+      "sha256": "6a36e8ac68b72de9457b5ea19e1263a0af988ef8476c9ab707a99a5cbd1c1108",
+      "state_id": "qwen/M2-A/update-686",
+      "status": "complete",
+      "task_index": 28
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2a-update-762/task_result.json",
+      "sha256": "e3d0008bdb8bf12a651abf25ad21aa674ed68c184f1cc521681fbb8cd3e3aeeb",
+      "state_id": "qwen/M2-A/update-762",
+      "status": "complete",
+      "task_index": 29
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2b-update-076/task_result.json",
+      "sha256": "89cf51811e9e2bd76878495bc4993de6124f91524f01ebe5351e266dd14ed85c",
+      "state_id": "qwen/M2-B/update-076",
+      "status": "complete",
+      "task_index": 30
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2b-update-152/task_result.json",
+      "sha256": "25add424c3715a03ec1d3d941aded59798dac2a62a94d306700f453054a48fd2",
+      "state_id": "qwen/M2-B/update-152",
+      "status": "complete",
+      "task_index": 31
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2b-update-229/task_result.json",
+      "sha256": "b8e935cc052ac30b1c5af799ad400d02adde7546aa0b84bc07aa376a238d1269",
+      "state_id": "qwen/M2-B/update-229",
+      "status": "complete",
+      "task_index": 32
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2b-update-305/task_result.json",
+      "sha256": "c4f60b003a96af838cbb1339f9661b1ba7152f58d7cd0b9ca033cfc8bdc13211",
+      "state_id": "qwen/M2-B/update-305",
+      "status": "complete",
+      "task_index": 33
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2b-update-381/task_result.json",
+      "sha256": "0379b7fe6c2431d28f5e57340ec2be470217061c70f65260b1ce52025ea4078d",
+      "state_id": "qwen/M2-B/update-381",
+      "status": "complete",
+      "task_index": 34
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2b-update-457/task_result.json",
+      "sha256": "2b1739a51de9fa6bdbfd8426995990d1582586b12e82d54f387ccdfe9adbdec3",
+      "state_id": "qwen/M2-B/update-457",
+      "status": "complete",
+      "task_index": 35
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2b-update-533/task_result.json",
+      "sha256": "3d19f6f3e9ddf2fbaa664232ced1ed1e44191e4425bcabd62be7a3ad19f1e2c8",
+      "state_id": "qwen/M2-B/update-533",
+      "status": "complete",
+      "task_index": 36
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2b-update-610/task_result.json",
+      "sha256": "7ecdfabf93eb5cde67670f6742620ee567f387db2768fe108452c6a569f97731",
+      "state_id": "qwen/M2-B/update-610",
+      "status": "complete",
+      "task_index": 37
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2b-update-686/task_result.json",
+      "sha256": "9bd92101293f0a915d3c7debef74a5e5bf503fb5e99e56c52daf01d9498cfa2b",
+      "state_id": "qwen/M2-B/update-686",
+      "status": "complete",
+      "task_index": 38
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m2b-update-762/task_result.json",
+      "sha256": "d7df7667d2473ac136d03c01c574750d84a188f978be48c014f0de53e30e8530",
+      "state_id": "qwen/M2-B/update-762",
+      "status": "complete",
+      "task_index": 39
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2a-update-076/task_result.json",
+      "sha256": "66684a1be55662a442f44b2cccd79208d91124bdb158b010669fbbfe38f754aa",
+      "state_id": "smollm/M2-A/update-076",
+      "status": "complete",
+      "task_index": 40
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2a-update-152/task_result.json",
+      "sha256": "f2285f369d6aeac514ab7e34ab32076ad6a86fb56995c83737b204dc3ccf16e2",
+      "state_id": "smollm/M2-A/update-152",
+      "status": "complete",
+      "task_index": 41
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2a-update-229/task_result.json",
+      "sha256": "304ae1da6a27a450994ce2c2dce19808f2b8ac7c2d6b6de5099b6494b8cd66fa",
+      "state_id": "smollm/M2-A/update-229",
+      "status": "complete",
+      "task_index": 42
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2a-update-305/task_result.json",
+      "sha256": "accf8750dab4d378925f7830688a0ba1687df328687c34cbea500034abd40b26",
+      "state_id": "smollm/M2-A/update-305",
+      "status": "complete",
+      "task_index": 43
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2a-update-381/task_result.json",
+      "sha256": "0d7de17f07214ae23256d17a5b35af65f9ced9ee767ed13e00f02ef76604ae04",
+      "state_id": "smollm/M2-A/update-381",
+      "status": "complete",
+      "task_index": 44
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2a-update-457/task_result.json",
+      "sha256": "9b78cb5c7647a20f49eb2628998495ddcdda33a2a66045a5ce0360ea3796e0ae",
+      "state_id": "smollm/M2-A/update-457",
+      "status": "complete",
+      "task_index": 45
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2a-update-533/task_result.json",
+      "sha256": "f5567ac58ea8ff772230e9d94bfe7eb223541fa4ace53b08d45ea3c9fedcd151",
+      "state_id": "smollm/M2-A/update-533",
+      "status": "complete",
+      "task_index": 46
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2a-update-610/task_result.json",
+      "sha256": "e6ec6e493e84f4aa203e719065fd972bd4abd4b1fed87a860d3d12383de2f5ec",
+      "state_id": "smollm/M2-A/update-610",
+      "status": "complete",
+      "task_index": 47
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2a-update-686/task_result.json",
+      "sha256": "9ad786c1bb3fcaf68a8f82518543668421da90bcb6e54d0abd8e6fc85276d2bc",
+      "state_id": "smollm/M2-A/update-686",
+      "status": "complete",
+      "task_index": 48
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2a-update-762/task_result.json",
+      "sha256": "1adad1a912eb8267182943b7b902eee1ad96095c827980200e1672690e855df7",
+      "state_id": "smollm/M2-A/update-762",
+      "status": "complete",
+      "task_index": 49
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2b-update-076/task_result.json",
+      "sha256": "1e8c0b07d2f7b0d7e5a78bcc67526dbc20a6797693fffac59572e783070203a9",
+      "state_id": "smollm/M2-B/update-076",
+      "status": "complete",
+      "task_index": 50
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2b-update-152/task_result.json",
+      "sha256": "d3a16dca74fe491f3448f109d43a973e5f6fecf0cfc4019ea9ac1903445cdf94",
+      "state_id": "smollm/M2-B/update-152",
+      "status": "complete",
+      "task_index": 51
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2b-update-229/task_result.json",
+      "sha256": "cb39e3bb0f33e00d772bd34ed5a6d917da9e8b11acbf8292ac3c6586714e00e3",
+      "state_id": "smollm/M2-B/update-229",
+      "status": "complete",
+      "task_index": 52
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2b-update-305/task_result.json",
+      "sha256": "fed074e326d5732b73bb5fb5a78d73d23895d9c2472a7709e66c292e4a70aabe",
+      "state_id": "smollm/M2-B/update-305",
+      "status": "complete",
+      "task_index": 53
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2b-update-381/task_result.json",
+      "sha256": "65d2411897a6d8cb30ca53ceca5c3b7e5417885801fcab08494b23a12a769dbc",
+      "state_id": "smollm/M2-B/update-381",
+      "status": "complete",
+      "task_index": 54
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2b-update-457/task_result.json",
+      "sha256": "e4b07ab5752a3312d2ee5bdb85da54ea2ff0bbab0c77c90ab89020387957e806",
+      "state_id": "smollm/M2-B/update-457",
+      "status": "complete",
+      "task_index": 55
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2b-update-533/task_result.json",
+      "sha256": "7d57821f9a7cc3e7109ad8112216e927ebbf749abc9a5fd54059300379ec3c88",
+      "state_id": "smollm/M2-B/update-533",
+      "status": "complete",
+      "task_index": 56
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2b-update-610/task_result.json",
+      "sha256": "1f3a8ae51a9996b2bbc3eb7eb6ee49252eed6a7944c3b7438462968f83d15e07",
+      "state_id": "smollm/M2-B/update-610",
+      "status": "complete",
+      "task_index": 57
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2b-update-686/task_result.json",
+      "sha256": "929d2943e4e90cb190be2245255ffb08f85bedddd98c90e5a448933bf519738b",
+      "state_id": "smollm/M2-B/update-686",
+      "status": "complete",
+      "task_index": 58
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m2b-update-762/task_result.json",
+      "sha256": "33ce9b17c0f7a2a0612c3be5f34617809cbf78bac33357bf77bc637d6ab05cc0",
+      "state_id": "smollm/M2-B/update-762",
+      "status": "complete",
+      "task_index": 59
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/olmo/m1-parent-oscar/task_result.json",
+      "sha256": "b00a563d59e61f3429c7cfff0c35ee76c707d74c753ee96f99bd8d4afc42208b",
+      "state_id": "olmo/M1-parent",
+      "status": "complete",
+      "task_index": 60
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/qwen/m1-parent-oscar/task_result.json",
+      "sha256": "ef9ffa457f8b7b50a3e2c920d3e34f37eb6091e27796ea0ef3665cc6c5befddf",
+      "state_id": "qwen/M1-parent",
+      "status": "complete",
+      "task_index": 61
+    },
+    {
+      "path": "/vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a/results/smollm/m1-parent-oscar/task_result.json",
+      "sha256": "4445875575da26cb608f896a494e368ec802f6969c6b6afe7c704eae51052f46",
+      "state_id": "smollm/M1-parent",
+      "status": "complete",
+      "task_index": 62
+    }
+  ],
+  "total_scientific_states": 63
+}

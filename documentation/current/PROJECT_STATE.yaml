@@ -1,11 +1,11 @@
 schema_version: 1
-as_of: "2026-09-04"
+as_of: "2026-09-05"
 project: transfer-vs-relearning
 
 repository:
   layout: monorepo_v1
   branch: agent/m2-three-model-vngrs-d0
-  status: m2_evaluation_v1b_terminal_partial_gpu_identity_qualification_pending
+  status: m2_evaluation_complete_63_of_63_bootstrap_prompt_identity_corrected_locally
   published: true
   main_cutover_completed: true
   publication_authorized: false
@@ -2149,28 +2149,39 @@ historical_next_decision_record_2026_08_22:
 
 # Current operational override of historical preparation/progress fields above.
 m2_evaluation_current:
-  as_of: "2026-09-04T00:24:02+02:00"
-  status: M2_EVAL_V2_INCOMPLETE
-  record: documentation/records/evaluation/M2_V1B_TERMINAL_GPU_GATE_AND_RECOVERY_PLAN_2026-09-04.md
-  executed_commit: 44b2dd45e06f85a8032faf56292d63bdeef514ae
-  consumed_contract_sha256: f05ff162e9b5288b693a2e8ad7b0f9b64a3e51b102f12458fa03ffdccfb7b7aa
-  jobs: {preflight: 483837, array: 483838, finalizer: 483839}
-  root: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_execution_v1b
+  as_of: "2026-09-05T08:57:18+02:00"
+  status: M2_EVAL_V2_COMPLETE_BOOTSTRAP_CORRECTED_LOCALLY
+  record: documentation/records/evaluation/M2_EVAL_RECOVERY_V1A_TERMINAL_RESULT_2026-09-05.md
+  record_sha256: 188215c47633ac1aedd7281b124eaccda18bac94a94e45e4ef29ebc96604de6d
+  executed_commit: b8230dfb88232182a7c92e9283711c8e6d5f7989
+  consumed_contract_sha256: 65ed0d725a8f2b703d05f863635cceb88e5620a06cbb252d6775498fa8029498
+  jobs: {preflight: 484057, canary: 484058, array: 484059, finalizer: 484060}
+  root: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_recovery_v1a
   source_access: immutable_read_only
-  complete_tasks: 21
-  failed_tasks: 42
-  complete_indices: "0-20"
-  failed_indices: "21-62"
-  failure: GPU_free_memory_gate_before_model_load
-  observed_free_bytes: 16720592896
-  required_free_bytes: 21474836480
-  scientific_analysis_produced: false
+  complete_tasks: 63
+  failed_tasks: 0
+  missing_tasks: 0
+  complete_indices: "0-62"
+  scientific_analysis_produced: true
+  evaluation_family_result_sha256: c04eff5ba1301f5fcd4a318cc3a88d281e389cd05f542e6f6d569826809bcebf
+  executed_scientific_analysis_sha256: 732c9c23ab795bf3212196d582f8300ca6c02dbf6902c489a1d4ecd6eae6e0ca
+  executed_bootstrap_status: superseded_fact_id_overwrite_prompt_order_dependent
+  corrected_bootstrap_status: complete_local_read_only_probe_id_pairing_10000_draw_seed42
+  corrected_bootstrap_artifact: artifacts/evaluations/m2_three_model_oscar_v1/dump/corrected_paired_subject_bootstrap.csv
+  corrected_bootstrap_artifact_sha256: e16610d1af87fea1f42a13ae1fcc2bc1e80ee78fe7343f91576858505563750d
+  corrected_family_gate: no_model_passes_all_primary_gates
+  model_primary_gates: {olmo: false, qwen: false, smollm: false}
+  gpu_or_inference_rerun_required: false
   automatic_retry_authorized: false
-  next_contract: documentation/contracts/evaluation/vngrs-m2-oscar-eval-v2-recovery-v1.md
-  next_contract_sha256: cd5731b29f5fa269e9ea98d919062e1160ad4a0af90fc0b3138998137a5c7bc4
-  next_scope: 42_task_recovery_canary21_then_array22_62_preserve21
+  next_contract: documentation/contracts/evaluation/vngrs-m2-oscar-eval-v2-analysis-correction-v1.md
+  next_contract_sha256: da2f3cb0251ae0bf9abc95e5663cb924988e77c1188dbdba4bc9c46066196b3f
+  next_scope: one_cpu_only_append_only_corrected_analysis_publication
   next_execution_authorized: false
-  scientific_recovery_contract_ready: true
+  scientific_recovery_contract_ready: false
+  analysis_correction_contract_status: frozen_unexecuted_exact_sha_authorization_required
+  analysis_correction_output_root: /vol/tmp2/yesildau/vnd_m2_oscar_eval_v2_analysis_correction_v1
+  analysis_correction_resources: {partition: std, cpus: 4, memory: 8G, time: "02:00:00", gpu: false}
+  analysis_correction_preparation_record: documentation/records/evaluation/M2_EVAL_BOOTSTRAP_CORRECTION_PREPARATION_2026-09-05.md
   recovery_preparation_record: documentation/records/evaluation/M2_EVAL_RECOVERY_PREPARATION_2026-09-04.md
   recovery_tests: 63_passed_offline
   source_inventory_sha256: bc930b814634530538c7ec4cb3642ffe1d5eed10e3d6ebe150bc75d3e8ec4839
@@ -2186,7 +2197,17 @@ m2_evaluation_current:
     smi_free_bytes: 66787999744
     model_loads: 0
     automatic_retry_authorized: false
-  unresolved: [recovery_corpus_symlink_verifier_integration, separately_authorized_repair]
+  unresolved: [exact_sha_authorization_for_optional_cpu_only_analysis_correction_publication]
+  recovery_v1a_execution:
+    status: consumed_complete_63_of_63
+    commit: b8230dfb88232182a7c92e9283711c8e6d5f7989
+    contract_sha256: 65ed0d725a8f2b703d05f863635cceb88e5620a06cbb252d6775498fa8029498
+    jobs: {preflight: 484057, canary: 484058, array: 484059, finalizer: 484060}
+    record: documentation/records/evaluation/M2_EVAL_RECOVERY_V1A_SUBMISSION_2026-09-04.md
+    tests: 64_passed_local_and_hu
+    corpus_mode: exclusive_hash_verified_regular_copy
+    preserved_states: 21
+    automatic_retry_authorized: false
   recovery_v1_execution:
     status: consumed_canary_failed_before_model_load
     jobs: {preflight: 484049, canary: 484050, array: 484051, finalizer: 484052}

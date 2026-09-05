@@ -1,0 +1,456 @@
+{
+  "estimands": {
+    "relearning": "M2-B minus M2-A",
+    "transfer": "M2-A minus M1"
+  },
+  "paired_subject_bootstrap": {
+    "direction": "tr_to_en",
+    "samples": 10000,
+    "seed": 42
+  },
+  "roles": {
+    "olmo": {
+      "all_primary_gates_pass": false,
+      "bits_per_byte": {
+        "M1_oscar": 2.0817190561871484,
+        "M1_wikitext": 0.6879687775993163,
+        "M2-A_oscar": 1.4989481111578598,
+        "M2-A_wikitext": 0.9273359725912286,
+        "M2-B_oscar": 1.4993837925677296
+      },
+      "gates": {
+        "m2a_en_to_en_drop_at_most_0_05": true,
+        "m2a_oscar_delta_bpb_at_most_minus_0_07400058": true,
+        "m2a_wikitext_delta_bpb_at_most_0_32192809": true,
+        "relearning_ci95_low_above_zero": false,
+        "relearning_point_gain_at_least_0_05": false
+      },
+      "relearning_m2b_minus_m2a_tr_to_en": {
+        "ci95_high": 0.012,
+        "ci95_low": -0.004,
+        "estimate": 0.004,
+        "samples": 10000,
+        "subjects": 100
+      },
+      "state_metrics": {
+        "M1": {
+          "en_to_en": {
+            "mean_margin": 3.820320645252229,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 1.0,
+              "field_of_study": 0.99375,
+              "lives_in": 1.0,
+              "profession": 0.86875,
+              "works_in_industry": 1.0
+            },
+            "top1_accuracy": 0.9725
+          },
+          "tr_to_en": {
+            "mean_margin": -2.513022512266934,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.2025,
+              "field_of_study": 0.1375,
+              "lives_in": 0.38625,
+              "profession": 0.13375,
+              "works_in_industry": 0.30875
+            },
+            "top1_accuracy": 0.23375
+          },
+          "tr_to_tr": {
+            "mean_margin": -3.2679942964958704,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.21,
+              "field_of_study": 0.01875,
+              "lives_in": 0.28375,
+              "profession": 0.045,
+              "works_in_industry": 0.05125
+            },
+            "top1_accuracy": 0.12175
+          }
+        },
+        "M2-A": {
+          "en_to_en": {
+            "mean_margin": 2.4420103749502435,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.955,
+              "field_of_study": 0.98,
+              "lives_in": 0.9625,
+              "profession": 0.82,
+              "works_in_industry": 0.9875
+            },
+            "top1_accuracy": 0.941
+          },
+          "tr_to_en": {
+            "mean_margin": -3.460468929709978,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.095,
+              "field_of_study": 0.10625,
+              "lives_in": 0.1125,
+              "profession": 0.0325,
+              "works_in_industry": 0.1175
+            },
+            "top1_accuracy": 0.09275
+          },
+          "tr_to_tr": {
+            "mean_margin": -2.6131443242007064,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.0925,
+              "field_of_study": 0.0325,
+              "lives_in": 0.0975,
+              "profession": 0.01,
+              "works_in_industry": 0.02875
+            },
+            "top1_accuracy": 0.05225
+          }
+        },
+        "M2-B": {
+          "en_to_en": {
+            "mean_margin": 2.5612590498190047,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.96375,
+              "field_of_study": 0.985,
+              "lives_in": 0.96,
+              "profession": 0.82875,
+              "works_in_industry": 0.9925
+            },
+            "top1_accuracy": 0.946
+          },
+          "tr_to_en": {
+            "mean_margin": -3.230314866245736,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.12625,
+              "field_of_study": 0.10875,
+              "lives_in": 0.145,
+              "profession": 0.04125,
+              "works_in_industry": 0.1425
+            },
+            "top1_accuracy": 0.11275
+          },
+          "tr_to_tr": {
+            "mean_margin": -2.35128470089543,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.12375,
+              "field_of_study": 0.03625,
+              "lives_in": 0.12625,
+              "profession": 0.02,
+              "works_in_industry": 0.0375
+            },
+            "top1_accuracy": 0.06875
+          }
+        }
+      },
+      "transfer_m2a_minus_m1_tr_to_en": {
+        "ci95_high": -0.11399999999999996,
+        "ci95_low": -0.18199999999999986,
+        "estimate": -0.14799999999999994,
+        "samples": 10000,
+        "subjects": 100
+      }
+    },
+    "qwen": {
+      "all_primary_gates_pass": false,
+      "bits_per_byte": {
+        "M1_oscar": 1.4566952556379298,
+        "M1_wikitext": 0.7366140000703555,
+        "M2-A_oscar": 1.19385204717429,
+        "M2-A_wikitext": 0.9444106996214263,
+        "M2-B_oscar": 1.1942875625829477
+      },
+      "gates": {
+        "m2a_en_to_en_drop_at_most_0_05": true,
+        "m2a_oscar_delta_bpb_at_most_minus_0_07400058": true,
+        "m2a_wikitext_delta_bpb_at_most_0_32192809": true,
+        "relearning_ci95_low_above_zero": true,
+        "relearning_point_gain_at_least_0_05": false
+      },
+      "relearning_m2b_minus_m2a_tr_to_en": {
+        "ci95_high": 0.058000000000000024,
+        "ci95_low": 0.014000000000000002,
+        "estimate": 0.036000000000000004,
+        "samples": 10000,
+        "subjects": 100
+      },
+      "state_metrics": {
+        "M1": {
+          "en_to_en": {
+            "mean_margin": 5.081226145198041,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 1.0,
+              "field_of_study": 1.0,
+              "lives_in": 0.9925,
+              "profession": 0.9075,
+              "works_in_industry": 1.0
+            },
+            "top1_accuracy": 0.98
+          },
+          "tr_to_en": {
+            "mean_margin": 1.543567139477229,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.685,
+              "field_of_study": 0.49875,
+              "lives_in": 0.85,
+              "profession": 0.8525,
+              "works_in_industry": 0.93125
+            },
+            "top1_accuracy": 0.7635
+          },
+          "tr_to_tr": {
+            "mean_margin": -3.02799405914532,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.60875,
+              "field_of_study": 0.06375,
+              "lives_in": 0.61375,
+              "profession": 0.17875,
+              "works_in_industry": 0.1125
+            },
+            "top1_accuracy": 0.3155
+          }
+        },
+        "M2-A": {
+          "en_to_en": {
+            "mean_margin": 3.7832206574901672,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.99875,
+              "field_of_study": 0.98625,
+              "lives_in": 0.965,
+              "profession": 0.93625,
+              "works_in_industry": 0.99875
+            },
+            "top1_accuracy": 0.977
+          },
+          "tr_to_en": {
+            "mean_margin": -0.6807197749613103,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.6825,
+              "field_of_study": 0.21125,
+              "lives_in": 0.59125,
+              "profession": 0.39875,
+              "works_in_industry": 0.39875
+            },
+            "top1_accuracy": 0.4565
+          },
+          "tr_to_tr": {
+            "mean_margin": -1.551566968841276,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.64875,
+              "field_of_study": 0.055,
+              "lives_in": 0.42625,
+              "profession": 0.12375,
+              "works_in_industry": 0.095
+            },
+            "top1_accuracy": 0.26975
+          }
+        },
+        "M2-B": {
+          "en_to_en": {
+            "mean_margin": 4.018522295481367,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 1.0,
+              "field_of_study": 0.99375,
+              "lives_in": 0.97125,
+              "profession": 0.95625,
+              "works_in_industry": 1.0
+            },
+            "top1_accuracy": 0.98425
+          },
+          "tr_to_en": {
+            "mean_margin": -0.43297823496496907,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.76875,
+              "field_of_study": 0.235,
+              "lives_in": 0.595,
+              "profession": 0.45625,
+              "works_in_industry": 0.445
+            },
+            "top1_accuracy": 0.5
+          },
+          "tr_to_tr": {
+            "mean_margin": -1.1103057979918833,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.71625,
+              "field_of_study": 0.08375,
+              "lives_in": 0.495,
+              "profession": 0.23,
+              "works_in_industry": 0.11875
+            },
+            "top1_accuracy": 0.32875
+          }
+        }
+      },
+      "transfer_m2a_minus_m1_tr_to_en": {
+        "ci95_high": -0.25999999999999984,
+        "ci95_low": -0.34399999999999964,
+        "estimate": -0.30199999999999977,
+        "samples": 10000,
+        "subjects": 100
+      }
+    },
+    "smollm": {
+      "all_primary_gates_pass": false,
+      "bits_per_byte": {
+        "M1_oscar": 1.5461409426652568,
+        "M1_wikitext": 0.6514583452814235,
+        "M2-A_oscar": 1.4324816610153426,
+        "M2-A_wikitext": 0.9463955483166838,
+        "M2-B_oscar": 1.43254810783092
+      },
+      "gates": {
+        "m2a_en_to_en_drop_at_most_0_05": false,
+        "m2a_oscar_delta_bpb_at_most_minus_0_07400058": true,
+        "m2a_wikitext_delta_bpb_at_most_0_32192809": true,
+        "relearning_ci95_low_above_zero": false,
+        "relearning_point_gain_at_least_0_05": false
+      },
+      "relearning_m2b_minus_m2a_tr_to_en": {
+        "ci95_high": 0.013999999999999999,
+        "ci95_low": -0.006000000000000001,
+        "estimate": 0.004,
+        "samples": 10000,
+        "subjects": 100
+      },
+      "state_metrics": {
+        "M1": {
+          "en_to_en": {
+            "mean_margin": 2.2128516113625674,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.82,
+              "field_of_study": 0.905,
+              "lives_in": 0.70875,
+              "profession": 0.73125,
+              "works_in_industry": 0.895
+            },
+            "top1_accuracy": 0.812
+          },
+          "tr_to_en": {
+            "mean_margin": -1.6234289882851103,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.4075,
+              "field_of_study": 0.1925,
+              "lives_in": 0.33875,
+              "profession": 0.21,
+              "works_in_industry": 0.32625
+            },
+            "top1_accuracy": 0.295
+          },
+          "tr_to_tr": {
+            "mean_margin": -2.006997301191224,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.36,
+              "field_of_study": 0.0275,
+              "lives_in": 0.3075,
+              "profession": 0.03375,
+              "works_in_industry": 0.0425
+            },
+            "top1_accuracy": 0.15425
+          }
+        },
+        "M2-A": {
+          "en_to_en": {
+            "mean_margin": 1.308798372629297,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.75625,
+              "field_of_study": 0.80375,
+              "lives_in": 0.58,
+              "profession": 0.74125,
+              "works_in_industry": 0.82125
+            },
+            "top1_accuracy": 0.7405
+          },
+          "tr_to_en": {
+            "mean_margin": -2.539489933719504,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.16875,
+              "field_of_study": 0.06875,
+              "lives_in": 0.1525,
+              "profession": 0.0975,
+              "works_in_industry": 0.17875
+            },
+            "top1_accuracy": 0.13325
+          },
+          "tr_to_tr": {
+            "mean_margin": -1.885276649475786,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.15375,
+              "field_of_study": 0.02375,
+              "lives_in": 0.12375,
+              "profession": 0.0025,
+              "works_in_industry": 0.02875
+            },
+            "top1_accuracy": 0.0665
+          }
+        },
+        "M2-B": {
+          "en_to_en": {
+            "mean_margin": 1.2795082880119861,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.7475,
+              "field_of_study": 0.8,
+              "lives_in": 0.57125,
+              "profession": 0.72375,
+              "works_in_industry": 0.8125
+            },
+            "top1_accuracy": 0.731
+          },
+          "tr_to_en": {
+            "mean_margin": -2.526767785626744,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.17,
+              "field_of_study": 0.06875,
+              "lives_in": 0.165,
+              "profession": 0.09875,
+              "works_in_industry": 0.18125
+            },
+            "top1_accuracy": 0.13675
+          },
+          "tr_to_tr": {
+            "mean_margin": -1.8547429899140704,
+            "n": 4000,
+            "per_relation_accuracy": {
+              "born_in": 0.15625,
+              "field_of_study": 0.02375,
+              "lives_in": 0.13375,
+              "profession": 0.0025,
+              "works_in_industry": 0.0275
+            },
+            "top1_accuracy": 0.06875
+          }
+        }
+      },
+      "transfer_m2a_minus_m1_tr_to_en": {
+        "ci95_high": -0.09400000000000004,
+        "ci95_low": -0.16799999999999993,
+        "estimate": -0.13199999999999995,
+        "samples": 10000,
+        "subjects": 100
+      }
+    }
+  },
+  "schema_version": 1,
+  "status": "M2_EVAL_V2_SCIENTIFIC_ANALYSIS_COMPLETE"
+}

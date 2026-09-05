@@ -1,17 +1,17 @@
 schema_version: 1
 brief_id: agent-brief-v2
-as_of: "2026-09-04"
+as_of: "2026-09-05"
 status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: df1dce6b2dda932bdab58a57d3473765571cb2ecf8f06ca8fe390fda79dad171
+  full_state_sha256: ef4c75e2ed27b83cdb9f525629fb450f6f78ec0eaefd2d88dcb44af2b98b0171
   role: context_projection_only
   may_expand_authority: false
 
 project:
   name: transfer-vs-relearning
-  phase: m2_recovery_v1_consumed_canary_corpus_symlink_failure
+  phase: m2_evaluation_complete_63_of_63_bootstrap_prompt_identity_corrected_locally
   branch: agent/m2-three-model-vngrs-d0
   states: [M0, M1, M2-A, M2-B]
   m2_relationship: parallel_sibling_arms_from_same_m1_parent
@@ -21,7 +21,7 @@ readiness:
   corpus_contract: oscar_phase2_evidence_complete
   m1_training_contract: frozen_executed_complete
   m2_training_contract: one_gpu_relocation_consumed_six_of_six_complete
-  ready_to_measure: false
+  ready_to_measure: complete_no_new_measurement_authorized
   ready_to_train: false
   selected_primary_model: null
 
@@ -150,7 +150,12 @@ stage_readiness:
   m2_eval_execution_adapter_registered: true
   m2_eval_v1b_result: terminal_21_complete_42_gpu_gate_failed
   m2_eval_v1b_record: documentation/records/evaluation/M2_V1B_TERMINAL_GPU_GATE_AND_RECOVERY_PLAN_2026-09-04.md
-  m2_ready_to_evaluate: false
+  m2_ready_to_evaluate: complete_63_of_63_no_rerun_required
+  m2_eval_terminal_result: documentation/records/evaluation/M2_EVAL_RECOVERY_V1A_TERMINAL_RESULT_2026-09-05.md
+  m2_eval_family_result_sha256: c04eff5ba1301f5fcd4a318cc3a88d281e389cd05f542e6f6d569826809bcebf
+  m2_eval_scientific_analysis_sha256: 732c9c23ab795bf3212196d582f8300ca6c02dbf6902c489a1d4ecd6eae6e0ca
+  m2_eval_bootstrap: executed_fact_id_rows_superseded_local_probe_id_correction_complete
+  m2_eval_primary_gate: no_model_passes_all_primary_gates
 
 evaluation:
   active_contract_name: eval-v2
@@ -178,15 +183,15 @@ m1:
   training_outputs_are_dependencies_not_preconditions: true
 
 next_boundary:
-  subject: prepare_corpus_link_verifier_integration_repair_no_retry_authorized
-  recovery_status: consumed_preflight_pass_canary484050_failed_before_model_load
-  recovery_result: documentation/records/evaluation/M2_EVAL_RECOVERY_V1_CANARY_SYMLINK_FAILURE_2026-09-04.md
+  subject: await_exact_sha_authorization_for_cpu_only_corrected_analysis_publication
+  recovery_status: complete_63_of_63_no_missing_or_failed_tasks
+  recovery_result: documentation/records/evaluation/M2_EVAL_RECOVERY_V1A_TERMINAL_RESULT_2026-09-05.md
   qualification_status: v1a_consumed_pass_job_484043_no_model_load
   qualification_result: documentation/records/evaluation/M2_GPU_IDENTITY_V1A_PASS_2026-09-04.md
   plan: documentation/191_M2_MATCHED_THREE_MODEL_OSCAR_TRAINING_AND_MEASUREMENT_PLAN_TR.md
-  contract: documentation/contracts/evaluation/vngrs-m2-oscar-eval-v2-recovery-v1.md
-  contract_sha256: cd5731b29f5fa269e9ea98d919062e1160ad4a0af90fc0b3138998137a5c7bc4
-  config: configs/evaluation/m2_eval_recovery_v1.json
+  contract: documentation/contracts/evaluation/vngrs-m2-oscar-eval-v2-analysis-correction-v1.md
+  contract_sha256: da2f3cb0251ae0bf9abc95e5663cb924988e77c1188dbdba4bc9c46066196b3f
+  config: configs/evaluation/m2_oscar_eval_v2_analysis_correction_v1.yaml
   allowed_now:
     - local_code_config_documentation_changes_requested_by_user
     - offline_tests_and_dry_runs
@@ -207,6 +212,10 @@ next_boundary:
     - prepare_and_offline_test_eval_v2_execution_adapter_and_contract
     - preserve_local_training_config_validator_and_smoke_training_dag_preparation
     - preserve_local_training_output_finalizer_and_eval_v2_matrix_preparation
+    - preserve_completed_63_state_m2_evaluation_family
+    - preserve_executed_scientific_analysis_as_historical_evidence
+    - use_probe_identity_corrected_bootstrap_for_current_interpretation
+    - build_local_figures_and_thesis_prose_from_compact_existing_results
   not_implied:
     - hu_or_ssh
     - slurm_or_gpu
