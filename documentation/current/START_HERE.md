@@ -14,10 +14,13 @@ the master synthesis, the long timeline, or a previous chat transcript.
 
 - **2026-09-05 terminal override:** the M2 OSCAR evaluation family is complete at 63/63 with zero
   missing/failed tasks. The executed bootstrap collapsed repeated prompt variants by `fact_id`;
-  its rows are preserved but superseded by the tested, read-only `probe_id` correction. No model
+  its rows are preserved but superseded by the tested `probe_id` correction, now canonically
+  published by CPU-only job `484357` with unchanged source inputs and no model/inference. No model
   passes every frozen primary gate. Read
   `documentation/records/evaluation/M2_EVAL_RECOVERY_V1A_TERMINAL_RESULT_2026-09-05.md` for the
-  current result. No GPU/evaluation rerun is needed or authorized.
+  scientific result and
+  `documentation/records/evaluation/M2_EVAL_BOOTSTRAP_CORRECTION_EXECUTION_RESULT_2026-09-05.md`
+  for the correction audit. No GPU/evaluation rerun is needed or authorized.
 
 - active evaluation protocol: eval-v2;
 - Pile-10k: retired from canonical evaluation;

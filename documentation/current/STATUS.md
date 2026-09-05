@@ -20,9 +20,10 @@ the strongest descriptive result, not an automatic primary-model selection.
 
 The executed terminal analysis is preserved byte-identically, but its original bootstrap rows are
 superseded: the implementation paired on `fact_id` and overwrote seven of eight prompt variants.
-The local correction pairs on unique `probe_id`, keeps all prompt forms, adds regression tests and
-requires no GPU/model inference. A canonical corrected HU analysis artifact, if desired, is a
-separate CPU-only publication step; it is not required to recover scientific measurements.
+The correction pairs on unique `probe_id` and keeps all prompt forms. Its single CPU publication
+job `484357` completed PASS with unchanged source inputs, empty stderr and no GPU/model/inference.
+The canonical corrected analysis SHA-256 is `7427b11f...`; the execution record is
+`documentation/records/evaluation/M2_EVAL_BOOTSTRAP_CORRECTION_EXECUTION_RESULT_2026-09-05.md`.
 
 **Execution state:** M1 eval-v2 wave v3 is terminal `complete`: 111/111 canonical scientific
 states, consisting of 108 GPU snapshots and 3 M0 parent projections. Full execution history,

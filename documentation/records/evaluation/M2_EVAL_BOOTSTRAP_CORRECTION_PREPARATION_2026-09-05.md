@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-05
 
-**Status:** locally prepared, frozen, unexecuted
+**Status:** consumed; executed once as job `484357`; PASS
 
 The completed 63/63 M2 evaluation family needs no GPU or inference rerun. Review found that the
 executed paired-subject bootstrap keyed repeated prompt rows by `fact_id`, silently retaining only
@@ -23,5 +23,7 @@ Frozen contract SHA-256:
 `da2f3cb0251ae0bf9abc95e5663cb924988e77c1188dbdba4bc9c46066196b3f`.
 
 Focused evaluation/recovery/correction tests pass 38/38. Preparation itself performed no source
-write, job submission, model load, evaluation, training or cleanup. The user's instruction allows
-local commit and ordinary push; HU fast-forward and execution remain separately SHA-bound.
+write, job submission, model load, evaluation, training or cleanup. The later exact SHA-bound
+authorization was consumed once: job `484357` completed the CPU-only publication with unchanged
+source inputs and no GPU/model/inference use. The execution result is recorded in
+`M2_EVAL_BOOTSTRAP_CORRECTION_EXECUTION_RESULT_2026-09-05.md`.
