@@ -1,7 +1,7 @@
 # M2 results website and thesis package — implementation result
 
 **Date:** 2026-09-05  
-**Status:** local implementation complete; verified; not yet pushed  
+**Status:** complete; verified; ordinary non-force push confirmed
 **Execution boundary:** local derived reporting only; no HU/GPU/model/evaluation/training
 
 ## Delivered
@@ -69,3 +69,12 @@ this reporting task.
 
 The website and thesis artifacts are derived reporting products. They do not alter the terminal
 scientific conclusion: no model passes all primary gates and no automatic primary model is selected.
+
+## Publication closure
+
+The user performed the ordinary non-force push and the remote branch was subsequently verified:
+
+- remote: `https://github.com/umutyesildal/transfer-vs-relearning`;
+- branch: `agent/m2-three-model-vngrs-d0`;
+- published commit: `677259972bec2b4857800d53b6e8253b3cec68f2`;
+- remote HEAD verification: exact match.
