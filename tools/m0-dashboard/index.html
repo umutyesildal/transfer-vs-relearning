@@ -3,103 +3,84 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>M0–M2 Evaluation Explorer</title>
+  <meta name="color-scheme" content="light">
+  <title>M0–M2 Evidence Explorer</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <main class="shell">
     <header class="hero">
       <div>
-        <p class="eyebrow" data-i18n="hero.eyebrow">TRANSFER VS. RELEARNING · EVALUATION</p>
-        <h1 data-i18n="hero.title">Evaluation Explorer</h1>
-        <p class="lede" data-i18n="hero.lede">M0, M1, M2-A ve M2-B sonuçlarını aynı ölçüm sözlüğüyle incele.</p>
+        <p class="eyebrow" data-i18n="hero.eyebrow">TRANSFER VS. RELEARNING · EVIDENCE EXPLORER</p>
+        <h1 data-i18n="hero.title">M0 → M1 → M2</h1>
+        <p class="lede" data-i18n="hero.lede">M0, M1, M2-A ve M2-B sonuçlarını aynı doğrulanmış veri sözleşmesiyle incele.</p>
       </div>
       <div class="hero-actions">
-        <label class="compact-label" for="state-select" data-i18n="state.label">State</label>
-        <select id="state-select" aria-label="State selector"></select>
-        <button id="language-toggle" class="language-toggle" type="button" aria-pressed="false">EN</button>
-        <a class="download" href="../../artifacts/evaluations/m0_three_model_v1/dump/m0_metrics.json" download data-i18n="hero.download">JSON dump</a>
+        <button id="language-toggle" class="button" type="button" aria-pressed="false">EN</button>
+        <a id="json-download" class="button" href="./data/results_explorer_data.json" download data-i18n="hero.download">Veri manifesti</a>
       </div>
     </header>
 
+    <section class="status-strip" aria-live="polite">
+      <div class="status-main"><span class="status-dot" aria-hidden="true"></span><div><span class="eyebrow" data-i18n="status.eyebrow">CURRENT EVIDENCE</span><strong id="status-title">M2 evidence package</strong><p id="status-copy">—</p></div></div>
+      <div class="status-meta"><span id="status-family">results_explorer_v1</span><code id="status-sha">manifest: pending</code></div>
+    </section>
+    <section id="load-error" class="load-error" role="alert" hidden>
+      <div><strong id="load-error-title">Veri manifesti yüklenemedi.</strong><span id="load-error-copy">—</span></div>
+      <button id="retry-load" class="button" type="button">Tekrar dene</button>
+    </section>
+
     <nav class="tabs" role="tablist" aria-label="Dashboard sections">
-      <button class="tab is-active" type="button" role="tab" aria-selected="true" data-page="home" data-i18n="nav.home">Ana sayfa</button>
-      <button class="tab" type="button" role="tab" aria-selected="false" data-page="metrics" data-i18n="nav.metrics">Metrics</button>
-      <button class="tab" type="button" role="tab" aria-selected="false" data-page="detail" data-i18n="nav.detail">Detail</button>
+      <button id="tab-overview" class="tab is-active" type="button" role="tab" aria-selected="true" aria-controls="page-overview" tabindex="0" data-page="overview" data-i18n="nav.overview">Genel bakış</button>
+      <button id="tab-primary" class="tab" type="button" role="tab" aria-selected="false" aria-controls="page-primary" tabindex="-1" data-page="primary" data-i18n="nav.primary">Primary result</button>
+      <button id="tab-trajectories" class="tab" type="button" role="tab" aria-selected="false" aria-controls="page-trajectories" tabindex="-1" data-page="trajectories" data-i18n="nav.trajectories">Trajectories</button>
+      <button id="tab-diagnostics" class="tab" type="button" role="tab" aria-selected="false" aria-controls="page-diagnostics" tabindex="-1" data-page="diagnostics" data-i18n="nav.diagnostics">Diagnostics</button>
+      <button id="tab-provenance" class="tab" type="button" role="tab" aria-selected="false" aria-controls="page-provenance" tabindex="-1" data-page="provenance" data-i18n="nav.provenance">Provenance</button>
     </nav>
 
-    <section id="state-banner" class="notice" aria-live="polite">
-      <span class="notice-dot" aria-hidden="true"></span>
-      <div><strong id="state-banner-title">M0</strong><span id="state-banner-text"></span></div>
+    <section id="page-overview" class="page" role="tabpanel" aria-labelledby="tab-overview">
+      <div class="page-heading"><p class="eyebrow" data-i18n="overview.eyebrow">STUDY OVERVIEW</p><h2 data-i18n="overview.title">Dört state, iki önceden belirlenmiş estimand</h2><p id="overview-lede" class="muted">—</p></div>
+      <div id="timeline" class="timeline" aria-label="Study state timeline"></div>
+      <div class="summary-grid" aria-label="Completion summary">
+        <article class="summary-card accent-teal"><span data-i18n="summary.m1">M1 states</span><strong id="summary-m1">—</strong><small data-i18n="summary.m1Note">parent + epoch states</small></article>
+        <article class="summary-card accent-blue"><span data-i18n="summary.m2">M2 states</span><strong id="summary-m2">—</strong><small data-i18n="summary.m2Note">A/B × model × checkpoint</small></article>
+        <article class="summary-card accent-amber"><span data-i18n="summary.checkpoints">M2 checkpoints</span><strong id="summary-checkpoints">—</strong><small data-i18n="summary.checkpointsNote">training trajectory rows</small></article>
+        <article class="summary-card accent-violet"><span data-i18n="summary.gates">Primary gates</span><strong id="summary-gates">—</strong><small data-i18n="summary.gatesNote">models passing every gate</small></article>
+      </div>
+      <section class="panel conclusion-panel"><p class="eyebrow" data-i18n="overview.conclusionEyebrow">TERMINAL SCIENTIFIC CONCLUSION</p><h2 id="overview-conclusion">—</h2><p id="overview-conclusion-copy" class="muted">—</p></section>
+      <div id="overview-highlights" class="highlight-grid"></div>
     </section>
 
-    <section id="page-home" class="page" role="tabpanel">
-      <div class="home-intro">
-        <p class="eyebrow" data-i18n="home.eyebrow">OVERVIEW</p>
-        <h2 id="home-title">M0 snapshot</h2>
-        <p id="home-description" class="muted"></p>
-      </div>
-      <div class="summary-grid" aria-label="State summary">
-        <article class="summary-card"><span data-i18n="summary.valid">Valid lanes</span><strong id="valid-lanes">—</strong><small id="valid-lanes-note">—</small></article>
-        <article class="summary-card"><span data-i18n="summary.models">Models</span><strong id="model-count">—</strong><small data-i18n="summary.modelsNote">same evaluation panel</small></article>
-        <article class="summary-card"><span data-i18n="summary.pending">Pending</span><strong id="pending-lanes">—</strong><small data-i18n="summary.pendingNote">missing is not zero</small></article>
-        <article class="summary-card"><span data-i18n="summary.sources">Source artifacts</span><strong id="source-count">—</strong><small data-i18n="summary.sourcesNote">path + SHA-256 attached</small></article>
-      </div>
-      <div id="home-highlights" class="highlight-grid"></div>
-      <div id="home-empty" class="empty-state" hidden></div>
+    <section id="page-primary" class="page" role="tabpanel" aria-labelledby="tab-primary" hidden>
+      <div class="page-heading"><p class="eyebrow" data-i18n="primary.eyebrow">M2 PRIMARY RESULT</p><h2 data-i18n="primary.title">Transfer ve relearning estimand’leri</h2><p class="muted" data-i18n="primary.lede">Transfer = M2-A − M1; relearning = M2-B − M2-A, yalnızca tr_to_en factual access için.</p></div>
+      <div id="estimand-cards" class="estimand-grid"></div>
+      <section class="panel forest-panel"><div class="section-heading"><div><p class="eyebrow" data-i18n="primary.forestEyebrow">INTERVAL VIEW</p><h2 data-i18n="primary.forestTitle">Model contrasts and confidence intervals</h2></div><span class="threshold-key"><i class="zero-key"></i> <span data-i18n="primary.zero">zero</span><i class="threshold-key-line"></i> <span data-i18n="primary.threshold">+0.05 threshold</span></span></div><div id="forest-chart" class="forest-chart" role="img" aria-label="Transfer and relearning interval chart"></div><p class="chart-note" data-i18n="primary.forestNote">CI’ın sıfır üstünde olması ile nokta tahmininin +0.05 eşiğini geçmesi ayrı koşullardır.</p></section>
+      <section class="panel"><div class="section-heading"><div><p class="eyebrow" data-i18n="primary.gateEyebrow">PRIMARY GATE LEDGER</p><h2 data-i18n="primary.gateTitle">Model × criterion</h2></div></div><div class="table-wrap"><table><thead><tr><th data-i18n="table.model">Model</th><th data-i18n="table.gates">Gate criteria</th><th data-i18n="table.overall">All primary gates</th></tr></thead><tbody id="gate-table"></tbody></table></div></section>
+      <section class="panel"><div class="section-heading"><div><p class="eyebrow" data-i18n="primary.endpointEyebrow">ENDPOINT STATES</p><h2 data-i18n="primary.endpointTitle">M1, M2-A and M2-B factual access</h2></div></div><div class="table-wrap"><table><thead><tr><th data-i18n="table.model">Model</th><th>M1</th><th>M2-A</th><th>M2-B</th><th data-i18n="table.direction">Direction</th></tr></thead><tbody id="endpoint-table"></tbody></table></div></section>
     </section>
 
-    <section id="page-metrics" class="page" role="tabpanel" hidden>
-      <div class="controls" aria-label="Metric controls">
-        <div><p class="eyebrow" data-i18n="metrics.eyebrow">METRIC EXPLORER</p><h2 data-i18n="metrics.title">Bir metric’i derinlemesine incele</h2></div>
-        <label class="sr-only" for="metric-select" data-i18n="metrics.selectLabel">Metric seç</label>
-        <select id="metric-select" aria-label="Metric selector"></select>
-      </div>
-      <div id="metrics-empty" class="empty-state" hidden></div>
-      <section id="chart-card" class="chart-card" aria-labelledby="chart-title">
-        <div class="section-heading"><div><p class="eyebrow" data-i18n="selected.eyebrow">SELECTED METRIC</p><h2 id="chart-title">—</h2></div><span id="chart-direction" class="direction">—</span></div>
-        <div id="chart" class="bars" role="img" aria-label="Model comparison chart"></div>
-        <div class="metric-explanation">
-          <article><p class="explanation-label" data-i18n="selected.measureLabel">What does it measure?</p><p id="metric-measure">—</p></article>
-          <article><p class="explanation-label" data-i18n="selected.readLabel">How should I read it?</p><p id="metric-read">—</p></article>
-          <article><p class="explanation-label" data-i18n="selected.caveatLabel">Caveat</p><p id="metric-caveat">—</p></article>
-        </div>
-        <p id="chart-caption" class="muted"></p>
-      </section>
+    <section id="page-trajectories" class="page" role="tabpanel" aria-labelledby="tab-trajectories" hidden>
+      <div class="page-heading"><p class="eyebrow" data-i18n="trajectory.eyebrow">TRAINING TRAJECTORIES</p><h2 data-i18n="trajectory.title">Checkpoint curves over dose</h2><p class="muted" data-i18n="trajectory.lede">Cheap factual top-1, OSCAR BPB, trwiki BPB, WikiText BPB ve exact top-1.</p></div>
+      <div class="controls panel"><label for="trajectory-model" data-i18n="trajectory.model">Model</label><select id="trajectory-model"></select><label for="trajectory-arm" data-i18n="trajectory.arm">Arm</label><select id="trajectory-arm"></select><label for="trajectory-metric" data-i18n="trajectory.metric">Metric</label><select id="trajectory-metric"></select></div>
+      <section class="panel"><div class="section-heading"><div><p class="eyebrow" data-i18n="trajectory.chartEyebrow">CHECKPOINT VIEW</p><h2 id="trajectory-title">—</h2></div><span id="trajectory-direction" class="direction">—</span></div><div id="trajectory-chart" class="trajectory-chart" role="img" aria-label="M2 checkpoint trajectory"></div><p class="chart-note" data-i18n="trajectory.denominator">Checkpoint factual top-1 = 1,500 probes; endpoint full suite = 12,000 probes. Bu paydalar doğrudan karşılaştırılmaz.</p></section>
+      <section class="panel"><div class="section-heading"><div><p class="eyebrow" data-i18n="trajectory.tableEyebrow">CHECKPOINT TABLE</p><h2 data-i18n="trajectory.tableTitle">Selected trajectory rows</h2></div></div><div class="table-wrap"><table><thead><tr><th data-i18n="table.checkpoint">Checkpoint</th><th data-i18n="table.state">State</th><th data-i18n="table.metric">Metric</th><th data-i18n="table.value">Value</th><th data-i18n="table.n">Denominator</th></tr></thead><tbody id="trajectory-table"></tbody></table></div></section>
     </section>
 
-    <section id="page-detail" class="page" role="tabpanel" hidden>
-      <section class="panel table-panel" aria-labelledby="all-metrics-title">
-        <div class="section-heading"><div><p class="eyebrow" data-i18n="detail.eyebrow">DETAIL</p><h2 id="all-metrics-title" data-i18n="detail.metricsTitle">All metric rows</h2></div><input id="metric-filter" class="filter" type="search" data-i18n-placeholder="detail.filter" placeholder="filter metric" aria-label="Metric filter"></div>
-        <div id="detail-empty" class="empty-state" hidden></div>
-        <div id="detail-table-wrap" class="table-wrap"><table><thead><tr><th data-i18n="table.metric">Metric</th><th data-i18n="table.family">Family</th><th>OLMo</th><th>Qwen</th><th>SmolLM</th><th data-i18n="table.direction">Direction</th></tr></thead><tbody id="metric-table"></tbody></table></div>
-      </section>
-
-      <div class="two-column">
-        <article class="panel">
-          <div class="section-heading"><div><p class="eyebrow" data-i18n="coverage.eyebrow">COVERAGE</p><h2 data-i18n="coverage.title">Lane status</h2></div><span class="muted" data-i18n="coverage.legend">complete / pending</span></div>
-          <div id="lane-matrix" class="lane-matrix"></div>
-        </article>
-        <article class="panel">
-          <div class="section-heading"><div><p class="eyebrow" data-i18n="guide.eyebrow">READING GUIDE</p><h2 data-i18n="guide.title">How to interpret</h2></div></div>
-          <ul class="guide-list">
-            <li data-i18n="guide.accuracy"><strong>Accuracy</strong> yüksekse daha iyi; <strong>BPB/PPL</strong> ve repetition düşükse daha iyi.</li>
-            <li data-i18n="guide.bpb">BPB, tokenizer’lar arası ana retention karşılaştırmasıdır. Token PPL companion evidence’tır.</li>
-            <li data-i18n="guide.tasks">Task’ler tek bir yapay overall score’a zorlanmaz.</li>
-            <li data-i18n="guide.missing">Pending sonuçlar boş bırakılır; eksik metric sıfır değildir.</li>
-          </ul>
-        </article>
-      </div>
-
-      <section class="panel provenance-panel" aria-labelledby="provenance-title">
-        <div class="section-heading"><div><p class="eyebrow" data-i18n="provenance.eyebrow">PROVENANCE</p><h2 id="provenance-title" data-i18n="provenance.title">Source and trust boundary</h2></div><span class="muted" id="generated-at">—</span></div>
-        <p id="provenance-note" class="muted"></p>
-        <details><summary data-i18n="provenance.show">Show source artifact hashes</summary><div id="sources" class="sources"></div></details>
-      </section>
+    <section id="page-diagnostics" class="page" role="tabpanel" aria-labelledby="tab-diagnostics" hidden>
+      <div class="page-heading"><p class="eyebrow" data-i18n="diagnostics.eyebrow">DIAGNOSTIC BREAKDOWN</p><h2 data-i18n="diagnostics.title">Relations, prompt forms and directions</h2><p class="muted" data-i18n="diagnostics.lede">Absolute endpoint values and M2-B − M2-A farkı birlikte okunur.</p></div>
+      <div class="controls panel"><label for="diagnostic-model" data-i18n="trajectory.model">Model</label><select id="diagnostic-model"></select><label for="diagnostic-slice" data-i18n="diagnostics.slice">Slice</label><select id="diagnostic-slice"><option value="relation">Relation</option><option value="form">Prompt form</option><option value="scaffold">Scaffold / direction</option></select></div>
+      <section class="panel"><div class="section-heading"><div><p class="eyebrow" data-i18n="diagnostics.chartEyebrow">ENDPOINT BREAKDOWN</p><h2 id="diagnostic-title">—</h2></div></div><div class="table-wrap"><table><thead><tr><th data-i18n="table.slice">Slice</th><th>M1</th><th>M2-A</th><th>M2-B</th><th data-i18n="table.delta">M2-B − M2-A</th></tr></thead><tbody id="diagnostic-table"></tbody></table></div></section>
     </section>
 
-    <footer><span data-i18n="footer.canonical">Canonical data</span>: <code>artifacts/evaluations/m0_three_model_v1/dump/m0_metrics.json</code> · <span data-i18n="footer.note">read-only derived dump; no raw weights/logs in Git.</span></footer>
+    <section id="page-provenance" class="page" role="tabpanel" aria-labelledby="tab-provenance" hidden>
+      <div class="page-heading"><p class="eyebrow" data-i18n="provenance.eyebrow">PROVENANCE & READING GUIDE</p><h2 data-i18n="provenance.title">What is in the package?</h2><p id="provenance-intro" class="muted">—</p></div>
+      <div class="two-column"><section class="panel"><div class="section-heading"><div><p class="eyebrow" data-i18n="provenance.sourcesEyebrow">SOURCE CLOSURE</p><h2 data-i18n="provenance.sourcesTitle">Paths and SHA-256</h2></div></div><div id="source-list" class="source-list"></div></section><section class="panel"><div class="section-heading"><div><p class="eyebrow" data-i18n="provenance.guideEyebrow">READING GUIDE</p><h2 data-i18n="provenance.guideTitle">Metric glossary and boundaries</h2></div></div><ul id="guide-list" class="guide-list"></ul></section></div>
+      <section class="panel historical-warning"><strong data-i18n="provenance.warningTitle">Historical bootstrap warning</strong><p data-i18n="provenance.warningCopy">fact_id bootstrap satırları tarihsel olarak korunur; canonical correction probe_id, 100 subject, 8 prompt variant, 10,000 draw ve seed 42’dir.</p></section>
+    </section>
+
+    <footer><span data-i18n="footer.copy">Read-only compact evidence layer · raw weights, logs ve scratch çıktıları Git’e alınmadı.</span> <code>tools/m0-dashboard/</code></footer>
   </main>
+  <noscript><p class="noscript">Bu explorer için JavaScript gerekir; kaynak JSON dosyası <code>tools/m0-dashboard/data/results_explorer_data.json</code> altındadır.</p></noscript>
   <script src="./app.js" defer></script>
 </body>
 </html>

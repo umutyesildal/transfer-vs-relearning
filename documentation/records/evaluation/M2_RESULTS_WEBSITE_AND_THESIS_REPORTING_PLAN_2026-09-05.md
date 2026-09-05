@@ -1,7 +1,7 @@
 # M2 results website and thesis-reporting plan
 
 **Date:** 2026-09-05  
-**Status:** implementation-ready local plan; no HU/GPU work required  
+**Status:** implemented locally and verified; no HU/GPU work used
 **Target:** extend the existing dependency-free `tools/m0-dashboard/` application
 
 ## 1. Goal and boundary
@@ -176,3 +176,6 @@ The package is complete only if:
 Implement Phase A and Phase B together as one local, reviewable website change, then validate the
 rendered result before producing thesis exports. This avoids freezing figures before the common
 data contract and UI semantics are proven. No scientific rerun should be scheduled from this plan.
+
+This sequence was completed on 2026-09-05. The implementation and verification evidence is in
+`M2_RESULTS_WEBSITE_AND_THESIS_PACKAGE_IMPLEMENTATION_RESULT_2026-09-05.md`.

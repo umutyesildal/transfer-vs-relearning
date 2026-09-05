@@ -28,6 +28,10 @@ the master synthesis, the long timeline, or a previous chat transcript.
   `documentation/records/evaluation/M2_RESULTS_WEBSITE_AND_THESIS_REPORTING_PLAN_2026-09-05.md`;
   it requires no HU, GPU, model load or new evaluation.
 
+- **Reporting implementation:** the validated multi-stage web-data layer, five-view bilingual
+  dashboard and deterministic thesis CSV/Markdown/SVG exports are locally complete. Read
+  `documentation/records/evaluation/M2_RESULTS_WEBSITE_AND_THESIS_PACKAGE_IMPLEMENTATION_RESULT_2026-09-05.md`.
+
 - active evaluation protocol: eval-v2;
 - Pile-10k: retired from canonical evaluation;
 - M0: closed with 21/21 active lanes, 3/3 exact-prefix and 42 v1f normalized observations;

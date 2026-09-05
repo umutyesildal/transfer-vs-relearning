@@ -1,0 +1,7 @@
+model,model_label,contrast,estimand,subset,n_subjects,estimate,ci95_low,ci95_high,estimate_pp,ci95_low_pp,ci95_high_pp,threshold_zero_pp,threshold_relearning_pp,interval_source
+olmo,OLMo,transfer,M2-A minus M1,all,100,-0.141,-0.16075,-0.1205,-14.1,-16.075,-12.05,0,,corrected_paired_subject_bootstrap
+olmo,OLMo,relearning,M2-B minus M2-A,all,100,0.02,0.015,0.0255,2,1.5,2.55,0,5,corrected_paired_subject_bootstrap
+qwen,Qwen,transfer,M2-A minus M1,all,100,-0.307,-0.33675,-0.2775,-30.7,-33.675,-27.75,0,,corrected_paired_subject_bootstrap
+qwen,Qwen,relearning,M2-B minus M2-A,all,100,0.0435,0.0295,0.05775,4.35,2.95,5.775,0,5,corrected_paired_subject_bootstrap
+smollm,SmolLM,transfer,M2-A minus M1,all,100,-0.16175,-0.18525,-0.1385,-16.175,-18.525,-13.85,0,,corrected_paired_subject_bootstrap
+smollm,SmolLM,relearning,M2-B minus M2-A,all,100,0.0035,0.0005,0.0065,0.35,0.05,0.65,0,5,corrected_paired_subject_bootstrap

@@ -1,0 +1,19 @@
+model,model_label,gate_id,criterion,pass,gate_type
+olmo,OLMo,m2a_en_to_en_drop_at_most_0_05,M2-A EN-to-EN drop ≤ 0.05,true,primary
+olmo,OLMo,m2a_oscar_delta_bpb_at_most_minus_0_07400058,M2-A OSCAR BPB delta ≤ −0.07400058,true,primary
+olmo,OLMo,m2a_wikitext_delta_bpb_at_most_0_32192809,M2-A WikiText BPB delta ≤ 0.32192809,true,primary
+olmo,OLMo,relearning_ci95_low_above_zero,Relearning 95% CI lower bound > 0,false,primary
+olmo,OLMo,relearning_point_gain_at_least_0_05,Relearning point gain ≥ 0.05,false,primary
+olmo,OLMo,all_primary_gates_pass,All frozen primary gates pass,false,summary
+qwen,Qwen,m2a_en_to_en_drop_at_most_0_05,M2-A EN-to-EN drop ≤ 0.05,true,primary
+qwen,Qwen,m2a_oscar_delta_bpb_at_most_minus_0_07400058,M2-A OSCAR BPB delta ≤ −0.07400058,true,primary
+qwen,Qwen,m2a_wikitext_delta_bpb_at_most_0_32192809,M2-A WikiText BPB delta ≤ 0.32192809,true,primary
+qwen,Qwen,relearning_ci95_low_above_zero,Relearning 95% CI lower bound > 0,true,primary
+qwen,Qwen,relearning_point_gain_at_least_0_05,Relearning point gain ≥ 0.05,false,primary
+qwen,Qwen,all_primary_gates_pass,All frozen primary gates pass,false,summary
+smollm,SmolLM,m2a_en_to_en_drop_at_most_0_05,M2-A EN-to-EN drop ≤ 0.05,false,primary
+smollm,SmolLM,m2a_oscar_delta_bpb_at_most_minus_0_07400058,M2-A OSCAR BPB delta ≤ −0.07400058,true,primary
+smollm,SmolLM,m2a_wikitext_delta_bpb_at_most_0_32192809,M2-A WikiText BPB delta ≤ 0.32192809,true,primary
+smollm,SmolLM,relearning_ci95_low_above_zero,Relearning 95% CI lower bound > 0,false,primary
+smollm,SmolLM,relearning_point_gain_at_least_0_05,Relearning point gain ≥ 0.05,false,primary
+smollm,SmolLM,all_primary_gates_pass,All frozen primary gates pass,false,summary

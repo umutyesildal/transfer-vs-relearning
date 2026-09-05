@@ -25,6 +25,12 @@ job `484357` completed PASS with unchanged source inputs, empty stderr and no GP
 The canonical corrected analysis SHA-256 is `7427b11f...`; the execution record is
 `documentation/records/evaluation/M2_EVAL_BOOTSTRAP_CORRECTION_EXECUTION_RESULT_2026-09-05.md`.
 
+The local reporting package is now implemented: `tools/m0-dashboard/` exposes the completed
+M0/M1/M2 evidence through five bilingual views, and
+`paper/transfer_or_relearning_wip/derived_m2_exports/` contains deterministic thesis-ready
+CSV/Markdown/SVG outputs. Both are generated from nine exact-hash-bound compact inputs; no new
+scientific job or model access was used.
+
 **Execution state:** M1 eval-v2 wave v3 is terminal `complete`: 111/111 canonical scientific
 states, consisting of 108 GPU snapshots and 3 M0 parent projections. Full execution history,
 final result and delegation boundaries:

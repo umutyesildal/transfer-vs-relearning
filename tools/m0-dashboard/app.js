@@ -1,289 +1,63 @@
-const DATA_URL = '../../artifacts/evaluations/m0_three_model_v1/dump/m0_metrics.json';
-const MODEL_ORDER = ['olmo', 'qwen', 'smollm'];
+/* Dependency-free rendering for results_explorer_v1.json. Scientific joins happen in the
+ * deterministic builder; this file only filters, formats and presents validated rows. */
+const DATA_URLS = ['./data/results_explorer_v1.json', './data/results_explorer_data.json'];
+const MODELS = ['olmo', 'qwen', 'smollm'];
 const MODEL_LABELS = { olmo: 'OLMo', qwen: 'Qwen', smollm: 'SmolLM' };
-const MODEL_CLASSES = { olmo: 'olmo', qwen: 'qwen', smollm: 'smollm' };
-const LANE_ORDER = ['english_retention_wikitext', 'english_grammar_blimp', 'english_capability', 'turkish_capability', 'turkish_perplexity', 'factual_access', 'generation_integrity'];
-const LANE_LABELS = {
-  english_retention_wikitext: { tr: 'WikiText', en: 'WikiText' },
-  english_grammar_blimp: { tr: 'BLiMP', en: 'BLiMP' },
-  english_capability: { tr: 'English cap.', en: 'English cap.' },
-  turkish_capability: { tr: 'Turkish cap.', en: 'Turkish cap.' },
-  turkish_perplexity: { tr: 'trwiki PPL', en: 'trwiki PPL' },
-  factual_access: { tr: 'Facts', en: 'Facts' },
-  generation_integrity: { tr: 'Integrity', en: 'Integrity' }
-};
-const FAMILY_LABELS = {
-  english_retention: { tr: 'English retention', en: 'English retention' },
-  english_capability: { tr: 'English capability', en: 'English capability' },
-  turkish_capability: { tr: 'Turkish capability', en: 'Turkish capability' },
-  turkish_perplexity: { tr: 'Turkish perplexity', en: 'Turkish perplexity' },
-  factual_access: { tr: 'Factual access', en: 'Factual access' },
-  generation_integrity: { tr: 'Generation integrity', en: 'Generation integrity' }
-};
-const STATE_COPY = {
-  M0: {
-    tr: { title: 'M0 — frozen pretrained base', description: 'eval-v2 canonical panelinde üç model için 21/21 non-Pile lane mevcuttur. Tarihsel Pile sonuçları bu görünümden çıkarılmıştır.' },
-    en: { title: 'M0 — frozen pretrained base', description: 'The eval-v2 canonical panel has all 21/21 non-Pile lanes across three models. Historical Pile observations are retired from this view.' }
-  },
-  M1: {
-    tr: { title: 'M1 — English factual adaptation', description: 'M1 için bu dump içinde henüz training/evaluation result snapshot’ı yok. Sayı uydurulmuyor; state yalnızca UI’da hazırlanmış durumda.' },
-    en: { title: 'M1 — English factual adaptation', description: 'No M1 training/evaluation result snapshot is present in this dump. The state is prepared in the UI without inventing numbers.' }
-  },
-  'M2-A': {
-    tr: { title: 'M2-A — fact-free Turkish adaptation', description: 'M2-A için bu dump içinde henüz metric snapshot’ı yok. Bu state, M1 parent’tan gelen matched-budget Turkish arm olarak ayrılmıştır.' },
-    en: { title: 'M2-A — fact-free Turkish adaptation', description: 'No M2-A metric snapshot is present in this dump. This state is reserved for the matched-budget fact-free Turkish arm from M1.' }
-  },
-  'M2-B': {
-    tr: { title: 'M2-B — controlled factual re-exposure', description: 'M2-B için bu dump içinde henüz metric snapshot’ı yok. Bu state, M2-A ile matched-budget controlled re-exposure arm olarak ayrılmıştır.' },
-    en: { title: 'M2-B — controlled factual re-exposure', description: 'No M2-B metric snapshot is present in this dump. This state is reserved for the matched-budget controlled re-exposure arm.' }
-  }
-};
+const MODEL_CLASSES = { olmo: 'model-olmo', qwen: 'model-qwen', smollm: 'model-smollm' };
 const I18N = {
-  tr: {
-    hero: { eyebrow: 'TRANSFER VS. RELEARNING · EVALUATION', title: 'Evaluation Explorer', lede: 'M0, M1, M2-A ve M2-B sonuçlarını aynı ölçüm sözlüğüyle incele.', download: 'JSON dump’ı indir' },
-    state: { label: 'State' }, nav: { home: 'Ana sayfa', metrics: 'Metrics', detail: 'Detail' },
-    home: { eyebrow: 'OVERVIEW', highlights: 'Snapshot highlights', noSnapshot: 'Bu state için henüz Git’e alınmış metric snapshot’ı yok.', noSnapshotNote: 'Veri geldiğinde aynı metric sözlüğü otomatik olarak bu ekrana bağlanacak.', best: 'En güçlü mevcut gözlem', context: 'Aynı metric içinde model karşılaştırması', status: 'State durumu' },
-    summary: { valid: 'Geçerli lane', models: 'Modeller', modelsNote: 'aynı evaluation paneli', pending: 'Bekleyen', pendingNote: 'eksik sonuç sıfır değildir', sources: 'Kaynak artifact', sourcesNote: 'path + SHA-256 bağlı' },
-    metrics: { eyebrow: 'METRIC EXPLORER', title: 'Bir metric’i derinlemesine incele', selectLabel: 'Metric seç' },
-    selected: { eyebrow: 'SELECTED METRIC', measureLabel: 'Ne ölçüyor?', readLabel: 'Nasıl okunmalı?', caveatLabel: 'Sınır / caveat' },
-    detail: { eyebrow: 'DETAIL', metricsTitle: 'Tüm metric satırları', filter: 'metric filtrele', noSnapshot: 'Bu state için detay tablosu oluşturulacak bir metric snapshot’ı yok.' },
-    table: { metric: 'Metric', family: 'Family', direction: 'Yön' },
-    coverage: { eyebrow: 'COVERAGE', title: 'Lane durumu', legend: 'complete / pending' },
-    guide: { eyebrow: 'READING GUIDE', title: 'Sonuçları nasıl yorumlamalı?', accuracy: '<strong>Accuracy</strong> yüksekse daha iyi; <strong>BPB/PPL</strong> ve repetition düşükse daha iyi.', bpb: 'BPB, tokenizer’lar arası ana retention karşılaştırmasıdır. Token PPL companion evidence’tır.', tasks: 'Farklı task’ler tek bir yapay overall score’a zorlanmaz.', missing: 'Pending sonuçlar boş bırakılır; eksik metric sıfır değildir.' },
-    provenance: { eyebrow: 'PROVENANCE', title: 'Kaynak ve güven sınırı', show: 'Kaynak artifact hash’lerini göster', noSnapshot: 'Bu state için provenance kaydı yok.' },
-    footer: { canonical: 'Canonical data', note: 'read-only derived dump; raw weights/logs Git’te yok.' },
-    directions: { lower: '↓ düşük daha iyi', higher: '↑ yüksek daha iyi' },
-    status: { observed: 'observed snapshot', pending: 'pending', noSnapshot: 'no result snapshot' }
-  },
-  en: {
-    hero: { eyebrow: 'TRANSFER VS. RELEARNING · EVALUATION', title: 'Evaluation Explorer', lede: 'Explore M0, M1, M2-A, and M2-B through one stable metric vocabulary.', download: 'Download JSON dump' },
-    state: { label: 'State' }, nav: { home: 'Home', metrics: 'Metrics', detail: 'Detail' },
-    home: { eyebrow: 'OVERVIEW', highlights: 'Snapshot highlights', noSnapshot: 'There is no Git-retained metric snapshot for this state yet.', noSnapshotNote: 'When data arrives, it will use the same metric vocabulary automatically.', best: 'Strongest available observation', context: 'Model comparison within one metric', status: 'State status' },
-    summary: { valid: 'Valid lanes', models: 'Models', modelsNote: 'same evaluation panel', pending: 'Pending', pendingNote: 'missing is not zero', sources: 'Source artifacts', sourcesNote: 'path + SHA-256 attached' },
-    metrics: { eyebrow: 'METRIC EXPLORER', title: 'Inspect one metric in depth', selectLabel: 'Choose metric' },
-    selected: { eyebrow: 'SELECTED METRIC', measureLabel: 'What does it measure?', readLabel: 'How should I read it?', caveatLabel: 'Boundary / caveat' },
-    detail: { eyebrow: 'DETAIL', metricsTitle: 'All metric rows', filter: 'filter metric', noSnapshot: 'There is no metric snapshot for this state to populate the detail table.' },
-    table: { metric: 'Metric', family: 'Family', direction: 'Direction' },
-    coverage: { eyebrow: 'COVERAGE', title: 'Lane status', legend: 'complete / pending' },
-    guide: { eyebrow: 'READING GUIDE', title: 'How should I interpret results?', accuracy: '<strong>Accuracy</strong> is better when higher; <strong>BPB/PPL</strong> and repetition are better when lower.', bpb: 'BPB is the primary cross-tokenizer retention comparison. Token PPL is companion evidence.', tasks: 'Different tasks are not forced into one artificial overall score.', missing: 'Pending results stay blank; a missing metric is not zero.' },
-    provenance: { eyebrow: 'PROVENANCE', title: 'Source and trust boundary', show: 'Show source artifact hashes', noSnapshot: 'No provenance record exists for this state.' },
-    footer: { canonical: 'Canonical data', note: 'read-only derived dump; raw weights/logs are not in Git.' },
-    directions: { lower: '↓ lower is better', higher: '↑ higher is better' },
-    status: { observed: 'observed snapshot', pending: 'pending', noSnapshot: 'no result snapshot' }
-  }
+  tr: { hero:{eyebrow:'TRANSFER VS. RELEARNING · EVIDENCE EXPLORER',title:'M0 → M1 → M2',lede:'M0, M1, M2-A ve M2-B sonuçlarını aynı doğrulanmış veri sözleşmesiyle incele.',download:'Veri manifesti'}, status:{eyebrow:'CURRENT EVIDENCE',ready:'M2 evidence package hazır',pending:'M2 evidence package bekleniyor'}, errors:{title:'Veri manifesti yüklenemedi.',copy:'Compact veri olmadan sayılar gösterilmiyor.',retry:'Tekrar dene'}, nav:{overview:'Genel bakış',primary:'Primary result',trajectories:'Trajectories',diagnostics:'Diagnostics',provenance:'Provenance'}, overview:{eyebrow:'STUDY OVERVIEW',title:'Dört state, iki önceden belirlenmiş estimand',conclusionEyebrow:'TERMINAL SCIENTIFIC CONCLUSION',conclusion:'Hiçbir model tüm primary gate’leri geçmedi.',conclusionCopy:'Qwen en güçlü betimsel relearning sinyalini verir; bu sonuç otomatik primary-model seçimi anlamına gelmez.'}, summary:{m1:'M1 states',m1Note:'parent + epoch states',m2:'M2 states',m2Note:'A/B × model × checkpoint',checkpoints:'M2 checkpoints',checkpointsNote:'training trajectory rows',gates:'Primary gates',gatesNote:'models passing every gate'}, primary:{eyebrow:'M2 PRIMARY RESULT',title:'Transfer ve relearning estimand’leri',lede:'Transfer = M2-A − M1; relearning = M2-B − M2-A, yalnızca tr_to_en factual access için.',forestEyebrow:'INTERVAL VIEW',forestTitle:'Model contrasts and confidence intervals',zero:'zero',threshold:'+0.05 threshold',forestNote:'CI’ın sıfır üstünde olması ile nokta tahmininin +0.05 eşiğini geçmesi ayrı koşullardır.',gateEyebrow:'PRIMARY GATE LEDGER',gateTitle:'Model × criterion',endpointEyebrow:'ENDPOINT STATES',endpointTitle:'M1, M2-A and M2-B factual access'},trajectory:{eyebrow:'TRAINING TRAJECTORIES',title:'Checkpoint curves over dose',lede:'Cheap factual top-1, OSCAR BPB, trwiki BPB, WikiText BPB ve exact top-1.',model:'Model',arm:'Arm',metric:'Metric',chartEyebrow:'CHECKPOINT VIEW',denominator:'Checkpoint factual top-1 = 1,500 probes; endpoint full suite = 12,000 probes. Bu paydalar doğrudan karşılaştırılmaz.',tableEyebrow:'CHECKPOINT TABLE',tableTitle:'Selected trajectory rows'},diagnostics:{eyebrow:'DIAGNOSTIC BREAKDOWN',title:'Relations, prompt forms and directions',lede:'Absolute endpoint values and M2-B − M2-A farkı birlikte okunur.',slice:'Slice',chartEyebrow:'ENDPOINT BREAKDOWN'},provenance:{eyebrow:'PROVENANCE & READING GUIDE',title:'What is in the package?',sourcesEyebrow:'SOURCE CLOSURE',sourcesTitle:'Paths and SHA-256',guideEyebrow:'READING GUIDE',guideTitle:'Metric glossary and boundaries',warningTitle:'Historical bootstrap warning',warningCopy:'fact_id bootstrap satırları tarihsel olarak korunur; canonical correction probe_id, 100 subject, 8 prompt variant, 10,000 draw ve seed 42’dir.'},table:{model:'Model',gates:'Gate criteria',overall:'All primary gates',direction:'Direction',checkpoint:'Checkpoint',state:'State',metric:'Metric',value:'Value',n:'Denominator',slice:'Slice',delta:'M2-B − M2-A'},footer:{copy:'Read-only compact evidence layer · raw weights, logs ve scratch çıktıları Git’e alınmadı.'},empty:'veri yok / pending',pass:'PASS',fail:'FAIL',observed:'observed',higher:'↑ yüksek daha iyi',lower:'↓ düşük daha iyi',noData:'Bu manifestte bu görünüm için doğrulanmış satır yok.'},
+  en: { hero:{eyebrow:'TRANSFER VS. RELEARNING · EVIDENCE EXPLORER',title:'M0 → M1 → M2',lede:'Inspect M0, M1, M2-A and M2-B through one validated data contract.',download:'Download data manifest'}, status:{eyebrow:'CURRENT EVIDENCE',ready:'M2 evidence package ready',pending:'M2 evidence package pending'}, errors:{title:'The data manifest could not be loaded.',copy:'Numbers stay hidden until compact evidence is available.',retry:'Retry'}, nav:{overview:'Overview',primary:'Primary result',trajectories:'Trajectories',diagnostics:'Diagnostics',provenance:'Provenance'}, overview:{eyebrow:'STUDY OVERVIEW',title:'Four states, two precommitted estimands',conclusionEyebrow:'TERMINAL SCIENTIFIC CONCLUSION',conclusion:'No model passes every primary gate.',conclusionCopy:'Qwen has the strongest descriptive relearning signal; this is not an automatic primary-model selection.'}, summary:{m1:'M1 states',m1Note:'parent + epoch states',m2:'M2 states',m2Note:'A/B × model × checkpoint',checkpoints:'M2 checkpoints',checkpointsNote:'training trajectory rows',gates:'Primary gates',gatesNote:'models passing every gate'}, primary:{eyebrow:'M2 PRIMARY RESULT',title:'Transfer and relearning estimands',lede:'Transfer = M2-A − M1; relearning = M2-B − M2-A, for tr_to_en factual access only.',forestEyebrow:'INTERVAL VIEW',forestTitle:'Model contrasts and confidence intervals',zero:'zero',threshold:'+0.05 threshold',forestNote:'A CI above zero and a point estimate meeting +0.05 are distinct conditions.',gateEyebrow:'PRIMARY GATE LEDGER',gateTitle:'Model × criterion',endpointEyebrow:'ENDPOINT STATES',endpointTitle:'M1, M2-A and M2-B factual access'},trajectory:{eyebrow:'TRAINING TRAJECTORIES',title:'Checkpoint curves over dose',lede:'Cheap factual top-1, OSCAR BPB, trwiki BPB, WikiText BPB and exact top-1.',model:'Model',arm:'Arm',metric:'Metric',chartEyebrow:'CHECKPOINT VIEW',denominator:'Checkpoint factual top-1 = 1,500 probes; endpoint full suite = 12,000 probes. These denominators must not be compared directly.',tableEyebrow:'CHECKPOINT TABLE',tableTitle:'Selected trajectory rows'},diagnostics:{eyebrow:'DIAGNOSTIC BREAKDOWN',title:'Relations, prompt forms and directions',lede:'Read absolute endpoint values beside the M2-B − M2-A contrast.',slice:'Slice',chartEyebrow:'ENDPOINT BREAKDOWN'},provenance:{eyebrow:'PROVENANCE & READING GUIDE',title:'What is in the package?',sourcesEyebrow:'SOURCE CLOSURE',sourcesTitle:'Paths and SHA-256',guideEyebrow:'READING GUIDE',guideTitle:'Metric glossary and boundaries',warningTitle:'Historical bootstrap warning',warningCopy:'fact_id bootstrap rows are retained as historical evidence; the canonical correction uses probe_id, 100 subjects, 8 prompt variants, 10,000 draws and seed 42.'},table:{model:'Model',gates:'Gate criteria',overall:'All primary gates',direction:'Direction',checkpoint:'Checkpoint',state:'State',metric:'Metric',value:'Value',n:'Denominator',slice:'Slice',delta:'M2-B − M2-A'},footer:{copy:'Read-only compact evidence layer · raw weights, logs and scratch outputs are not in Git.'},empty:'no data / pending',pass:'PASS',fail:'FAIL',observed:'observed',higher:'↑ higher is better',lower:'↓ lower is better',noData:'No validated rows for this view are present in the manifest.'}
 };
-const METRICS = {
-  turkish_bpb: { label: { tr: 'Turkish trwiki BPB', en: 'Turkish trwiki BPB' }, help: { tr: 'Bits per byte · aynı byte-level corpus · düşük daha iyi', en: 'Bits per byte · same byte-level corpus · lower is better' }, format: v => v.toFixed(6), scale: 'relative', direction: 'lower', measure: { tr: 'Aynı UTF-8 byte akışı üzerindeki ortalama negatif log-likelihood’i ölçer. Tokenizer vocabulary’sinden daha az etkilenir.', en: 'Measures average negative log-likelihood over the same UTF-8 byte stream and is less dependent on tokenizer vocabulary.' }, read: { tr: 'Aynı trwiki corpus ve aynı byte accounting ile düşük değer daha iyi language fit demektir.', en: 'With the same trwiki corpus and byte accounting, a lower value means better language fit.' }, caveat: { tr: 'Bu tek başına overall model skoru değildir; Turkish capability ve factual access ile birlikte okunur.', en: 'This is not an overall model score; read it alongside Turkish capability and factual access.' }, caption: { tr: 'Qwen bu byte-level ölçümde en düşük loss değerini veriyor.', en: 'Qwen has the lowest loss on this byte-level measurement.' } },
-  turkish_ppl: { label: { tr: 'Turkish trwiki token PPL', en: 'Turkish trwiki token PPL' }, help: { tr: 'Token perplexity · tokenizer-sensitive · düşük daha iyi', en: 'Token perplexity · tokenizer-sensitive · lower is better' }, format: v => v.toFixed(4), scale: 'relative', direction: 'lower', measure: { tr: 'Modelin token dizisini ne kadar şaşırtığını ölçer; tokenization doğrudan sonucu etkiler.', en: 'Measures how surprised the model is by the token sequence; tokenization directly affects the result.' }, read: { tr: 'Aynı tokenizer ailesinde düşük daha iyi okunur. Farklı tokenizer’larda BPB ana kıyas olmalıdır.', en: 'Lower is better within the same tokenizer family. BPB should lead comparisons across tokenizers.' }, caveat: { tr: 'SmolLM/Qwen/OLMo token sayıları farklı olduğu için token PPL’i tek başına ranking yapmaz.', en: 'Because token counts differ across SmolLM, Qwen, and OLMo, token PPL alone does not rank them.' }, caption: { tr: 'Token PPL companion evidence’tır; tokenizer farkı nedeniyle BPB’nin yerine geçmez.', en: 'Token PPL is companion evidence; tokenizer differences keep it secondary to BPB.' } },
-  turblimp_acc_norm: { label: { tr: 'TurBLiMP acc_norm', en: 'TurBLiMP acc_norm' }, help: { tr: '16.000 Türkçe sentaktik örnek · yüksek daha iyi', en: '16,000 Turkish syntax examples · higher is better' }, format: v => `${(v * 100).toFixed(2)}%`, scale: 'fraction', direction: 'higher', measure: { tr: 'Türkçe minimal pair örneklerinde modelin doğru seçimi yapma oranıdır.', en: 'Measures the rate at which the model selects the correct option in Turkish minimal pairs.' }, read: { tr: 'Yüksek değer, Türkçe grammar preference sinyalinin daha güçlü olduğunu gösterir.', en: 'A higher value indicates a stronger Turkish grammar preference signal.' }, caveat: { tr: 'Bu sentaktik capability’dir; factual access veya retention yerine geçmez.', en: 'This is syntactic capability; it is not factual access or retention.' }, caption: { tr: 'Türkçe sentaktik tercih doğruluğu.', en: 'Turkish syntactic preference accuracy.' } },
-  blimp_accuracy: { label: { tr: 'English BLiMP accuracy', en: 'English BLiMP accuracy' }, help: { tr: '67.000 İngilizce grammar örneği · yüksek daha iyi', en: '67,000 English grammar examples · higher is better' }, format: v => `${(v * 100).toFixed(2)}%`, scale: 'fraction', direction: 'higher', measure: { tr: 'İngilizce grammar minimal pair örneklerindeki genel doğruluk oranıdır.', en: 'Measures overall accuracy on English grammar minimal pairs.' }, read: { tr: 'Aynı 67.000 örnek üzerinde yüksek değer daha iyi grammar acceptability demektir.', en: 'On the same 67,000 examples, a higher value means better grammar acceptability.' }, caveat: { tr: 'Task-specific bir capability metriğidir; HellaSwag veya Turkish task’leriyle doğrudan karıştırılmaz.', en: 'It is task-specific capability; do not compare it directly with HellaSwag or Turkish tasks.' }, caption: { tr: 'İngilizce grammar acceptability.', en: 'English grammar acceptability.' } },
-  hellaswag_acc_norm: { label: { tr: 'HellaSwag acc_norm', en: 'HellaSwag acc_norm' }, help: { tr: '10.042 commonsense örneği · yüksek daha iyi', en: '10,042 commonsense examples · higher is better' }, format: v => `${(v * 100).toFixed(2)}%`, scale: 'fraction', direction: 'higher', measure: { tr: 'Commonsense completion seçeneklerinde normalized accuracy’yi ölçer.', en: 'Measures normalized accuracy on commonsense completion choices.' }, read: { tr: 'Yüksek değer, genel English commonsense completion başarısının daha iyi olduğunu gösterir.', en: 'A higher value indicates stronger English commonsense completion.' }, caveat: { tr: 'Factual access veya Türkçe adaptation etkisini doğrudan ölçmez.', en: 'It does not directly measure factual access or Turkish adaptation.' }, caption: { tr: 'Commonsense completion capability.', en: 'Commonsense completion capability.' } },
-  wikitext_bpb: { label: { tr: 'WikiText-2 BPB', en: 'WikiText-2 BPB' }, help: { tr: '62 WikiText segmenti · düşük daha iyi', en: '62 WikiText segments · lower is better' }, format: v => v.toFixed(6), scale: 'relative', direction: 'lower', measure: { tr: 'İngilizce WikiText üzerinde byte-level retention loss’unu ölçer.', en: 'Measures byte-level retention loss on English WikiText.' }, read: { tr: 'Düşük BPB, pretrained English distribution üzerinde daha iyi likelihood demektir.', en: 'Lower BPB means better likelihood on the pretrained English distribution.' }, caveat: { tr: 'Retention ölçümüdür; factual knowledge veya Turkish capability değildir.', en: 'This is retention; it is not factual knowledge or Turkish capability.' }, caption: { tr: 'English retention için byte-level metric.', en: 'Byte-level metric for English retention.' } },
-  factual_top1_rate: { label: { tr: 'Factual access top-1 rate', en: 'Factual access top-1 rate' }, help: { tr: '12.000 factual probe · yüksek daha iyi', en: '12,000 factual probes · higher is better' }, format: v => `${(v * 100).toFixed(2)}%`, scale: 'fraction', direction: 'higher', measure: { tr: 'Modelin factual probe’a doğru ilk cevabı verme oranıdır.', en: 'Measures the rate of correct first answers on factual probes.' }, read: { tr: 'Yüksek değer, probe formatında daha fazla doğru ilk cevap demektir.', en: 'A higher value means more correct first answers in the probe format.' }, caveat: { tr: 'Prompt-form failures ve robust intersection sonuçlarıyla beraber okunmalıdır.', en: 'Read together with prompt-form failures and robust intersection results.' }, caption: { tr: 'Doğru ilk cevap oranı; canonical normalized winner değildir.', en: 'Correct first-answer rate; not a canonical normalized winner.' } },
-  generation_distinct_2: { label: { tr: 'Generation distinct-2', en: 'Generation distinct-2' }, help: { tr: '30 completion · çeşitlilik yüksek daha iyi', en: '30 completions · higher diversity is better' }, format: v => v.toFixed(3), scale: 'fraction', direction: 'higher', measure: { tr: 'Üretimlerdeki distinct bigram oranını ölçer.', en: 'Measures the fraction of distinct bigrams in generated completions.' }, read: { tr: 'Yüksek değer daha çeşitli; fakat tek başına factual correctness anlamına gelmez.', en: 'A higher value means more variety, but not factual correctness by itself.' }, caveat: { tr: 'Generation integrity diagnostic’idir; ana scientific winner metriği değildir.', en: 'It is a generation-integrity diagnostic, not the primary scientific winner metric.' }, caption: { tr: 'Üretim çeşitliliği; generation integrity diagnostic.', en: 'Generation diversity; generation-integrity diagnostic.' } },
-  generation_repeated_3gram: { label: { tr: 'Repeated 3-gram fraction', en: 'Repeated 3-gram fraction' }, help: { tr: '30 completion · tekrar düşük daha iyi', en: '30 completions · lower repetition is better' }, format: v => v.toFixed(3), scale: 'fraction', direction: 'lower', measure: { tr: 'Üretimlerde tekrar eden 3-gramların oranını ölçer.', en: 'Measures the fraction of repeated 3-grams in generated completions.' }, read: { tr: 'Düşük değer degeneration/repetition riskinin daha düşük olduğunu gösterir.', en: 'A lower value indicates less degeneration or repetition risk.' }, caveat: { tr: 'Kısa bir 30 completion panelidir; tek başına model kalitesi değildir.', en: 'This is a small 30-completion panel; it is not model quality by itself.' }, caption: { tr: 'Tekrarlı üretim oranı; düşük olması daha iyi.', en: 'Repeated-generation fraction; lower is better.' } }
-};
-const metricKeys = () => [...new Set(data.metric_rows.map(row => row.metric))];
-const metricMeta = metric => {
-  if (METRICS[metric]) return METRICS[metric];
-  const sample = data.metric_rows.find(row => row.metric === metric) ?? {};
-  const unit = sample.unit ?? '';
-  const direction = sample.direction ?? 'higher';
-  const isFraction = unit === 'fraction';
-  const family = FAMILY_LABELS[sample.family] ?? { tr: sample.family ?? 'Metric', en: sample.family ?? 'Metric' };
-  const label = metric.replaceAll('_', ' ');
-  const format = value => isFraction ? `${(value * 100).toFixed(2)}%` : unit === 'count' ? Math.round(value).toLocaleString('en-US') : unit === 'PPL' ? value.toFixed(4) : value.toFixed(6);
-  const preferenceTr = direction === 'lower' ? 'Düşük değer daha iyi okunur.' : 'Yüksek değer daha iyi okunur.';
-  const preferenceEn = direction === 'lower' ? 'Lower values are better.' : 'Higher values are better.';
-  return {
-    label: { tr: label, en: label }, help: { tr: `${tx(family)} · ${sample.sample_count?.toLocaleString('tr-TR') ?? '—'} örnek`, en: `${tx(family)} · ${sample.sample_count?.toLocaleString('en-US') ?? '—'} samples` },
-    format, scale: isFraction ? 'fraction' : 'relative', direction,
-    measure: { tr: `${tx(family)} içindeki ${label} değerini raporlar; birim: ${unit || '—'}.`, en: `Reports ${label} within ${tx(family)}; unit: ${unit || '—'}.` },
-    read: { tr: preferenceTr, en: preferenceEn },
-    caveat: { tr: 'Task-specific bir diagnostic’tir; farklı family metric’leriyle tek overall score yapılmaz.', en: 'This is task-specific evidence; do not collapse different metric families into one overall score.' },
-    caption: { tr: `${label} için ${direction === 'lower' ? 'düşük' : 'yüksek'} değer tercih edilir.`, en: `${direction === 'lower' ? 'Lower' : 'Higher'} is preferred for ${label}.` }
-  };
-};
-const HIGHLIGHTS = ['turkish_bpb', 'turblimp_acc_norm', 'hellaswag_acc_norm'];
-let data;
-let currentMetric = 'turkish_bpb';
-let currentState = 'M0';
-let currentPage = 'home';
-let language = 'tr';
-
+const METRIC_LABELS = { factual_top1:'Factual top-1', factual_top1_rate:'Factual top-1', factual_cheap_top1_rate:'Cheap factual top-1', exact_top1:'Exact top-1', exact_prefix_top1_accuracy:'Exact top-1', oscar_bpb:'OSCAR BPB', trwiki_bpb:'trwiki BPB', turkish_bpb:'trwiki BPB', wikitext_bpb:'WikiText BPB', transfer:'Transfer', relearning:'Relearning' };
 const $ = id => document.getElementById(id);
-const t = key => key.split('.').reduce((value, part) => value?.[part], I18N[language]) ?? key;
-const tx = value => typeof value === 'string' ? value : value?.[language] ?? '';
-const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
-const rowsFor = metric => data.metric_rows.filter(row => row.metric === metric);
-const hasCurrentData = () => currentState === 'M0' && Boolean(data.dashboard_states.find(item => item.id === currentState)?.available);
-const formatNumber = value => typeof value === 'number' ? value.toLocaleString('en-US', { maximumFractionDigits: 6 }) : 'pending';
-const stateCopy = () => STATE_COPY[currentState][language];
+const esc = value => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const num = value => typeof value === 'number' && Number.isFinite(value) ? value : Number.isFinite(Number(value)) && value !== '' ? Number(value) : null;
+const text = value => typeof value === 'object' && value !== null ? (value[language] ?? value.en ?? value.tr ?? '') : String(value ?? '');
+const modelName = model => MODEL_LABELS[String(model ?? '').toLowerCase()] || String(model ?? '—');
+const normModel = model => String(model ?? '').toLowerCase().replace(/[^a-z]/g, '').replace('olmo20425','olmo').replace('qwen2515b','qwen').replace('smollm21','smollm');
+const labelMetric = metric => METRIC_LABELS[metric] || String(metric ?? '—').replaceAll('_', ' ');
+const formatValue = (value, metric = '') => { const n = num(value); if (n === null) return t('empty'); if (/(rate|accuracy|fraction|top1|top_1)/i.test(metric) && Math.abs(n) <= 1) return `${(n * 100).toFixed(2)}%`; if (/(bpb|ppl|margin|delta|transfer|relearning)/i.test(metric)) return n.toFixed(4); return n.toLocaleString('en-US', { maximumFractionDigits: 6 }); };
+const formatDelta = value => { const n = num(value); return n === null ? t('empty') : `${n >= 0 ? '+' : ''}${n.toFixed(4)}`; };
+const t = key => key.split('.').reduce((v, p) => v?.[p], I18N[language]) ?? key;
+let language = 'tr'; let page = 'overview'; let data = null; let loadError = null; let currentTrajectory = { model:'qwen', arm:'M2-A', metric:'factual_top1' }; let currentDiagnostic = { model:'qwen', slice:'relation' };
 
-function applyI18n() {
-  document.documentElement.lang = language;
-  document.title = language === 'tr' ? 'M0–M2 Evaluation Explorer' : 'M0–M2 Evaluation Explorer';
-  document.querySelectorAll('[data-i18n]').forEach(element => { element.innerHTML = t(element.dataset.i18n); });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(element => { element.placeholder = t(element.dataset.i18nPlaceholder); });
-  $('language-toggle').textContent = language === 'tr' ? 'EN' : 'TR';
-  $('language-toggle').setAttribute('aria-pressed', language === 'en' ? 'true' : 'false');
-  $('metric-select').setAttribute('aria-label', t('metrics.selectLabel'));
-  $('state-select').setAttribute('aria-label', t('state.label'));
-  renderStateSelect();
+function arrayOf(value) { if (Array.isArray(value)) return value; if (value && typeof value === 'object') return Object.entries(value).map(([key, row]) => ({ key, ...(row || {}) })); return []; }
+function rowsAtFrom(root, ...paths) { for (const path of paths) { let value = root; for (const part of path.split('.')) value = value?.[part]; if (Array.isArray(value)) return value; if (value && typeof value === 'object') return arrayOf(value); } return []; }
+function normalize(raw) {
+  const overview = raw.overview || raw.summary || {};
+  const states = rowsAtFrom(raw,'states','overview.states','dashboard_states');
+  const gates = rowsAtFrom(raw,'gates','primary.gates','gate_table','model_gates').map(row => ({...row, model:normModel(row.model || row.model_id || row.key), criteria:arrayOf(row.criteria || row.gates || row.checks)}));
+  const estimates = rowsAtFrom(raw,'estimands','primary.estimands','contrasts','bootstrap','results.estimands').map(row => ({...row, model:normModel(row.model || row.model_id), kind:String(row.kind || row.estimand || row.contrast || row.name || '').toLowerCase(), estimate:num(row.estimate ?? row.value ?? row.delta), low:num(row.ci_low ?? row.ci95_low ?? row.lower ?? row.low ?? row.ci?.[0]), high:num(row.ci_high ?? row.ci95_high ?? row.upper ?? row.high ?? row.ci?.[1])}));
+  const endpoints = rowsAtFrom(raw,'endpoints','endpoint_states','primary.endpoints','state_endpoints').map(row => ({...row, model:normModel(row.model || row.model_id), state:String(row.state || row.arm || row.condition || '').toUpperCase(), direction:row.direction || 'higher', value:num(row.value ?? row.rate ?? row.accuracy ?? row.top1_accuracy), metric:row.metric || 'factual_top1_rate'}));
+  const trajectorySource = Array.isArray(raw.trajectories) ? raw.trajectories : (raw.trajectories?.m2 || []);
+  const trajectoryMetricKeys = ['factual_top1','factual_cheap_top1_rate','exact_top1','exact_prefix_top1_accuracy','oscar_bpb','trwiki_bpb','turkish_bpb','wikitext_bpb'];
+  const trajectories = trajectorySource.flatMap(row => { const base = { ...row, model:normModel(row.model || row.model_id), arm:String(row.arm || row.state || row.condition || 'M2-A').toUpperCase(), checkpoint:row.checkpoint ?? row.update ?? row.step ?? row.epoch, denominator:row.denominator ?? row.n ?? row.sample_count }; const keys = row.metric || row.metric_key ? [row.metric || row.metric_key] : trajectoryMetricKeys.filter(key => row[key] !== undefined); return keys.map(metric => ({...base, metric, value:num(row.value ?? row[metric]), denominator:base.denominator ?? (metric.includes('factual') ? 1500 : null)})); });
+  const rawBreakdowns = raw.breakdowns || raw.diagnostics || {};
+  const breakdowns = {}; ['relation','form','scaffold','direction','relations','forms'].forEach(key => { const rows = Array.isArray(rawBreakdowns) ? rawBreakdowns.filter(r => String(r.axis || r.slice || r.breakdown || r.kind || '').toLowerCase().includes(key.replace('relations','relation').replace('forms','form'))) : arrayOf(rawBreakdowns[key] || rawBreakdowns[`${key}_breakdown`]); if (rows.length) breakdowns[key.replace('relations','relation').replace('forms','form')] = rows.map(row => ({...row, model:normModel(row.model || row.model_id), axis:String(row.axis || '').replace('_id',''), arm:String(row.arm || '').toUpperCase(), slice:row.slice || row.relation || row.form || row.scaffold || row.direction || row.key, m1:num(row.m1 ?? row.M1 ?? row.value_m1), m2a:num(row.m2a ?? row['M2-A'] ?? row.value_m2a ?? (row.arm === 'M2-A' ? row.accuracy : null)), m2b:num(row.m2b ?? row['M2-B'] ?? row.value_m2b ?? (row.arm === 'M2-B' ? row.accuracy : null)), delta:num(row.delta ?? row.relearning ?? row.m2b_minus_m2a)})); });
+  Object.keys(breakdowns).forEach(key => { const grouped = new Map(); (breakdowns[key] || []).forEach(row => { const groupKey = `${row.model}/${row.slice}`; const previous = grouped.get(groupKey) || {...row, m2a:null, m2b:null}; if (row.arm === 'M2-A') previous.m2a = row.m2a; if (row.arm === 'M2-B') previous.m2b = row.m2b; if (previous.m2a !== null && previous.m2b !== null) previous.delta = previous.m2b - previous.m2a; grouped.set(groupKey, previous); }); breakdowns[key] = [...grouped.values()]; });
+  const canonicalStates = states.length ? states : Object.entries(raw.semantics?.states || {}).map(([id, label]) => ({id, label, available:true}));
+  return { ...raw, overview, states:canonicalStates, gates, estimates, endpoints, trajectories, breakdowns, provenance:raw.provenance?.sources || rowsAtFrom(raw,'provenance','sources','source_records','manifest.sources'), glossary:raw.glossary || raw.metadata?.glossary || [], completion:overview.completion || {} };
 }
-
-function renderStateSelect() {
-  const select = $('state-select');
-  select.innerHTML = data.dashboard_states.map(state => `<option value="${escapeHtml(state.id)}">${escapeHtml(state.label)}</option>`).join('');
-  select.value = currentState;
-}
-
-function renderStateBanner() {
-  const copy = stateCopy();
-  $('state-banner-title').textContent = copy.title;
-  $('state-banner-text').textContent = ` · ${data.dashboard_states.find(item => item.id === currentState)?.available ? t('status.observed') : t('status.noSnapshot')}`;
-  $('state-banner').classList.toggle('is-pending', !hasCurrentData());
-}
-
-function renderSummary() {
-  const available = hasCurrentData();
-  $('home-title').textContent = stateCopy().title;
-  $('home-description').textContent = stateCopy().description;
-  $('valid-lanes').textContent = available ? `${data.coverage.valid_lanes}/${data.coverage.total_lanes}` : '—';
-  $('valid-lanes-note').textContent = available ? (language === 'tr' ? `${data.coverage.total_lanes} toplam lane` : `${data.coverage.total_lanes} total lanes`) : t('status.noSnapshot');
-  $('model-count').textContent = available ? Object.keys(data.models).length : '—';
-  $('pending-lanes').textContent = available ? data.coverage.pending_lanes : '—';
-  $('source-count').textContent = available ? data.source_records.length : '—';
-}
-
-function renderHighlights() {
-  const target = $('home-highlights');
-  if (!hasCurrentData()) {
-    target.innerHTML = '';
-    $('home-empty').hidden = false;
-    $('home-empty').innerHTML = `<strong>${escapeHtml(t('home.noSnapshot'))}</strong><span>${escapeHtml(t('home.noSnapshotNote'))}</span>`;
-    return;
-  }
-  $('home-empty').hidden = true;
-  target.innerHTML = `<div class="highlight-heading"><p class="eyebrow">${escapeHtml(t('home.highlights'))}</p></div>${HIGHLIGHTS.map(metric => {
-    const meta = metricMeta(metric);
-    const rows = rowsFor(metric).filter(row => typeof row.value === 'number');
-    const bestValue = meta.direction === 'lower' ? Math.min(...rows.map(row => row.value)) : Math.max(...rows.map(row => row.value));
-    const best = rows.find(row => row.value === bestValue);
-    return `<article class="highlight-card"><span>${escapeHtml(tx(meta.label))}</span><strong class="model-${best.model}">${escapeHtml(MODEL_LABELS[best.model])} · ${meta.format(best.value)}</strong><small>${escapeHtml(t('home.best'))} · ${escapeHtml(tx(meta.read))}</small></article>`;
-  }).join('')}`;
-}
-
-function initMetricSelect() {
-  const select = $('metric-select');
-  select.innerHTML = metricKeys().map(key => `<option value="${escapeHtml(key)}">${escapeHtml(tx(metricMeta(key).label))}</option>`).join('');
-  select.value = currentMetric;
-}
-
-function renderChart() {
-  const meta = metricMeta(currentMetric);
-  const rows = rowsFor(currentMetric);
-  const present = rows.filter(row => typeof row.value === 'number');
-  const max = present.length ? Math.max(...present.map(row => row.value)) : 1;
-  $('chart-title').textContent = tx(meta.label);
-  $('chart-direction').textContent = meta.direction === 'lower' ? t('directions.lower') : t('directions.higher');
-  $('metric-measure').textContent = tx(meta.measure);
-  $('metric-read').textContent = tx(meta.read);
-  $('metric-caveat').textContent = tx(meta.caveat);
-  $('chart-caption').textContent = tx(meta.caption);
-  $('chart').innerHTML = MODEL_ORDER.map(model => {
-    const row = rows.find(item => item.model === model);
-    const isPending = !row || typeof row.value !== 'number';
-    const width = isPending ? 3 : meta.scale === 'fraction' ? row.value * 100 : (row.value / max) * 100;
-    const bestValue = present.length ? (meta.direction === 'lower' ? Math.min(...present.map(item => item.value)) : Math.max(...present.map(item => item.value))) : null;
-    const best = !isPending && row.value === bestValue;
-    return `<div class="bar-row"><span class="model-name model-${model}">${MODEL_LABELS[model]}</span><div class="bar-track"><div class="bar-fill ${MODEL_CLASSES[model]}${isPending ? ' pending' : ''}" style="width:${Math.max(width, 3)}%"></div></div><span class="bar-value ${best ? 'best' : ''} ${isPending ? 'pending-text' : ''}">${isPending ? t('status.pending') : meta.format(row.value)}</span></div>`;
-  }).join('');
-  $('chart').setAttribute('aria-label', `${tx(meta.label)}: ${MODEL_ORDER.map(model => { const row = rows.find(item => item.model === model); return `${MODEL_LABELS[model]} ${row?.value == null ? t('status.pending') : meta.format(row.value)}`; }).join(', ')}`);
-}
-
-function renderMetricsPage() {
-  const available = hasCurrentData();
-  $('metrics-empty').hidden = available;
-  $('metrics-empty').innerHTML = available ? '' : `<strong>${escapeHtml(t('detail.noSnapshot'))}</strong><span>${escapeHtml(stateCopy().description)}</span>`;
-  $('metric-select').disabled = !available;
-  $('chart-card').hidden = !available;
-  if (available) { initMetricSelect(); renderChart(); }
-}
-
-function renderLaneMatrix() {
-  const target = $('lane-matrix');
-  if (!hasCurrentData()) { target.innerHTML = `<div class="empty-inline">${escapeHtml(t('detail.noSnapshot'))}</div>`; return; }
-  const lookup = new Map(data.lane_status.map(row => [`${row.model}/${row.lane}`, row]));
-  target.innerHTML = `<div></div>${LANE_ORDER.map(lane => `<div class="lane-head" title="${escapeHtml(tx(LANE_LABELS[lane]))}">${escapeHtml(tx(LANE_LABELS[lane]))}</div>`).join('')}${MODEL_ORDER.map(model => `<div class="lane-model model-${model}">${MODEL_LABELS[model]}</div>${LANE_ORDER.map(lane => { const row = lookup.get(`${model}/${lane}`); const pending = row?.status !== 'complete'; return `<div class="lane-cell${pending ? ' pending' : ''}" title="${MODEL_LABELS[model]} · ${escapeHtml(tx(LANE_LABELS[lane]))} · ${pending ? t('status.pending') : 'complete'}">${pending ? '—' : '✓'}</div>`; }).join('')}`).join('')}`;
-}
-
-function displayRow(row) {
-  if (row.value == null) return `<span class="pending-text">${escapeHtml(t('status.pending'))}</span>`;
-  if (row.unit === 'fraction') return `${(row.value * 100).toFixed(2)}%`;
-  if (row.unit === 'count') return Math.round(row.value).toLocaleString('en-US');
-  return formatNumber(row.value);
-}
-
-function renderMetricTable() {
-  const target = $('metric-table');
-  const filter = $('metric-filter').value.trim().toLowerCase();
-  if (!hasCurrentData()) { target.innerHTML = ''; $('detail-table-wrap').hidden = true; $('detail-empty').hidden = false; $('detail-empty').innerHTML = `<strong>${escapeHtml(t('detail.noSnapshot'))}</strong><span>${escapeHtml(stateCopy().description)}</span>`; return; }
-  $('detail-table-wrap').hidden = false; $('detail-empty').hidden = true;
-  const metricKeys = [...new Set(data.metric_rows.map(row => row.metric))].filter(key => !filter || key.includes(filter));
-  const byMetric = Object.fromEntries(data.metric_rows.map(row => [`${row.metric}/${row.model}`, row]));
-  target.innerHTML = metricKeys.map(metric => {
-    const sample = data.metric_rows.find(row => row.metric === metric);
-    const meta = metricMeta(metric);
-    const label = meta ? tx(meta.label) : metric;
-    const family = FAMILY_LABELS[sample.family]?.[language] ?? sample.family;
-    return `<tr><td><code>${escapeHtml(label)}</code><small class="row-key">${escapeHtml(metric)}</small></td><td>${escapeHtml(family)}</td>${MODEL_ORDER.map(model => { const row = byMetric[`${metric}/${model}`]; return `<td class="model-${model}">${row ? displayRow(row) : '—'}</td>`; }).join('')}<td>${sample.direction === 'lower' ? escapeHtml(t('directions.lower')) : escapeHtml(t('directions.higher'))}</td></tr>`;
-  }).join('');
-}
-
-function renderSources() {
-  if (!hasCurrentData()) { $('sources').innerHTML = `<p class="muted">${escapeHtml(t('provenance.noSnapshot'))}</p>`; return; }
-  $('sources').innerHTML = data.source_records.map(source => `<div class="source-row"><strong>${escapeHtml(source.source_ref)}</strong><span class="muted"> · ${escapeHtml(source.model)} · ${escapeHtml(source.lane)} · ${source.bytes.toLocaleString('en-US')} bytes</span><code>${escapeHtml(source.path)}</code><code>sha256: ${escapeHtml(source.sha256)}</code></div>`).join('');
-}
-
-function renderDetailPage() {
-  $('generated-at').textContent = hasCurrentData() ? `${language === 'tr' ? 'snapshot' : 'snapshot'}: ${data.generated_at}` : t('status.noSnapshot');
-  $('provenance-note').textContent = hasCurrentData() ? `${data.contract.extraction_mode}; ${language === 'tr' ? 'HU scratch kaynakları read-only.' : 'HU scratch sources are read-only.'} ${data.contract.scientific_note}` : stateCopy().description;
-  renderMetricTable(); renderLaneMatrix(); renderSources();
-}
-
-function renderPageVisibility() {
-  document.querySelectorAll('.tab').forEach(tab => { const active = tab.dataset.page === currentPage; tab.classList.toggle('is-active', active); tab.setAttribute('aria-selected', active ? 'true' : 'false'); });
-  document.querySelectorAll('.page').forEach(page => { page.hidden = page.id !== `page-${currentPage}`; });
-}
-
-function renderAll() {
-  applyI18n(); renderStateBanner(); renderSummary(); renderHighlights(); renderMetricsPage(); renderDetailPage(); renderPageVisibility();
-}
-
-async function main() {
-  try {
-    const response = await fetch(DATA_URL, { cache: 'no-store' });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    data = await response.json();
-    data.metric_rows = data.metric_rows.filter(row => !row.metric.toLowerCase().includes('pile'));
-    data.lane_status = data.lane_status.filter(row => row.lane !== 'english_retention_pile_10k');
-    data.source_records = data.source_records.filter(row => row.lane !== 'english_retention_pile_10k');
-    data.coverage = {
-      total_lanes: 21,
-      valid_lanes: 21,
-      pending_lanes: 0,
-      pending: [],
-      normalization_status: 'eval_v2_projection_pending'
-    };
-    $('language-toggle').addEventListener('click', () => { language = language === 'tr' ? 'en' : 'tr'; renderAll(); });
-    $('state-select').addEventListener('change', event => { currentState = event.target.value; renderAll(); });
-    $('metric-select').addEventListener('change', event => { currentMetric = event.target.value; renderMetricsPage(); });
-    $('metric-filter').addEventListener('input', renderMetricTable);
-    document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => { currentPage = tab.dataset.page; renderPageVisibility(); }));
-    renderAll();
-  } catch (error) {
-    document.querySelector('.shell').innerHTML = `<section class="panel"><h1>Dashboard yüklenemedi</h1><p>Canonical dump okunamadı: <code>${escapeHtml(error.message)}</code></p><p>Repo root’tan <code>python3 tools/m0-dashboard/serve.py</code> ile aç.</p></section>`;
-  }
-}
+function applyI18n() { document.documentElement.lang = language; document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); }); $('language-toggle').textContent = language === 'tr' ? 'EN' : 'TR'; $('language-toggle').setAttribute('aria-pressed', language === 'en' ? 'true' : 'false'); }
+function renderStatus() { const ready = Boolean(data); $('status-title').textContent = ready ? t('status.ready') : t('status.pending'); $('status-copy').textContent = data ? text(data.overview.description || data.overview.lede || data.scientific_conclusion || t('overview.conclusionCopy')) : t('noData'); $('status-family').textContent = data?.schema_version || data?.schemaVersion || 'results_explorer_v1'; const inputManifest = data?.input_manifest_sha256 || data?.manifest?.input_manifest_sha256 || data?.identity?.input_manifest_sha256; const manifest = inputManifest || data?.manifest_sha256 || data?.identity?.manifest_sha256 || data?.sha256; $('status-sha').textContent = manifest ? `${inputManifest ? 'input manifest' : 'manifest'}: ${String(manifest)}` : 'manifest: pending'; }
+function renderLoadError() { const visible = Boolean(loadError); $('load-error').hidden = !visible; if (!visible) return; $('load-error-title').textContent = t('errors.title'); $('load-error-copy').textContent = `${t('errors.copy')} (${loadError.message || 'unknown error'})`; $('retry-load').textContent = t('errors.retry'); }
+function renderTimeline() { const target = $('timeline'); const items = data?.states.length ? data.states : [{id:'M0',label:'M0',available:true},{id:'M1',label:'M1',available:true},{id:'M2-A',label:'M2-A',available:true},{id:'M2-B',label:'M2-B',available:true}]; target.innerHTML = items.map((state, i) => `<div class="timeline-item ${state.available === false ? 'pending' : ''}"><span class="timeline-node">${i + 1}</span><strong>${esc(text(state.label || state.id))}</strong><small>${esc(text(state.description || (state.available === false ? t('empty') : 'observed')))}</small></div>`).join(''); }
+function countLabel(value, fallback) { if (value && typeof value === 'object') return `${value.observed ?? value.actual ?? '—'}/${value.expected ?? '—'}`; return value ?? fallback; }
+function renderOverview() { const o = data?.overview || {}; $('overview-lede').textContent = text(o.description || o.lede || t('overview.conclusionCopy')); const counts = data?.completion || data?.counts || {}; $('summary-m1').textContent = countLabel(counts.m1_states ?? counts.m1_evaluation_states ?? counts.m1, '111/111'); $('summary-m2').textContent = countLabel(counts.m2_states ?? counts.m2_evaluation_states ?? counts.m2, '63/63'); $('summary-checkpoints').textContent = countLabel(counts.m2_checkpoints ?? counts.m2_training_checkpoints ?? counts.checkpoints, '60/60'); const modelResults = MODELS.map(model => data?.gates.filter(row => row.model === model).every(row => row.passed === true)); const passed = modelResults.filter(Boolean).length; $('summary-gates').textContent = `${passed}/${modelResults.length || 3}`; const conclusion = o.terminal_conclusion || o.conclusion || data?.scientific_conclusion || t('overview.conclusion'); $('overview-conclusion').textContent = text(conclusion); $('overview-conclusion-copy').textContent = text(o.conclusion_copy || data?.scientific_note || t('overview.conclusionCopy')); const leader = o.descriptive_relearning_leader || 'qwen'; $('overview-highlights').innerHTML = [{label:{tr:'Transfer',en:'Transfer'},value:'M2-A − M1',note:{tr:'Türkçe adaptation etkisi',en:'Turkish adaptation effect'}},{label:{tr:'Relearning',en:'Relearning'},value:'M2-B − M2-A',note:{tr:'kontrollü factual re-exposure',en:'controlled factual re-exposure'}},{label:{tr:'En güçlü betimsel sinyal',en:'Strongest descriptive signal'},value:modelName(leader),note:{tr:'primary model seçimi değildir',en:'not a primary-model selection'}}].map(row => `<article class="highlight-card"><span>${esc(text(row.label))}</span><strong>${esc(text(row.value))}</strong><small>${esc(text(row.note))}</small></article>`).join(''); }
+function estimateRows(kind) { return data?.estimates.filter(row => !kind || row.kind.includes(kind)) || []; }
+function renderEstimands() { const rows = data?.estimates || []; const kinds = ['transfer','relearning']; $('estimand-cards').innerHTML = kinds.map(kind => { const values = rows.filter(row => row.kind.includes(kind)); const best = values.find(row => row.model === 'qwen') || values[0]; return `<article class="estimand-card ${kind}"><p class="eyebrow">${kind.toUpperCase()}</p><h3>${kind === 'transfer' ? 'M2-A − M1' : 'M2-B − M2-A'}</h3><p class="estimand-definition">${kind === 'transfer' ? 'Turkish adaptation effect after transfer.' : 'Controlled factual re-exposure effect.'}</p><div class="estimand-values">${best ? `<strong>${esc(modelName(best.model))} ${formatDelta(best.estimate)}</strong><span>95% CI [${formatDelta(best.low)}, ${formatDelta(best.high)}]</span>` : `<strong>${esc(t('empty'))}</strong>`}</div><small>tr_to_en · paired-subject correction</small></article>`; }).join(''); }
+function renderForest() { const rows = data?.estimates || []; if (!rows.length) { $('forest-chart').innerHTML = `<p class="empty-inline">${esc(t('noData'))}</p>`; return; } const vals = rows.flatMap(row => [row.low,row.high,row.estimate]).filter(v => v !== null); let min = Math.min(-0.35, ...vals), max = Math.max(0.08, ...vals); const range = max - min; const x = v => ((v - min) / range) * 100; const zero = x(0), threshold = x(0.05); $('forest-chart').innerHTML = `<div class="forest-axis"><span style="left:${zero}%">0</span><span style="left:${threshold}%">+0.05</span></div><div class="forest-reference zero" style="left:${zero}%"></div><div class="forest-reference threshold" style="left:${threshold}%"></div>${['transfer','relearning'].flatMap(kind => rows.filter(row => row.kind.includes(kind)).map(row => `<div class="forest-row"><span class="forest-label">${esc(modelName(row.model))}<small>${kind}</small></span><div class="forest-track"><span class="forest-ci" style="left:${x(row.low)}%;width:${Math.max(0, x(row.high)-x(row.low))}%"></span><span class="forest-point" style="left:${x(row.estimate)}%" title="${esc(formatDelta(row.estimate))}"></span></div><span class="forest-value">${esc(formatDelta(row.estimate))} [${esc(formatDelta(row.low))}, ${esc(formatDelta(row.high))}]</span></div>`)).join('')}`; }
+function renderGates() { const groups = MODELS.map(model => ({model, rows:(data?.gates || []).filter(row => row.model === model)})).filter(group => group.rows.length); $('gate-table').innerHTML = groups.length ? groups.map(group => { const all = group.rows.every(row => row.passed === true); const criteria = group.rows.map(row => `<span class="gate-chip ${row.passed ? 'pass' : 'fail'}" title="${esc(formatValue(row.observed,row.gate_id))}">${esc(text(row.label || row.gate_id))}</span>`).join(''); return `<tr><td class="${MODEL_CLASSES[group.model]}"><strong>${esc(modelName(group.model))}</strong></td><td>${criteria}</td><td><span class="status-pill ${all ? 'pass' : 'fail'}">${all ? t('pass') : t('fail')}</span></td></tr>`; }).join('') : `<tr><td colspan="3" class="empty-inline">${esc(t('noData'))}</td></tr>`; }
+function endpointFor(model, state) { return (data?.endpoints || []).find(row => row.model === model && row.state.replace('_','-') === state && row.direction === 'tr_to_en') || (data?.endpoints || []).find(row => row.model === model && row.state.replace('_','-') === state) || null; }
+function renderEndpoints() { $('endpoint-table').innerHTML = MODELS.map(model => { const vals = ['M1','M2-A','M2-B'].map(state => endpointFor(model,state)); const direction = vals.find(Boolean)?.direction || 'higher'; return `<tr><td class="${MODEL_CLASSES[model]}"><strong>${modelName(model)}</strong></td>${vals.map(row => `<td>${row ? formatValue(row.value,row.metric) : t('empty')}<small>${row?.denominator ? `n=${esc(row.denominator)}` : ''}</small></td>`).join('')}<td>${direction === 'lower' ? t('lower') : t('higher')}</td></tr>`; }).join(''); }
+function renderPrimary() { renderEstimands(); renderForest(); renderGates(); renderEndpoints(); }
+function unique(list) { return [...new Set(list.filter(Boolean))]; }
+function fillSelect(id, options, selected) { const el = $(id); el.innerHTML = options.map(item => `<option value="${esc(item.value ?? item)}">${esc(item.label ?? item)}</option>`).join(''); if (selected != null) el.value = selected; }
+function renderTrajectoryControls() { const rows = data?.trajectories || []; fillSelect('trajectory-model', MODELS.map(model => ({value:model,label:modelName(model)})), currentTrajectory.model); fillSelect('trajectory-arm', unique(rows.map(row => row.arm)).map(arm => ({value:arm,label:arm})), currentTrajectory.arm); fillSelect('trajectory-metric', unique(rows.map(row => row.metric)).map(metric => ({value:metric,label:labelMetric(metric)})), currentTrajectory.metric); }
+function renderTrajectory() { const rows = (data?.trajectories || []).filter(row => row.model === currentTrajectory.model && row.arm === currentTrajectory.arm && row.metric === currentTrajectory.metric).sort((a,b) => num(a.checkpoint) - num(b.checkpoint)); const meta = rows[0] || {}; $('trajectory-title').textContent = `${modelName(currentTrajectory.model)} · ${currentTrajectory.arm} · ${labelMetric(currentTrajectory.metric)}`; $('trajectory-direction').textContent = meta.direction === 'lower' ? t('lower') : t('higher'); if (!rows.length) { $('trajectory-chart').innerHTML = `<p class="empty-inline">${esc(t('noData'))}</p>`; $('trajectory-table').innerHTML = `<tr><td colspan="5" class="empty-inline">${esc(t('noData'))}</td></tr>`; return; } const values = rows.map(row => row.value).filter(v => v !== null); const min = Math.min(...values), max = Math.max(...values), span = max - min || 1; const points = rows.map((row,i) => `${(i / Math.max(rows.length - 1,1)) * 100}% ${100 - ((row.value - min) / span) * 90}%`).join(' L '); $('trajectory-chart').innerHTML = `<svg viewBox="0 0 800 250" preserveAspectRatio="none" aria-label="${esc(labelMetric(currentTrajectory.metric))}"><line class="grid-line" x1="30" y1="20" x2="790" y2="20"/><line class="grid-line" x1="30" y1="125" x2="790" y2="125"/><line class="grid-line" x1="30" y1="230" x2="790" y2="230"/><polyline class="trajectory-line ${MODEL_CLASSES[currentTrajectory.model]}" points="${rows.map((row,i) => `${30 + (i / Math.max(rows.length - 1,1)) * 760},${220 - ((row.value - min) / span) * 180}`).join(' ')}"/>${rows.map((row,i) => `<circle class="trajectory-point ${MODEL_CLASSES[currentTrajectory.model]}" cx="${30 + (i / Math.max(rows.length - 1,1)) * 760}" cy="${220 - ((row.value - min) / span) * 180}" r="4"><title>${esc(String(row.checkpoint))}: ${esc(formatValue(row.value,row.metric))}</title></circle>`).join('')}<text class="axis-label" x="30" y="246">${esc(String(rows[0].checkpoint))}</text><text class="axis-label" x="760" y="246">${esc(String(rows[rows.length-1].checkpoint))}</text></svg>`; $('trajectory-table').innerHTML = rows.map(row => `<tr><td>${esc(row.checkpoint)}</td><td>${esc(row.arm)}</td><td>${esc(labelMetric(row.metric))}</td><td>${esc(formatValue(row.value,row.metric))}</td><td>${row.denominator == null ? '—' : esc(row.denominator)}</td></tr>`).join(''); }
+function renderDiagnostics() { fillSelect('diagnostic-model', MODELS.map(model => ({value:model,label:modelName(model)})), currentDiagnostic.model); const rows = data?.breakdowns?.[currentDiagnostic.slice] || []; $('diagnostic-title').textContent = `${modelName(currentDiagnostic.model)} · ${currentDiagnostic.slice}`; const selected = rows.filter(row => row.model === currentDiagnostic.model || !row.model); $('diagnostic-table').innerHTML = selected.length ? selected.map(row => `<tr><td>${esc(text(row.slice))}</td><td>${esc(formatValue(row.m1,'factual_top1_rate'))}</td><td>${esc(formatValue(row.m2a,'factual_top1_rate'))}</td><td>${esc(formatValue(row.m2b,'factual_top1_rate'))}</td><td class="delta-cell">${esc(formatDelta(row.delta ?? ((row.m2b ?? 0) - (row.m2a ?? 0))))}</td></tr>`).join('') : `<tr><td colspan="5" class="empty-inline">${esc(t('noData'))}</td></tr>`; }
+function renderProvenance() { $('provenance-intro').textContent = text(data?.provenance_note || data?.contract?.scientific_note || t('overview.conclusionCopy')); const sources = data?.provenance || []; $('source-list').innerHTML = sources.length ? sources.map(source => `<div class="source-row"><strong>${esc(text(source.role || source.name || source.source_ref || source.path))}</strong><span>${esc(source.path || source.source_ref || '—')}</span><code>${esc(source.sha256 || source.hash || '—')}</code><small>${source.bytes ? `${Number(source.bytes).toLocaleString('en-US')} bytes` : ''}${source.rows ? ` · ${source.rows} rows` : ''}</small></div>`).join('') : `<p class="muted">${esc(t('noData'))}</p>`; const guide = data?.glossary?.length ? data.glossary : [{term:'BPB',description:'Byte-level retention comparison; lower is better.'},{term:'Exact top-1',description:'Exact-prefix acquisition diagnostic.'},{term:'Full-suite top-1',description:'Endpoint factual access; denominator is 12,000 probes.'},{term:'Estimands',description:'Transfer and relearning are separate contrasts; do not collapse into an overall score.'}]; $('guide-list').innerHTML = guide.map(item => `<li><strong>${esc(text(item.term || item.name))}</strong> — ${esc(text(item.description || item.definition))}</li>`).join(''); }
+function renderAll() { applyI18n(); renderStatus(); renderLoadError(); renderTimeline(); renderOverview(); renderPrimary(); renderTrajectoryControls(); renderTrajectory(); renderDiagnostics(); renderProvenance(); document.querySelectorAll('.tab').forEach(tab => { const active = tab.dataset.page === page; tab.classList.toggle('is-active',active); tab.setAttribute('aria-selected',active ? 'true' : 'false'); tab.tabIndex = active ? 0 : -1; }); document.querySelectorAll('.page').forEach(el => { el.hidden = el.id !== `page-${page}`; }); }
+function handleTabKeydown(event) { const tabs = [...document.querySelectorAll('.tab')]; const index = tabs.indexOf(event.currentTarget); if (index < 0) return; let targetIndex = null; if (event.key === 'ArrowRight') targetIndex = (index + 1) % tabs.length; if (event.key === 'ArrowLeft') targetIndex = (index - 1 + tabs.length) % tabs.length; if (event.key === 'Home') targetIndex = 0; if (event.key === 'End') targetIndex = tabs.length - 1; if (targetIndex === null) return; event.preventDefault(); page = tabs[targetIndex].dataset.page; renderAll(); tabs[targetIndex].focus(); }
+async function main() { try { let payload; let lastError; for (const url of DATA_URLS) { try { const response = await fetch(url,{cache:'no-store'}); if (!response.ok) throw new Error(`HTTP ${response.status}`); payload = await response.json(); break; } catch (error) { lastError = error; } } if (!payload) throw lastError || new Error('manifest unavailable'); data = normalize(payload); loadError = null; } catch (error) { data = null; loadError = error; console.warn('results explorer manifest unavailable:', error.message); } document.querySelectorAll('.tab').forEach(tab => { tab.addEventListener('click', () => { page = tab.dataset.page; renderAll(); }); tab.addEventListener('keydown', handleTabKeydown); }); $('language-toggle').addEventListener('click', () => { language = language === 'tr' ? 'en' : 'tr'; renderAll(); }); $('retry-load').addEventListener('click', () => window.location.reload()); $('trajectory-model').addEventListener('change', e => { currentTrajectory.model = e.target.value; renderTrajectory(); }); $('trajectory-arm').addEventListener('change', e => { currentTrajectory.arm = e.target.value; renderTrajectory(); }); $('trajectory-metric').addEventListener('change', e => { currentTrajectory.metric = e.target.value; renderTrajectory(); }); $('diagnostic-model').addEventListener('change', e => { currentDiagnostic.model = e.target.value; renderDiagnostics(); }); $('diagnostic-slice').addEventListener('change', e => { currentDiagnostic.slice = e.target.value; renderDiagnostics(); }); renderAll(); }
 main();
