@@ -22,6 +22,12 @@ the master synthesis, the long timeline, or a previous chat transcript.
   `documentation/records/evaluation/M2_EVAL_BOOTSTRAP_CORRECTION_EXECUTION_RESULT_2026-09-05.md`
   for the correction audit. No GPU/evaluation rerun is needed or authorized.
 
+- **Current reporting plan:** extend the existing dependency-free `tools/m0-dashboard/` site with
+  the compact M0/M1/M2 result layers, corrected contrast intervals, trajectories, diagnostic
+  breakdowns and thesis exports. The implementation-ready boundary is recorded in
+  `documentation/records/evaluation/M2_RESULTS_WEBSITE_AND_THESIS_REPORTING_PLAN_2026-09-05.md`;
+  it requires no HU, GPU, model load or new evaluation.
+
 - active evaluation protocol: eval-v2;
 - Pile-10k: retired from canonical evaluation;
 - M0: closed with 21/21 active lanes, 3/3 exact-prefix and 42 v1f normalized observations;

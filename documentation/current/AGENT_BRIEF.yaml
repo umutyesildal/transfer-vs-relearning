@@ -5,7 +5,7 @@ status: active
 
 source:
   full_state: documentation/current/PROJECT_STATE.yaml
-  full_state_sha256: 95ba921859a6a62913cebf257e8902687aee3f52a9b58930cc2fd92b0ecc3a28
+  full_state_sha256: 4d0c4de54173027071abd85ee8428166f71d22948905ea900d16d5506091d9ae
   role: context_projection_only
   may_expand_authority: false
 
@@ -186,6 +186,7 @@ m1:
 
 next_boundary:
   subject: m2_terminal_interpretation_and_thesis_reporting
+  reporting_plan: documentation/records/evaluation/M2_RESULTS_WEBSITE_AND_THESIS_REPORTING_PLAN_2026-09-05.md
   recovery_status: complete_63_of_63_no_missing_or_failed_tasks
   recovery_result: documentation/records/evaluation/M2_EVAL_RECOVERY_V1A_TERMINAL_RESULT_2026-09-05.md
   qualification_status: v1a_consumed_pass_job_484043_no_model_load

@@ -2191,6 +2191,8 @@ m2_evaluation_current:
   analysis_correction_source_inputs_unchanged: true
   analysis_correction_gpu_used: false
   analysis_correction_model_load_or_inference: false
+  results_website_plan: documentation/records/evaluation/M2_RESULTS_WEBSITE_AND_THESIS_REPORTING_PLAN_2026-09-05.md
+  results_website_plan_status: implementation_ready_local_no_hu_or_new_scientific_run
   recovery_preparation_record: documentation/records/evaluation/M2_EVAL_RECOVERY_PREPARATION_2026-09-04.md
   recovery_tests: 63_passed_offline
   source_inventory_sha256: bc930b814634530538c7ec4cb3642ffe1d5eed10e3d6ebe150bc75d3e8ec4839
