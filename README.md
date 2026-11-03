@@ -35,6 +35,10 @@ Read the concise live state in
 [`documentation/current/STATUS.md`](documentation/current/STATUS.md). The machine-readable state
 is [`documentation/current/PROJECT_STATE.yaml`](documentation/current/PROJECT_STATE.yaml).
 
+## Thesis paper
+
+The paper is written in LaTeX under [`paper/transfer_or_relearning_wip/`](paper/transfer_or_relearning_wip/). Build instructions and sources are in that folder. It is work in progress and does not yet report M1 or M2 results.
+
 ## Start here
 
 For a human:
@@ -75,7 +79,7 @@ external execution additionally requires the full `PROJECT_STATE.yaml` and exact
 | `artifacts/evaluations/m0_three_model_v1/dump/` | Git-sized M0 metric dump with source hashes |
 | `tools/m0-dashboard/` | Dependency-free local M0–M2 bilingual evaluation explorer |
 | `artifacts/` and `runs/` | Local/generated scientific artifacts; generally not Git data |
-| `paper/`, `papers/`, `study-notes/` | Thesis sources, reference notes, and learning material |
+| `paper/`, `papers/`, `study-notes/` | Thesis sources, reference notes, and learning material. Code is MIT, thesis text is separate |
 | `presentations/`, `reports/` | Authored and legacy presentation/report material |
 | `.agents/` | Optional bounded Sol/Luna orchestration layer |
 | `ssh-client/` | HU connection helpers and operational instructions |
